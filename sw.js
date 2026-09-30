@@ -1,6 +1,6 @@
 // Efuture Games - service worker: tiene i giochi sul telefono per giocare anche con poca rete.
 // Quando aggiorni l'app, cambia il numero di versione qui sotto.
-const CACHE = 'efuture-games-v4';
+const CACHE = 'efuture-games-v5';
 const ASSETS = [
   "./",
   "config.js",
@@ -58,6 +58,13 @@ const ASSETS = [
   "hub.js",
   "backend.js",
   "classifica.html",
+  "qr/qr-app.png",
+  "fonts/poppins-latin-600-normal.woff2",
+  "fonts/poppins-latin-400-normal.woff2",
+  "fonts/poppins-latin-300-normal.woff2",
+  "fonts/montserrat-latin-800-normal.woff2",
+  "fonts/montserrat-latin-700-normal.woff2",
+  "fonts/montserrat-latin-500-normal.woff2",
   "icons/apple-touch-icon.png",
   "icons/favicon.png",
   "icons/icon-192.png",
