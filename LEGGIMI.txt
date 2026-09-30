@@ -44,6 +44,21 @@ CODICI DI SBLOCCO (uno per gioco)
      aperta: per la classifica comune serve Supabase (punto 2).
 
 
+2c) PANNELLO ADMIN
+   https://marraliefuture.github.io/efuture_games/admin.html
+   Si entra con la chiave admin (non è nel sito: è salvata cifrata nel
+   database). Dal pannello:
+   - Giocatori: elenco con email, cellulare, punti per gioco; CSV.
+   - Registro: registrazioni, accessi, partite e operazioni admin; CSV.
+   - Backup: crea e scarica una copia (JSON), ripristina una copia.
+   - Reset: azzera i punti (i giocatori restano) o cancella tutto.
+     Prima di ogni reset viene fatto un backup automatico.
+   - Chiave: cambia la chiave admin.
+   Se perdi la chiave: Supabase > SQL Editor >
+     select efg_admin_init('NUOVA-CHIAVE-LUNGA');
+   Dopo 8 chiavi sbagliate in 10 minuti il pannello si blocca 10 minuti.
+
+
 3) COME FUNZIONA
    - Prima pagina: 4 blocchi, uno per gioco. I giochi bloccati mostrano 🔒.
    - Toccando un gioco bloccato: inquadra il QR allo stand oppure

@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Admin · Efuture Games</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#141d28">
+<meta name="color-scheme" content="light">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<style>
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/montserrat-latin-700-normal.woff2) format('woff2');}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:800;font-display:swap;src:url(fonts/montserrat-latin-800-normal.woff2) format('woff2');}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:300;font-display:swap;src:url(fonts/poppins-latin-300-normal.woff2) format('woff2');}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format('woff2');}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format('woff2');}
+/* Pannello di amministrazione nello stile efuture.it: barra scura, titoli Montserrat con parola azzurra, schede bianche */
+:root{
+  color-scheme:light;
+  --ink:#141d28; --text:#233142; --muted:#5c6f87; --navy:#002238; --sky:#8ad0ff;
+  --orange:#ff6d00; --brand-orange:#f18c22; --danger:#d93636; --ok:#1f9d57;
+  --bg:#f8f8f9; --card:#fff; --line:#e6eaef; --row:#f3f5f8;
+  --title:'Montserrat',system-ui,sans-serif; --body:'Poppins',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text)}
+body{font-family:var(--body);font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+[hidden]{display:none!important}
+button,input,select{font:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.topbar{background:var(--ink);color:#fff;font-size:12px;text-align:center;padding:calc(7px + env(safe-area-inset-top,0px)) 16px 7px}
+.topbar b{font-weight:600}
+header{background:#fff;display:flex;align-items:center;gap:24px;padding:14px clamp(16px,3vw,40px);flex-wrap:wrap;box-shadow:0 2px 14px rgba(20,29,40,.06)}
+.brand{height:36px;width:auto;display:block}
+.special{border-left:3px solid var(--sky);padding-left:16px}
+h1{font-family:var(--title);font-weight:700;font-size:clamp(20px,2vw,30px);letter-spacing:-1px;margin:0;color:var(--ink)}
+h2{font-family:var(--title);font-weight:700;font-size:18px;letter-spacing:-.5px;margin:0;color:var(--ink)}
+mark{background:none;color:var(--sky);padding:0}
+.label{font-size:12px;font-weight:300;letter-spacing:.6px;color:var(--muted);margin-top:2px}
+.hright{margin-left:auto;display:flex;gap:10px;align-items:center}
+.btn{background:var(--orange);color:#fff;border:0;border-radius:3px;padding:9px 14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn:hover{filter:brightness(.95)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.navy{background:var(--navy)}
+.btn.danger{background:var(--danger)}
+main{flex:1;width:100%;max-width:1200px;margin:0 auto;padding:20px clamp(16px,3vw,40px) 40px;display:flex;flex-direction:column;gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 30px rgba(20,29,40,.06);padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.login{max-width:420px;margin:40px auto 0;width:100%}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;color:var(--muted);font-weight:600}
+input[type=text],input[type=password],select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#fff;color:var(--ink);font-size:15px}
+.msg{font-size:13px;min-height:1.2em;color:var(--muted)}
+.msg.err{color:var(--danger)} .msg.ok{color:var(--ok)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:var(--navy);color:#fff;border-radius:6px;padding:14px 16px}
+.stat b{font-family:var(--title);font-weight:800;font-size:26px;display:block;line-height:1.1}
+.stat span{font-size:12px;font-weight:300;color:#b7c7d8}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px;cursor:pointer;color:var(--muted);font-weight:600}
+.tab.on{color:var(--ink);border-bottom-color:var(--sky)}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.bar .grow{flex:1}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:4px;max-height:65vh}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{position:sticky;top:0;background:var(--row);font-weight:600;color:var(--ink);white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+td.small{font-size:12px;color:var(--muted)}
+tr:hover td{background:#fbfcfd}
+.tag{display:inline-block;border-radius:3px;padding:2px 7px;font-size:11px;font-weight:600;background:#e3f3ff;color:var(--navy);white-space:nowrap}
+.tag.admin{background:#ffe7d4;color:#8a3a00}
+.tag.err{background:#fde2e2;color:#8a1c1c}
+.danger-box{border:1px solid #f3c2c2;background:#fff7f7;border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.danger-box h3{margin:0;font-family:var(--title);font-size:15px;color:var(--danger)}
+p{margin:0;line-height:1.55}
+.dim{color:var(--muted);font-size:13px}
+code{background:var(--row);padding:1px 5px;border-radius:3px}
+@media (max-width:600px){ .hright{margin-left:0;width:100%} }
+</style>
+</head>
+<body>
+<div class="topbar"><b>Efuture Games</b> · pannello di amministrazione</div>
+<header>
+  <img class="brand" src="img/efuture-logo.png" alt="efuture">
+  <div class="special"><h1><mark>Admin</mark> Efuture Games</h1><div class="label">CARE Conference Edition · classifica, backup e registro</div></div>
+  <div class="hright" id="hRight" hidden>
+    <a class="btn ghost" href="classifica.html" target="_blank" rel="noopener" style="text-decoration:none">Classifica ↗</a>
+    <button class="btn ghost" id="btnOut" type="button">Esci</button>
+  </div>
+</header>
+
+<main>
+  <!-- login -->
+  <form class="card login" id="fLogin" autocomplete="off">
+    <h2><mark>Accesso</mark> amministratore</h2>
+    <p class="dim">Inserisci la chiave admin. Resta memorizzata solo finché tieni aperta questa scheda.</p>
+    <div class="field"><label for="key">Chiave admin</label><input id="key" type="password" autocomplete="current-password" required></div>
+    <button class="btn" type="submit">Entra</button>
+    <div class="msg" id="lMsg" aria-live="polite"></div>
+  </form>
+
+  <!-- dashboard -->
+  <div id="dash" hidden style="display:flex;flex-direction:column;gap:18px">
+    <div class="stats" id="stats"></div>
+    <div class="card">
+      <div class="tabs" role="tablist">
+        <button class="tab on" data-tab="players" type="button">Giocatori</button>
+        <button class="tab" data-tab="log" type="button">Registro</button>
+        <button class="tab" data-tab="backup" type="button">Backup</button>
+        <button class="tab" data-tab="reset" type="button">Reset</button>
+        <button class="tab" data-tab="key" type="button">Chiave</button>
+      </div>
+
+      <section data-pane="players">
+        <div class="bar"><span class="grow dim" id="pInfo"></span>
+          <button class="btn ghost" id="pReload" type="button">Aggiorna</button>
+          <button class="btn navy" id="pCsv" type="button">Scarica CSV</button></div>
+        <div class="tablewrap" style="margin-top:10px"><table id="pTable"></table></div>
+      </section>
+
+      <section data-pane="log" hidden>
+        <div class="bar">
+          <select id="lKind" style="max-width:220px">
+            <option value="">Tutti gli eventi</option>
+            <option value="partita">Partite</option>
+            <option value="registrazione">Registrazioni</option>
+            <option value="accesso">Accessi giocatori</option>
+            <option value="admin">Operazioni admin</option>
+          </select>
+          <select id="lLimit" style="max-width:140px"><option>100</option><option selected>300</option><option>1000</option><option>2000</option></select>
+          <label class="dim" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="lAuto"> aggiorna ogni 15 s</label>
+          <span class="grow"></span>
+          <button class="btn ghost" id="lReload" type="button">Aggiorna</button>
+          <button class="btn navy" id="lCsv" type="button">Scarica CSV</button>
+        </div>
+        <div class="tablewrap" style="margin-top:10px"><table id="lTable"></table></div>
+      </section>
+
+      <section data-pane="backup" hidden>
+        <div class="bar">
+          <input type="text" id="bNote" placeholder="Nota (facoltativa), es. fine giornata 1" style="max-width:360px">
+          <button class="btn" id="bMake" type="button">Crea backup e scarica</button>
+          <span class="grow"></span>
+          <button class="btn ghost" id="bReload" type="button">Aggiorna</button>
+        </div>
+        <p class="dim" style="margin-top:8px">Ogni backup resta salvato nel database e viene scaricato anche sul tuo computer (file JSON). Prima di ogni reset o ripristino viene fatto un backup automatico.</p>
+        <div class="msg" id="bMsg" aria-live="polite"></div>
+        <div class="tablewrap"><table id="bTable"></table></div>
+      </section>
+
+      <section data-pane="reset" hidden>
+        <p class="dim">Prima di azzerare viene creato un backup automatico, che puoi ripristinare dalla scheda Backup.</p>
+        <div class="danger-box">
+          <h3>Azzera i punti di tutti</h3>
+          <p>Cancella tutti i punteggi e i livelli. I giocatori restano registrati e possono rigiocare subito.</p>
+          <div class="bar"><input type="text" id="rConf1" placeholder="Scrivi AZZERA per confermare" style="max-width:260px"><button class="btn danger" id="rScores" type="button">Azzera i punti</button></div>
+        </div>
+        <div class="danger-box" style="margin-top:12px">
+          <h3>Cancella tutto</h3>
+          <p>Cancella punteggi <b>e giocatori registrati</b> (nomi, email, cellulari). Tutti dovranno registrarsi di nuovo.</p>
+          <div class="bar"><input type="text" id="rConf2" placeholder="Scrivi CANCELLA TUTTO per confermare" style="max-width:300px"><button class="btn danger" id="rAll" type="button">Cancella tutto</button></div>
+        </div>
+        <div class="msg" id="rMsg" aria-live="polite" style="margin-top:10px"></div>
+      </section>
+
+      <section data-pane="key" hidden>
+        <form id="fKey" class="bar" autocomplete="off" style="align-items:flex-end">
+          <div class="field" style="flex:1;min-width:220px"><label for="kNew">Nuova chiave admin (almeno 10 caratteri)</label><input id="kNew" type="password" autocomplete="new-password"></div>
+          <div class="field" style="flex:1;min-width:220px"><label for="kNew2">Ripeti la nuova chiave</label><input id="kNew2" type="password" autocomplete="new-password"></div>
+          <button class="btn" type="submit">Cambia chiave</button>
+        </form>
+        <div class="msg" id="kMsg" aria-live="polite"></div>
+      </section>
+    </div>
+  </div>
+
+  <p class="dim" id="noRemote" hidden>Il database online non è configurato in <code>config.js</code>: il pannello admin funziona solo con Supabase.</p>
+</main>
+
+<script src="config.js?v=11"></script>
+<script src="vendor/supabase.js"></script>
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const CFG = window.EFG_CONFIG || {};
+if (!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY && window.supabase)){ $('noRemote').hidden = false; $('fLogin').hidden = true; return; }
+const sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, { auth:{ persistSession:false } });
+const GAMES = { sysadmin:'SysAdmin', coretech:'CoreTech', timenet:'Timenet', inncloud:'Inncloud' };
+const ss = { get(){ try { return sessionStorage.getItem('efgAdminKey') || ''; } catch(e){ return ''; } }, set(v){ try { v ? sessionStorage.setItem('efgAdminKey', v) : sessionStorage.removeItem('efgAdminKey'); } catch(e){} } };
+let KEY = ss.get();
+
+function setMsg(el, t, kind){ el.textContent = t; el.className = 'msg' + (kind ? ' ' + kind : ''); }
+const fmtDate = d => d ? new Date(d).toLocaleString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' }) : '';
+const stamp = () => new Date().toISOString().slice(0,16).replace(/[-:T]/g, '').replace(/^(\d{8})(\d{4})$/, '$1-$2');
+async function call(fn, args){
+  const { data, error } = await sb.rpc(fn, Object.assign({ p_key:KEY }, args || {}));
+  if (error) throw new Error(/fetch|network/i.test(error.message) ? 'nessuna connessione con il database' : error.message);
+  if (data && !Array.isArray(data) && data.errore){ const e = new Error(data.errore); e.auth = /chiave|tentativi/.test(data.errore); throw e; }
+  return data;
+}
+function download(name, text, type){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: type || 'application/octet-stream' }));
+  a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+const csvCell = v => { v = v === null || v === undefined ? '' : String(v); return /[";\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+const toCsv = (head, rows) => '﻿' + [head, ...rows].map(r => r.map(csvCell).join(';')).join('\r\n');   // ; e BOM: si apre bene in Excel italiano
+function fillTable(tbl, head, rows, cls){
+  tbl.innerHTML = '';
+  const tr = document.createElement('tr'); head.forEach(h => { const th = document.createElement('th'); th.textContent = h; tr.appendChild(th); });
+  const thead = document.createElement('thead'); thead.appendChild(tr); tbl.appendChild(thead);
+  const tb = document.createElement('tbody');
+  if (!rows.length){ const r = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = head.length; td.className = 'small'; td.textContent = 'Nessun dato.'; r.appendChild(td); tb.appendChild(r); }
+  rows.forEach(cells => {
+    const r = document.createElement('tr');
+    cells.forEach((c, i) => { const td = document.createElement('td'); if (cls && cls[i]) td.className = cls[i];
+      if (c instanceof Node) td.appendChild(c); else td.textContent = c === null || c === undefined ? '' : c; r.appendChild(td); });
+    tb.appendChild(r);
+  });
+  tbl.appendChild(tb);
+}
+function onErr(err, msgEl){ if (err.auth){ logout(err.message); return; } setMsg(msgEl, 'Errore: ' + err.message, 'err'); }
+
+/* ---------- login ---------- */
+async function enter(){
+  const st = await call('efg_admin_login');
+  $('fLogin').hidden = true; $('dash').hidden = false; $('hRight').hidden = false;
+  renderStats(st); loadPlayers();
+}
+function renderStats(st){
+  const items = [['giocatori','Giocatori registrati'], ['punteggi','Record salvati'], ['eventi','Eventi nel registro'], ['backup','Backup salvati']];
+  $('stats').innerHTML = '';
+  for (const [k, label] of items){ const d = document.createElement('div'); d.className = 'stat'; d.innerHTML = '<b></b><span></span>'; d.querySelector('b').textContent = st[k] ?? 0; d.querySelector('span').textContent = label; $('stats').appendChild(d); }
+  const d = document.createElement('div'); d.className = 'stat'; d.innerHTML = '<b style="font-size:15px;padding:6px 0"></b><span>Ultimo backup</span>'; d.querySelector('b').textContent = st.ultimo_backup ? fmtDate(st.ultimo_backup) : 'mai'; $('stats').appendChild(d);
+}
+async function refreshStats(){ try { renderStats(await call('efg_admin_login')); } catch(e){} }
+function logout(msg){ KEY = ''; ss.set(''); $('dash').hidden = true; $('hRight').hidden = true; $('fLogin').hidden = false; $('key').value = ''; setMsg($('lMsg'), msg || '', msg ? 'err' : ''); stopAuto(); }
+$('fLogin').addEventListener('submit', async e => {
+  e.preventDefault(); KEY = $('key').value; setMsg($('lMsg'), 'Controllo…');
+  try { await enter(); ss.set(KEY); setMsg($('lMsg'), ''); } catch(err){ KEY = ''; setMsg($('lMsg'), err.message, 'err'); }
+});
+$('btnOut').onclick = () => logout();
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+  document.querySelectorAll('[data-pane]').forEach(p => p.hidden = p.dataset.pane !== t.dataset.tab);
+  if (t.dataset.tab === 'players') loadPlayers();
+  if (t.dataset.tab === 'log') loadLogs();
+  if (t.dataset.tab === 'backup') loadBackups();
+});
+
+/* ---------- giocatori ---------- */
+let players = [];
+async function loadPlayers(){
+  $('pInfo').textContent = 'Carico…';
+  try { players = await call('efg_admin_players') || []; } catch(err){ return onErr(err, $('pInfo')); }
+  $('pInfo').textContent = players.length + ' giocatori registrati';
+  const det = p => Object.keys(GAMES).map(g => { const x = p.dettaglio && p.dettaglio[g]; return x ? GAMES[g] + ' ' + x.livelli + '/3 · ' + x.punti : null; }).filter(Boolean).join(' — ');
+  const sorted = players.slice().sort((a, b) => b.livelli - a.livelli || b.punti - a.punti);
+  fillTable($('pTable'), ['#', 'Nome', 'Email', 'Cellulare', 'Registrato', 'Giochi', 'Livelli', 'Punti', 'Dettaglio per gioco'],
+    sorted.map((p, i) => [i + 1, p.name, p.email, p.phone, fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p)]),
+    [null, null, null, null, 'small', 'num', 'num', 'num', 'small']);
+}
+$('pReload').onclick = loadPlayers;
+$('pCsv').onclick = () => {
+  const head = ['Nome', 'Email', 'Cellulare', 'Registrato', 'Giochi usati', 'Livelli totali', 'Punti totali'];
+  Object.values(GAMES).forEach(n => head.push(n + ' livelli', n + ' punti'));
+  const rows = players.map(p => { const r = [p.name, p.email, p.phone, fmtDate(p.created_at), p.giochi, p.livelli, p.punti];
+    Object.keys(GAMES).forEach(g => { const x = p.dettaglio && p.dettaglio[g]; r.push(x ? x.livelli : '', x ? x.punti : ''); }); return r; });
+  download('efuture-games-giocatori-' + stamp() + '.csv', toCsv(head, rows), 'text/csv;charset=utf-8');
+};
+
+/* ---------- registro ---------- */
+let logs = [], autoT = 0;
+const describe = l => {
+  const d = l.detail || {};
+  if (l.kind === 'partita') return d.livelli + '/3 livelli · ' + d.punti + ' punti' + (d.record ? ' · nuovo record' : '');
+  if (l.kind === 'registrazione') return d.nome || '';
+  if (l.kind === 'accesso') return d.esito || '';
+  return Object.keys(d).map(k => k.replace(/_/g, ' ') + ': ' + d[k]).join(' · ');
+};
+async function loadLogs(){
+  try { logs = await call('efg_admin_logs', { p_limit: parseInt($('lLimit').value, 10), p_kind: $('lKind').value || null }) || []; }
+  catch(err){ return onErr(err, $('pInfo')); }
+  fillTable($('lTable'), ['Quando', 'Evento', 'Email', 'Gioco', 'Dettagli'],
+    logs.map(l => { const t = document.createElement('span'); t.className = 'tag' + (/errata/.test(l.kind) ? ' err' : l.kind.startsWith('admin') ? ' admin' : ''); t.textContent = l.kind;
+      return [fmtDate(l.at), t, l.email || '', l.game ? (GAMES[l.game] || l.game) : '', describe(l)]; }),
+    ['small', null, null, null, 'small']);
+}
+function stopAuto(){ clearInterval(autoT); autoT = 0; const c = $('lAuto'); if (c) c.checked = false; }
+$('lReload').onclick = loadLogs; $('lKind').onchange = loadLogs; $('lLimit').onchange = loadLogs;
+$('lAuto').onchange = e => { clearInterval(autoT); autoT = e.target.checked ? setInterval(() => { if (!$('dash').hidden) loadLogs(); }, 15000) : 0; };
+$('lCsv').onclick = () => download('efuture-games-registro-' + stamp() + '.csv',
+  toCsv(['Quando', 'Evento', 'Email', 'Gioco', 'Dettagli'], logs.map(l => [fmtDate(l.at), l.kind, l.email || '', l.game || '', describe(l)])), 'text/csv;charset=utf-8');
+
+/* ---------- backup ---------- */
+async function loadBackups(){
+  let list;
+  try { list = await call('efg_admin_backups') || []; } catch(err){ return onErr(err, $('bMsg')); }
+  fillTable($('bTable'), ['#', 'Creato', 'Nota', 'Giocatori', 'Record', ''],
+    list.map(b => {
+      const box = document.createElement('div'); box.className = 'bar';
+      const dl = document.createElement('button'); dl.className = 'btn ghost'; dl.type = 'button'; dl.textContent = 'Scarica';
+      dl.onclick = async () => { try { const d = await call('efg_admin_backup_get', { p_id:b.id }); download('efuture-games-backup-' + b.id + '.json', JSON.stringify(d, null, 2), 'application/json'); } catch(err){ onErr(err, $('bMsg')); } };
+      const rs = document.createElement('button'); rs.className = 'btn navy'; rs.type = 'button'; rs.textContent = 'Ripristina';
+      rs.onclick = async () => {
+        if (!confirm('Ripristinare il backup #' + b.id + ' del ' + fmtDate(b.creato) + '?\n\nLa classifica attuale verrà sostituita (prima ne viene salvata una copia).')) return;
+        setMsg($('bMsg'), 'Ripristino in corso…');
+        try { const r = await call('efg_admin_restore', { p_id:b.id }); setMsg($('bMsg'), 'Backup #' + b.id + ' ripristinato. Lo stato precedente è salvato nel backup #' + r.backup_prima + '.', 'ok'); loadBackups(); refreshStats(); }
+        catch(err){ onErr(err, $('bMsg')); }
+      };
+      box.append(dl, rs);
+      return [b.id, fmtDate(b.creato), b.nota || '', b.giocatori, b.punteggi, box];
+    }), [null, 'small', null, 'num', 'num', null]);
+}
+$('bReload').onclick = loadBackups;
+$('bMake').onclick = async () => {
+  $('bMake').disabled = true; setMsg($('bMsg'), 'Creo il backup…');
+  try {
+    const r = await call('efg_admin_backup', { p_note: $('bNote').value });
+    download('efuture-games-backup-' + r.id + '-' + stamp() + '.json', JSON.stringify(r.data, null, 2), 'application/json');
+    setMsg($('bMsg'), 'Backup #' + r.id + ' creato e scaricato.', 'ok'); $('bNote').value = ''; loadBackups(); refreshStats();
+  } catch(err){ onErr(err, $('bMsg')); }
+  $('bMake').disabled = false;
+};
+
+/* ---------- reset ---------- */
+async function doReset(what, input, word){
+  if ($(input).value.trim().toUpperCase() !== word){ return setMsg($('rMsg'), 'Per confermare scrivi ' + word + ' nel campo.', 'err'); }
+  setMsg($('rMsg'), 'Operazione in corso…');
+  try {
+    const r = await call('efg_admin_reset', { p_what: what });
+    $(input).value = '';
+    setMsg($('rMsg'), 'Fatto: cancellati ' + r.punteggi + ' record' + (what === 'tutto' ? ' e ' + r.giocatori + ' giocatori' : '') + '. Backup automatico #' + r.backup + ' (ripristinabile dalla scheda Backup).', 'ok');
+    refreshStats();
+  } catch(err){ onErr(err, $('rMsg')); }
+}
+$('rScores').onclick = () => doReset('punti', 'rConf1', 'AZZERA');
+$('rAll').onclick = () => doReset('tutto', 'rConf2', 'CANCELLA TUTTO');
+
+/* ---------- chiave ---------- */
+$('fKey').addEventListener('submit', async e => {
+  e.preventDefault();
+  const a = $('kNew').value, b = $('kNew2').value;
+  if (a.length < 10) return setMsg($('kMsg'), 'La nuova chiave deve avere almeno 10 caratteri.', 'err');
+  if (a !== b) return setMsg($('kMsg'), 'Le due chiavi non coincidono.', 'err');
+  try { await call('efg_admin_set_key', { p_new:a }); KEY = a; ss.set(a); $('kNew').value = $('kNew2').value = ''; setMsg($('kMsg'), 'Chiave cambiata. Usa la nuova chiave dal prossimo accesso.', 'ok'); }
+  catch(err){ onErr(err, $('kMsg')); }
+});
+
+if (KEY) enter().catch(err => logout(err.auth ? err.message : ''));
+})();
+</script>
+</body>
+</html>
