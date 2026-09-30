@@ -38,7 +38,7 @@ const Backend = remote ? {
   },
   async signOut(){ store.set('efgSessionLive', null); },
   async submit(user, game, score, levels){ return !!(await rpc('efg_submit', { p_email:user.email, p_game:game, p_score:score, p_levels:levels })); },
-  // game: 'all' (somma dei 4 giochi) oppure l'id del gioco → [{pid, name, levels, score}] ordinati
+  // game: 'all' (somma dei 4 giochi) oppure l'id del gioco → [{pid, name, levels, score, games}] ordinati
   async board(game){ return (await rpc('efg_board', { p_game:game })) || []; },
 } : {
   remote:false,
@@ -67,8 +67,8 @@ const Backend = remote ? {
     for (const r of Object.values(store.get('efgDemoScores4', {}))){
       if (game !== 'all' && r.game !== game) continue;
       const u = users[r.email]; if (!u) continue;
-      const t = tot[r.email] = tot[r.email] || { pid:u.pid, name:u.name, levels:0, score:0 };
-      t.score += r.score; t.levels += r.levels || 0;
+      const t = tot[r.email] = tot[r.email] || { pid:u.pid, name:u.name, levels:0, score:0, games:0 };
+      t.score += r.score; t.levels += r.levels || 0; if ((r.levels||0) > 0) t.games++;
     }
     return Object.values(tot).sort((a,b)=>b.levels-a.levels || b.score-a.score).slice(0,50);
   },

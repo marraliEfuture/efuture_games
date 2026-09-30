@@ -77,7 +77,7 @@ function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v9' : 'Modalità demo: account e classifica restano su questo telefono. · v9';
+  mn.textContent = remote ? 'Classifica online · v10' : 'Modalità demo: account e classifica restano su questo telefono. · v10';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -287,7 +287,7 @@ async function loadBoard(){
     const li = document.createElement('li'); if (session && r.pid === session.id) li.className = 'me';
     const a = document.createElement('span'); a.className = 'r'; a.textContent = i+1;
     const n = document.createElement('span'); n.className = 'n'; n.textContent = r.name;
-    const s = document.createElement('span'); s.className = 's'; s.textContent = (r.levels||0) + '/' + (boardTab === 'all' ? LEVELS*GAMES.length : LEVELS) + ' liv · ' + r.score + ' pt';
+    const s = document.createElement('span'); s.className = 's'; s.textContent = (boardTab === 'all' ? (r.games||0) + '/' + GAMES.length + ' giochi · ' + (r.levels||0) + '/' + LEVELS*GAMES.length : (r.levels||0) + '/' + LEVELS) + ' liv · ' + r.score + ' pt';
     li.append(a, n, s); list.appendChild(li);
   });
 }

@@ -147,7 +147,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 
 <main>
   <section class="panel total" aria-labelledby="tTotal">
-    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale</h2><div class="sub">Somma dei record nei 4 giochi · prima i livelli, poi i punti</div></div></div>
+    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale</h2><div class="sub">Somma dei record nei 4 giochi · giochi usati, livelli superati e punti</div></div></div>
     <ol id="list-all"></ol>
   </section>
   <div class="games" id="games"></div>
@@ -161,9 +161,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   <div class="powered">powered by <img src="img/efuture-white.png" alt="efuture"></div>
 </footer>
 
-<script src="config.js?v=9"></script>
+<script src="config.js?v=10"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=9"></script>
+<script src="backend.js?v=10"></script>
 <script>
 (function(){
 "use strict";
@@ -200,7 +200,7 @@ function render(key, rows, top){
     const li = document.createElement('li');
     const a = document.createElement('span'); a.className = 'r'; a.textContent = i + 1;
     const n = document.createElement('span'); n.className = 'n'; n.textContent = r.name;
-    const lv = document.createElement('span'); lv.className = 'lv'; lv.textContent = (r.levels || 0) + '/' + (key === 'all' ? 12 : 3) + ' liv';
+    const lv = document.createElement('span'); lv.className = 'lv'; lv.textContent = (key === 'all' ? (r.games || 0) + '/4 giochi · ' + (r.levels || 0) + '/12 liv' : (r.levels || 0) + '/3 liv');
     const s = document.createElement('span'); s.className = 's'; s.textContent = r.score; const u = document.createElement('small'); u.textContent = 'pt'; s.appendChild(u);
     li.append(a, n, lv, s); ol.appendChild(li);
     if (prev && !prev.has(r.pid + ':' + r.levels + ':' + r.score)){ li.classList.add('fresh'); setTimeout(() => li.classList.remove('fresh'), 2500); }

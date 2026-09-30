@@ -73,9 +73,10 @@ end $$;
 
 -- classifica: 'all' = somma dei 4 giochi, oppure l'id di un gioco
 create or replace function public.efg_board(p_game text)
-returns table (pid uuid, name text, levels integer, score integer)
+returns table (pid uuid, name text, levels integer, score integer, games integer)
 language sql stable security definer set search_path = public as $$
-  select p.pid, p.name, sum(s.levels)::int as levels, sum(s.score)::int as score
+  select p.pid, p.name, sum(s.levels)::int as levels, sum(s.score)::int as score,
+         (count(*) filter (where s.levels > 0))::int as games
   from efg_scores s join efg_players p on p.email = s.email
   where p_game = 'all' or s.game = p_game
   group by p.pid, p.name
