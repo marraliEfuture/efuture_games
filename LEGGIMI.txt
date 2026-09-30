@@ -1,0 +1,79 @@
+EFUTURE GAMES – CARE CONFERENCE EDITION
+=======================================
+Un'unica web app con i 4 giochi: SysAdmin Runner (Efuture), CoreTech Pac,
+Timenet Breakout, Inncloud Invaders. I giochi si sbloccano con un codice
+(QR allo stand), i punteggi vanno in una classifica comune.
+
+CODICI DI SBLOCCO (uno per gioco)
+  SysAdmin Runner ...... RUN-4827   (stand Efuture)
+  CoreTech Pac ......... PAC-3915   (stand CoreTech)
+  Timenet Breakout ..... BRK-6042   (stand Timenet)
+  Inncloud Invaders .... INV-7358   (stand Inncloud)
+  I QR pronti da stampare sono in qr/ (apri qr/stampa.html e stampa).
+  Nel codice dell'app i codici non compaiono in chiaro.
+
+
+1) METTERE ONLINE (GitHub Pages)
+   a. Crea il repository  efuture_games  (Public) su github.com/marraliEfuture
+   b. Carica TUTTO il contenuto di questa cartella (non la cartella stessa)
+   c. Settings > Pages > Deploy from a branch > main > / (root) > Save
+   d. L'app sarà su  https://marraliefuture.github.io/efuture_games/
+   Se usi un nome o un indirizzo diverso, i QR vanno rigenerati
+   (e va aggiornato PUBLIC_URL in config.js).
+
+
+2) ATTIVARE REGISTRAZIONE E CLASSIFICA COMUNE (Supabase, gratuito)
+   Finché non lo fai l'app funziona in MODALITÀ DEMO: account e
+   classifica restano sul singolo telefono.
+   a. Crea un account e un nuovo progetto su https://supabase.com
+      (scegli la regione "Central EU (Frankfurt)")
+   b. SQL Editor > New query > incolla il contenuto di supabase.sql > Run
+   c. Authentication > Sign In / Providers > Email:
+      disattiva "Confirm email" (così alla conferenza ci si registra
+      subito, senza dover aprire la posta)
+   d. Project Settings > API: copia "Project URL" e la chiave "anon public"
+   e. Incollale in config.js (SUPABASE_URL e SUPABASE_ANON_KEY) e
+      ricarica config.js su GitHub.
+
+
+2b) RECUPERO PASSWORD VIA SMS (codice OTP)
+   Per mandare gli SMS Supabase usa un fornitore esterno (a pagamento,
+   pochi centesimi a SMS): Twilio, MessageBird, Vonage o Textlocal.
+   a. Crea l'account presso il fornitore (es. Twilio) e prendi le chiavi
+   b. Supabase > Authentication > Sign In / Providers > Phone: attivalo,
+      scegli il fornitore e incolla le chiavi
+   c. Nella stessa pagina lascia disattivata la conferma del telefono
+      ("Confirm phone"), così il cellulare inserito in registrazione
+      viene collegato subito all'account
+   Il cellulare si scrive con il prefisso (+39...). Se manca, l'app
+   aggiunge +39 da sola.
+   Da provare con un paio di numeri veri prima della conferenza.
+
+
+3) COME FUNZIONA
+   - Prima pagina: 4 blocchi, uno per gioco. I giochi bloccati mostrano 🔒.
+   - Toccando un gioco bloccato: inquadra il QR allo stand oppure
+     scrivi il codice. Il QR apre l'app e sblocca il gioco da solo.
+   - Sblocco: "Apri la fotocamera" legge il QR direttamente nell'app;
+     in alternativa si scrive il codice. Anche la fotocamera normale
+     del telefono funziona: il QR apre l'app e sblocca il gioco.
+   - In fondo: "Registrati / Accedi". Registrazione: nome, password,
+     cellulare, email. Accesso: email e password, con "Password
+     dimenticata?" che manda un codice via SMS.
+   - REGOLE DI GARA (solo dentro l'app): ogni gioco ha 3 livelli, al
+     massimo 1 minuto ciascuno. Punteggio = secondi che avanzano sui
+     3 minuti (es. finisci in 2:30 -> 30 punti). Se scade il minuto o
+     finisci le vite, 0 punti. Aperti da soli, i giochi hanno tutti i
+     livelli e nessun limite di tempo.
+   - Classifica: Totale (somma dei record nei 4 giochi, massimo 720) e
+     una per gioco. Se rigiochi, conta solo il risultato migliore.
+     I record fatti prima di accedere vengono aggiunti al primo accesso.
+   - I giochi sbloccati restano sbloccati su quel telefono.
+
+
+4) AGGIORNARE
+   Sostituisci i file e in sw.js cambia 'efuture-games-v2' in v3, v4...
+
+Nota: lo sblocco e i punteggi sono controllati dal telefono del
+giocatore. Per un evento va benissimo, ma un utente esperto potrebbe
+aggirarli: non usarli per premi di valore senza un controllo finale.

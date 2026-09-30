@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Inncloud Invaders</title>
+<meta name="description" content="Arcade anni '80 in 5 livelli: la nuvola di Inncloud difende il cloud da bug e hacker.">
+<meta name="theme-color" content="#15181e">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Inncloud">
+<style>
+@font-face{font-family:'Press Start 2P';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/press-start-2p-latin-400-normal.woff2) format('woff2');}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/ibm-plex-mono-latin-400-normal.woff2) format('woff2');}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/ibm-plex-mono-latin-600-normal.woff2) format('woff2');}
+/* Layout: arcade cabinet — score bar on top, cloudy night sky in the middle, drag strip for the cloud ship below */
+:root{
+  color-scheme:dark;
+  --ic-ink:#272727;      /* Inncloud wordmark grey */
+  --ic-red:#c00000;      /* the red dot of the "i" — used for every shot the player fires */
+  --ic-red-hi:#ff3b3b;
+  --bg:#15181e;          /* night sky, neutral with a cool bias */
+  --panel:#1d2129;
+  --panel-2:#252a34;
+  --line:#3a414e;
+  --text:#f2f2f2;
+  --dim:#a3abb7;
+  --hack:#39e07a;        /* hacker green, only for the attackers */
+  --danger:#ff5d56;
+  --pixel:'Press Start 2P','IBM Plex Mono',ui-monospace,monospace;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --ct:var(--ic-red); --ct-light:#ffd0d0; --ct-deep:#7a0000; --coin:#ffffff; --sun:#ffffff;
+  --tn-light:var(--ic-red-hi);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--text);overscroll-behavior:none}
+body{font-family:var(--mono);overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+[hidden]{display:none!important}
+#app{height:100%;display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% 0%,#2a303b 0%,var(--bg) 62%)}
+
+#hud{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line);font-size:12px}
+.hud-block{display:flex;flex-direction:column;gap:3px;min-width:0}
+.hud-label{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.hud-val{font-family:var(--pixel);font-size:12px;color:var(--text);font-variant-numeric:tabular-nums}
+#score{color:#fff}
+#levelName{flex:1;text-align:center;color:var(--dim);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#levelName b{color:var(--ct-light);font-weight:600}
+#lives{display:flex;gap:4px;align-items:center;min-height:14px}
+.life{width:18px;height:11px;border-radius:8px 8px 4px 4px;background:#f2f2f2;position:relative}.life::after{content:"";position:absolute;left:7px;top:-4px;width:5px;height:5px;border-radius:50%;background:var(--ic-red)}
+.iconbtn{flex:0 0 auto;width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--mono)}
+.iconbtn:focus-visible,button:focus-visible{outline:2px solid var(--coin);outline-offset:2px}
+
+#main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+#stage{position:relative;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;touch-action:none;padding:6px}
+#game{display:block;border-radius:6px;box-shadow:0 0 0 1px var(--line),0 18px 50px rgba(0,0,0,.6)}
+
+#controls{flex:0 0 auto;padding:6px 12px 8px;touch-action:none}
+#strip{height:74px;border-radius:14px;border:1px dashed var(--line);background:linear-gradient(180deg,rgba(242,242,242,.05),rgba(192,0,0,.08));display:flex;align-items:center;justify-content:center;gap:10px;color:var(--dim);font-size:11px;letter-spacing:.06em;text-align:center;padding-inline:12px}
+#strip b{color:var(--ct-light)}
+#strip .arrow{font-size:18px;color:var(--tn-light)}
+@media (orientation:landscape) and (max-height:560px){
+  #main{flex-direction:row}
+  #controls{order:-1;display:flex;padding:8px 8px 8px calc(12px + env(safe-area-inset-left,0px))}
+  #strip{height:auto;width:120px;flex-direction:column}
+}
+.logo-badge{background:#f7f7f7;border-radius:12px;padding:12px 14px;margin:0 auto;width:min(100%,320px)}
+.logo-badge img{width:100%;display:block}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,8,14,.84);backdrop-filter:blur(2px);z-index:10;overflow-y:auto;text-align:center}
+.card{width:100%;max-width:420px;margin:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 18px;box-shadow:0 16px 40px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:12px}
+.card h1,.card h2{font-family:var(--pixel);margin:0;line-height:1.5;text-wrap:balance}
+.card h1{font-size:17px;color:var(--ct-light)}
+.card h2{font-size:12px;color:var(--coin)}
+.card p{margin:0;font-size:13px;line-height:1.6}
+.dim{color:var(--dim);font-size:11.5px}
+.logo{width:min(78%,300px);margin:4px auto 0;display:block}
+.kicker{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.tag{align-self:center;font-size:10px;letter-spacing:.06em;padding:3px 9px;border-radius:20px;background:var(--ct);color:#fff}
+.tag.gold{background:#f2f2f2;color:#272727}
+.tag.red{background:var(--danger);color:#2a0000}
+.howto{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;text-align:left;font-size:12.5px;line-height:1.6;display:flex;flex-direction:column;gap:8px}
+.legend{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center}
+.legend canvas{width:26px;height:26px}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+button.btn{font-family:var(--pixel);font-size:11px;padding:12px 16px;border-radius:8px;border:1px solid var(--ct-deep);background:var(--ic-red);color:#fff;cursor:pointer;box-shadow:0 4px 0 var(--ct-deep),0 6px 14px rgba(0,0,0,.4)}
+button.btn:active{box-shadow:0 1px 0 var(--ct-deep);transform:translateY(3px)}
+button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--text);box-shadow:0 4px 0 #09111d,0 6px 14px rgba(0,0,0,.4)}
+.stats{display:grid;grid-template-columns:1fr auto;gap:4px 12px;text-align:left;font-size:12px}
+.stats b{font-family:var(--pixel);font-size:11px;color:#fff;text-align:right}
+.hint{font-size:10.5px;color:var(--dim)}
+.hint b{color:var(--coin)}
+@media (prefers-reduced-motion:reduce){button.btn:active{transform:none}}
+
+/* title screen: compact explanation + powered by efuture */
+#ov-title .card{gap:10px}
+#ov-title .card > p{font-size:12px;line-height:1.5}
+#ov-title .howto{font-size:11px;line-height:1.5;padding:9px 12px;gap:6px}
+#ov-title .legend{gap:5px 9px}
+#ov-title .legend canvas{width:20px;height:20px}
+#ov-title .dim{font-size:10px}
+.powered{display:flex;align-items:center;justify-content:center;gap:8px;padding-top:8px;border-top:1px solid var(--line)}
+.powered span{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.powered .chip{background:#ffffff;border-radius:7px;padding:5px 9px;display:flex;align-items:center}
+.powered img{height:17px;width:auto;display:block}
+
+/* persistent footer: powered by efuture, visible on every screen and level */
+.powered-bar{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:7px;padding:4px 12px calc(6px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line)}
+.powered-bar span{font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.powered-bar .chip{background:#ffffff;border-radius:6px;padding:3px 7px;display:flex;align-items:center}
+.powered-bar img{height:14px;width:auto;display:block}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="hud">
+    <div class="hud-block"><span class="hud-label">Punti</span><span class="hud-val" id="score">0</span></div>
+    <div class="hud-block"><span class="hud-label">Vite</span><div id="lives"></div></div>
+    <div id="levelName">Inncloud Invaders</div>
+    <button class="iconbtn" id="soundBtn" title="Audio" aria-label="Audio on/off">♪</button>
+    <button class="iconbtn" id="pauseBtn" title="Pausa" aria-label="Pausa">II</button>
+  </div>
+
+  <div id="main">
+    <div id="stage">
+      <canvas id="game"></canvas>
+
+      <div class="overlay" id="ov-title">
+        <div class="card">
+          <div class="logo-badge"><img id="logoImg" src="img/inncloud-logo.png" alt="Inncloud"></div>
+          <h1>INVADERS</h1>
+          <p>Il cloud è sotto attacco. Guida la <b style="color:#fff">nuvola di Inncloud</b> e respingi bug e hacker con i colpi rossi.</p>
+          <div class="howto">
+            <div class="legend">
+              <canvas id="lgShot" width="44" height="44"></canvas><span>La nuvola spara da sola i <b style="color:var(--ic-red-hi)">colpi rossi</b>: tu pensa solo a muoverti.</span>
+              <canvas id="lgBug" width="44" height="44"></canvas><span>Elimina tutti gli attaccanti: <b style="color:var(--hack)">bug</b>, virus e hacker. Schiva i loro codici verdi.</span>
+              <canvas id="lgWall" width="44" height="44"></canvas><span>Riparati dietro le <b>nuvolette</b>: i tuoi colpi le attraversano, i codici degli hacker no. Ma si consumano.</span>
+            </div>
+            <span class="dim">5 livelli, dal login sospetto al ransomware finale.</span>
+          </div>
+          <p class="dim" id="bestLine" hidden>Record: <b id="bestVal" style="color:#fff"></b></p>
+          <div class="btnrow">
+            <button class="btn" id="btnStart">Inizia</button>
+            <button class="btn alt" id="btnContinue" hidden>Continua · Liv. <span id="continueLvl"></span></button>
+          </div>
+          <div class="hint">Trascina o usa le <b>frecce</b> · <b>P</b> pausa</div>
+        </div>
+      </div>
+
+      <div class="overlay" id="ov-level" hidden>
+        <div class="card">
+          <span class="tag" id="lvTag">Livello 1/5</span>
+          <h2 id="lvName">Login sospetto</h2>
+          <p id="lvText"></p>
+          <div class="btnrow"><button class="btn" id="btnGo">Via!</button></div>
+        </div>
+      </div>
+
+      <div class="overlay" id="ov-clear" hidden>
+        <div class="card">
+          <span class="tag gold">Attacco respinto</span>
+          <h2 id="clearTitle">Livello completato!</h2>
+          <div class="stats">
+            <span>Punti</span><b id="clearScore">0</b>
+            <span>Attaccanti</span><b id="clearBugs">0</b>
+            <span>Tempo</span><b id="clearTime">0:00</b>
+          </div>
+          <div class="btnrow"><button class="btn" id="btnNext">Prossimo livello</button></div>
+        </div>
+      </div>
+
+      <div class="overlay" id="ov-over" hidden>
+        <div class="card">
+          <span class="tag red">Cloud violato</span>
+          <h1>GAME OVER</h1>
+          <p>Gli hacker hanno bucato le difese, per stavolta.</p>
+          <div class="stats"><span>Punti</span><b id="overScore">0</b><span>Livello</span><b id="overLvl">1</b></div>
+          <div class="btnrow">
+            <button class="btn" id="btnRetry">Riprova livello</button>
+            <button class="btn alt" id="btnMenu">Menu</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overlay" id="ov-win" hidden>
+        <div class="card">
+          <span class="tag gold">Missione compiuta</span>
+          <h1>CLOUD AL SICURO</h1>
+          <p>Hai sconfitto il ransomware e respinto tutti gli attacchi. I dati su Inncloud sono al sicuro.</p>
+          <div class="stats"><span>Punteggio finale</span><b id="winScore">0</b><span>Record</span><b id="winBest">0</b></div>
+          <p class="dim" id="winRecord" style="color:var(--coin)"></p>
+          <div class="btnrow"><button class="btn" id="btnAgain">Gioca ancora</button></div>
+        </div>
+      </div>
+
+      <div class="overlay" id="ov-pause" hidden>
+        <div class="card">
+          <h1>PAUSA</h1>
+          <div class="btnrow">
+            <button class="btn" id="btnResume">Riprendi</button>
+            <button class="btn alt" id="btnPauseMenu">Menu</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="controls">
+      <div id="strip"><span class="arrow">◀</span><span>Trascina per muovere la <b>nuvola</b><br>spara da sola</span><span class="arrow">▶</span></div>
+    </div>
+  </div>
+  <div class="powered-bar" id="poweredBar"><span>powered by</span><img src="img/efuture-white.png" alt="efuture"></div>
+</div>
+<script>
+/* Efuture Games: send scores to the hub that hosts this game */
+window.efgReport = function(game, score, level, won){
+  try { if (window.parent && window.parent !== window) window.parent.postMessage({type:'efg-score', game:game, score:score, level:level, won:!!won}, '*'); } catch(e){}
+};
+</script>
+<script src="game.js"></script>
+</body>
+</html>
