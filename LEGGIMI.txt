@@ -28,26 +28,20 @@ CODICI DI SBLOCCO (uno per gioco)
    a. Crea un account e un nuovo progetto su https://supabase.com
       (scegli la regione "Central EU (Frankfurt)")
    b. SQL Editor > New query > incolla il contenuto di supabase.sql > Run
-   c. Authentication > Sign In / Providers > Email:
-      disattiva "Confirm email" (così alla conferenza ci si registra
-      subito, senza dover aprire la posta)
-   d. Project Settings > API: copia "Project URL" e la chiave "anon public"
-   e. Incollale in config.js (SUPABASE_URL e SUPABASE_ANON_KEY) e
+   c. Project Settings > API: copia "Project URL" e la chiave "anon public"
+   d. Incollale in config.js (SUPABASE_URL e SUPABASE_ANON_KEY) e
       ricarica config.js su GitHub.
 
 
-2b) RECUPERO PASSWORD VIA SMS (codice OTP)
-   Per mandare gli SMS Supabase usa un fornitore esterno (a pagamento,
-   pochi centesimi a SMS): Twilio, MessageBird, Vonage o Textlocal.
-   a. Crea l'account presso il fornitore (es. Twilio) e prendi le chiavi
-   b. Supabase > Authentication > Sign In / Providers > Phone: attivalo,
-      scegli il fornitore e incolla le chiavi
-   c. Nella stessa pagina lascia disattivata la conferma del telefono
-      ("Confirm phone"), così il cellulare inserito in registrazione
-      viene collegato subito all'account
-   Il cellulare si scrive con il prefisso (+39...). Se manca, l'app
-   aggiunge +39 da sola.
-   Da provare con un paio di numeri veri prima della conferenza.
+2b) CLASSIFICA DA PROIETTARE
+   Pagina dedicata, da aprire su un PC collegato allo schermo o al
+   ledwall:  https://marraliefuture.github.io/efuture_games/classifica.html
+   - Si aggiorna da sola ogni 15 secondi. Pulsante "Schermo intero".
+   - Mostra la classifica generale (top 10) e i top 5 di ogni gioco,
+     più il QR per aprire l'app.
+   - Più righe:  classifica.html?top=20&topgioco=8
+   - In modalità demo mostra solo i punteggi del dispositivo su cui è
+     aperta: per la classifica comune serve Supabase (punto 2).
 
 
 3) COME FUNZIONA
@@ -57,9 +51,8 @@ CODICI DI SBLOCCO (uno per gioco)
    - Sblocco: "Apri la fotocamera" legge il QR direttamente nell'app;
      in alternativa si scrive il codice. Anche la fotocamera normale
      del telefono funziona: il QR apre l'app e sblocca il gioco.
-   - In fondo: "Registrati / Accedi". Registrazione: nome, password,
-     cellulare, email. Accesso: email e password, con "Password
-     dimenticata?" che manda un codice via SMS.
+   - In fondo: "Registrati / Accedi". Registrazione: nome, cellulare,
+     email. Accesso: basta l'email, nessuna password.
    - REGOLE DI GARA (solo dentro l'app): ogni gioco ha 3 livelli, al
      massimo 1 minuto ciascuno. Punteggio = secondi che avanzano sui
      3 minuti (es. finisci in 2:30 -> 30 punti). Se scade il minuto o
@@ -72,7 +65,7 @@ CODICI DI SBLOCCO (uno per gioco)
 
 
 4) AGGIORNARE
-   Sostituisci i file e in sw.js cambia 'efuture-games-v2' in v3, v4...
+   Sostituisci i file e in sw.js cambia 'efuture-games-v4' in v5, v6...
 
 Nota: lo sblocco e i punteggi sono controllati dal telefono del
 giocatore. Per un evento va benissimo, ma un utente esperto potrebbe

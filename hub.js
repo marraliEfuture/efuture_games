@@ -49,93 +49,8 @@ let unlocked = new Set(store.get('efgUnlocked', []));
 let bests = store.get('efgBestsTime', {});   // best score (seconds left) per game on this device
 let session = null;                          // {id, email, nickname}
 
-/* ================= BACKEND =================
-   Supabase when configured in config.js, otherwise a demo that
-   keeps everything on this device (SMS codes are shown on screen). */
-const CFG = window.EFG_CONFIG || {};
-const remote = !!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY && window.supabase);
-const sb = remote ? window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY) : null;
-const userOf = u => u ? { id:u.id, email:u.email, nickname:(u.user_metadata && u.user_metadata.nickname) || (u.email||'').split('@')[0] || 'Giocatore' } : null;
-
-const Backend = remote ? {
-  async current(){ const { data } = await sb.auth.getSession(); return userOf(data && data.session && data.session.user); },
-  async signUp({ name, password, phone, email }){
-    const { data, error } = await sb.auth.signUp({ email, password, options:{ data:{ nickname:name, phone } } });
-    if (error) throw error;
-    if (!data.session) return { needsConfirm:true };
-    // attach the mobile number to the account, so it can be used to recover the password
-    try { await sb.auth.updateUser({ phone }); } catch(e){}
-    return { user:userOf(data.session.user) };
-  },
-  async signIn(email, password){ const { data, error } = await sb.auth.signInWithPassword({ email, password }); if (error) throw error; return { user:userOf(data.user) }; },
-  async signOut(){ await sb.auth.signOut(); },
-  async sendOtp(phone){ const { error } = await sb.auth.signInWithOtp({ phone, options:{ shouldCreateUser:false } }); if (error) throw error; return {}; },
-  async resetWithOtp(phone, token, password){
-    const { data, error } = await sb.auth.verifyOtp({ phone, token, type:'sms' }); if (error) throw error;
-    const up = await sb.auth.updateUser({ password }); if (up.error) throw up.error;
-    return { user:userOf(data.user) };
-  },
-  async submit(user, game, score){
-    const { data } = await sb.from('scores').select('score').eq('user_id', user.id).eq('game', game).maybeSingle();
-    if (data && data.score >= score) return false;          // keep only the best result
-    const { error } = await sb.from('scores').upsert({ user_id:user.id, game, score, nickname:user.nickname, updated_at:new Date().toISOString() });
-    if (error) throw error; return true;
-  },
-  async board(game){
-    let q = sb.from('scores').select('user_id,nickname,game,score');
-    if (game !== 'all') q = q.eq('game', game).order('score', { ascending:false }).limit(50);
-    const { data, error } = await q; if (error) throw error; return data || [];
-  },
-} : {
-  async current(){ return store.get('efgDemoSession', null); },
-  async signUp({ name, password, phone, email }){
-    const users = store.get('efgDemoUsers2', {}); const key = email.toLowerCase();
-    if (users[key]) throw new Error('already registered');
-    users[key] = { id:'local-'+Date.now().toString(36), email:key, nickname:name, phone, pw: await sha256('pw:'+password) };
-    store.set('efgDemoUsers2', users);
-    const u = { id:users[key].id, email:key, nickname:name }; store.set('efgDemoSession', u); return { user:u };
-  },
-  async signIn(email, password){
-    const u = store.get('efgDemoUsers2', {})[email.toLowerCase()];
-    if (!u || u.pw !== await sha256('pw:'+password)) throw new Error('Invalid login');
-    const s = { id:u.id, email:u.email, nickname:u.nickname }; store.set('efgDemoSession', s); return { user:s };
-  },
-  async signOut(){ store.set('efgDemoSession', null); },
-  async sendOtp(phone){
-    const u = Object.values(store.get('efgDemoUsers2', {})).find(x=>x.phone === phone);
-    if (!u) throw new Error('Nessun account con questo cellulare.');
-    const code = String(Math.floor(100000 + Math.random()*900000));
-    store.set('efgDemoOtp', { phone, code, exp:Date.now() + 5*60*1000 });
-    return { demoCode:code };
-  },
-  async resetWithOtp(phone, token, password){
-    const o = store.get('efgDemoOtp', null);
-    if (!o || o.phone !== phone || o.code !== token || Date.now() > o.exp) throw new Error('Token has expired or is invalid');
-    const users = store.get('efgDemoUsers2', {}); const u = Object.values(users).find(x=>x.phone === phone);
-    u.pw = await sha256('pw:'+password); store.set('efgDemoUsers2', users); store.set('efgDemoOtp', null);
-    const s = { id:u.id, email:u.email, nickname:u.nickname }; store.set('efgDemoSession', s); return { user:s };
-  },
-  async submit(user, game, score){
-    const rows = store.get('efgDemoScores2', {}); const k = user.id + '|' + game;
-    if (rows[k] && rows[k].score >= score) return false;
-    rows[k] = { user_id:user.id, nickname:user.nickname, game, score }; store.set('efgDemoScores2', rows); return true;
-  },
-  async board(game){
-    const rows = Object.values(store.get('efgDemoScores2', {}));
-    return game === 'all' ? rows : rows.filter(r=>r.game===game).sort((a,b)=>b.score-a.score).slice(0,50);
-  },
-};
-function friendly(err){
-  const m = String(err && err.message || err);
-  if (/fetch|network/i.test(m)) return 'Nessuna connessione con il server: controlla la rete e riprova.';
-  if (/Invalid login/i.test(m)) return 'Email o password non corretti.';
-  if (/already registered|already been registered/i.test(m)) return 'Esiste già un account con questa email: usa Accedi.';
-  if (/expired|invalid/i.test(m) && /token|otp/i.test(m)) return 'Codice SMS non valido o scaduto. Richiedine uno nuovo.';
-  if (/Signups not allowed for otp|not found|No user/i.test(m)) return 'Nessun account con questo cellulare.';
-  if (/sms|phone provider|Unsupported phone/i.test(m)) return 'Invio SMS non disponibile al momento. Contatta lo stand Efuture.';
-  if (/Password should|at least 6/i.test(m)) return 'La password deve avere almeno 6 caratteri.';
-  return m;
-}
+/* ================= BACKEND (backend.js) ================= */
+const Backend = window.EFG_BACKEND, friendly = window.EFG_FRIENDLY, remote = Backend.remote;
 
 /* ================= LOBBY ================= */
 function renderGrid(){
@@ -301,20 +216,17 @@ async function showResult(g, ok, reason, seconds, level){
   $('mResult').hidden = false;
 }
 
-/* ================= AUTH ================= */
+/* ================= AUTH (senza password) ================= */
 function showAuth(view){
-  $('fSignup').hidden = view !== 'signup'; $('fLogin').hidden = view !== 'login'; $('fRecover').hidden = view !== 'recover';
-  $('aTabs').hidden = view === 'recover';
+  $('fSignup').hidden = view !== 'signup'; $('fLogin').hidden = view !== 'login';
   $('tabSignup').classList.toggle('on', view === 'signup'); $('tabLogin').classList.toggle('on', view === 'login');
-  $('aTitle').textContent = view === 'signup' ? 'Registrati' : view === 'login' ? 'Accedi' : 'Recupera password';
-  ['sMsg','lMsg','rMsg'].forEach(id=>setMsg($(id), ''));
-  if (view === 'recover'){ $('otpStep').hidden = true; $('rOtp').value = ''; $('rPass').value = ''; }
+  $('aTitle').textContent = view === 'signup' ? 'Registrati' : 'Accedi';
+  ['sMsg','lMsg'].forEach(id=>setMsg($(id), ''));
 }
 $('tabSignup').onclick = ()=>showAuth('signup');
 $('tabLogin').onclick = ()=>showAuth('login');
-$('btnForgot').onclick = ()=>showAuth('recover');
-$('btnBackLogin').onclick = ()=>showAuth('login');
 $('btnAuth').onclick = ()=>{ showAuth('signup'); openModal('mAuth'); };
+const validEmail = e => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
 
 async function loggedIn(user){
   session = user; $('mAuth').hidden = true; renderDock(); toast('Benvenuto, ' + session.nickname + '!');
@@ -322,40 +234,21 @@ async function loggedIn(user){
 }
 $('fSignup').addEventListener('submit', async e=>{
   e.preventDefault();
-  const name = $('sName').value.trim(), password = $('sPass').value, phone = normPhone($('sPhone').value), email = $('sEmail').value.trim();
+  const name = $('sName').value.trim(), phone = normPhone($('sPhone').value), email = $('sEmail').value.trim();
   const m = $('sMsg');
   if (name.length < 2 || name.length > 20) return setMsg(m, 'Il nome deve avere da 2 a 20 caratteri.', 'err');
-  if (password.length < 6) return setMsg(m, 'La password deve avere almeno 6 caratteri.', 'err');
   if (!validPhone(phone)) return setMsg(m, 'Scrivi un numero di cellulare valido, ad esempio +39 333 1234567.', 'err');
+  if (!validEmail(email)) return setMsg(m, 'Scrivi un indirizzo email valido.', 'err');
   setMsg(m, 'Un attimo…');
-  try {
-    const r = await Backend.signUp({ name, password, phone, email });
-    if (r.needsConfirm){ setMsg(m, 'Ti abbiamo mandato una email: conferma l\'indirizzo e poi accedi.', 'ok'); return; }
-    loggedIn(r.user);
-  } catch(err){ setMsg(m, friendly(err), 'err'); }
-});
-$('fLogin').addEventListener('submit', async e=>{
-  e.preventDefault(); const m = $('lMsg'); setMsg(m, 'Un attimo…');
-  try { const r = await Backend.signIn($('lEmail').value.trim(), $('lPass').value); loggedIn(r.user); }
+  try { const r = await Backend.signUp({ name, phone, email }); loggedIn(r.user); }
   catch(err){ setMsg(m, friendly(err), 'err'); }
 });
-$('btnSendOtp').onclick = async ()=>{
-  const phone = normPhone($('rPhone').value), m = $('rMsg');
-  if (!validPhone(phone)) return setMsg(m, 'Scrivi il cellulare usato in registrazione, ad esempio +39 333 1234567.', 'err');
-  setMsg(m, 'Invio il codice…');
-  try {
-    const r = await Backend.sendOtp(phone);
-    $('otpStep').hidden = false; $('btnSendOtp').textContent = 'Invia di nuovo';
-    setMsg(m, r.demoCode ? 'Modalità demo: il codice SMS è ' + r.demoCode : 'Codice inviato via SMS a ' + phone + '.', 'ok');
-  } catch(err){ setMsg(m, friendly(err), 'err'); }
-};
-$('fRecover').addEventListener('submit', async e=>{
-  e.preventDefault();
-  const phone = normPhone($('rPhone').value), token = $('rOtp').value.replace(/\D/g,''), password = $('rPass').value, m = $('rMsg');
-  if (token.length !== 6) return setMsg(m, 'Il codice SMS ha 6 cifre.', 'err');
-  if (password.length < 6) return setMsg(m, 'La nuova password deve avere almeno 6 caratteri.', 'err');
+$('fLogin').addEventListener('submit', async e=>{
+  e.preventDefault(); const m = $('lMsg');
+  const email = $('lEmail').value.trim();
+  if (!validEmail(email)) return setMsg(m, 'Scrivi l\'email con cui ti sei registrato.', 'err');
   setMsg(m, 'Un attimo…');
-  try { const r = await Backend.resetWithOtp(phone, token, password); toast('Password aggiornata.'); loggedIn(r.user); }
+  try { const r = await Backend.signIn(email); loggedIn(r.user); }
   catch(err){ setMsg(m, friendly(err), 'err'); }
 });
 $('btnLogout').onclick = async ()=>{ await Backend.signOut(); session = null; renderDock(); toast('Sei uscito.'); };
@@ -375,17 +268,12 @@ async function loadBoard(){
   boardMessage('Carico la classifica…');
   let rows;
   try { rows = await Backend.board(boardTab); } catch(e){ return boardMessage('Classifica non raggiungibile: controlla la connessione.'); }
-  if (boardTab === 'all'){
-    const tot = {};
-    for (const r of rows){ const t = tot[r.user_id] = tot[r.user_id] || { user_id:r.user_id, nickname:r.nickname, score:0 }; t.score += r.score; t.nickname = r.nickname; }
-    rows = Object.values(tot).sort((a,b)=>b.score-a.score).slice(0,50);
-  }
   if (!rows.length) return boardMessage('Ancora nessun punteggio. Gioca e sii il primo!');
   const list = $('bList'); list.innerHTML = '';
   rows.forEach((r, i)=>{
-    const li = document.createElement('li'); if (session && r.user_id === session.id) li.className = 'me';
+    const li = document.createElement('li'); if (session && r.pid === session.id) li.className = 'me';
     const a = document.createElement('span'); a.className = 'r'; a.textContent = i+1;
-    const n = document.createElement('span'); n.className = 'n'; n.textContent = r.nickname;
+    const n = document.createElement('span'); n.className = 'n'; n.textContent = r.name;
     const s = document.createElement('span'); s.className = 's'; s.textContent = r.score + ' pt';
     li.append(a, n, s); list.appendChild(li);
   });

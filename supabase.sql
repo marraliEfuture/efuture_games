@@ -1,31 +1,81 @@
 -- ============================================================
--- EFUTURE GAMES — tabella della classifica per Supabase
+-- EFUTURE GAMES — database della classifica per Supabase
 -- Incolla tutto nel "SQL Editor" del progetto e premi "Run".
+-- Accesso senza password: il giocatore è identificato dall'email.
+-- Le tabelle non sono leggibili direttamente dal sito: il sito usa
+-- solo le funzioni qui sotto, e la classifica espone solo i nomi.
 -- ============================================================
 
-create table if not exists public.scores (
-  user_id    uuid not null references auth.users(id) on delete cascade,
-  game       text not null check (game in ('sysadmin','coretech','timenet','inncloud')),
-  score      integer not null check (score >= 0 and score < 10000000),
-  nickname   text not null check (char_length(nickname) between 2 and 20),
-  updated_at timestamptz not null default now(),
-  primary key (user_id, game)
+create extension if not exists pgcrypto;
+
+create table if not exists public.efg_players (
+  email      text primary key check (email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
+  pid        uuid not null unique default gen_random_uuid(),
+  name       text not null check (char_length(name) between 2 and 20),
+  phone      text not null check (phone ~ '^\+\d{8,15}$'),
+  created_at timestamptz not null default now()
 );
 
-alter table public.scores enable row level security;
+create table if not exists public.efg_scores (
+  email      text not null references public.efg_players(email) on delete cascade,
+  game       text not null check (game in ('sysadmin','coretech','timenet','inncloud')),
+  score      integer not null check (score between 0 and 180),
+  updated_at timestamptz not null default now(),
+  primary key (email, game)
+);
+create index if not exists efg_scores_game_score on public.efg_scores (game, score desc);
 
--- chiunque può leggere la classifica
-drop policy if exists "classifica pubblica" on public.scores;
-create policy "classifica pubblica" on public.scores
-  for select using (true);
+alter table public.efg_players enable row level security;
+alter table public.efg_scores  enable row level security;
+-- nessuna policy: da fuori si passa solo dalle funzioni
 
--- ognuno può scrivere solo i propri punteggi
-drop policy if exists "inserisce i propri punti" on public.scores;
-create policy "inserisce i propri punti" on public.scores
-  for insert with check (auth.uid() = user_id);
+-- registrazione
+create or replace function public.efg_register(p_email text, p_name text, p_phone text)
+returns table (pid uuid, name text)
+language plpgsql security definer set search_path = public as $$
+declare e text := lower(trim(p_email));
+begin
+  if e !~* '^[^@\s]+@[^@\s]+\.[^@\s]+$' then raise exception 'invalid email'; end if;
+  if char_length(trim(p_name)) not between 2 and 20 then raise exception 'invalid name'; end if;
+  if exists (select 1 from efg_players where efg_players.email = e) then raise exception 'already registered'; end if;
+  return query insert into efg_players(email, name, phone) values (e, trim(p_name), p_phone)
+    returning efg_players.pid, efg_players.name;
+end $$;
 
-drop policy if exists "aggiorna i propri punti" on public.scores;
-create policy "aggiorna i propri punti" on public.scores
-  for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+-- accesso con la sola email
+create or replace function public.efg_login(p_email text)
+returns table (pid uuid, name text)
+language sql security definer set search_path = public as $$
+  select pid, name from efg_players where email = lower(trim(p_email));
+$$;
 
-create index if not exists scores_game_score on public.scores (game, score desc);
+-- salva un punteggio, tenendo solo il migliore
+create or replace function public.efg_submit(p_email text, p_game text, p_score integer)
+returns boolean
+language plpgsql security definer set search_path = public as $$
+declare e text := lower(trim(p_email)); n int;
+begin
+  if not exists (select 1 from efg_players where email = e) then raise exception 'not found'; end if;
+  insert into efg_scores(email, game, score) values (e, p_game, p_score)
+  on conflict (email, game) do update set score = excluded.score, updated_at = now()
+    where efg_scores.score < excluded.score;
+  get diagnostics n = row_count;
+  return n > 0;
+end $$;
+
+-- classifica: 'all' = somma dei 4 giochi, oppure l'id di un gioco
+create or replace function public.efg_board(p_game text)
+returns table (pid uuid, name text, score integer)
+language sql stable security definer set search_path = public as $$
+  select p.pid, p.name, sum(s.score)::int as score
+  from efg_scores s join efg_players p on p.email = s.email
+  where p_game = 'all' or s.game = p_game
+  group by p.pid, p.name
+  order by score desc, min(s.updated_at) asc
+  limit 50;
+$$;
+
+revoke all on function public.efg_register(text,text,text), public.efg_login(text),
+  public.efg_submit(text,text,integer), public.efg_board(text) from public;
+grant execute on function public.efg_register(text,text,text), public.efg_login(text),
+  public.efg_submit(text,text,integer), public.efg_board(text) to anon, authenticated;
