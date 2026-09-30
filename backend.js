@@ -37,8 +37,8 @@ const Backend = remote ? {
     store.set('efgSessionLive', u); return { user:u };
   },
   async signOut(){ store.set('efgSessionLive', null); },
-  async submit(user, game, score){ return !!(await rpc('efg_submit', { p_email:user.email, p_game:game, p_score:score })); },
-  // game: 'all' (somma dei 4 giochi) oppure l'id del gioco → [{pid, name, score}] ordinati
+  async submit(user, game, score, levels){ return !!(await rpc('efg_submit', { p_email:user.email, p_game:game, p_score:score, p_levels:levels })); },
+  // game: 'all' (somma dei 4 giochi) oppure l'id del gioco → [{pid, name, levels, score}] ordinati
   async board(game){ return (await rpc('efg_board', { p_game:game })) || []; },
 } : {
   remote:false,
@@ -56,21 +56,21 @@ const Backend = remote ? {
     const u = { id:x.pid, email:x.email, nickname:x.name }; store.set('efgSession3', u); return { user:u };
   },
   async signOut(){ store.set('efgSession3', null); },
-  async submit(user, game, score){
-    const rows = store.get('efgDemoScores3', {}); const k = user.email + '|' + game;
-    if (rows[k] && rows[k].score >= score) return false;
-    rows[k] = { email:user.email, game, score }; store.set('efgDemoScores3', rows); return true;
+  async submit(user, game, score, levels){
+    const rows = store.get('efgDemoScores4', {}); const k = user.email + '|' + game; const o = rows[k];
+    if (o && (o.levels > levels || (o.levels === levels && o.score >= score))) return false;
+    rows[k] = { email:user.email, game, score, levels }; store.set('efgDemoScores4', rows); return true;
   },
   async board(game){
     const users = store.get('efgDemoUsers3', {});
     const tot = {};
-    for (const r of Object.values(store.get('efgDemoScores3', {}))){
+    for (const r of Object.values(store.get('efgDemoScores4', {}))){
       if (game !== 'all' && r.game !== game) continue;
       const u = users[r.email]; if (!u) continue;
-      const t = tot[r.email] = tot[r.email] || { pid:u.pid, name:u.name, score:0 };
-      t.score += r.score;
+      const t = tot[r.email] = tot[r.email] || { pid:u.pid, name:u.name, levels:0, score:0 };
+      t.score += r.score; t.levels += r.levels || 0;
     }
-    return Object.values(tot).sort((a,b)=>b.score-a.score).slice(0,50);
+    return Object.values(tot).sort((a,b)=>b.levels-a.levels || b.score-a.score).slice(0,50);
   },
 };
 

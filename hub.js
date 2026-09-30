@@ -46,7 +46,10 @@ document.addEventListener('keydown', e=>{ if (e.key === 'Escape'){ ['mUnlock','m
 
 /* ================= STATE ================= */
 let unlocked = new Set(store.get('efgUnlocked', []));
-let bests = store.get('efgBestsTime', {});   // best score (seconds left) per game on this device
+// best result per game on this device: { l: levels passed (0-3), s: points }
+let bests = store.get('efgBests3', {});
+const better = (a, b) => !b || a.l > b.l || (a.l === b.l && a.s > b.s);
+const fmtRes = r => r.l + '/' + LEVELS + ' liv · ' + r.s + ' pt';
 let session = null;                          // {id, email, nickname}
 
 /* ================= BACKEND (backend.js) ================= */
@@ -64,7 +67,7 @@ function renderGrid(){
     const name = document.createElement('span'); name.className = 'name'; name.textContent = g.name;
     const st = document.createElement('span'); st.className = 'state'; st.textContent = open ? 'Gioca ▶' : 'Da sbloccare';
     const best = document.createElement('span'); best.className = 'best';
-    if (bests[g.id] !== undefined){ best.innerHTML = 'Record: <b></b> pt'; best.querySelector('b').textContent = bests[g.id]; }
+    if (bests[g.id]){ best.innerHTML = 'Record: <b></b>'; best.querySelector('b').textContent = fmtRes(bests[g.id]); }
     b.append(img, name, st, best);
     b.addEventListener('click', ()=> open ? play(g) : askUnlock(g));
     grid.appendChild(b);
@@ -74,7 +77,7 @@ function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v7' : 'Modalità demo: account e classifica restano su questo telefono. · v7';
+  mn.textContent = remote ? 'Classifica online · v8' : 'Modalità demo: account e classifica restano su questo telefono. · v8';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -190,28 +193,35 @@ window.addEventListener('message', async e=>{
     clk.classList.toggle('warn', left <= 10);
     return;
   }
-  if (d.ev === 'result') showResult(playing, !!d.ok, d.reason, Number(d.seconds)||0, d.level);
+  if (d.ev === 'result') showResult(playing, !!d.ok, d.reason, Number(d.seconds)||0, Number(d.level)||1, Number(d.used)||0, Array.isArray(d.times) ? d.times.map(Number) : null);
 });
 
-async function showResult(g, ok, reason, seconds, level){
-  const score = ok ? Math.max(0, Math.round(TOTAL - seconds)) : 0;
+// ogni livello superato vale (secondi che avanzano sul suo minuto) x (numero del livello):
+// livello 1 x1, livello 2 x2, livello 3 x3 → massimo 60+120+180 = 360. Un livello non finito vale 0.
+const MAX_SCORE = LEVEL_SECONDS * LEVELS * (LEVELS + 1) / 2;
+async function showResult(g, ok, reason, seconds, level, used, times){
+  if (!times){ const n = ok ? LEVELS : Math.max(0, level - 1); times = Array.from({length:n}, ()=> n ? used / n : 0); }
+  times = times.slice(0, LEVELS);
+  const levels = times.length;
+  const score = Math.max(0, Math.min(MAX_SCORE, Math.round(times.reduce((sum, t, i)=> sum + Math.max(0, LEVEL_SECONDS - t) * (i + 1), 0))));
+  const res = { l:levels, s:score };
   $('rsIcon').src = g.icon; $('rsGame').textContent = g.name;
   $('rsTitle').textContent = ok ? 'Tre livelli completati!' : (reason === 'time' ? 'Tempo scaduto' : 'Vite finite');
   $('rsScore').textContent = score;
-  $('rsLine').textContent = ok ? 'punti · secondi rimasti sui 3 minuti' : 'punti · al livello ' + level + ' di ' + LEVELS;
-  $('rsTime').textContent = ok ? fmt(seconds) : '—';
+  $('rsLine').textContent = 'punti · ' + levels + (levels === 1 ? ' livello superato' : ' livelli superati') + ' su ' + LEVELS;
+  $('rsLevels').textContent = levels + '/' + LEVELS;
+  $('rsTime').textContent = fmt(times.reduce((a,b)=>a+b,0));
   const prev = bests[g.id];
-  const isBest = ok && (prev === undefined || score > prev);
-  if (isBest){ bests[g.id] = score; store.set('efgBestsTime', bests); }
-  else if (prev === undefined){ bests[g.id] = 0; store.set('efgBestsTime', bests); }
-  $('rsBest').textContent = bests[g.id];
+  const isBest = levels > 0 && better(res, prev);
+  if (isBest){ bests[g.id] = res; store.set('efgBests3', bests); }
+  $('rsBest').textContent = bests[g.id] ? fmtRes(bests[g.id]) : '—';
   const msg = $('rsMsg');
-  if (!ok) setMsg(msg, 'Completa i 3 livelli entro un minuto ciascuno per fare punti. Il record precedente resta valido.');
-  else if (!isBest) setMsg(msg, 'Il tuo record resta ' + prev + ': in classifica conta solo il risultato migliore.');
+  if (levels === 0) setMsg(msg, 'Supera almeno un livello entro il minuto per entrare in classifica.' + (prev ? ' Il tuo record resta valido.' : ''));
+  else if (!isBest) setMsg(msg, 'Il tuo record resta ' + fmtRes(prev) + ': in classifica conta solo il risultato migliore.');
   else if (!session) setMsg(msg, 'Nuovo record! Registrati o accedi per entrare in classifica.', 'ok');
   else {
     setMsg(msg, 'Nuovo record! Salvo in classifica…', 'ok');
-    try { await Backend.submit(session, g.id, score); setMsg(msg, 'Nuovo record salvato in classifica!', 'ok'); }
+    try { await Backend.submit(session, g.id, score, levels); setMsg(msg, 'Nuovo record salvato in classifica!', 'ok'); }
     catch(err){ setMsg(msg, 'Non riesco a salvare in classifica: ' + friendly(err), 'err'); }
   }
   $('mResult').hidden = false;
@@ -231,7 +241,7 @@ const validEmail = e => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
 
 async function loggedIn(user){
   session = user; $('mAuth').hidden = true; renderDock(); toast('Benvenuto, ' + session.nickname + '!');
-  for (const g of GAMES){ if (bests[g.id] > 0){ try { await Backend.submit(session, g.id, bests[g.id]); } catch(e){} } }   // records made before logging in
+  for (const g of GAMES){ const b = bests[g.id]; if (b && b.l > 0){ try { await Backend.submit(session, g.id, b.s, b.l); } catch(e){} } }   // records made before logging in
 }
 $('fSignup').addEventListener('submit', async e=>{
   e.preventDefault();
@@ -275,17 +285,16 @@ async function loadBoard(){
     const li = document.createElement('li'); if (session && r.pid === session.id) li.className = 'me';
     const a = document.createElement('span'); a.className = 'r'; a.textContent = i+1;
     const n = document.createElement('span'); n.className = 'n'; n.textContent = r.name;
-    const s = document.createElement('span'); s.className = 's'; s.textContent = r.score + ' pt';
+    const s = document.createElement('span'); s.className = 's'; s.textContent = (r.levels||0) + '/' + (boardTab === 'all' ? LEVELS*GAMES.length : LEVELS) + ' liv · ' + r.score + ' pt';
     li.append(a, n, s); list.appendChild(li);
   });
 }
 $('btnBoard').onclick = ()=>{
-  $('bNote').textContent = (boardTab === 'all' ? 'Totale = somma dei record nei 4 giochi (massimo 720). ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
+  $('bNote').textContent = (boardTab === 'all' ? 'Totale = somma dei record nei 4 giochi. Prima contano i livelli superati, poi i punti. ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
   renderBoardTabs(); openModal('mBoard'); loadBoard();
 };
 
 /* ================= BOOT ================= */
 renderGrid(); renderDock();
 Backend.current().then(u=>{ session = u; renderDock(); });
-if (remote) sb.auth.onAuthStateChange((_e, s)=>{ if (!s){ session = null; renderDock(); } });
 })();

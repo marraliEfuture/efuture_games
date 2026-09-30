@@ -54,18 +54,21 @@ CODICI DI SBLOCCO (uno per gioco)
    - In fondo: "Registrati / Accedi". Registrazione: nome, cellulare,
      email. Accesso: basta l'email, nessuna password.
    - REGOLE DI GARA (solo dentro l'app): ogni gioco ha 3 livelli, al
-     massimo 1 minuto ciascuno. Punteggio = secondi che avanzano sui
-     3 minuti (es. finisci in 2:30 -> 30 punti). Se scade il minuto o
-     finisci le vite, 0 punti. Aperti da soli, i giochi hanno tutti i
-     livelli e nessun limite di tempo.
-   - Classifica: Totale (somma dei record nei 4 giochi, massimo 720) e
+     massimo 1 minuto ciascuno. Ogni livello superato vale i secondi
+     che avanzano sul suo minuto moltiplicati per il numero del livello:
+     es. 30 s avanzati in ciascun livello -> 1x30 + 2x30 + 3x30 = 180.
+     Massimo 360 punti per gioco. Il livello in cui scade il tempo o
+     finiscono le vite vale 0, quelli già superati restano.
+     In classifica contano prima i livelli superati, poi i punti.
+     Aperti da soli, i giochi hanno tutti i livelli e nessun limite.
+   - Classifica: Totale (somma dei record nei 4 giochi, massimo 12 livelli e 1440 punti) e
      una per gioco. Se rigiochi, conta solo il risultato migliore.
      I record fatti prima di accedere vengono aggiunti al primo accesso.
    - I giochi sbloccati restano sbloccati su quel telefono.
 
 
 4) AGGIORNARE
-   Sostituisci i file e in sw.js cambia 'efuture-games-v4' in v5, v6...
+   Sostituisci i file e in sw.js cambia 'efuture-games-v8' in v9, v10...
 
 Nota: lo sblocco e i punteggi sono controllati dal telefono del
 giocatore. Per un evento va benissimo, ma un utente esperto potrebbe

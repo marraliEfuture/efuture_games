@@ -19,11 +19,18 @@ create table if not exists public.efg_players (
 create table if not exists public.efg_scores (
   email      text not null references public.efg_players(email) on delete cascade,
   game       text not null check (game in ('sysadmin','coretech','timenet','inncloud')),
-  score      integer not null check (score between 0 and 180),
+  score      integer not null check (score between 0 and 360),
+  levels     integer not null default 0 check (levels between 0 and 3),
   updated_at timestamptz not null default now(),
   primary key (email, game)
 );
-create index if not exists efg_scores_game_score on public.efg_scores (game, score desc);
+-- aggiornamento di un database già creato: livelli superati per ogni record, punti fino a 360
+alter table public.efg_scores drop constraint if exists efg_scores_score_check;
+alter table public.efg_scores add constraint efg_scores_score_check check (score between 0 and 360);
+alter table public.efg_scores add column if not exists levels integer not null default 0 check (levels between 0 and 3);
+create index if not exists efg_scores_game_score on public.efg_scores (game, levels desc, score desc);
+drop function if exists public.efg_submit(text,text,integer);
+drop function if exists public.efg_board(text);
 
 alter table public.efg_players enable row level security;
 alter table public.efg_scores  enable row level security;
@@ -49,33 +56,34 @@ language sql security definer set search_path = public as $$
   select pid, name from efg_players where email = lower(trim(p_email));
 $$;
 
--- salva un punteggio, tenendo solo il migliore
-create or replace function public.efg_submit(p_email text, p_game text, p_score integer)
+-- salva un risultato, tenendo solo il migliore:
+-- prima contano i livelli superati, a parità di livelli i punti
+create or replace function public.efg_submit(p_email text, p_game text, p_score integer, p_levels integer)
 returns boolean
 language plpgsql security definer set search_path = public as $$
 declare e text := lower(trim(p_email)); n int;
 begin
   if not exists (select 1 from efg_players where email = e) then raise exception 'not found'; end if;
-  insert into efg_scores(email, game, score) values (e, p_game, p_score)
-  on conflict (email, game) do update set score = excluded.score, updated_at = now()
-    where efg_scores.score < excluded.score;
+  insert into efg_scores(email, game, score, levels) values (e, p_game, p_score, p_levels)
+  on conflict (email, game) do update set score = excluded.score, levels = excluded.levels, updated_at = now()
+    where (efg_scores.levels, efg_scores.score) < (excluded.levels, excluded.score);
   get diagnostics n = row_count;
   return n > 0;
 end $$;
 
 -- classifica: 'all' = somma dei 4 giochi, oppure l'id di un gioco
 create or replace function public.efg_board(p_game text)
-returns table (pid uuid, name text, score integer)
+returns table (pid uuid, name text, levels integer, score integer)
 language sql stable security definer set search_path = public as $$
-  select p.pid, p.name, sum(s.score)::int as score
+  select p.pid, p.name, sum(s.levels)::int as levels, sum(s.score)::int as score
   from efg_scores s join efg_players p on p.email = s.email
   where p_game = 'all' or s.game = p_game
   group by p.pid, p.name
-  order by score desc, min(s.updated_at) asc
+  order by levels desc, score desc, max(s.updated_at) asc
   limit 50;
 $$;
 
 revoke all on function public.efg_register(text,text,text), public.efg_login(text),
-  public.efg_submit(text,text,integer), public.efg_board(text) from public;
+  public.efg_submit(text,text,integer,integer), public.efg_board(text) from public;
 grant execute on function public.efg_register(text,text,text), public.efg_login(text),
-  public.efg_submit(text,text,integer), public.efg_board(text) to anon, authenticated;
+  public.efg_submit(text,text,integer,integer), public.efg_board(text) to anon, authenticated;

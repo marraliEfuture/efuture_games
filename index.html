@@ -144,7 +144,7 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
   </header>
   <main>
     <p class="intro">Quattro giochi arcade, uno per ogni sponsor. Visita gli stand, inquadra il QR per sbloccare il gioco e scala la classifica.</p>
-    <p class="rules">Ogni gioco: <b>3 livelli</b>, massimo <b>1 minuto</b> ciascuno. Il punteggio sono i <b>secondi che avanzano</b> sui 3 minuti. Conta sempre il tuo risultato migliore.</p>
+    <p class="rules">Ogni gioco: <b>3 livelli</b>, massimo <b>1 minuto</b> ciascuno. Ogni livello superato vale i <b>secondi che avanzano</b> sul suo minuto <b>moltiplicati per il numero del livello</b> (×1, ×2, ×3). In classifica contano prima i <b>livelli superati</b>, poi i punti. Vale il tuo risultato migliore.</p>
     <div class="grid" id="grid"></div>
   </main>
   <div class="dock" id="dock">
@@ -223,7 +223,8 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
     <div class="result-big" id="rsScore">0</div>
     <div class="result-sub" id="rsLine">punti</div>
     <div class="stats2">
-      <span>Tempo</span><b id="rsTime">0:00</b>
+      <span>Livelli superati</span><b id="rsLevels">0/3</b>
+      <span>Tempo nei livelli superati</span><b id="rsTime">0:00</b>
       <span>Il tuo record</span><b id="rsBest">0</b>
     </div>
     <p class="msg" id="rsMsg"></p>
@@ -239,11 +240,11 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=7"></script>
+<script src="config.js?v=8"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=7"></script>
+<script src="backend.js?v=8"></script>
 <script src="vendor/jsQR.js"></script>
-<script src="hub.js?v=7"></script>
+<script src="hub.js?v=8"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });

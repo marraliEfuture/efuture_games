@@ -64,10 +64,13 @@ main{flex:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr);gap
 .ph h2{font-family:var(--title);font-weight:700;font-size:clamp(15px,1.3vw,22px);letter-spacing:-.5px;line-height:1.2;margin:0;color:var(--ink)}
 .ph .sub{font-size:clamp(11px,.8vw,13px);font-weight:300;letter-spacing:.4px;color:var(--muted);margin-top:2px}
 ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-li{display:grid;grid-template-columns:2.1em minmax(0,1fr) auto;gap:12px;align-items:center;padding:.5em .8em;border-radius:4px;background:var(--row);font-size:clamp(13px,1vw,17px);transition:background .6s}
+li{display:grid;grid-template-columns:2.1em minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:.5em .8em;border-radius:4px;background:var(--row);font-size:clamp(13px,1vw,17px);transition:background .6s}
 li .r{font-family:var(--title);font-weight:700;font-size:.85em;width:2.1em;height:2.1em;border-radius:50%;display:grid;place-items:center;color:var(--muted);background:#fff;border:1px solid var(--line)}
 li .n{font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 li .s{font-family:var(--title);font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+li .lv{font-family:var(--title);font-weight:700;font-size:.72em;color:var(--navy);background:#e3f3ff;border-radius:3px;padding:.25em .55em;white-space:nowrap}
+.total li .lv{background:rgba(138,208,255,.18);color:var(--sky)}
+li .s{min-width:4.2em;text-align:right}
 li .s small{font-family:var(--body);font-weight:300;font-size:.75em;color:var(--muted);margin-left:.3em}
 li:nth-child(1) .r{background:var(--gold);border-color:var(--gold);color:#fff}
 li:nth-child(2) .r{background:var(--silver);border-color:var(--silver);color:var(--navy)}
@@ -144,7 +147,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 
 <main>
   <section class="panel total" aria-labelledby="tTotal">
-    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale</h2><div class="sub">Somma dei record nei 4 giochi · max 720 punti</div></div></div>
+    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale</h2><div class="sub">Somma dei record nei 4 giochi · prima i livelli, poi i punti</div></div></div>
     <ol id="list-all"></ol>
   </section>
   <div class="games" id="games"></div>
@@ -154,13 +157,13 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 
 <footer>
   <div class="join"><img src="qr/qr-app.png" alt="QR per aprire Efuture Games"><div><b>Gioca <mark>anche tu</mark></b><span>Inquadra il QR, sblocca i giochi agli stand e scala la classifica.</span></div></div>
-  <div class="rules">3 livelli per gioco, massimo 1 minuto ciascuno. Il punteggio sono i secondi che avanzano sui 3 minuti. Conta il risultato migliore.</div>
+  <div class="rules">3 livelli per gioco, massimo 1 minuto ciascuno. Ogni livello superato vale i secondi che avanzano sul suo minuto moltiplicati per il numero del livello (×1, ×2, ×3). In classifica contano prima i livelli superati, poi i punti.</div>
   <div class="powered">powered by <img src="img/efuture-white.png" alt="efuture"></div>
 </footer>
 
-<script src="config.js?v=7"></script>
+<script src="config.js?v=8"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=7"></script>
+<script src="backend.js?v=8"></script>
 <script>
 (function(){
 "use strict";
@@ -181,7 +184,7 @@ $('demoNote').hidden = B.remote;
 // game panels
 for (const g of GAMES){
   const sec = document.createElement('section'); sec.className = 'panel'; sec.setAttribute('aria-label', g.name);
-  sec.innerHTML = '<div class="ph"><img alt=""><div><h2></h2><div class="sub">Top ' + TOP_GAME + ' · max 180 punti</div></div></div><ol></ol>';
+  sec.innerHTML = '<div class="ph"><img alt=""><div><h2></h2><div class="sub">Top ' + TOP_GAME + ' · livelli superati e punti</div></div></div><ol></ol>';
   sec.querySelector('img').src = g.icon; sec.querySelector('h2').textContent = g.name;
   sec.querySelector('ol').id = 'list-' + g.id;
   $('games').appendChild(sec);
@@ -192,14 +195,15 @@ function render(key, rows, top){
   const ol = $('list-' + key); ol.innerHTML = '';
   rows = rows.slice(0, top);
   if (!rows.length){ const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Ancora nessun punteggio. Sarai il primo?'; ol.appendChild(li); return; }
-  const prev = last[key]; last[key] = new Set(rows.map(r => r.pid + ':' + r.score));
+  const prev = last[key]; last[key] = new Set(rows.map(r => r.pid + ':' + r.levels + ':' + r.score));
   rows.forEach((r, i) => {
     const li = document.createElement('li');
     const a = document.createElement('span'); a.className = 'r'; a.textContent = i + 1;
     const n = document.createElement('span'); n.className = 'n'; n.textContent = r.name;
+    const lv = document.createElement('span'); lv.className = 'lv'; lv.textContent = (r.levels || 0) + '/' + (key === 'all' ? 12 : 3) + ' liv';
     const s = document.createElement('span'); s.className = 's'; s.textContent = r.score; const u = document.createElement('small'); u.textContent = 'pt'; s.appendChild(u);
-    li.append(a, n, s); ol.appendChild(li);
-    if (prev && !prev.has(r.pid + ':' + r.score)){ li.classList.add('fresh'); setTimeout(() => li.classList.remove('fresh'), 2500); }
+    li.append(a, n, lv, s); ol.appendChild(li);
+    if (prev && !prev.has(r.pid + ':' + r.levels + ':' + r.score)){ li.classList.add('fresh'); setTimeout(() => li.classList.remove('fresh'), 2500); }
   });
 }
 
