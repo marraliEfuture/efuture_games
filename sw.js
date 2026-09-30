@@ -1,6 +1,6 @@
 // Efuture Games - service worker: tiene i giochi sul telefono per giocare anche con poca rete.
 // Quando aggiorni l'app, cambia il numero di versione qui sotto.
-const CACHE = 'efuture-games-v6';
+const CACHE = 'efuture-games-v7';
 const ASSETS = [
   "./",
   "config.js",
@@ -93,8 +93,9 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;   // classifica e login vanno sempre in rete
-  if (e.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('config.js')) {
-    e.respondWith(fetch(e.request).then((r) => { const c = r.clone(); caches.open(CACHE).then((k) => k.put(e.request, c)); return r; })
+  // pagine e script: sempre la versione più recente dalla rete (la copia salvata serve solo offline)
+  if (e.request.mode === 'navigate' || /\.(html|js|webmanifest)$/.test(url.pathname)) {
+    e.respondWith(fetch(e.request, { cache: 'no-cache' }).then((r) => { const c = r.clone(); caches.open(CACHE).then((k) => k.put(e.request, c)); return r; })
       .catch(() => caches.match(e.request, { ignoreSearch: true }).then((m) => m || caches.match('index.html'))));
   } else {
     e.respondWith(caches.match(e.request).then((hit) => hit || fetch(e.request)));
