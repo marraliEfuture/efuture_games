@@ -24,19 +24,19 @@ const one = d => Array.isArray(d) ? d[0] : d;
 
 const Backend = remote ? {
   remote:true,
-  async current(){ return store.get('efgSession3', null); },
+  async current(){ return store.get('efgSessionLive', null); },
   async signUp({ name, phone, email }){
     const r = one(await rpc('efg_register', { p_email:normEmail(email), p_name:name, p_phone:phone }));
     const u = { id:r.pid, email:normEmail(email), nickname:r.name };
-    store.set('efgSession3', u); return { user:u };
+    store.set('efgSessionLive', u); return { user:u };
   },
   async signIn(email){
     const r = one(await rpc('efg_login', { p_email:normEmail(email) }));
     if (!r) throw new Error('not found');
     const u = { id:r.pid, email:normEmail(email), nickname:r.name };
-    store.set('efgSession3', u); return { user:u };
+    store.set('efgSessionLive', u); return { user:u };
   },
-  async signOut(){ store.set('efgSession3', null); },
+  async signOut(){ store.set('efgSessionLive', null); },
   async submit(user, game, score){ return !!(await rpc('efg_submit', { p_email:user.email, p_game:game, p_score:score })); },
   // game: 'all' (somma dei 4 giochi) oppure l'id del gioco → [{pid, name, score}] ordinati
   async board(game){ return (await rpc('efg_board', { p_game:game })) || []; },

@@ -10,8 +10,8 @@
    MODALITÀ DEMO: account e classifica solo su questo telefono.
    ============================================================ */
 window.EFG_CONFIG = {
-  SUPABASE_URL: "",
-  SUPABASE_ANON_KEY: "",
+  SUPABASE_URL: "https://kodhwbrxjhnlmvwrmkbu.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_FVe3tJzNjHzLC29m54WV_w_jHH6G8Jj",
   // indirizzo pubblico dell'app (serve per i QR di sblocco)
   PUBLIC_URL: "https://marraliefuture.github.io/efuture_games/"
 };
