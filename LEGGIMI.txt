@@ -54,14 +54,14 @@ CODICI DI SBLOCCO (uno per gioco)
    - In fondo: "Registrati / Accedi". Registrazione: nome, cellulare,
      email. Accesso: basta l'email, nessuna password.
    - REGOLE DI GARA (solo dentro l'app): ogni gioco ha 3 livelli, al
-     massimo 1 minuto ciascuno. Ogni livello superato vale i secondi
-     che avanzano sul suo minuto moltiplicati per il numero del livello:
-     es. 30 s avanzati in ciascun livello -> 1x30 + 2x30 + 3x30 = 180.
-     Massimo 360 punti per gioco. Il livello in cui scade il tempo o
+     massimo 1 minuto ciascuno. Ogni livello superato vale
+     numero del livello x secondi che avanzano x vite rimaste, poi si
+     sommano. Es. livello 1 finito in 35 s con 2 vite -> 1x25x2 = 50;
+     livello 2 con 20 s avanzati e 3 vite -> 2x20x3 = 120. Il livello in cui scade il tempo o
      finiscono le vite vale 0, quelli già superati restano.
      In classifica contano prima i livelli superati, poi i punti.
      Aperti da soli, i giochi hanno tutti i livelli e nessun limite.
-   - Classifica: Totale (somma dei record nei 4 giochi, massimo 12 livelli e 1440 punti) e
+   - Classifica: Totale (somma dei record nei 4 giochi, massimo 12 livelli) e
      una per gioco. Se rigiochi, conta solo il risultato migliore.
      I record fatti prima di accedere vengono aggiunti al primo accesso.
    - I giochi sbloccati restano sbloccati su quel telefono.

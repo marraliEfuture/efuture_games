@@ -19,14 +19,14 @@ create table if not exists public.efg_players (
 create table if not exists public.efg_scores (
   email      text not null references public.efg_players(email) on delete cascade,
   game       text not null check (game in ('sysadmin','coretech','timenet','inncloud')),
-  score      integer not null check (score between 0 and 360),
+  score      integer not null check (score between 0 and 100000),
   levels     integer not null default 0 check (levels between 0 and 3),
   updated_at timestamptz not null default now(),
   primary key (email, game)
 );
--- aggiornamento di un database già creato: livelli superati per ogni record, punti fino a 360
+-- aggiornamento di un database già creato: livelli superati per ogni record, punti = livello x secondi x vite
 alter table public.efg_scores drop constraint if exists efg_scores_score_check;
-alter table public.efg_scores add constraint efg_scores_score_check check (score between 0 and 360);
+alter table public.efg_scores add constraint efg_scores_score_check check (score between 0 and 100000);
 alter table public.efg_scores add column if not exists levels integer not null default 0 check (levels between 0 and 3);
 create index if not exists efg_scores_game_score on public.efg_scores (game, levels desc, score desc);
 drop function if exists public.efg_submit(text,text,integer);

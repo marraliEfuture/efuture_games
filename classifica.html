@@ -157,13 +157,13 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 
 <footer>
   <div class="join"><img src="qr/qr-app.png" alt="QR per aprire Efuture Games"><div><b>Gioca <mark>anche tu</mark></b><span>Inquadra il QR, sblocca i giochi agli stand e scala la classifica.</span></div></div>
-  <div class="rules">3 livelli per gioco, massimo 1 minuto ciascuno. Ogni livello superato vale i secondi che avanzano sul suo minuto moltiplicati per il numero del livello (×1, ×2, ×3). In classifica contano prima i livelli superati, poi i punti.</div>
+  <div class="rules">3 livelli per gioco, massimo 1 minuto ciascuno. Ogni livello superato vale numero del livello × secondi che avanzano × vite rimaste, poi si sommano. In classifica contano prima i livelli superati, poi i punti.</div>
   <div class="powered">powered by <img src="img/efuture-white.png" alt="efuture"></div>
 </footer>
 
-<script src="config.js?v=8"></script>
+<script src="config.js?v=9"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=8"></script>
+<script src="backend.js?v=9"></script>
 <script>
 (function(){
 "use strict";

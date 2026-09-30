@@ -5,7 +5,7 @@
    Opened from the Efuture Games app (?hub=1): only 3 levels, at most
    60 seconds of play each. The time used is sent to the app, which
    turns the seconds left out of 180 into the score.                 */
-const EFG = { on: /[?&]hub=1\b/.test(location.search), max:3, limit:60, used:0, times:[], tickT:0, done:false };
+const EFG = { on: /[?&]hub=1\b/.test(location.search), max:3, limit:60, used:0, times:[], livesAt:[], tickT:0, done:false };
 function efgPost(m){ try { if (window.parent !== window) window.parent.postMessage(Object.assign({type:'efg'}, m), '*'); } catch(e){} }
 
 
@@ -467,11 +467,11 @@ function efgEnd(ok, reason){
   if (EFG.done) return;
   EFG.done = true;
   if (!ok) state = 'over';
-  efgPost({ev:'result', ok, reason: reason||'', level:lvIndex+1, max:EFG.max, used:EFG.used, times:EFG.times.slice(), seconds: EFG.used + (ok ? 0 : levelTime)});
+  efgPost({ev:'result', ok, reason: reason||'', level:lvIndex+1, max:EFG.max, used:EFG.used, times:EFG.times.slice(), lives:EFG.livesAt.slice(), seconds: EFG.used + (ok ? 0 : levelTime)});
 }
 function levelCleared(){
   if (EFG.on && !EFG.done){
-    EFG.used += levelTime; EFG.times.push(levelTime);
+    EFG.used += levelTime; EFG.times.push(levelTime); EFG.livesAt.push(lives);
     efgPost({ev:'tick', level:lvIndex+1, max:EFG.max, t:levelTime, used:EFG.used});
     if (lvIndex + 1 >= EFG.max){ state = 'clear'; sfx.clear(); efgEnd(true); return; }
   }
@@ -511,7 +511,8 @@ function fmt(s){ s=Math.floor(s); return Math.floor(s/60)+':'+String(s%60).padSt
 
 /* ================= FLOW ================= */
 function showLevelCard(i){
-  if (EFG.on && i === 0){ EFG.used = 0; EFG.times = []; EFG.done = false; efgPost({ev:'start'}); }
+  if (EFG.on) lives = 3;   // gara: 3 vite per ogni livello
+  if (EFG.on && i === 0){ EFG.used = 0; EFG.times = []; EFG.livesAt = []; EFG.done = false; efgPost({ev:'start'}); }
   loadLevel(i);
   levelStartScore = score;
   state = 'levelcard';

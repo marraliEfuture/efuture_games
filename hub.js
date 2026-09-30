@@ -47,7 +47,7 @@ document.addEventListener('keydown', e=>{ if (e.key === 'Escape'){ ['mUnlock','m
 /* ================= STATE ================= */
 let unlocked = new Set(store.get('efgUnlocked', []));
 // best result per game on this device: { l: levels passed (0-3), s: points }
-let bests = store.get('efgBests3', {});
+let bests = store.get('efgBests4', {});
 const better = (a, b) => !b || a.l > b.l || (a.l === b.l && a.s > b.s);
 const fmtRes = r => r.l + '/' + LEVELS + ' liv · ' + r.s + ' pt';
 let session = null;                          // {id, email, nickname}
@@ -77,7 +77,7 @@ function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v8' : 'Modalità demo: account e classifica restano su questo telefono. · v8';
+  mn.textContent = remote ? 'Classifica online · v9' : 'Modalità demo: account e classifica restano su questo telefono. · v9';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -193,17 +193,18 @@ window.addEventListener('message', async e=>{
     clk.classList.toggle('warn', left <= 10);
     return;
   }
-  if (d.ev === 'result') showResult(playing, !!d.ok, d.reason, Number(d.seconds)||0, Number(d.level)||1, Number(d.used)||0, Array.isArray(d.times) ? d.times.map(Number) : null);
+  if (d.ev === 'result') showResult(playing, !!d.ok, d.reason, Number(d.seconds)||0, Number(d.level)||1, Number(d.used)||0, Array.isArray(d.times) ? d.times.map(Number) : null, Array.isArray(d.lives) ? d.lives.map(Number) : null);
 });
 
-// ogni livello superato vale (secondi che avanzano sul suo minuto) x (numero del livello):
-// livello 1 x1, livello 2 x2, livello 3 x3 → massimo 60+120+180 = 360. Un livello non finito vale 0.
-const MAX_SCORE = LEVEL_SECONDS * LEVELS * (LEVELS + 1) / 2;
-async function showResult(g, ok, reason, seconds, level, used, times){
+// ogni livello superato vale: numero del livello x secondi che avanzano sul suo minuto x vite rimaste
+// es. livello 1 finito a 35 s con 2 vite → 1 x 25 x 2 = 50; livello 2 con 20 s e 3 vite → 2 x 20 x 3 = 120.
+// Un livello non finito vale 0; alla fine si sommano i livelli superati.
+async function showResult(g, ok, reason, seconds, level, used, times, lives){
   if (!times){ const n = ok ? LEVELS : Math.max(0, level - 1); times = Array.from({length:n}, ()=> n ? used / n : 0); }
   times = times.slice(0, LEVELS);
   const levels = times.length;
-  const score = Math.max(0, Math.min(MAX_SCORE, Math.round(times.reduce((sum, t, i)=> sum + Math.max(0, LEVEL_SECONDS - t) * (i + 1), 0))));
+  const parts = times.map((t, i)=>{ const left = Math.max(0, Math.round(LEVEL_SECONDS - t)); const v = Math.max(0, (lives && lives[i] !== undefined) ? lives[i] : 1); return { n:i+1, left, v, pts:(i+1)*left*v }; });
+  const score = parts.reduce((a, p)=> a + p.pts, 0);
   const res = { l:levels, s:score };
   $('rsIcon').src = g.icon; $('rsGame').textContent = g.name;
   $('rsTitle').textContent = ok ? 'Tre livelli completati!' : (reason === 'time' ? 'Tempo scaduto' : 'Vite finite');
@@ -211,9 +212,10 @@ async function showResult(g, ok, reason, seconds, level, used, times){
   $('rsLine').textContent = 'punti · ' + levels + (levels === 1 ? ' livello superato' : ' livelli superati') + ' su ' + LEVELS;
   $('rsLevels').textContent = levels + '/' + LEVELS;
   $('rsTime').textContent = fmt(times.reduce((a,b)=>a+b,0));
+  $('rsCalc').textContent = parts.length ? parts.map(p=> p.n + '×' + p.left + '×' + p.v).join(' + ') + ' = ' + score : '';
   const prev = bests[g.id];
   const isBest = levels > 0 && better(res, prev);
-  if (isBest){ bests[g.id] = res; store.set('efgBests3', bests); }
+  if (isBest){ bests[g.id] = res; store.set('efgBests4', bests); }
   $('rsBest').textContent = bests[g.id] ? fmtRes(bests[g.id]) : '—';
   const msg = $('rsMsg');
   if (levels === 0) setMsg(msg, 'Supera almeno un livello entro il minuto per entrare in classifica.' + (prev ? ' Il tuo record resta valido.' : ''));
