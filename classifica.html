@@ -161,9 +161,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   <div class="powered">powered by <img src="img/efuture-white.png" alt="efuture"></div>
 </footer>
 
-<script src="config.js?v=11"></script>
+<script src="config.js?v=12"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=11"></script>
+<script src="backend.js?v=12"></script>
 <script>
 (function(){
 "use strict";
@@ -217,7 +217,8 @@ async function refresh(){
     const t = new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
     $('status').textContent = 'Live · aggiornata alle ' + t; $('dot').classList.remove('off');
   } catch(e){
-    $('status').textContent = 'Connessione assente, riprovo…'; $('dot').classList.add('off');
+    console.warn('classifica', e);
+    $('status').textContent = 'Classifica non raggiungibile (' + String(e && e.message || e).slice(0, 60) + '), riprovo…'; $('dot').classList.add('off');
   }
   timer = setTimeout(refresh, EVERY * 1000);
 }

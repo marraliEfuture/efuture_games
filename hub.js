@@ -42,7 +42,7 @@ function openModal(id){ $(id).hidden = false; }
 document.querySelectorAll('.modal').forEach(m=>{
   m.addEventListener('click', e=>{ if ((e.target === m && m.id !== 'mResult') || e.target.closest('[data-close]')){ m.hidden = true; if (m.id === 'mUnlock') stopCam(); } });
 });
-document.addEventListener('keydown', e=>{ if (e.key === 'Escape'){ ['mUnlock','mAuth','mBoard'].forEach(id=>$(id).hidden = true); stopCam(); } });
+document.addEventListener('keydown', e=>{ if (e.key === 'Escape'){ ['mUnlock','mAuth','mBoard','mInstall'].forEach(id=>$(id).hidden = true); stopCam(); } });
 
 /* ================= STATE ================= */
 let unlocked = new Set(store.get('efgUnlocked', []));
@@ -77,7 +77,7 @@ function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v11' : 'Modalità demo: account e classifica restano su questo telefono. · v11';
+  mn.textContent = remote ? 'Classifica online · v12' : 'Modalità demo: account e classifica restano su questo telefono. · v12';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -295,6 +295,58 @@ $('btnBoard').onclick = ()=>{
   $('bNote').textContent = (boardTab === 'all' ? 'Totale = somma dei record nei 4 giochi. Prima contano i livelli superati, poi i punti. ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
   renderBoardTabs(); openModal('mBoard'); loadBoard();
 };
+
+/* ================= INSTALLA L'APP =================
+   Android/Chrome: usa la richiesta di installazione del browser (beforeinstallprompt).
+   iPhone/iPad: Safari non ha una richiesta automatica, quindi mostriamo le istruzioni.
+   Si apre da sola alla prima visita e ogni volta che si arriva da un QR. */
+const ua = navigator.userAgent || '';
+const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isAndroid = /Android/i.test(ua);
+const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+const fromQr = /[?&](sblocca|installa)=/.test(location.search);
+if (/[?&]installa=/.test(location.search)) history.replaceState(null, '', location.pathname);
+let installEvt = null, autoShown = false;
+function canInstall(){ return !isStandalone() && window.top === window && !store.get('efgInstalled', false); }
+function openInstall(){
+  if (!canInstall()) return;
+  autoShown = true;
+  $('iAuto').hidden = !installEvt;
+  $('iIos').hidden = !(isIOS && !installEvt);
+  $('iAndroid').hidden = !(!isIOS && !installEvt && isAndroid);
+  if (!installEvt && !isIOS && !isAndroid) return;          // computer senza richiesta del browser: niente finestra
+  openModal('mInstall');
+}
+function updateInstallBtn(){ $('btnInstall').hidden = !(canInstall() && (installEvt || isIOS || isAndroid)); }
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault(); installEvt = e; updateInstallBtn();
+  if (autoInstallDue()) setTimeout(openInstall, 600);
+});
+window.addEventListener('appinstalled', ()=>{ installEvt = null; store.set('efgInstalled', true); $('mInstall').hidden = true; updateInstallBtn(); toast('App installata: la trovi nella schermata Home.'); });
+$('btnDoInstall').onclick = async ()=>{
+  if (!installEvt) return;
+  const e = installEvt; installEvt = null;
+  e.prompt();
+  try { const r = await e.userChoice; if (r && r.outcome === 'accepted') store.set('efgInstalled', true); } catch(err){}
+  $('mInstall').hidden = true; updateInstallBtn();
+};
+$('btnInstallLater').onclick = ()=>{ store.set('efgInstallLater', Date.now()); $('mInstall').hidden = true; };
+$('btnInstall').onclick = openInstall;
+$('mInstall').addEventListener('click', e=>{ if (e.target === $('mInstall') || e.target.closest('[data-close]')) store.set('efgInstallLater', Date.now()); });
+function autoInstallDue(){
+  if (autoShown || !canInstall()) return false;
+  const later = store.get('efgInstallLater', 0);
+  return fromQr || !later || Date.now() - later > 12*3600*1000;   // dal QR sempre; altrimenti al massimo ogni 12 ore
+}
+(function autoInstall(){
+  updateInstallBtn();
+  if (!autoInstallDue()) return;
+  // iPhone: istruzioni subito; Android: aspetta la richiesta del browser, se non arriva mostra le istruzioni
+  setTimeout(()=>{ if (autoInstallDue() && (isIOS || (isAndroid && !installEvt))) openInstall(); }, isIOS ? 1200 : 3500);
+})();
+
+// link alla classifica sempre verso il sito pubblico (anche dall'anteprima in Claude)
+try { const pu = (window.EFG_CONFIG || {}).PUBLIC_URL; if (pu) $('lnkBoard').href = pu.replace(/\/?$/, '/') + 'classifica.html'; } catch(e){}
 
 /* ================= BOOT ================= */
 renderGrid(); renderDock();
