@@ -77,7 +77,7 @@ function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v14' : 'Modalità demo: account e classifica restano su questo telefono. · v14';
+  mn.textContent = remote ? 'Classifica online · v15' : 'Modalità demo: account e classifica restano su questo telefono. · v15';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -310,7 +310,10 @@ const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: stan
 const fromQr = /[?&](sblocca|installa)=/.test(location.search);
 if (/[?&]installa=/.test(location.search)) history.replaceState(null, '', location.pathname);
 let installEvt = null, autoShown = false;
-function canInstall(){ return !isStandalone() && window.top === window && !store.get('efgInstalled', false); }
+// "già installata" vale solo 3 giorni e non conta quando si arriva dal QR o da Samsung Internet
+// (l'installazione può essere stata bloccata da Play Protect o l'app disinstallata)
+function installedRecently(){ const t = store.get('efgInstalled', 0); return typeof t === 'number' && Date.now() - t < 3*24*3600*1000; }
+function canInstall(){ return !isStandalone() && window.top === window && (fromQr || isSamsung || !installedRecently()); }
 function openInstall(){
   if (!canInstall()) return;
   autoShown = true;
@@ -327,12 +330,12 @@ window.addEventListener('beforeinstallprompt', e=>{
   installEvt = e; updateInstallBtn();
   if (autoInstallDue()) setTimeout(openInstall, 600);
 });
-window.addEventListener('appinstalled', ()=>{ installEvt = null; store.set('efgInstalled', true); $('mInstall').hidden = true; updateInstallBtn(); toast('App installata: la trovi nella schermata Home.'); });
+window.addEventListener('appinstalled', ()=>{ installEvt = null; store.set('efgInstalled', Date.now()); $('mInstall').hidden = true; updateInstallBtn(); toast('App installata: la trovi nella schermata Home.'); });
 $('btnDoInstall').onclick = async ()=>{
   if (!installEvt) return;
   const e = installEvt; installEvt = null;
   e.prompt();
-  try { const r = await e.userChoice; if (r && r.outcome === 'accepted') store.set('efgInstalled', true); } catch(err){}
+  try { const r = await e.userChoice; if (r && r.outcome === 'accepted') store.set('efgInstalled', Date.now()); } catch(err){}
   $('mInstall').hidden = true; updateInstallBtn();
 };
 $('btnInstallLater').onclick = ()=>{ store.set('efgInstallLater', Date.now()); $('mInstall').hidden = true; };
@@ -342,7 +345,7 @@ $('mInstall').addEventListener('click', e=>{ if (e.target === $('mInstall') || e
 function autoInstallDue(){
   if (autoShown || !canInstall()) return false;
   const later = store.get('efgInstallLater', 0);
-  return fromQr || !later || Date.now() - later > 12*3600*1000;   // dal QR sempre; altrimenti al massimo ogni 12 ore
+  return fromQr || !later || Date.now() - later > 2*3600*1000;   // dal QR sempre; altrimenti al massimo ogni 2 ore
 }
 (function autoInstall(){
   updateInstallBtn();
