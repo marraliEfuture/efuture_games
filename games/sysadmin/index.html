@@ -374,6 +374,28 @@ img{max-width:100%}
     #btnJump{margin-top:-18px;}
     #btnSpecial{width:50px;height:50px;font-size:18px;}
   }
+
+  /* ---------- Telefono in orizzontale: gioco a tutto schermo ----------
+     HUD, comandi e "powered by" vanno sopra al gioco, il canvas usa tutta l'altezza */
+  @media (orientation:landscape) and (max-height:560px){
+    #app{position:relative;}
+    #hud{position:absolute;top:0;left:0;right:0;border-bottom:0;
+      background:linear-gradient(180deg, rgba(11,22,36,.88), rgba(11,22,36,0));
+      padding:4px calc(12px + env(safe-area-inset-right,0px)) 10px calc(12px + env(safe-area-inset-left,0px));
+      padding-top:calc(4px + env(safe-area-inset-top,0px));}
+    #pauseBtn{width:30px;height:30px;}
+    #bossBarWrap{top:calc(36px + env(safe-area-inset-top,0px));}
+    #stage{background:#000;}
+    #game{box-shadow:none;border-radius:0;}
+    #controls{position:absolute;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));
+      background:none;border-top:0;pointer-events:none;
+      padding:0 calc(16px + env(safe-area-inset-right,0px)) 0 calc(16px + env(safe-area-inset-left,0px));}
+    #controls > *{pointer-events:auto;}
+    #controls .dbtn, #controls .abtn{opacity:.78;}
+    .powered-bar{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:6;
+      border:0;border-radius:8px 8px 0 0;background:rgba(11,22,36,.7);padding:3px 10px calc(3px + env(safe-area-inset-bottom,0px));}
+    .powered-bar img{height:12px;}
+  }
 </style>
 
 <div id="app">

@@ -133,6 +133,12 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 #playerBar .wm{margin-left:auto;height:13px}
 #playerClock{font-family:var(--pixel);font-size:9px;color:var(--ef-orange);white-space:nowrap;font-variant-numeric:tabular-nums}
 #playerClock.warn{color:var(--danger)}
+/* telefono in orizzontale: barra del giocatore sottile, il gioco usa quasi tutto lo schermo */
+@media (orientation:landscape) and (max-height:560px){
+  #playerBar{padding:2px calc(10px + env(safe-area-inset-right,0px)) 2px calc(10px + env(safe-area-inset-left,0px));gap:8px}
+  #playerBar button{padding:3px 8px;font-size:10px}
+  #playerBar .wm{height:10px}
+}
 @media (prefers-reduced-motion:reduce){.game{transition:none}}
 </style>
 </head>
@@ -270,11 +276,11 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=16"></script>
+<script src="config.js?v=17"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=16"></script>
+<script src="backend.js?v=17"></script>
 <script src="vendor/jsQR.js"></script>
-<script src="hub.js?v=16"></script>
+<script src="hub.js?v=17"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });
