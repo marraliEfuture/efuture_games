@@ -246,8 +246,8 @@ function findChar(ch){
 
 function resetActors(){
   const p = findChar('P');
-  player = { x:p.x, y:p.y, dir:DIR.right, moving:true, mouth:0, isBug:false };
-  desired = DIR.right;
+  player = { x:p.x, y:p.y, dir:null, face:DIR.right, moving:false, mouth:0, isBug:false };   // fermo finché il giocatore non sceglie una direzione
+  desired = null;
   bugs = [];
   const hx = HOUSE_EXIT.x, hy = HOUSE_IN.y;
   const starts = [ {x:hx,y:HOUSE_EXIT.y,mode:'scatter',dir:DIR.left}, {x:hx,y:hy,mode:'house',dir:DIR.left}, {x:hx-1,y:hy,mode:'house',dir:DIR.right}, {x:hx+1,y:hy,mode:'house',dir:DIR.left} ];
@@ -779,12 +779,12 @@ function render(){
   if (state === 'dying'){
     const k = 1 - Math.max(0, dyingTimer-0.3)/1.2;
     const open = 0.25*Math.PI + k*0.75*Math.PI;
-    if (open < Math.PI*0.99) drawC(ctx, px, py, T*0.53*(1-k*0.3), player.dir.a - Math.PI/2*0, open);
+    if (open < Math.PI*0.99) drawC(ctx, px, py, T*0.53*(1-k*0.3), (player.dir||player.face||DIR.left).a - Math.PI/2*0, open);
   } else {
     const open = 0.1*Math.PI + (Math.sin(player.mouth)*0.5+0.5)*0.22*Math.PI;
-    drawC(ctx, px, py, T*0.53, (player.dir||DIR.left).a, open);
-    if (player.x < 0.5) drawC(ctx, px + COLS*T, py, T*0.53, (player.dir||DIR.left).a, open);
-    if (player.x > COLS-1.5) drawC(ctx, px - COLS*T, py, T*0.53, (player.dir||DIR.left).a, open);
+    drawC(ctx, px, py, T*0.53, (player.dir||player.face||DIR.left).a, open);
+    if (player.x < 0.5) drawC(ctx, px + COLS*T, py, T*0.53, (player.dir||player.face||DIR.left).a, open);
+    if (player.x > COLS-1.5) drawC(ctx, px - COLS*T, py, T*0.53, (player.dir||player.face||DIR.left).a, open);
   }
   // bugs
   if (state !== 'dying' || dyingTimer > 1.2){
