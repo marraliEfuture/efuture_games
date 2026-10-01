@@ -252,6 +252,12 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
       <p>2. Scorri e scegli <b>Aggiungi alla schermata Home</b>.</p>
       <p>3. Tocca <b>Aggiungi</b>.</p>
     </div>
+    <div id="iSamsung" class="option" hidden>
+      <span class="t">Stai usando Samsung Internet</span>
+      <p>Per installarla senza avvisi di sicurezza aprila con <b>Chrome</b>:</p>
+      <a class="btn" id="btnOpenChrome" href="#" style="max-width:none;text-align:center;text-decoration:none">Apri in Chrome e installa</a>
+      <p style="margin-top:4px">Oppure resta qui: menu <b>≡</b> in basso → <b>Aggiungi pagina a</b> → <b>Schermata Home</b>.</p>
+    </div>
     <div id="iAndroid" class="option" hidden>
       <span class="t">Su Android</span>
       <p>1. Tocca il menu <b>⋮</b> del browser (in alto a destra).</p>
@@ -263,11 +269,11 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=12"></script>
+<script src="config.js?v=13"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=12"></script>
+<script src="backend.js?v=13"></script>
 <script src="vendor/jsQR.js"></script>
-<script src="hub.js?v=12"></script>
+<script src="hub.js?v=13"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });

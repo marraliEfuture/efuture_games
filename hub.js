@@ -77,7 +77,7 @@ function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v12' : 'Modalità demo: account e classifica restano su questo telefono. · v12';
+  mn.textContent = remote ? 'Classifica online · v13' : 'Modalità demo: account e classifica restano su questo telefono. · v13';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -303,6 +303,9 @@ $('btnBoard').onclick = ()=>{
 const ua = navigator.userAgent || '';
 const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isAndroid = /Android/i.test(ua);
+// Samsung Internet crea il pacchetto dell'app con un formato vecchio e Google Play Protect lo blocca:
+// lì non usiamo la sua installazione ma proponiamo Chrome (o il collegamento sulla schermata Home)
+const isSamsung = /SamsungBrowser/i.test(ua);
 const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 const fromQr = /[?&](sblocca|installa)=/.test(location.search);
 if (/[?&]installa=/.test(location.search)) history.replaceState(null, '', location.pathname);
@@ -311,15 +314,17 @@ function canInstall(){ return !isStandalone() && window.top === window && !store
 function openInstall(){
   if (!canInstall()) return;
   autoShown = true;
-  $('iAuto').hidden = !installEvt;
+  $('iAuto').hidden = !installEvt || isSamsung;
   $('iIos').hidden = !(isIOS && !installEvt);
-  $('iAndroid').hidden = !(!isIOS && !installEvt && isAndroid);
+  $('iSamsung').hidden = !isSamsung;
+  $('iAndroid').hidden = !(!isIOS && !installEvt && isAndroid && !isSamsung);
   if (!installEvt && !isIOS && !isAndroid) return;          // computer senza richiesta del browser: niente finestra
   openModal('mInstall');
 }
 function updateInstallBtn(){ $('btnInstall').hidden = !(canInstall() && (installEvt || isIOS || isAndroid)); }
 window.addEventListener('beforeinstallprompt', e=>{
-  e.preventDefault(); installEvt = e; updateInstallBtn();
+  e.preventDefault(); if (isSamsung) return;
+  installEvt = e; updateInstallBtn();
   if (autoInstallDue()) setTimeout(openInstall, 600);
 });
 window.addEventListener('appinstalled', ()=>{ installEvt = null; store.set('efgInstalled', true); $('mInstall').hidden = true; updateInstallBtn(); toast('App installata: la trovi nella schermata Home.'); });
@@ -332,6 +337,7 @@ $('btnDoInstall').onclick = async ()=>{
 };
 $('btnInstallLater').onclick = ()=>{ store.set('efgInstallLater', Date.now()); $('mInstall').hidden = true; };
 $('btnInstall').onclick = openInstall;
+$('btnOpenChrome').href = 'intent://' + location.host + location.pathname + '?installa=1#Intent;scheme=https;package=com.android.chrome;end';
 $('mInstall').addEventListener('click', e=>{ if (e.target === $('mInstall') || e.target.closest('[data-close]')) store.set('efgInstallLater', Date.now()); });
 function autoInstallDue(){
   if (autoShown || !canInstall()) return false;
