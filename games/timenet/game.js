@@ -621,7 +621,19 @@ function drawBeachBall(x, y, r, spin){
 }
 
 // an original, cartoon blue dolphin; drawn facing right, mirrored for left
+/* delfino Timenet (immagine fornita); finché non è caricata si usa il disegno vettoriale */
+const DOLPHIN_IMG = new Image(); let dolphinImgOk = false;
+DOLPHIN_IMG.onload = ()=>{ dolphinImgOk = true; }; DOLPHIN_IMG.src = 'img/delfino.png';
 function drawDolphin(x, y, w, face, rot, nod){
+  if (dolphinImgOk && DOLPHIN_IMG.naturalWidth){
+    const dw = w*0.92, dh = dw * DOLPHIN_IMG.naturalHeight / DOLPHIN_IMG.naturalWidth;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot||0);
+    ctx.scale(-face, 1);                       // l'immagine guarda a sinistra
+    ctx.rotate((nod||0)*0.6);
+    ctx.drawImage(DOLPHIN_IMG, -dw/2, -dh*0.42, dw, dh);
+    ctx.restore();
+    return;
+  }
   const s = w/100;
   ctx.save(); ctx.translate(x, y); ctx.rotate(rot||0); ctx.scale(face*s, s);
   ctx.rotate(-(nod||0)*0.6);

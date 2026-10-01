@@ -1,6 +1,6 @@
 // Efuture Games - service worker: tiene i giochi sul telefono per giocare anche con poca rete.
 // Quando aggiorni l'app, cambia il numero di versione qui sotto.
-const CACHE = 'efuture-games-v10';
+const CACHE = 'efuture-games-v11';
 const ASSETS = [
   "./",
   "config.js",
@@ -54,6 +54,7 @@ const ASSETS = [
   "games/timenet/icons/icon-maskable-512.png",
   "games/timenet/img/efuture-white.png",
   "games/timenet/img/timenet-logo.png",
+  "games/timenet/img/delfino.png",
   "games/timenet/index.html",
   "hub.js",
   "backend.js",
