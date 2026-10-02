@@ -58,6 +58,7 @@ const Backend = window.EFG_BACKEND, friendly = window.EFG_FRIENDLY, remote = Bac
 /* ================= LOBBY ================= */
 function renderGrid(){
   const grid = $('grid'); grid.innerHTML = '';
+  $('gate').hidden = !!session;
   for (const g of GAMES){
     const open = unlocked.has(g.id);
     const b = document.createElement('button');
@@ -69,15 +70,17 @@ function renderGrid(){
     const best = document.createElement('span'); best.className = 'best';
     if (bests[g.id]){ best.innerHTML = 'Record: <b></b>'; best.querySelector('b').textContent = fmtRes(bests[g.id]); }
     b.append(img, name, st, best);
-    b.addEventListener('click', ()=> open ? play(g) : askUnlock(g));
+    if (!session){ b.disabled = true; b.setAttribute('aria-label', g.name + ', accedi per giocare'); }
+    b.addEventListener('click', ()=>{ if (!session) return; open ? play(g) : askUnlock(g); });
     grid.appendChild(b);
   }
 }
 function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
+  renderGrid();
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v17' : 'Modalità demo: account e classifica restano su questo telefono. · v17';
+  mn.textContent = remote ? 'Classifica online · v18' : 'Modalità demo: account e classifica restano su questo telefono. · v18';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -238,7 +241,7 @@ function showAuth(view){
 }
 $('tabSignup').onclick = ()=>showAuth('signup');
 $('tabLogin').onclick = ()=>showAuth('login');
-$('btnAuth').onclick = ()=>{ showAuth('signup'); openModal('mAuth'); };
+$('btnAuth').onclick = ()=>{ showAuth('login'); openModal('mAuth'); };
 const validEmail = e => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
 
 async function loggedIn(user){
@@ -283,16 +286,20 @@ async function loadBoard(){
   try { rows = await Backend.board(boardTab); } catch(e){ return boardMessage('Classifica non raggiungibile: controlla la connessione.'); }
   if (!rows.length) return boardMessage('Ancora nessun punteggio. Gioca e sii il primo!');
   const list = $('bList'); list.innerHTML = '';
+  const hd = document.createElement('li'); hd.className = 'hd';
+  ['Pos','Nickname','Punti'].forEach((t, k)=>{ const c = document.createElement('span'); c.textContent = t; if (k === 2) c.style.textAlign = 'right'; hd.appendChild(c); });
+  list.appendChild(hd);
+  rows = rows.slice().sort((x, y)=> (Number(y.score)||0) - (Number(x.score)||0));
   rows.forEach((r, i)=>{
     const li = document.createElement('li'); if (session && r.pid === session.id) li.className = 'me';
     const a = document.createElement('span'); a.className = 'r'; a.textContent = i+1;
     const n = document.createElement('span'); n.className = 'n'; n.textContent = r.name;
-    const s = document.createElement('span'); s.className = 's'; s.textContent = (boardTab === 'all' ? (r.games||0) + '/' + GAMES.length + ' giochi · ' + (r.levels||0) + '/' + LEVELS*GAMES.length : (r.levels||0) + '/' + LEVELS) + ' liv · ' + r.score + ' pt';
+    const s = document.createElement('span'); s.className = 's'; s.textContent = r.score;
     li.append(a, n, s); list.appendChild(li);
   });
 }
 $('btnBoard').onclick = ()=>{
-  $('bNote').textContent = (boardTab === 'all' ? 'Totale = somma dei record nei 4 giochi. Prima contano i livelli superati, poi i punti. ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
+  $('bNote').textContent = (boardTab === 'all' ? 'Totale = somma dei record nei 4 giochi. ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
   renderBoardTabs(); openModal('mBoard'); loadBoard();
 };
 
@@ -354,8 +361,7 @@ function autoInstallDue(){
   setTimeout(()=>{ if (autoInstallDue() && (isIOS || (isAndroid && !installEvt))) openInstall(); }, isIOS ? 1200 : 3500);
 })();
 
-// link alla classifica sempre verso il sito pubblico (anche dall'anteprima in Claude)
-try { const pu = (window.EFG_CONFIG || {}).PUBLIC_URL; if (pu) $('lnkBoard').href = pu.replace(/\/?$/, '/') + 'classifica.html'; } catch(e){}
+// la classifica a schermo intero è la copia che sta accanto a questa pagina (sito o artefatto)
 
 /* ================= BOOT ================= */
 renderGrid(); renderDock();

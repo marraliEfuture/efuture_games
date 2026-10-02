@@ -46,17 +46,21 @@ CODICI DI SBLOCCO (uno per gioco)
 
 2c) PANNELLO ADMIN
    https://marraliefuture.github.io/efuture_games/admin.html
-   Si entra con la chiave admin (non è nel sito: è salvata cifrata nel
-   database). Dal pannello:
-   - Giocatori: elenco con email, cellulare, punti per gioco; CSV.
-   - Registro: registrazioni, accessi, partite e operazioni admin; CSV.
-   - Backup: crea e scarica una copia (JSON), ripristina una copia.
-   - Reset: azzera i punti (i giocatori restano) o cancella tutto.
-     Prima di ogni reset viene fatto un backup automatico.
-   - Chiave: cambia la chiave admin.
-   Se perdi la chiave: Supabase > SQL Editor >
-     select efg_admin_init('NUOVA-CHIAVE-LUNGA');
-   Dopo 8 chiavi sbagliate in 10 minuti il pannello si blocca 10 minuti.
+   (anche dal pulsante "Admin" nella classifica a schermo intero)
+   Ogni amministratore entra con la SUA email e password (Supabase Auth).
+   Prima volta: esegui supabase-admin-utenti.sql nel SQL Editor (dà il
+   diritto admin a marrali@efuture.it), poi su admin.html > Primo accesso.
+   In Supabase > Authentication: provider Email attivo, "Confirm email"
+   acceso, e admin.html tra i Redirect URLs (URL Configuration).
+   Dal pannello:
+   - Utenti: elenco, punti, CSV; interruttore per dare/togliere il diritto
+     admin (deve restare sempre almeno un admin); un admin non si può
+     eliminare finché ha il diritto.
+   - Registro, Backup (crea/scarica/ripristina), Reset (gli admin restano).
+   Password dimenticata: link "Password dimenticata?" su admin.html,
+   arriva un'email per sceglierne una nuova.
+   La vecchia chiave condivisa resta valida finché non esegui
+     delete from efg_admin;
 
 
 3) COME FUNZIONA
