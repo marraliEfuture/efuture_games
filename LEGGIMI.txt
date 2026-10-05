@@ -37,15 +37,16 @@ CODICI DI SBLOCCO (uno per gioco)
    Pagina dedicata, da aprire su un PC collegato allo schermo o al
    ledwall:  https://marraliefuture.github.io/efuture_games/classifica.html
    - Si aggiorna da sola ogni 15 secondi. Pulsante "Schermo intero".
-   - Mostra la classifica generale (top 10) e i top 5 di ogni gioco,
-     più il QR per aprire l'app.
-   - Più righe:  classifica.html?top=20&topgioco=8
-   - Interruttori sotto il titolo: mostra/nascondi classifica generale,
-     classifiche dei giochi e QR code (all'apertura: solo giochi + QR);
-     menu "Giochi: primi" 3 / 5 / 10 / 20; giocatori "Utenti Efuture" (email @efuture.it)
-     e/o "Ospiti". Le scelte restano salvate sullo schermo. Per i giocatori
-     serve una volta  supabase-classifica-gruppi.sql  nel SQL Editor.
-     Da indirizzo:  classifica.html?generale=0&giochi=1&qr=0&topgioco=10&giocatori=efuture
+   - Mostra le classifiche dei giochi, la classifica generale e un QR
+     grande per aprire l'app.
+   - Pulsanti sotto il titolo (le scelte restano salvate sullo schermo):
+       Classifica  Generale / Giochi / Tutti   (all'apertura: Giochi)
+       Top         3 / 5 / 10 righe per classifica (all'apertura: 5)
+       Giocatori   Ospiti / Efuture (email @efuture.it) / Tutti
+       QR          Sì / No
+     Per il filtro Giocatori serve una volta supabase-classifica-gruppi.sql
+     nel SQL Editor. Da indirizzo, ad esempio:
+       classifica.html?classifica=tutti&top=10&giocatori=efuture&qr=no
    - In modalità demo mostra solo i punteggi del dispositivo su cui è
      aperta: per la classifica comune serve Supabase (punto 2).
 
