@@ -41,10 +41,11 @@ CODICI DI SBLOCCO (uno per gioco)
      più il QR per aprire l'app.
    - Più righe:  classifica.html?top=20&topgioco=8
    - Interruttori sotto il titolo: mostra/nascondi classifica generale,
-     classifiche dei giochi e QR code (all'apertura: solo giochi + QR); giocatori "Utenti Efuture" (email @efuture.it)
+     classifiche dei giochi e QR code (all'apertura: solo giochi + QR);
+     menu "Giochi: primi" 3 / 5 / 10 / 20; giocatori "Utenti Efuture" (email @efuture.it)
      e/o "Ospiti". Le scelte restano salvate sullo schermo. Per i giocatori
      serve una volta  supabase-classifica-gruppi.sql  nel SQL Editor.
-     Da indirizzo:  classifica.html?generale=0&giochi=1&qr=0&giocatori=efuture
+     Da indirizzo:  classifica.html?generale=0&giochi=1&qr=0&topgioco=10&giocatori=efuture
    - In modalità demo mostra solo i punteggi del dispositivo su cui è
      aperta: per la classifica comune serve Supabase (punto 2).
 
