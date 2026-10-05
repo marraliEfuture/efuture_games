@@ -362,6 +362,15 @@ function autoInstallDue(){
 })();
 
 // la classifica a schermo intero è la copia che sta accanto a questa pagina (sito o artefatto)
+// dentro un riquadro (anteprima/artefatto Claude) le nuove schede sono bloccate: la classifica si apre qui dentro
+$('lnkBoard').addEventListener('click', e=>{
+  if (window.top === window) return;              // sito o app installata: nuova scheda come sempre
+  e.preventDefault();
+  $('mBoard').hidden = true; playing = null;
+  $('playerTitle').textContent = 'Classifica'; $('playerClock').textContent = '';
+  $('frame').src = 'classifica.html';
+  $('player').hidden = false; document.body.style.overflow = 'hidden';
+});
 
 /* ================= BOOT ================= */
 renderGrid(); renderDock();
