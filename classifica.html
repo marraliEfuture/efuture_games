@@ -74,7 +74,9 @@ mark{background:none;color:var(--sky);padding:0}
 .who-tag{display:inline-block;font-family:var(--body);font-size:.6em;font-weight:600;letter-spacing:.04em;vertical-align:.25em;margin-left:.5em;padding:.2em .6em;border-radius:3px;background:var(--orange);color:#fff}
 @media (max-width:560px){.controls .grp + .grp{border-left:0;padding-left:0}}
 
-main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(14px,1.6vw,28px);padding:clamp(16px,2vw,32px) clamp(16px,3vw,48px);align-items:start}
+main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) auto;}
+main.no-qr{grid-template-columns:minmax(0,1fr)}
+main{gap:clamp(14px,1.6vw,28px);padding:clamp(16px,2vw,32px) clamp(16px,3vw,48px);align-items:start}
 .games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:inherit}
 .panel{background:var(--card);border-radius:6px;padding:clamp(14px,1.4vw,24px);display:flex;flex-direction:column;gap:12px;min-width:0;box-shadow:0 10px 30px rgba(20,29,40,.07);border:1px solid var(--line)}
 .ph{display:flex;align-items:center;gap:14px}
@@ -185,6 +187,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
     <span class="ttl">Mostra</span>
     <label class="sw"><input type="checkbox" id="swTotal" checked><span class="tr"></span>Classifica generale</label>
     <label class="sw"><input type="checkbox" id="swGames" checked><span class="tr"></span>Classifiche giochi</label>
+    <label class="sw"><input type="checkbox" id="swQr" checked><span class="tr"></span>QR code</label>
   </div>
   <div class="grp">
     <span class="ttl">Giocatori</span>
@@ -201,7 +204,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
     <ol id="list-all"></ol>
   </section>
   </div>
-  <aside class="qrbig" aria-label="QR per giocare">
+  <aside class="qrbig" id="qrBig" aria-label="QR per giocare">
     <img src="qr/qr-app.svg" alt="QR per aprire Efuture Games">
     <div class="qrcap"><b>Gioca <mark>anche tu</mark></b><span>Inquadra il QR con la fotocamera</span></div>
   </aside>
@@ -294,15 +297,16 @@ function render(key, rows, top){
 
 /* ---------- interruttori: cosa mostrare e quali giocatori ----------
    Le scelte restano su questo schermo; si possono anche fissare dall'indirizzo:
-   classifica.html?generale=0&giochi=1&giocatori=efuture|ospiti|tutti */
+   classifica.html?generale=0&giochi=1&qr=0&giocatori=efuture|ospiti|tutti */
 const store = { get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
                 set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
 const saved = store.get('efgBoardView2', {});   // v2: nuovo default, solo le classifiche dei giochi
 const qp = (k, d) => Q.has(k) ? Q.get(k) !== '0' : d;
 const qg = Q.get('giocatori');
-const sw = { total:$('swTotal'), games:$('swGames'), ef:$('swEf'), guest:$('swGuest') };
+const sw = { total:$('swTotal'), games:$('swGames'), qr:$('swQr'), ef:$('swEf'), guest:$('swGuest') };
 sw.total.checked = qp('generale', saved.total === true);
 sw.games.checked = qp('giochi', saved.games !== false);
+sw.qr.checked    = qp('qr', saved.qr !== false);
 sw.ef.checked    = qg ? qg !== 'ospiti'  : saved.ef !== false;
 sw.guest.checked = qg ? qg !== 'efuture' : saved.guest !== false;
 const view = {
@@ -310,6 +314,7 @@ const view = {
   apply(){
     const t = sw.total.checked, g = sw.games.checked;
     $('secTotal').hidden = !t; $('games').hidden = !g;
+    $('qrBig').hidden = !sw.qr.checked; $('main').classList.toggle('no-qr', !sw.qr.checked);
     $('main').classList.toggle('only-total', t && !g);
     $('main').classList.toggle('only-games', g && !t);
     // almeno una classifica e almeno un gruppo di giocatori restano sempre accesi
@@ -318,7 +323,7 @@ const view = {
     const grp = view.group(), label = grp === 'efuture' ? 'Solo utenti Efuture' : grp === 'ospiti' ? 'Solo ospiti' : '';
     $('whoTag').hidden = !label; $('whoTag').textContent = label;
     document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · ordinata per punti' + (label ? ' · ' + label.toLowerCase() : ''));
-    store.set('efgBoardView2', { total:t, games:g, ef:sw.ef.checked, guest:sw.guest.checked });
+    store.set('efgBoardView2', { total:t, games:g, qr:sw.qr.checked, ef:sw.ef.checked, guest:sw.guest.checked });
   }
 };
 let lastGroup = view.group();
