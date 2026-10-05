@@ -60,22 +60,17 @@ mark{background:none;color:var(--sky);padding:0}
 :fullscreen .btn.ghost,:fullscreen .controls{display:none}
 /* interruttori di visualizzazione */
 .controls{background:#fff;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;padding:10px clamp(16px,3vw,48px);font-size:clamp(12px,.9vw,14px);color:var(--text)}
-.controls .grp{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
-.controls .grp + .grp{border-left:1px solid var(--line);padding-left:22px}
+.controls .seg-grp + .seg-grp{border-left:1px solid var(--line);padding-left:22px}
 .controls .ttl{font-family:var(--title);font-weight:700;font-size:.8em;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.sw{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-weight:600}
-.sw input{position:absolute;opacity:0;width:1px;height:1px}
-.sw .tr{position:relative;width:40px;height:22px;border-radius:22px;background:#cfd8e3;transition:background .15s;flex:0 0 auto}
-.sw .tr::before{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .15s}
-.sw input:checked + .tr{background:var(--orange)}
-.sw input:checked + .tr::before{transform:translateX(18px)}
-.sw input:focus-visible + .tr{outline:2px solid var(--sky);outline-offset:2px}
-.sw input:disabled + .tr{opacity:.55;cursor:not-allowed}
-.topsel{display:inline-flex;align-items:center;gap:8px;font-weight:600}
-.topsel select{font:inherit;font-weight:600;padding:4px 8px;border:1px solid var(--line);border-radius:4px;background:#fff;color:var(--ink);cursor:pointer}
-.topsel select:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.seg-grp{display:flex;align-items:center;gap:10px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--row)}
+.seg button{border:0;background:none;padding:7px 14px;font:inherit;font-weight:600;color:var(--muted);cursor:pointer;min-width:44px}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button:hover{background:#e9eef4;color:var(--ink)}
+.seg button[aria-checked="true"]{background:var(--orange);color:#fff}
+.seg button:focus-visible{outline:2px solid var(--sky);outline-offset:-2px}
 .who-tag{display:inline-block;font-family:var(--body);font-size:.6em;font-weight:600;letter-spacing:.04em;vertical-align:.25em;margin-left:.5em;padding:.2em .6em;border-radius:3px;background:var(--orange);color:#fff}
-@media (max-width:560px){.controls .grp + .grp{border-left:0;padding-left:0}}
+@media (max-width:560px){.controls .seg-grp + .seg-grp{border-left:0;padding-left:0}}
 
 main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) auto;}
 main.no-qr{grid-template-columns:minmax(0,1fr)}
@@ -185,19 +180,23 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
     <a class="btn ghost" id="btnAdmin" href="admin.html" title="Area amministratori">Admin</a>
   </div>
 </header>
-<div class="controls" id="controls" role="group" aria-label="Cosa mostrare">
-  <div class="grp">
-    <span class="ttl">Mostra</span>
-    <label class="sw"><input type="checkbox" id="swTotal" checked><span class="tr"></span>Classifica generale</label>
-    <label class="sw"><input type="checkbox" id="swGames" checked><span class="tr"></span>Classifiche giochi</label>
-    <label class="sw"><input type="checkbox" id="swQr" checked><span class="tr"></span>QR code</label>
-    <label class="topsel">Giochi: primi <select id="selTop" aria-label="Quanti giocatori mostrare per ogni gioco"><option>3</option><option>5</option><option>10</option><option>20</option></select></label>
-  </div>
-  <div class="grp">
-    <span class="ttl">Giocatori</span>
-    <label class="sw"><input type="checkbox" id="swEf" checked><span class="tr"></span>Utenti Efuture</label>
-    <label class="sw"><input type="checkbox" id="swGuest" checked><span class="tr"></span>Ospiti</label>
-  </div>
+<div class="controls" id="controls" aria-label="Cosa mostrare">
+  <div class="seg-grp"><span class="ttl" id="lbBoard">Classifica</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lbBoard" data-key="board">
+      <button type="button" role="radio" data-v="generale">Generale</button><button type="button" role="radio" data-v="giochi">Giochi</button><button type="button" role="radio" data-v="tutti">Tutti</button>
+    </div></div>
+  <div class="seg-grp"><span class="ttl" id="lbTop">Top</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lbTop" data-key="top">
+      <button type="button" role="radio" data-v="3">3</button><button type="button" role="radio" data-v="5">5</button><button type="button" role="radio" data-v="10">10</button>
+    </div></div>
+  <div class="seg-grp"><span class="ttl" id="lbWho">Giocatori</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lbWho" data-key="group">
+      <button type="button" role="radio" data-v="ospiti">Ospiti</button><button type="button" role="radio" data-v="efuture">Efuture</button><button type="button" role="radio" data-v="tutti">Tutti</button>
+    </div></div>
+  <div class="seg-grp"><span class="ttl" id="lbQr">QR</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lbQr" data-key="qr">
+      <button type="button" role="radio" data-v="si">Sì</button><button type="button" role="radio" data-v="no">No</button>
+    </div></div>
 </div>
 
 <main id="main">
@@ -235,9 +234,7 @@ const GAMES = [
   { id:'inncloud', name:'Inncloud Invaders', icon:'img/g-inncloud.png' },
 ];
 const Q = new URLSearchParams(location.search);
-const TOP_ALL  = Math.max(3, Math.min(50, parseInt(Q.get('top'), 10) || 10));   // ?top=15 mostra più righe
-const TOP_CHOICES = [3, 5, 10, 20];
-let TOP_GAME = 5;   // righe per gioco: scelta dal menu "Top" (o da ?topgioco=)
+let TOP_GAME = 5;   // righe per gioco: scelta con i pulsanti "Top"
 const EVERY = 15;   // secondi tra un aggiornamento e l'altro
 const B = window.EFG_BACKEND;
 const $ = id => document.getElementById(id);
@@ -300,49 +297,53 @@ function render(key, rows, top){
   });
 }
 
-/* ---------- interruttori: cosa mostrare e quali giocatori ----------
+/* ---------- pulsanti: Classifica / Top / Giocatori / QR ----------
    Le scelte restano su questo schermo; si possono anche fissare dall'indirizzo:
-   classifica.html?generale=0&giochi=1&qr=0&topgioco=10&giocatori=efuture|ospiti|tutti */
+   classifica.html?classifica=generale|giochi|tutti&top=3|5|10&giocatori=ospiti|efuture|tutti&qr=si|no */
 const store = { get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
                 set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
-const saved = store.get('efgBoardView2', {});   // v2: nuovo default, solo le classifiche dei giochi
-const qp = (k, d) => Q.has(k) ? Q.get(k) !== '0' : d;
-const qg = Q.get('giocatori');
-const sw = { total:$('swTotal'), games:$('swGames'), qr:$('swQr'), ef:$('swEf'), guest:$('swGuest') };
-sw.total.checked = qp('generale', saved.total === true);
-sw.games.checked = qp('giochi', saved.games !== false);
-sw.qr.checked    = qp('qr', saved.qr !== false);
-{ const t = parseInt(Q.get('topgioco'), 10) || saved.top; TOP_GAME = TOP_CHOICES.includes(t) ? t : (t > 0 ? Math.max(3, Math.min(20, t)) : 5); }
-if (!TOP_CHOICES.includes(TOP_GAME)){ const o = document.createElement('option'); o.textContent = TOP_GAME; $('selTop').appendChild(o); }
-$('selTop').value = String(TOP_GAME);
-sw.ef.checked    = qg ? qg !== 'ospiti'  : saved.ef !== false;
-sw.guest.checked = qg ? qg !== 'efuture' : saved.guest !== false;
+const OPTS = { board:['generale','giochi','tutti'], top:['3','5','10'], group:['ospiti','efuture','tutti'], qr:['si','no'] };
+const DEF  = { board:'giochi', top:'5', group:'tutti', qr:'si' };
+const URLK = { board:'classifica', top:'top', group:'giocatori', qr:'qr' };
+const saved = store.get('efgBoardView3', {});
+const st = {};
+for (const k in OPTS){
+  let v = Q.get(URLK[k]); if (k === 'qr' && (v === '1' || v === '0')) v = v === '1' ? 'si' : 'no';
+  st[k] = OPTS[k].includes(v) ? v : (OPTS[k].includes(saved[k]) ? saved[k] : DEF[k]);
+}
 const view = {
-  group(){ return sw.ef.checked && sw.guest.checked ? 'tutti' : (sw.ef.checked ? 'efuture' : 'ospiti'); },
+  group(){ return st.group; },
   apply(){
-    const t = sw.total.checked, g = sw.games.checked;
+    const t = st.board !== 'giochi', g = st.board !== 'generale';
+    TOP_GAME = parseInt(st.top, 10);
     $('secTotal').hidden = !t; $('games').hidden = !g;
-    $('qrBig').hidden = !sw.qr.checked; $('main').classList.toggle('no-qr', !sw.qr.checked);
+    $('qrBig').hidden = st.qr === 'no'; $('main').classList.toggle('no-qr', st.qr === 'no');
     $('main').classList.toggle('only-total', t && !g);
     $('main').classList.toggle('only-games', g && !t);
-    // almeno una classifica e almeno un gruppo di giocatori restano sempre accesi
-    sw.total.disabled = t && !g; sw.games.disabled = g && !t;
-    sw.ef.disabled = sw.ef.checked && !sw.guest.checked; sw.guest.disabled = sw.guest.checked && !sw.ef.checked;
-    const grp = view.group(), label = grp === 'efuture' ? 'Solo utenti Efuture' : grp === 'ospiti' ? 'Solo ospiti' : '';
+    document.querySelectorAll('.seg').forEach(seg => seg.querySelectorAll('button').forEach(b => {
+      const on = b.dataset.v === st[seg.dataset.key]; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1;
+    }));
+    const label = st.group === 'efuture' ? 'Solo utenti Efuture' : st.group === 'ospiti' ? 'Solo ospiti' : '';
     $('whoTag').hidden = !label; $('whoTag').textContent = label;
     document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · ordinata per punti' + (label ? ' · ' + label.toLowerCase() : ''));
-    store.set('efgBoardView2', { total:t, games:g, qr:sw.qr.checked, top:TOP_GAME, ef:sw.ef.checked, guest:sw.guest.checked });
+    store.set('efgBoardView3', st);
   }
 };
-let lastGroup = view.group();
-Object.values(sw).forEach(x => x.addEventListener('change', () => {
-  view.apply();
-  if (view.group() !== lastGroup){ lastGroup = view.group(); Object.keys(rowsByKey).forEach(k => delete rowsByKey[k]); document.querySelectorAll('main ol').forEach(o => o.innerHTML = ''); refresh(); }
-}));
-$('selTop').addEventListener('change', () => {
-  TOP_GAME = parseInt($('selTop').value, 10) || 5; view.apply();
-  GAMES.forEach(g => { delete rowsByKey[g.id]; $('list-' + g.id).innerHTML = ''; });   // ridisegna senza animazioni
-  refresh();
+function choose(key, v){
+  if (st[key] === v) return;
+  st[key] = v; view.apply();
+  if (key === 'group' || key === 'top'){   // ridisegna le liste senza animazioni
+    Object.keys(rowsByKey).forEach(k => delete rowsByKey[k]); document.querySelectorAll('main ol').forEach(o => o.innerHTML = ''); refresh();
+  }
+}
+document.querySelectorAll('.seg').forEach(seg => {
+  seg.addEventListener('click', e => { const b = e.target.closest('button'); if (b) choose(seg.dataset.key, b.dataset.v); });
+  seg.addEventListener('keydown', e => {   // frecce sinistra/destra come in un gruppo di opzioni
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const list = OPTS[seg.dataset.key], i = list.indexOf(st[seg.dataset.key]);
+    const v = list[(i + (e.key === 'ArrowRight' ? 1 : list.length - 1)) % list.length];
+    choose(seg.dataset.key, v); seg.querySelector('[data-v="' + v + '"]').focus(); e.preventDefault();
+  });
 });
 view.apply();
 
@@ -351,7 +352,7 @@ async function refresh(){
   clearTimeout(timer);
   try {
     const boards = await Promise.all(['all', ...GAMES.map(g => g.id)].map(k => B.board(k, view.group())));
-    render('all', boards[0], TOP_ALL);
+    render('all', boards[0], TOP_GAME);   // "Top" vale per tutte le classifiche
     GAMES.forEach((g, i) => render(g.id, boards[i + 1], TOP_GAME));
     const t = new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
     $('status').textContent = 'Live · aggiornata alle ' + t; $('dot').classList.remove('off');
