@@ -98,6 +98,21 @@ li:nth-child(3) .r{background:var(--bronze);border-color:var(--bronze);color:var
 li.fresh{background:#ffe7d4}
 .empty{display:block;background:none;color:var(--muted);text-align:center;font-weight:300;font-size:clamp(12px,.9vw,15px);padding:14px 0}
 
+/* countdown di apertura/chiusura: grande, visibile anche a schermo intero */
+.gatebar{display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.5vw,28px);flex-wrap:wrap;padding:clamp(8px,1vw,16px) 16px;background:var(--navy);color:#fff;font-family:var(--title);font-weight:700;font-size:clamp(18px,2vw,40px);letter-spacing:-.5px;text-align:center}
+.gatebar b{font-weight:800;font-size:1.5em;color:var(--orange);font-variant-numeric:tabular-nums;letter-spacing:0}
+.gatebar.closing b{color:var(--sky)}
+.gatebar.warn b{color:#ff5a5f}
+.gatebar.closed{background:#5a1418}
+.gmodal{position:fixed;inset:0;background:rgba(2,16,28,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
+.gcard{background:#fff;border-radius:6px;max-width:440px;width:100%;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.gcard h2{margin:0;font-family:var(--title);font-size:20px;color:var(--ink)}
+.gnote{margin:0;font-size:13px;color:var(--muted);line-height:1.5}
+.gnote.err{color:#d93a3f}.gnote.ok{color:#1f9d5c}
+.gmin{display:flex;align-items:center;gap:10px;font-weight:600}
+.gmin input{width:110px;font:inherit;font-size:18px;padding:8px 10px;border:1px solid var(--line);border-radius:4px}
+.grow2{display:flex;gap:10px;flex-wrap:wrap}
+:fullscreen #btnGate{display:none}
 /* contenitore delle classifiche: giochi e generale affiancati */
 .boards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:inherit;align-items:start;min-width:0}
 main.only-total .boards,main.only-games .boards{grid-template-columns:minmax(0,1fr)}
@@ -177,9 +192,11 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
     <span class="dot" id="dot" aria-hidden="true"></span>
     <span id="status" aria-live="polite">Carico…</span>
     <button class="btn" id="btnFull" type="button">Schermo intero</button>
+    <button class="btn ghost" id="btnGate" type="button" hidden>⏱ Countdown</button>
     <a class="btn ghost" id="btnAdmin" href="admin.html" title="Area amministratori">Admin</a>
   </div>
 </header>
+<div class="gatebar" id="gateBar" hidden role="status" aria-live="polite"><span id="gateTxt"></span><b id="gateClock"></b></div>
 <div class="controls" id="controls" aria-label="Cosa mostrare">
   <div class="seg-grp"><span class="ttl" id="lbBoard">Classifica</span>
     <div class="seg" role="radiogroup" aria-labelledby="lbBoard" data-key="board">
@@ -220,6 +237,21 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   <div class="rules">3 livelli per gioco, massimo 1 minuto ciascuno. Ogni livello superato vale numero del livello × secondi che avanzano × vite rimaste, poi si sommano. In classifica vale il punteggio migliore.</div>
   <div class="powered">powered by <img src="img/efuture-white.png" alt="efuture"></div>
 </footer>
+
+<div class="gmodal" id="gateDlg" hidden role="dialog" aria-modal="true" aria-labelledby="gdT">
+  <div class="gcard">
+    <h2 id="gdT">Countdown della gara</h2>
+    <p class="gnote" id="gdNow">Nessun countdown attivo: i giochi sono liberi.</p>
+    <div class="seg-grp"><span class="ttl" id="lbGm">Tipo</span>
+      <div class="seg" role="radiogroup" aria-labelledby="lbGm" id="gdMode">
+        <button type="button" role="radio" data-v="apertura" aria-checked="true">Apertura</button><button type="button" role="radio" data-v="chiusura" aria-checked="false">Chiusura</button>
+      </div></div>
+    <p class="gnote" id="gdHelp"></p>
+    <label class="gmin">Minuti <input type="number" id="gdMin" min="1" max="1440" step="1" value="10" inputmode="numeric"></label>
+    <div class="grow2"><button class="btn" type="button" id="gdStart">▶ Start</button><button class="btn ghost" type="button" id="gdStop">■ Stop</button><button class="btn ghost" type="button" id="gdClose">Chiudi</button></div>
+    <p class="gnote" id="gdMsg" aria-live="polite"></p>
+  </div>
+</div>
 
 <script src="config.js?v=18"></script>
 <script src="vendor/supabase.js"></script>
@@ -370,6 +402,73 @@ $('btnFull').onclick = () => {
   else if (d.documentElement.requestFullscreen) d.documentElement.requestFullscreen().catch(() => {});
 };
 if (!document.documentElement.requestFullscreen) $('btnFull').hidden = true;
+/* ---------- countdown di apertura / chiusura ----------
+   Lo vedono tutti (anche a schermo intero); lo avvia e lo ferma solo un amministratore
+   collegato da admin.html (stesso browser). In demo il pulsante è sempre disponibile. */
+let gate = { mode:null }, gateOffset = 0, gdMode = 'apertura';
+const pad = n => String(n).padStart(2, '0');
+const fmtLeft = s => (s >= 3600 ? Math.floor(s / 3600) + ':' + pad(Math.floor(s % 3600 / 60)) : Math.floor(s / 60)) + ':' + pad(s % 60);
+async function loadGate(){
+  try { const g = await B.gate(); if (g){ gate = g; if (g.now) gateOffset = new Date(g.now).getTime() - Date.now(); } } catch(e){}
+  renderGate();
+}
+function renderGate(){
+  const ph = window.EFG_GATE_PHASE(gate, Date.now() + gateOffset), bar = $('gateBar');
+  bar.hidden = ph.phase === 'libero' || (ph.phase === 'aperto' && !ph.closing);
+  if (ph.phase === 'prima'){ bar.className = 'gatebar'; $('gateTxt').textContent = 'I giochi si aprono tra'; $('gateClock').textContent = fmtLeft(ph.left); }
+  else if (ph.closing){ bar.className = 'gatebar closing' + (ph.left <= 60 ? ' warn' : ''); $('gateTxt').textContent = 'La gara si chiude tra'; $('gateClock').textContent = fmtLeft(ph.left); }
+  else if (ph.phase === 'chiuso'){ bar.className = 'gatebar closed'; $('gateTxt').textContent = '🏁 Gara chiusa · classifica definitiva'; $('gateClock').textContent = ''; }
+  const now = $('gdNow');
+  now.textContent = ph.phase === 'prima' ? 'Attivo: apertura tra ' + fmtLeft(ph.left) + '. I giochi sono bloccati.'
+    : ph.closing ? 'Attivo: chiusura tra ' + fmtLeft(ph.left) + '. Si gioca fino allo zero.'
+    : ph.phase === 'chiuso' ? 'Gara chiusa: i giochi sono bloccati e i punteggi non vengono più accettati. Stop per riaprire.'
+    : gate.mode === 'apertura' ? 'Apertura completata: i giochi sono aperti.' : 'Nessun countdown attivo: i giochi sono liberi.';
+}
+function setGdMode(v){
+  gdMode = v; $('gdMode').querySelectorAll('button').forEach(b => b.setAttribute('aria-checked', b.dataset.v === v));
+  $('gdHelp').textContent = v === 'apertura' ? 'Fino allo zero i 4 giochi restano bloccati per tutti; allo zero si aprono da soli.'
+                                             : 'Si gioca fino allo zero; allo zero i giochi si bloccano e la classifica diventa definitiva.';
+}
+$('gdMode').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setGdMode(b.dataset.v); });
+setGdMode('apertura');
+
+// chi può comandare il countdown
+let adminSb = null;
+async function gateCommand(mode, minutes){
+  if (!B.remote) return B.gateSet(mode, minutes);
+  const { data, error } = await adminSb.rpc('efg_admin_gate', { p_key:'', p_mode:mode, p_minutes:minutes || null });
+  if (error) throw error; if (data && data.errore) throw new Error(data.errore); return data;
+}
+(async () => {
+  if (!B.remote){ $('btnGate').hidden = false; return; }
+  const C = window.EFG_CONFIG || {};
+  try {
+    adminSb = window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:false, storageKey:'efg-admin-auth' } });
+    const { data } = await adminSb.auth.getSession(); if (!data || !data.session) return;
+    const me = await adminSb.rpc('efg_admin_me'); if (me.data && me.data.admin) $('btnGate').hidden = false;
+  } catch(e){}
+})();
+$('btnGate').onclick = () => { $('gdMsg').textContent = ''; $('gdMsg').className = 'gnote'; if (gate.mode) setGdMode(gate.mode); if (gate.minutes) $('gdMin').value = gate.minutes; renderGate(); $('gateDlg').hidden = false; $('gdMin').focus(); };
+$('gdClose').onclick = () => { $('gateDlg').hidden = true; };
+$('gateDlg').addEventListener('click', e => { if (e.target === $('gateDlg')) $('gateDlg').hidden = true; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('gateDlg').hidden = true; });
+const gdMsg = (t, k) => { $('gdMsg').textContent = t; $('gdMsg').className = 'gnote' + (k ? ' ' + k : ''); };
+$('gdStart').onclick = async () => {
+  const m = parseInt($('gdMin').value, 10);
+  if (!(m >= 1 && m <= 1440)) return gdMsg('Scrivi i minuti: da 1 a 1440.', 'err');
+  try { gate = await gateCommand(gdMode, m) || gate; if (gate.now) gateOffset = new Date(gate.now).getTime() - Date.now(); renderGate(); gdMsg('Countdown di ' + gdMode + ' avviato: ' + m + ' min.', 'ok'); }
+  catch(e){ gdMsg('Non riesco ad avviarlo: ' + (e.message || e), 'err'); }
+};
+$('gdStop').onclick = async () => {
+  try { gate = await gateCommand('stop') || { mode:null }; renderGate(); gdMsg('Countdown fermato: i giochi sono liberi.', 'ok'); }
+  catch(e){ gdMsg('Non riesco a fermarlo: ' + (e.message || e), 'err'); }
+};
+setInterval(renderGate, 1000);
+setInterval(loadGate, 10000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) loadGate(); });
+window.addEventListener('storage', e => { if (e.key === 'efgDemoGate') loadGate(); });
+loadGate();
+
 refresh();
 })();
 </script>

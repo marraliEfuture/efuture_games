@@ -47,6 +47,15 @@ CODICI DI SBLOCCO (uno per gioco)
      Per il filtro Giocatori serve una volta supabase-classifica-gruppi.sql
      nel SQL Editor. Da indirizzo, ad esempio:
        classifica.html?classifica=tutti&top=10&giocatori=efuture&qr=no
+   - Pulsante "⏱ Countdown" (visibile solo se sei collegato come admin da
+     admin.html nello stesso browser): scegli Apertura o Chiusura, i minuti
+     e premi Start; Stop lo annulla. Una volta sola esegui
+     supabase-countdown.sql nel SQL Editor.
+       Apertura: fino allo zero i 4 giochi sono bloccati per tutti, poi si aprono.
+       Chiusura: si gioca fino allo zero, poi i giochi si bloccano (anche
+       chi sta giocando) e i punteggi non vengono più accettati.
+     Il conto alla rovescia si vede grande sulla classifica (anche a
+     schermo intero) e in cima all'app sui telefoni.
    - In modalità demo mostra solo i punteggi del dispositivo su cui è
      aperta: per la classifica comune serve Supabase (punto 2).
 
