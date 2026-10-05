@@ -47,6 +47,11 @@ const Backend = remote ? {
     }
     return (await rpc('efg_board', { p_game:game })) || [];
   },
+  // countdown di apertura/chiusura: { mode:'apertura'|'chiusura'|null, ends_at, minutes, now }
+  async gate(){
+    try { return one(await rpc('efg_gate_state', {})) || { mode:null }; }
+    catch(e){ if (/efg_gate_state|PGRST202|does not exist/i.test(String(e && (e.code + ' ' + e.message)))) return { mode:null }; throw e; }
+  },
 } : {
   remote:false,
   async current(){ return store.get('efgSession3', null); },
@@ -84,8 +89,26 @@ const Backend = remote ? {
   },
 };
 
+// demo: countdown salvato su questo dispositivo (app e classifica aperte nello stesso browser lo condividono)
+if (!Backend.remote){
+  Backend.gate = async () => Object.assign({ mode:null }, store.get('efgDemoGate', {}), { now:new Date().toISOString() });
+  Backend.gateSet = async (mode, minutes) => {
+    if (!mode || mode === 'stop') store.set('efgDemoGate', { mode:null });
+    else store.set('efgDemoGate', { mode, minutes, ends_at:new Date(Date.now() + minutes * 60000).toISOString() });
+    return Backend.gate();
+  };
+}
+// stato della gara in un istante: 'libero' | 'prima' (giochi chiusi fino all'apertura) | 'aperto' | 'chiuso'
+window.EFG_GATE_PHASE = (g, nowMs) => {
+  if (!g || !g.mode || !g.ends_at) return { phase:'libero', left:0 };
+  const left = Math.max(0, Math.round((new Date(g.ends_at).getTime() - nowMs) / 1000));
+  if (g.mode === 'apertura') return left > 0 ? { phase:'prima', left } : { phase:'aperto', left:0, justOpened:true };
+  return left > 0 ? { phase:'aperto', left, closing:true } : { phase:'chiuso', left:0 };
+};
+
 function friendly(err){
   const m = String(err && err.message || err);
+  if (/gara chiusa/i.test(m)) return 'La gara è chiusa: i punteggi non vengono più registrati.';
   if (/fetch|network/i.test(m)) return 'Nessuna connessione con il server: controlla la rete e riprova.';
   if (/not found/i.test(m)) return 'Nessun giocatore registrato con questa email: usa Registrati.';
   if (/already registered|duplicate/i.test(m)) return 'Questa email è già registrata: usa Accedi.';
