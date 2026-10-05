@@ -71,6 +71,9 @@ mark{background:none;color:var(--sky);padding:0}
 .sw input:checked + .tr::before{transform:translateX(18px)}
 .sw input:focus-visible + .tr{outline:2px solid var(--sky);outline-offset:2px}
 .sw input:disabled + .tr{opacity:.55;cursor:not-allowed}
+.topsel{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.topsel select{font:inherit;font-weight:600;padding:4px 8px;border:1px solid var(--line);border-radius:4px;background:#fff;color:var(--ink);cursor:pointer}
+.topsel select:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
 .who-tag{display:inline-block;font-family:var(--body);font-size:.6em;font-weight:600;letter-spacing:.04em;vertical-align:.25em;margin-left:.5em;padding:.2em .6em;border-radius:3px;background:var(--orange);color:#fff}
 @media (max-width:560px){.controls .grp + .grp{border-left:0;padding-left:0}}
 
@@ -188,6 +191,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
     <label class="sw"><input type="checkbox" id="swTotal" checked><span class="tr"></span>Classifica generale</label>
     <label class="sw"><input type="checkbox" id="swGames" checked><span class="tr"></span>Classifiche giochi</label>
     <label class="sw"><input type="checkbox" id="swQr" checked><span class="tr"></span>QR code</label>
+    <label class="topsel">Giochi: primi <select id="selTop" aria-label="Quanti giocatori mostrare per ogni gioco"><option>3</option><option>5</option><option>10</option><option>20</option></select></label>
   </div>
   <div class="grp">
     <span class="ttl">Giocatori</span>
@@ -232,7 +236,8 @@ const GAMES = [
 ];
 const Q = new URLSearchParams(location.search);
 const TOP_ALL  = Math.max(3, Math.min(50, parseInt(Q.get('top'), 10) || 10));   // ?top=15 mostra più righe
-const TOP_GAME = Math.max(3, Math.min(20, parseInt(Q.get('topgioco'), 10) || 5));
+const TOP_CHOICES = [3, 5, 10, 20];
+let TOP_GAME = 5;   // righe per gioco: scelta dal menu "Top" (o da ?topgioco=)
 const EVERY = 15;   // secondi tra un aggiornamento e l'altro
 const B = window.EFG_BACKEND;
 const $ = id => document.getElementById(id);
@@ -297,7 +302,7 @@ function render(key, rows, top){
 
 /* ---------- interruttori: cosa mostrare e quali giocatori ----------
    Le scelte restano su questo schermo; si possono anche fissare dall'indirizzo:
-   classifica.html?generale=0&giochi=1&qr=0&giocatori=efuture|ospiti|tutti */
+   classifica.html?generale=0&giochi=1&qr=0&topgioco=10&giocatori=efuture|ospiti|tutti */
 const store = { get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
                 set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
 const saved = store.get('efgBoardView2', {});   // v2: nuovo default, solo le classifiche dei giochi
@@ -307,6 +312,9 @@ const sw = { total:$('swTotal'), games:$('swGames'), qr:$('swQr'), ef:$('swEf'),
 sw.total.checked = qp('generale', saved.total === true);
 sw.games.checked = qp('giochi', saved.games !== false);
 sw.qr.checked    = qp('qr', saved.qr !== false);
+{ const t = parseInt(Q.get('topgioco'), 10) || saved.top; TOP_GAME = TOP_CHOICES.includes(t) ? t : (t > 0 ? Math.max(3, Math.min(20, t)) : 5); }
+if (!TOP_CHOICES.includes(TOP_GAME)){ const o = document.createElement('option'); o.textContent = TOP_GAME; $('selTop').appendChild(o); }
+$('selTop').value = String(TOP_GAME);
 sw.ef.checked    = qg ? qg !== 'ospiti'  : saved.ef !== false;
 sw.guest.checked = qg ? qg !== 'efuture' : saved.guest !== false;
 const view = {
@@ -323,7 +331,7 @@ const view = {
     const grp = view.group(), label = grp === 'efuture' ? 'Solo utenti Efuture' : grp === 'ospiti' ? 'Solo ospiti' : '';
     $('whoTag').hidden = !label; $('whoTag').textContent = label;
     document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · ordinata per punti' + (label ? ' · ' + label.toLowerCase() : ''));
-    store.set('efgBoardView2', { total:t, games:g, qr:sw.qr.checked, ef:sw.ef.checked, guest:sw.guest.checked });
+    store.set('efgBoardView2', { total:t, games:g, qr:sw.qr.checked, top:TOP_GAME, ef:sw.ef.checked, guest:sw.guest.checked });
   }
 };
 let lastGroup = view.group();
@@ -331,6 +339,11 @@ Object.values(sw).forEach(x => x.addEventListener('change', () => {
   view.apply();
   if (view.group() !== lastGroup){ lastGroup = view.group(); Object.keys(rowsByKey).forEach(k => delete rowsByKey[k]); document.querySelectorAll('main ol').forEach(o => o.innerHTML = ''); refresh(); }
 }));
+$('selTop').addEventListener('change', () => {
+  TOP_GAME = parseInt($('selTop').value, 10) || 5; view.apply();
+  GAMES.forEach(g => { delete rowsByKey[g.id]; $('list-' + g.id).innerHTML = ''; });   // ridisegna senza animazioni
+  refresh();
+});
 view.apply();
 
 let timer = 0;
