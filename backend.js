@@ -39,7 +39,14 @@ const Backend = remote ? {
   async signOut(){ store.set('efgSessionLive', null); },
   async submit(user, game, score, levels){ return !!(await rpc('efg_submit', { p_email:user.email, p_game:game, p_score:score, p_levels:levels })); },
   // game: 'all' (somma dei 4 giochi) oppure l'id del gioco → [{pid, name, levels, score, games}] ordinati
-  async board(game){ return (await rpc('efg_board', { p_game:game })) || []; },
+  async board(game, group){
+    if (group && group !== 'tutti'){
+      try { return (await rpc('efg_board_group', { p_game:game, p_group:group })) || []; }
+      catch(e){ if (!/efg_board_group|PGRST202|does not exist/i.test(String(e && (e.code + ' ' + e.message)))) throw e; }
+      // funzione non ancora creata su Supabase: classifica completa
+    }
+    return (await rpc('efg_board', { p_game:game })) || [];
+  },
 } : {
   remote:false,
   async current(){ return store.get('efgSession3', null); },
@@ -61,11 +68,14 @@ const Backend = remote ? {
     if (o && (o.levels > levels || (o.levels === levels && o.score >= score))) return false;
     rows[k] = { email:user.email, game, score, levels }; store.set('efgDemoScores4', rows); return true;
   },
-  async board(game){
+  async board(game, group){
+    const isEf = e => /@efuture\.it$/i.test(e || '');
     const users = store.get('efgDemoUsers3', {});
     const tot = {};
     for (const r of Object.values(store.get('efgDemoScores4', {}))){
       if (game !== 'all' && r.game !== game) continue;
+      if (group === 'efuture' && !isEf(r.email)) continue;
+      if (group === 'ospiti' && isEf(r.email)) continue;
       const u = users[r.email]; if (!u) continue;
       const t = tot[r.email] = tot[r.email] || { pid:u.pid, name:u.name, levels:0, score:0, games:0 };
       t.score += r.score; t.levels += r.levels || 0; if ((r.levels||0) > 0) t.games++;

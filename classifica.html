@@ -57,7 +57,26 @@ mark{background:none;color:var(--sky);padding:0}
 .btn:hover{background:#e66200}
 .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);text-decoration:none}
 .btn.ghost:hover{background:var(--row)}
-:fullscreen .btn.ghost{display:none}
+:fullscreen .btn.ghost,:fullscreen .controls{display:none}
+/* interruttori di visualizzazione */
+.controls{background:#fff;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;padding:10px clamp(16px,3vw,48px);font-size:clamp(12px,.9vw,14px);color:var(--text)}
+.controls .grp{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.controls .grp + .grp{border-left:1px solid var(--line);padding-left:22px}
+.controls .ttl{font-family:var(--title);font-weight:700;font-size:.8em;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.sw{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-weight:600}
+.sw input{position:absolute;opacity:0;width:1px;height:1px}
+.sw .tr{position:relative;width:40px;height:22px;border-radius:22px;background:#cfd8e3;transition:background .15s;flex:0 0 auto}
+.sw .tr::before{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .15s}
+.sw input:checked + .tr{background:var(--orange)}
+.sw input:checked + .tr::before{transform:translateX(18px)}
+.sw input:focus-visible + .tr{outline:2px solid var(--sky);outline-offset:2px}
+.sw input:disabled + .tr{opacity:.55;cursor:not-allowed}
+.who-tag{display:inline-block;font-family:var(--body);font-size:.6em;font-weight:600;letter-spacing:.04em;vertical-align:.25em;margin-left:.5em;padding:.2em .6em;border-radius:3px;background:var(--orange);color:#fff}
+main.only-total{grid-template-columns:minmax(0,1fr)}
+main.only-games{grid-template-columns:minmax(0,1fr)}
+main.only-games .games{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1100px){main.only-games .games{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.controls .grp + .grp{border-left:0;padding-left:0}}
 
 main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(14px,1.6vw,28px);padding:clamp(16px,2vw,32px) clamp(16px,3vw,48px);align-items:start}
 .games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:inherit}
@@ -151,11 +170,23 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
     <a class="btn ghost" id="btnAdmin" href="admin.html" title="Area amministratori">Admin</a>
   </div>
 </header>
+<div class="controls" id="controls" role="group" aria-label="Cosa mostrare">
+  <div class="grp">
+    <span class="ttl">Mostra</span>
+    <label class="sw"><input type="checkbox" id="swTotal" checked><span class="tr"></span>Classifica generale</label>
+    <label class="sw"><input type="checkbox" id="swGames" checked><span class="tr"></span>Classifiche giochi</label>
+  </div>
+  <div class="grp">
+    <span class="ttl">Giocatori</span>
+    <label class="sw"><input type="checkbox" id="swEf" checked><span class="tr"></span>Utenti Efuture</label>
+    <label class="sw"><input type="checkbox" id="swGuest" checked><span class="tr"></span>Ospiti</label>
+  </div>
+</div>
 
-<main>
+<main id="main">
   <div class="games" id="games"></div>
-  <section class="panel total" aria-labelledby="tTotal">
-    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale</h2><div class="sub">Somma dei record nei 4 giochi · ordinata per punti</div></div></div>
+  <section class="panel total" id="secTotal" aria-labelledby="tTotal">
+    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale<span class="who-tag" id="whoTag" hidden></span></h2><div class="sub">Somma dei record nei 4 giochi · ordinata per punti</div></div></div>
     <ol id="list-all"></ol>
   </section>
 </main>
@@ -245,11 +276,47 @@ function render(key, rows, top){
   });
 }
 
+/* ---------- interruttori: cosa mostrare e quali giocatori ----------
+   Le scelte restano su questo schermo; si possono anche fissare dall'indirizzo:
+   classifica.html?generale=0&giochi=1&giocatori=efuture|ospiti|tutti */
+const store = { get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
+                set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
+const saved = store.get('efgBoardView', {});
+const qp = (k, d) => Q.has(k) ? Q.get(k) !== '0' : d;
+const qg = Q.get('giocatori');
+const sw = { total:$('swTotal'), games:$('swGames'), ef:$('swEf'), guest:$('swGuest') };
+sw.total.checked = qp('generale', saved.total !== false);
+sw.games.checked = qp('giochi', saved.games !== false);
+sw.ef.checked    = qg ? qg !== 'ospiti'  : saved.ef !== false;
+sw.guest.checked = qg ? qg !== 'efuture' : saved.guest !== false;
+const view = {
+  group(){ return sw.ef.checked && sw.guest.checked ? 'tutti' : (sw.ef.checked ? 'efuture' : 'ospiti'); },
+  apply(){
+    const t = sw.total.checked, g = sw.games.checked;
+    $('secTotal').hidden = !t; $('games').hidden = !g;
+    $('main').classList.toggle('only-total', t && !g);
+    $('main').classList.toggle('only-games', g && !t);
+    // almeno una classifica e almeno un gruppo di giocatori restano sempre accesi
+    sw.total.disabled = t && !g; sw.games.disabled = g && !t;
+    sw.ef.disabled = sw.ef.checked && !sw.guest.checked; sw.guest.disabled = sw.guest.checked && !sw.ef.checked;
+    const grp = view.group(), label = grp === 'efuture' ? 'Solo utenti Efuture' : grp === 'ospiti' ? 'Solo ospiti' : '';
+    $('whoTag').hidden = !label; $('whoTag').textContent = label;
+    document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · ordinata per punti' + (label ? ' · ' + label.toLowerCase() : ''));
+    store.set('efgBoardView', { total:t, games:g, ef:sw.ef.checked, guest:sw.guest.checked });
+  }
+};
+let lastGroup = view.group();
+Object.values(sw).forEach(x => x.addEventListener('change', () => {
+  view.apply();
+  if (view.group() !== lastGroup){ lastGroup = view.group(); Object.keys(rowsByKey).forEach(k => delete rowsByKey[k]); document.querySelectorAll('main ol').forEach(o => o.innerHTML = ''); refresh(); }
+}));
+view.apply();
+
 let timer = 0;
 async function refresh(){
   clearTimeout(timer);
   try {
-    const boards = await Promise.all(['all', ...GAMES.map(g => g.id)].map(k => B.board(k)));
+    const boards = await Promise.all(['all', ...GAMES.map(g => g.id)].map(k => B.board(k, view.group())));
     render('all', boards[0], TOP_ALL);
     GAMES.forEach((g, i) => render(g.id, boards[i + 1], TOP_GAME));
     const t = new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
