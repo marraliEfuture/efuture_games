@@ -72,13 +72,9 @@ mark{background:none;color:var(--sky);padding:0}
 .sw input:focus-visible + .tr{outline:2px solid var(--sky);outline-offset:2px}
 .sw input:disabled + .tr{opacity:.55;cursor:not-allowed}
 .who-tag{display:inline-block;font-family:var(--body);font-size:.6em;font-weight:600;letter-spacing:.04em;vertical-align:.25em;margin-left:.5em;padding:.2em .6em;border-radius:3px;background:var(--orange);color:#fff}
-main.only-total{grid-template-columns:minmax(0,1fr)}
-main.only-games{grid-template-columns:minmax(0,1fr)}
-main.only-games .games{grid-template-columns:repeat(4,minmax(0,1fr))}
-@media (max-width:1100px){main.only-games .games{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.controls .grp + .grp{border-left:0;padding-left:0}}
 
-main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(14px,1.6vw,28px);padding:clamp(16px,2vw,32px) clamp(16px,3vw,48px);align-items:start}
+main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(14px,1.6vw,28px);padding:clamp(16px,2vw,32px) clamp(16px,3vw,48px);align-items:start}
 .games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:inherit}
 .panel{background:var(--card);border-radius:6px;padding:clamp(14px,1.4vw,24px);display:flex;flex-direction:column;gap:12px;min-width:0;box-shadow:0 10px 30px rgba(20,29,40,.07);border:1px solid var(--line)}
 .ph{display:flex;align-items:center;gap:14px}
@@ -102,6 +98,18 @@ li:nth-child(3) .r{background:var(--bronze);border-color:var(--bronze);color:var
 li.fresh{background:#ffe7d4}
 .empty{display:block;background:none;color:var(--muted);text-align:center;font-weight:300;font-size:clamp(12px,.9vw,15px);padding:14px 0}
 
+/* contenitore delle classifiche: giochi e generale affiancati */
+.boards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:inherit;align-items:start;min-width:0}
+main.only-total .boards,main.only-games .boards{grid-template-columns:minmax(0,1fr)}
+/* QR grande per scansionare da lontano: il più alto possibile senza uscire dallo schermo.
+   Regola pratica: lato del QR ≈ distanza ÷ 10–15 (da 20 m serve un QR di circa 1,3–2 m sul ledwall) */
+.qrbig{align-self:start;position:sticky;top:12px;display:flex;flex-direction:column;align-items:center;gap:4px;background:#fff;border:1px solid var(--line);border-radius:6px;padding:4px 4px clamp(10px,1vw,16px);box-shadow:0 10px 30px rgba(20,29,40,.07)}
+.qrbig img{display:block;width:var(--qr);height:var(--qr);image-rendering:pixelated}
+.qrbig{--qr:min(40vw, calc(100vh - 440px))}
+.qrcap{text-align:center;font-family:var(--title)}
+.qrcap b{display:block;font-weight:700;font-size:clamp(18px,2vw,40px);letter-spacing:-.5px;color:var(--ink)}
+.qrcap span{font-family:var(--body);font-weight:300;font-size:clamp(12px,1vw,20px);color:var(--muted)}
+:fullscreen .qrbig{--qr:min(44vw, calc(100vh - 290px))}
 /* classifica generale: sezione blu notte come sul sito */
 .panel.total{background:var(--navy);border-color:var(--navy);box-shadow:0 16px 40px rgba(0,34,56,.25)}
 .total .ph h2{color:#fff;font-size:clamp(18px,1.7vw,30px);letter-spacing:-1px}
@@ -131,7 +139,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 
 @media (max-width:900px){
   main{grid-template-columns:minmax(0,1fr)}
+  .boards{grid-template-columns:minmax(0,1fr)}
   .panel.total{order:-1}
+  .qrbig{position:static;--qr:min(72vw,380px)}
   .live .upd{display:none}
 }
 @media (max-width:560px){
@@ -184,17 +194,23 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 </div>
 
 <main id="main">
+  <div class="boards" id="boards">
   <div class="games" id="games"></div>
   <section class="panel total" id="secTotal" aria-labelledby="tTotal">
     <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale<span class="who-tag" id="whoTag" hidden></span></h2><div class="sub">Somma dei record nei 4 giochi · ordinata per punti</div></div></div>
     <ol id="list-all"></ol>
   </section>
+  </div>
+  <aside class="qrbig" aria-label="QR per giocare">
+    <img src="qr/qr-app.svg" alt="QR per aprire Efuture Games">
+    <div class="qrcap"><b>Gioca <mark>anche tu</mark></b><span>Inquadra il QR con la fotocamera</span></div>
+  </aside>
 </main>
 
 <p class="note" id="demoNote" hidden>Modalità demo: il database online non è ancora configurato, qui vedi solo i punteggi fatti su questo dispositivo.</p>
 
 <footer>
-  <div class="join"><img src="qr/qr-app.png" alt="QR per aprire Efuture Games"><div><b>Gioca <mark>anche tu</mark></b><span>Inquadra il QR, sblocca i giochi agli stand e scala la classifica.</span></div></div>
+  <div class="join"><div><b>Sblocca i giochi <mark>agli stand</mark></b><span>Inquadra il QR allo stand di ogni sponsor e scala la classifica.</span></div></div>
   <div class="rules">3 livelli per gioco, massimo 1 minuto ciascuno. Ogni livello superato vale numero del livello × secondi che avanzano × vite rimaste, poi si sommano. In classifica vale il punteggio migliore.</div>
   <div class="powered">powered by <img src="img/efuture-white.png" alt="efuture"></div>
 </footer>
@@ -281,11 +297,11 @@ function render(key, rows, top){
    classifica.html?generale=0&giochi=1&giocatori=efuture|ospiti|tutti */
 const store = { get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
                 set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
-const saved = store.get('efgBoardView', {});
+const saved = store.get('efgBoardView2', {});   // v2: nuovo default, solo le classifiche dei giochi
 const qp = (k, d) => Q.has(k) ? Q.get(k) !== '0' : d;
 const qg = Q.get('giocatori');
 const sw = { total:$('swTotal'), games:$('swGames'), ef:$('swEf'), guest:$('swGuest') };
-sw.total.checked = qp('generale', saved.total !== false);
+sw.total.checked = qp('generale', saved.total === true);
 sw.games.checked = qp('giochi', saved.games !== false);
 sw.ef.checked    = qg ? qg !== 'ospiti'  : saved.ef !== false;
 sw.guest.checked = qg ? qg !== 'efuture' : saved.guest !== false;
@@ -302,7 +318,7 @@ const view = {
     const grp = view.group(), label = grp === 'efuture' ? 'Solo utenti Efuture' : grp === 'ospiti' ? 'Solo ospiti' : '';
     $('whoTag').hidden = !label; $('whoTag').textContent = label;
     document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · ordinata per punti' + (label ? ' · ' + label.toLowerCase() : ''));
-    store.set('efgBoardView', { total:t, games:g, ef:sw.ef.checked, guest:sw.guest.checked });
+    store.set('efgBoardView2', { total:t, games:g, ef:sw.ef.checked, guest:sw.guest.checked });
   }
 };
 let lastGroup = view.group();
