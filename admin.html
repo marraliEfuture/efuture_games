@@ -77,6 +77,42 @@ p{margin:0;line-height:1.55}
 .dim{color:var(--muted);font-size:13px}
 code{background:var(--row);padding:1px 5px;border-radius:3px}
 @media (max-width:600px){ .hright{margin-left:0;width:100%} }
+/* Link */
+.links{display:flex;flex-direction:column;gap:16px}
+.lgroup h3{margin:0 0 6px;font-family:var(--title);font-size:15px;color:var(--ink)}
+.lrow{display:grid;grid-template-columns:minmax(150px,1fr) minmax(0,2fr) auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:#fff}
+.lrow+.lrow{margin-top:6px}
+.lrow b{display:block;color:var(--ink);font-size:13px} .lrow small{color:var(--muted);font-size:12px}
+.lrow a.u{font-family:ui-monospace,monospace;font-size:12px;color:var(--navy);word-break:break-all}
+.lrow .acts{display:flex;gap:6px}
+.lrow .btn{padding:6px 10px;font-size:12px}
+.lqr{grid-column:1/-1;display:flex;justify-content:center;padding:8px 0}
+.lqr svg{width:200px;height:auto}
+@media (max-width:700px){ .lrow{grid-template-columns:1fr} }
+/* QR: cartellini in bianco e nero, 5 su un foglio A4 */
+.codes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.codes input{font-family:ui-monospace,monospace;text-transform:uppercase}
+.codes input.bad{border-color:var(--danger)}
+.qrsheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.qrcard{background:#fff;color:#000;border:1.5px dashed #000;border-radius:4px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;break-inside:avoid}
+.qrcard .k{font-family:var(--title);font-weight:800;font-size:13px;letter-spacing:2px}
+.qrcard h3{font-family:var(--title);font-weight:800;font-size:18px;letter-spacing:-.3px;margin:0;line-height:1.15}
+.qrcard .st{font-size:12px}
+.qrcard svg{width:100%;max-width:210px;height:auto;display:block;margin:6px 0}
+.qrcard .hint{font-size:11px;line-height:1.35}
+.qrcard .code{font-family:ui-monospace,monospace;font-weight:700;font-size:26px;letter-spacing:2px;border:2px solid #000;border-radius:4px;padding:2px 12px;margin-top:2px}
+.qrcard .url{font-family:ui-monospace,monospace;font-size:10px;word-break:break-all}
+@media print{
+  @page{size:A4 portrait;margin:8mm}
+  html,body{background:#fff!important}
+  .topbar,header,#stats,.tabs,.noprint,#noRemote{display:none!important}
+  main{padding:0;max-width:none}
+  #dash>.card{border:0;box-shadow:none;padding:0}
+  .qrsheet{grid-template-columns:1fr 1fr;grid-auto-rows:92mm;gap:0}
+  .qrcard{height:92mm;border-radius:0;padding:4mm;justify-content:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .qrcard svg{width:56mm;max-width:none;margin:2mm 0}
+  .qrcard h3{font-size:15pt} .qrcard .code{font-size:20pt}
+}
 </style>
 </head>
 <body>
@@ -110,6 +146,8 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <button class="tab" data-tab="backup" type="button">Backup</button>
         <button class="tab" data-tab="reset" type="button">Reset</button>
         <button class="tab" data-tab="key" type="button">Chiave</button>
+        <button class="tab" data-tab="qr" type="button">QR</button>
+        <button class="tab" data-tab="links" type="button">Link</button>
       </div>
 
       <section data-pane="players">
@@ -172,14 +210,35 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         </form>
         <div class="msg" id="kMsg" aria-live="polite"></div>
       </section>
+
+      <section data-pane="links" hidden>
+        <p class="dim">Tutti i link di Efuture Games: apri, copia o mostra il QR di ciascuno.</p>
+        <div class="links" id="lkList" style="margin-top:12px"></div>
+        <div class="msg" id="lkMsg" aria-live="polite" style="margin-top:8px"></div>
+      </section>
+
+      <section data-pane="qr" hidden>
+        <div class="noprint" style="display:flex;flex-direction:column;gap:10px">
+          <p class="dim">I 5 QR dell'evento: il QR dell'app (installazione) e i 4 QR di sblocco degli stand. Si stampano tutti su un foglio A4, in bianco e nero, con le linee tratteggiate per ritagliarli.</p>
+          <div class="bar">
+            <button class="btn" id="qGen" type="button">Genera i QR</button>
+            <button class="btn navy" id="qPrint" type="button" disabled>Stampa (A4, bianco e nero)</button>
+            <span class="grow"></span>
+          </div>
+          <div class="codes" id="qCodes"></div>
+          <div class="msg" id="qMsg" aria-live="polite"></div>
+        </div>
+        <div class="qrsheet" id="qSheet" style="margin-top:14px"></div>
+      </section>
     </div>
   </div>
 
   <p class="dim" id="noRemote" hidden>Il database online non è configurato in <code>config.js</code>: il pannello admin funziona solo con Supabase.</p>
 </main>
 
-<script src="config.js?v=17"></script>
+<script src="config.js?v=18"></script>
 <script src="vendor/supabase.js"></script>
+<script src="vendor/qrcode.js"></script>
 <script>
 (function(){
 "use strict";
@@ -251,6 +310,7 @@ document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
   if (t.dataset.tab === 'players') loadPlayers();
   if (t.dataset.tab === 'log') loadLogs();
   if (t.dataset.tab === 'backup') loadBackups();
+  if (t.dataset.tab === 'links') renderLinks();
 });
 
 /* ---------- giocatori ---------- */
@@ -351,6 +411,144 @@ $('fKey').addEventListener('submit', async e => {
   try { await call('efg_admin_set_key', { p_new:a }); KEY = a; ss.set(a); $('kNew').value = $('kNew2').value = ''; setMsg($('kMsg'), 'Chiave cambiata. Usa la nuova chiave dal prossimo accesso.', 'ok'); }
   catch(err){ onErr(err, $('kMsg')); }
 });
+
+/* ---------- QR ---------- */
+// I codici non sono scritti in questa pagina: si ricavano dagli hash di hub.js
+// (SHA-256 di "efg:" + codice senza trattino), provando le 10.000 combinazioni del prefisso del gioco.
+const QR_GAMES = [
+  { id:'sysadmin', name:'SysAdmin Runner',   stand:'Efuture',  pre:'RUN' },
+  { id:'coretech', name:'CoreTech Pac',      stand:'CoreTech', pre:'PAC' },
+  { id:'timenet',  name:'Timenet Breakout',  stand:'Timenet',  pre:'BRK' },
+  { id:'inncloud', name:'Inncloud Invaders', stand:'Inncloud', pre:'INV' },
+];
+const appUrl = () => { const u = CFG.PUBLIC_URL || new URL('./', location.href).href; return u.endsWith('/') ? u : u + '/'; };
+const normCode = c => String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+const fmtCode = c => { c = normCode(c); return /^[A-Z]{3}\d{4}$/.test(c) ? c.slice(0,3) + '-' + c.slice(3) : c; };
+async function sha(t){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+async function loadHashes(){
+  const src = await (await fetch('hub.js', { cache:'no-store' })).text();
+  const out = {};
+  for (const g of QR_GAMES){ const m = src.match(new RegExp("id:'" + g.id + "'[\\s\\S]*?hash:'([0-9a-f]{64})'")); if (m) out[g.id] = m[1]; }
+  return out;
+}
+async function findCode(pre, hash){
+  for (let start = 0; start < 10000; start += 500){
+    const batch = [];
+    for (let n = start; n < start + 500; n++) batch.push(String(n).padStart(4, '0'));
+    const hs = await Promise.all(batch.map(d => sha('efg:' + pre + d)));
+    const i = hs.indexOf(hash); if (i >= 0) return pre + '-' + batch[i];
+  }
+  return '';
+}
+function qrSvg(text){
+  const q = qrcode(0, 'M'); q.addData(text); q.make();
+  const n = q.getModuleCount(), b = 4; let d = '';
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += 'M' + (c + b) + ' ' + (r + b) + 'h1v1h-1z';
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (n + 2*b) + ' ' + (n + 2*b) + '" shape-rendering="crispEdges" role="img"><rect width="100%" height="100%" fill="#fff"/><path d="' + d + '" fill="#000"/></svg>';
+}
+function qrCard(o){
+  const el = document.createElement('div'); el.className = 'qrcard';
+  el.innerHTML = '<div class="k">EFUTURE GAMES</div><h3></h3><div class="st"></div>' + qrSvg(o.url) + '<div class="hint"></div>';
+  el.querySelector('h3').textContent = o.title; el.querySelector('.st').textContent = o.stand; el.querySelector('.hint').textContent = o.hint;
+  el.querySelector('svg').setAttribute('aria-label', 'QR ' + o.title);
+  const x = document.createElement('div'); x.className = o.code ? 'code' : 'url'; x.textContent = o.code || o.url.replace(/^https?:\/\//, '').replace(/\?.*$/, ''); el.appendChild(x);
+  return el;
+}
+let qrHashes = null;
+async function renderQr(){
+  const sheet = $('qSheet'); sheet.innerHTML = '';
+  const base = appUrl(); let ok = true;
+  sheet.appendChild(qrCard({ title:"Installa l'app", stand:'Ingresso · ledwall', url: base + '?installa=1', hint:'Inquadra con la fotocamera e aggiungi l’app alla schermata Home' }));
+  for (const g of QR_GAMES){
+    const inp = $('qc-' + g.id), code = fmtCode(inp.value);
+    const good = !!code && qrHashes && (await sha('efg:' + normCode(code))) === qrHashes[g.id];
+    inp.classList.toggle('bad', !good); if (!good){ ok = false; continue; }
+    inp.value = code;
+    sheet.appendChild(qrCard({ title:'Sblocca ' + g.name, stand:'Stand ' + g.stand, url: base + '?sblocca=' + code, code, hint:'Inquadra con la fotocamera oppure inserisci il codice nell’app' }));
+  }
+  $('qPrint').disabled = !ok;
+  setMsg($('qMsg'), ok ? '5 QR pronti. Controlla l’anteprima e premi Stampa.' : 'Alcuni codici non sbloccano il loro gioco (bordo rosso): correggili e premi di nuovo Genera i QR.', ok ? 'ok' : 'err');
+}
+$('qGen').onclick = async () => {
+  $('qGen').disabled = true; setMsg($('qMsg'), 'Preparo i QR…');
+  try {
+    if (!qrHashes){
+      qrHashes = await loadHashes();
+      $('qCodes').innerHTML = '';
+      for (const g of QR_GAMES){
+        const f = document.createElement('div'); f.className = 'field';
+        f.innerHTML = '<label></label><input type="text" autocomplete="off" spellcheck="false">';
+        f.querySelector('label').textContent = 'Codice ' + g.name; f.querySelector('label').htmlFor = 'qc-' + g.id;
+        f.querySelector('input').id = 'qc-' + g.id;
+        f.querySelector('input').value = qrHashes[g.id] ? await findCode(g.pre, qrHashes[g.id]) : '';
+        $('qCodes').appendChild(f);
+      }
+    }
+    await renderQr();
+  } catch(err){ setMsg($('qMsg'), 'Errore: ' + err.message, 'err'); }
+  $('qGen').disabled = false;
+};
+$('qPrint').onclick = () => window.print();
+
+/* ---------- link ---------- */
+// i link del sito si calcolano da PUBLIC_URL; gli altri sono fissi (stessi della skill efuture-games-links)
+const LINKS = () => {
+  const b = appUrl();
+  return [
+    ['Sito', [
+      ['App (giocatori)', b, 'pagina principale, installabile sul telefono'],
+      ['App – installazione', b + '?installa=1', 'il link del QR: apre l’app e propone l’installazione'],
+      ['Classifica da proiettare', b + 'classifica.html', 'per PC / ledwall, si aggiorna da sola'],
+      ['Admin', b + 'admin.html', 'questo pannello (serve la chiave)'],
+    ]],
+    ['GitHub', [
+      ['Repository', 'https://github.com/marraliEfuture/efuture_games', 'codice del sito'],
+      ['Pubblicazioni', 'https://github.com/marraliEfuture/efuture_games/actions', 'stato degli aggiornamenti del sito'],
+    ]],
+    ['Claude', [
+      ['Claude', 'https://claude.ai/', 'apri Claude'],
+      ['Claude Code', 'https://claude.ai/code', 'sessioni di lavoro sul codice'],
+      ['Efuture Games (artifact)', 'https://claude.ai/artifact/SP9Kk2UndgdSKYWdvarENf', ''],
+      ['SysAdmin Runner Efuture (artifact)', 'https://claude.ai/artifact/Ch9xMtgjtGbAGReq5qdyQJ', ''],
+      ['CoreTech Pac (artifact)', 'https://claude.ai/artifact/A9ZzBrDF2Rp2uXAArVNuHj', ''],
+      ['Timenet Breakout (artifact)', 'https://claude.ai/artifact/YR5HxarMv6q8hqeqwa64Pc', ''],
+      ['Inncloud Invaders (artifact)', 'https://claude.ai/artifact/SvTmC6vb1gjUobJfQeNckc', ''],
+    ]],
+    ['ChatGPT', [
+      ['ChatGPT', 'https://chatgpt.com/', 'apri ChatGPT'],
+    ]],
+  ];
+};
+async function copyText(t){
+  try { await navigator.clipboard.writeText(t); return true; }
+  catch(e){ const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); const ok = document.execCommand('copy'); a.remove(); return ok; }
+}
+function renderLinks(){
+  const list = $('lkList'); list.innerHTML = '';
+  for (const [group, rows] of LINKS()){
+    const g = document.createElement('div'); g.className = 'lgroup';
+    g.innerHTML = '<h3></h3>'; g.querySelector('h3').textContent = group;
+    for (const [name, url, note] of rows){
+      const r = document.createElement('div'); r.className = 'lrow';
+      r.innerHTML = '<div><b></b><small></small></div><a class="u" target="_blank" rel="noopener"></a>' +
+        '<div class="acts"><a class="btn ghost" target="_blank" rel="noopener" style="text-decoration:none">Apri</a><button class="btn ghost" type="button">Copia</button><button class="btn navy" type="button">QR</button></div>';
+      r.querySelector('b').textContent = name; r.querySelector('small').textContent = note;
+      const a = r.querySelector('a.u'); a.href = url; a.textContent = url;
+      r.querySelector('.acts a').href = url;
+      const [bCopy, bQr] = r.querySelectorAll('.acts button');
+      bCopy.onclick = async () => setMsg($('lkMsg'), (await copyText(url)) ? 'Copiato: ' + url : 'Copia non riuscita: seleziona il link a mano.', 'ok');
+      bQr.onclick = () => {
+        const open = r.querySelector('.lqr');
+        if (open){ open.remove(); bQr.textContent = 'QR'; return; }
+        const q = document.createElement('div'); q.className = 'lqr'; q.innerHTML = qrSvg(url);
+        q.querySelector('svg').setAttribute('aria-label', 'QR ' + name);
+        r.appendChild(q); bQr.textContent = 'Chiudi QR';
+      };
+      g.appendChild(r);
+    }
+    list.appendChild(g);
+  }
+}
 
 if (KEY) enter().catch(err => logout(err.auth ? err.message : ''));
 })();
