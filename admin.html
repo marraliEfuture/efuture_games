@@ -553,13 +553,19 @@ const VIDEOS = [
     desc:'Installazione di Claude in Chrome e prompt; poi Claude prende il controllo del mouse e prenota un tavolo per due su TheFork, con il timer del tempo reale. Alla fine la notifica e la mail di conferma sullo smartphone. 78 secondi.' },
 ];
 let videosDone = false;
+async function fileVersion(f){
+  try { const r = await fetch(f, { method:'HEAD', cache:'no-store' }); const tag = r.headers.get('etag') || r.headers.get('last-modified'); if (tag) return '?v=' + encodeURIComponent(tag.replace(/[^0-9a-zA-Z]/g, '').slice(-12)); } catch(e){}
+  return '?v=' + Date.now();
+}
 function renderVideos(){
   if (videosDone) return; videosDone = true;
   const list = $('vList');
   VIDEOS.forEach(v => {
     const c = document.createElement('div'); c.className = 'vcard';
     c.innerHTML = '<video controls preload="none" playsinline></video><div class="vb"><h3></h3><p class="dim"></p><div class="bar"><a class="btn ghost" target="_blank" rel="noopener" style="text-decoration:none">Apri</a><button class="btn ghost" type="button">Copia link</button><a class="btn ghost" style="text-decoration:none">Scarica</a></div></div>';
-    const vid = c.querySelector('video'); vid.src = v.file; vid.poster = v.poster; vid.setAttribute('aria-label', v.title);
+    const vid = c.querySelector('video'); vid.setAttribute('aria-label', v.title);
+    // l'indirizzo del video include la sua "firma" (ETag): quando il file cambia, il browser non usa la copia vecchia
+    fileVersion(v.file).then(q => { vid.src = v.file + q; vid.poster = v.poster + q; aOpen.href = new URL(v.file + q, location.href).href; aDown.href = v.file + q; });
     c.querySelector('h3').textContent = v.title; c.querySelector('p').textContent = v.desc;
     const url = new URL(v.file, location.href).href;
     const [aOpen, aDown] = c.querySelectorAll('a.btn'); aOpen.href = url; aDown.href = v.file; aDown.download = v.file.split('/').pop();
