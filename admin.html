@@ -89,6 +89,18 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 .lqr{grid-column:1/-1;display:flex;justify-content:center;padding:8px 0}
 .lqr svg{width:200px;height:auto}
 @media (max-width:700px){ .lrow{grid-template-columns:1fr} }
+/* Video utili */
+.videos{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.vcard{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.vcard video{width:100%;display:block;background:#000;aspect-ratio:16/11}
+.vcard .vb{padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.vcard h3{margin:0;font-family:var(--title);font-size:15px;color:var(--ink);line-height:1.3}
+.vcard .vb .bar{gap:6px} .vcard .btn{padding:6px 10px;font-size:12px}
+/* Skills */
+.skills{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.skill{border:1px solid var(--line);border-left:3px solid var(--sky);border-radius:4px;background:#fff;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.skill code{font-size:14px;font-weight:600;color:var(--navy);align-self:flex-start}
+.skill .ex{font-size:12px;color:var(--muted);font-style:italic}
 /* QR: cartellini in bianco e nero, 5 su un foglio A4 */
 .codes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
 .codes input{font-family:ui-monospace,monospace;text-transform:uppercase}
@@ -148,6 +160,8 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <button class="tab" data-tab="key" type="button">Chiave</button>
         <button class="tab" data-tab="qr" type="button">QR</button>
         <button class="tab" data-tab="links" type="button">Link</button>
+        <button class="tab" data-tab="videos" type="button">Video utili</button>
+        <button class="tab" data-tab="skills" type="button">Skills</button>
       </div>
 
       <section data-pane="players">
@@ -215,6 +229,17 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <p class="dim">Tutti i link di Efuture Games: apri, copia o mostra il QR di ciascuno.</p>
         <div class="links" id="lkList" style="margin-top:12px"></div>
         <div class="msg" id="lkMsg" aria-live="polite" style="margin-top:8px"></div>
+      </section>
+
+      <section data-pane="videos" hidden>
+        <p class="dim">Video brevi che mostrano come usare Claude e gli strumenti dell'evento.</p>
+        <div class="videos" id="vList" style="margin-top:12px"></div>
+        <div class="msg" id="vMsg" aria-live="polite" style="margin-top:8px"></div>
+      </section>
+
+      <section data-pane="skills" hidden>
+        <p class="dim">Le skill di Claude Code create per Efuture Games. Si usano in una sessione di Claude Code aperta sul repository efuture_games: scrivi il comando (es. <code>/efuture-games-qr</code>) oppure chiedilo a parole.</p>
+        <div class="skills" id="skList" style="margin-top:12px"></div>
       </section>
 
       <section data-pane="qr" hidden>
@@ -311,6 +336,8 @@ document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
   if (t.dataset.tab === 'log') loadLogs();
   if (t.dataset.tab === 'backup') loadBackups();
   if (t.dataset.tab === 'links') renderLinks();
+  if (t.dataset.tab === 'videos') renderVideos();
+  if (t.dataset.tab === 'skills') renderSkills();
 });
 
 /* ---------- giocatori ---------- */
@@ -489,6 +516,47 @@ $('qGen').onclick = async () => {
   $('qGen').disabled = false;
 };
 $('qPrint').onclick = () => window.print();
+
+/* ---------- skills ---------- */
+// stesso elenco di .claude/skills/ (la skill /efuture-games-skills lo legge dai file)
+const SKILLS = [
+  ['/efuture-games-qr', 'Crea i 5 QR (app + sblocco dei 4 giochi) come cartellini da stampare e controlla che ogni codice apra il gioco giusto.', '“dammi i QR da stampare”'],
+  ['/efuture-games-links', 'Elenca tutti i link del gioco: app, installazione, classifica, admin, GitHub, Claude e ChatGPT.', '“dammi i link del gioco”'],
+  ['/efuture-games-commit', 'Salva e carica le modifiche su GitHub: controlla i file, aumenta la versione dell’app se serve e pubblica su main solo se lo chiedi.', '“carica le modifiche su GitHub”'],
+  ['/efuture-games-skills', 'Mostra l’elenco aggiornato delle skill del progetto con il significato di ciascuna.', '“che skill ci sono per l’app?”'],
+];
+let skillsDone = false;
+function renderSkills(){
+  if (skillsDone) return; skillsDone = true;
+  for (const [cmd, what, ex] of SKILLS){
+    const d = document.createElement('div'); d.className = 'skill';
+    d.innerHTML = '<code></code><p></p><span class="ex"></span>';
+    d.querySelector('code').textContent = cmd; d.querySelector('p').textContent = what; d.querySelector('.ex').textContent = 'Esempio: ' + ex;
+    $('skList').appendChild(d);
+  }
+}
+
+/* ---------- video utili ---------- */
+// per aggiungere un video: file in video/ (mp4 H.264) + copertina jpg, poi una riga qui
+const VIDEOS = [
+  { title:'Ordina una cena su The Fork con l’estensione di Claude', file:'video/thefork-claude.mp4', poster:'video/thefork-claude.jpg',
+    desc:'Claude in Chrome prenota un tavolo per due su TheFork: sceglie data, orario e persone e conferma la prenotazione. 35 secondi.' },
+];
+let videosDone = false;
+function renderVideos(){
+  if (videosDone) return; videosDone = true;
+  const list = $('vList');
+  VIDEOS.forEach(v => {
+    const c = document.createElement('div'); c.className = 'vcard';
+    c.innerHTML = '<video controls preload="none" playsinline></video><div class="vb"><h3></h3><p class="dim"></p><div class="bar"><a class="btn ghost" target="_blank" rel="noopener" style="text-decoration:none">Apri</a><button class="btn ghost" type="button">Copia link</button><a class="btn ghost" style="text-decoration:none">Scarica</a></div></div>';
+    const vid = c.querySelector('video'); vid.src = v.file; vid.poster = v.poster; vid.setAttribute('aria-label', v.title);
+    c.querySelector('h3').textContent = v.title; c.querySelector('p').textContent = v.desc;
+    const url = new URL(v.file, location.href).href;
+    const [aOpen, aDown] = c.querySelectorAll('a.btn'); aOpen.href = url; aDown.href = v.file; aDown.download = v.file.split('/').pop();
+    c.querySelector('button').onclick = async () => setMsg($('vMsg'), (await copyText(url)) ? 'Copiato: ' + url : 'Copia non riuscita: usa Apri e copia l’indirizzo.', 'ok');
+    list.appendChild(c);
+  });
+}
 
 /* ---------- link ---------- */
 // i link del sito si calcolano da PUBLIC_URL; gli altri sono fissi (stessi della skill efuture-games-links)
