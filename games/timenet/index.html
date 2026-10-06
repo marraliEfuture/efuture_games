@@ -101,6 +101,7 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
 #ov-title .legend{gap:5px 9px}
 #ov-title .legend canvas{width:20px;height:20px}
 #ov-title .dim{font-size:10px}
+#howBox:not([hidden]){display:flex;flex-direction:column;gap:10px}
 .powered{display:flex;align-items:center;justify-content:center;gap:8px;padding-top:8px;border-top:1px solid var(--line)}
 .powered span{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
 .powered .chip{background:#ffffff;border-radius:7px;padding:5px 9px;display:flex;align-items:center}
@@ -132,20 +133,23 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
           <div class="logo-badge"><img id="logoImg" src="img/timenet-logo.png" alt="Timenet"></div>
           <h1>BREAKOUT</h1>
           <p>Una giornata in ufficio da ripulire. Muovi il <b style="color:var(--ct-light)">delfino blu</b> e rimbalza il pallone da spiaggia contro i mattoncini.</p>
-          <div class="howto">
-            <div class="legend">
-              <canvas id="lgBrick" width="44" height="44"></canvas><span>Rompi tutti i <b style="color:var(--ct-light)">mattoncini</b>. I più scuri vanno colpiti più volte. Dietro il muro si nasconde il logo.</span>
-              <canvas id="lgBall" width="44" height="44"></canvas><span>Non far cadere il <b style="color:var(--sun)">pallone</b> in acqua, o perdi una vita.</span>
-              <canvas id="lgPow" width="44" height="44"></canvas><span>Prendi le capsule: <b>C</b> connessi (3 palloni), <b>S</b> sicuri (rete di salvataggio), <b>✓</b> soddisfatti (delfino più grande), <b>T</b> tempo (pallone lento).</span>
-            </div>
-            <span class="dim">5 livelli, dalle 08:00 alle 18:00: ogni ora il pallone va più veloce.</span>
-          </div>
           <p class="dim" id="bestLine" hidden>Record: <b id="bestVal" style="color:var(--sun)"></b></p>
           <div class="btnrow">
             <button class="btn" id="btnStart">Inizia</button>
             <button class="btn alt" id="btnContinue" hidden>Continua · Liv. <span id="continueLvl"></span></button>
+            <button class="btn alt" id="btnHow" type="button" aria-expanded="false" aria-controls="howBox">Istruzioni</button>
           </div>
-          <div class="hint">Trascina o usa le <b>frecce</b> · <b>spazio</b> lancia · <b>P</b> pausa</div>
+          <div id="howBox" hidden>
+            <div class="howto">
+              <div class="legend">
+                <canvas id="lgBrick" width="44" height="44"></canvas><span>Rompi tutti i <b style="color:var(--ct-light)">mattoncini</b>. I più scuri vanno colpiti più volte. Dietro il muro si nasconde il logo.</span>
+                <canvas id="lgBall" width="44" height="44"></canvas><span>Non far cadere il <b style="color:var(--sun)">pallone</b> in acqua, o perdi una vita.</span>
+                <canvas id="lgPow" width="44" height="44"></canvas><span>Prendi le capsule: <b>C</b> connessi (3 palloni), <b>S</b> sicuri (rete di salvataggio), <b>✓</b> soddisfatti (delfino più grande), <b>T</b> tempo (pallone lento).</span>
+              </div>
+              <span class="dim">5 livelli, dalle 08:00 alle 18:00: ogni ora il pallone va più veloce.</span>
+            </div>
+            <div class="hint">Trascina o usa le <b>frecce</b> · <b>spazio</b> lancia · <b>P</b> pausa</div>
+          </div>
         </div>
       </div>
 
@@ -219,5 +223,18 @@ window.efgReport = function(game, score, level, won){
 };
 </script>
 <script src="game.js"></script>
+<script>
+// Istruzioni: nascoste finché il giocatore non le chiede
+(function(){
+  var b = document.getElementById('btnHow'), box = document.getElementById('howBox');
+  if (!b || !box) return;
+  b.addEventListener('click', function(){
+    box.hidden = !box.hidden;
+    b.setAttribute('aria-expanded', String(!box.hidden));
+    b.textContent = box.hidden ? 'Istruzioni' : 'Nascondi istruzioni';
+    if (!box.hidden) box.scrollIntoView({ block:'nearest', behavior:'smooth' });
+  });
+})();
+</script>
 </body>
 </html>

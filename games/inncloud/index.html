@@ -101,6 +101,7 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
 #ov-title .legend{gap:5px 9px}
 #ov-title .legend canvas{width:20px;height:20px}
 #ov-title .dim{font-size:10px}
+#howBox:not([hidden]){display:flex;flex-direction:column;gap:10px}
 .powered{display:flex;align-items:center;justify-content:center;gap:8px;padding-top:8px;border-top:1px solid var(--line)}
 .powered span{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
 .powered .chip{background:#ffffff;border-radius:7px;padding:5px 9px;display:flex;align-items:center}
@@ -132,20 +133,23 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
           <div class="logo-badge"><img id="logoImg" src="img/inncloud-logo.png" alt="Inncloud"></div>
           <h1>INVADERS</h1>
           <p>Il cloud è sotto attacco. Guida la <b style="color:#fff">nuvola di Inncloud</b> e respingi bug e hacker con i colpi rossi.</p>
-          <div class="howto">
-            <div class="legend">
-              <canvas id="lgShot" width="44" height="44"></canvas><span>La nuvola spara da sola i <b style="color:var(--ic-red-hi)">colpi rossi</b>: tu pensa solo a muoverti.</span>
-              <canvas id="lgBug" width="44" height="44"></canvas><span>Elimina tutti gli attaccanti: <b style="color:var(--hack)">bug</b>, virus e hacker. Schiva i loro codici verdi.</span>
-              <canvas id="lgWall" width="44" height="44"></canvas><span>Riparati dietro le <b>nuvolette</b>: i tuoi colpi le attraversano, i codici degli hacker no. Ma si consumano.</span>
-            </div>
-            <span class="dim">5 livelli, dal login sospetto al ransomware finale.</span>
-          </div>
           <p class="dim" id="bestLine" hidden>Record: <b id="bestVal" style="color:#fff"></b></p>
           <div class="btnrow">
             <button class="btn" id="btnStart">Inizia</button>
             <button class="btn alt" id="btnContinue" hidden>Continua · Liv. <span id="continueLvl"></span></button>
+            <button class="btn alt" id="btnHow" type="button" aria-expanded="false" aria-controls="howBox">Istruzioni</button>
           </div>
-          <div class="hint">Trascina o usa le <b>frecce</b> · <b>P</b> pausa</div>
+          <div id="howBox" hidden>
+            <div class="howto">
+              <div class="legend">
+                <canvas id="lgShot" width="44" height="44"></canvas><span>La nuvola spara da sola i <b style="color:var(--ic-red-hi)">colpi rossi</b>: tu pensa solo a muoverti.</span>
+                <canvas id="lgBug" width="44" height="44"></canvas><span>Elimina tutti gli attaccanti: <b style="color:var(--hack)">bug</b>, virus e hacker. Schiva i loro codici verdi.</span>
+                <canvas id="lgWall" width="44" height="44"></canvas><span>Riparati dietro le <b>nuvolette</b>: i tuoi colpi le attraversano, i codici degli hacker no. Ma si consumano.</span>
+              </div>
+              <span class="dim">5 livelli, dal login sospetto al ransomware finale.</span>
+            </div>
+            <div class="hint">Trascina o usa le <b>frecce</b> · <b>P</b> pausa</div>
+          </div>
         </div>
       </div>
 
@@ -219,5 +223,18 @@ window.efgReport = function(game, score, level, won){
 };
 </script>
 <script src="game.js"></script>
+<script>
+// Istruzioni: nascoste finché il giocatore non le chiede
+(function(){
+  var b = document.getElementById('btnHow'), box = document.getElementById('howBox');
+  if (!b || !box) return;
+  b.addEventListener('click', function(){
+    box.hidden = !box.hidden;
+    b.setAttribute('aria-expanded', String(!box.hidden));
+    b.textContent = box.hidden ? 'Istruzioni' : 'Nascondi istruzioni';
+    if (!box.hidden) box.scrollIntoView({ block:'nearest', behavior:'smooth' });
+  });
+})();
+</script>
 </body>
 </html>

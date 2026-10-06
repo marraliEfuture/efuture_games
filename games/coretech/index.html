@@ -105,6 +105,7 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
 #ov-title .legend{gap:5px 9px}
 #ov-title .legend canvas{width:20px;height:20px}
 #ov-title .dim{font-size:10px}
+#howBox:not([hidden]){display:flex;flex-direction:column;gap:10px}
 .powered{display:flex;align-items:center;justify-content:center;gap:8px;padding-top:8px;border-top:1px solid var(--line)}
 .powered span{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
 .powered .chip{background:#ffffff;border-radius:7px;padding:5px 9px;display:flex;align-items:center}
@@ -136,20 +137,23 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
           <img class="logo" id="logoImg" src="img/coretech-logo.png" alt="CoreTech">
           <h1>PAC</h1>
           <p>Il sistema è pieno di bug. Guida la <b style="color:var(--ct-light)">C di CoreTech</b> nel labirinto e ripulisci tutto.</p>
-          <div class="howto">
-            <div class="legend">
-              <canvas id="lgCoin" width="44" height="44"></canvas><span>Mangia tutte le <b style="color:var(--coin)">monetine</b> per chiudere il livello.</span>
-              <canvas id="lgBug" width="44" height="44"></canvas><span>I <b style="color:var(--danger)">bug</b> ti danno la caccia: se ti toccano perdi una vita.</span>
-              <canvas id="lgPatch" width="44" height="44"></canvas><span>Prendi il <b>floppy patch</b>: per qualche secondo sei tu a mangiare i bug.</span>
-            </div>
-            <span class="dim">5 livelli, ognuno più veloce e con meno tempo di patch.</span>
-          </div>
           <p class="dim" id="bestLine" hidden>Record: <b id="bestVal" style="color:var(--coin)"></b></p>
           <div class="btnrow">
             <button class="btn" id="btnStart">Inizia</button>
             <button class="btn alt" id="btnContinue" hidden>Continua · Liv. <span id="continueLvl"></span></button>
+            <button class="btn alt" id="btnHow" type="button" aria-expanded="false" aria-controls="howBox">Istruzioni</button>
           </div>
-          <div class="hint">Scorri sullo schermo o usa le <b>frecce</b> · <b>P</b> pausa</div>
+          <div id="howBox" hidden>
+            <div class="howto">
+              <div class="legend">
+                <canvas id="lgCoin" width="44" height="44"></canvas><span>Mangia tutte le <b style="color:var(--coin)">monetine</b> per chiudere il livello.</span>
+                <canvas id="lgBug" width="44" height="44"></canvas><span>I <b style="color:var(--danger)">bug</b> ti danno la caccia: se ti toccano perdi una vita.</span>
+                <canvas id="lgPatch" width="44" height="44"></canvas><span>Prendi il <b>floppy patch</b>: per qualche secondo sei tu a mangiare i bug.</span>
+              </div>
+              <span class="dim">5 livelli, ognuno più veloce e con meno tempo di patch.</span>
+            </div>
+            <div class="hint">Scorri sullo schermo o usa le <b>frecce</b> · <b>P</b> pausa</div>
+          </div>
         </div>
       </div>
 
@@ -229,5 +233,18 @@ window.efgReport = function(game, score, level, won){
 };
 </script>
 <script src="game.js"></script>
+<script>
+// Istruzioni: nascoste finché il giocatore non le chiede
+(function(){
+  var b = document.getElementById('btnHow'), box = document.getElementById('howBox');
+  if (!b || !box) return;
+  b.addEventListener('click', function(){
+    box.hidden = !box.hidden;
+    b.setAttribute('aria-expanded', String(!box.hidden));
+    b.textContent = box.hidden ? 'Istruzioni' : 'Nascondi istruzioni';
+    if (!box.hidden) box.scrollIntoView({ block:'nearest', behavior:'smooth' });
+  });
+})();
+</script>
 </body>
 </html>

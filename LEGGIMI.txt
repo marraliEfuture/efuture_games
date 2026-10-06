@@ -71,6 +71,8 @@ CODICI DI SBLOCCO (uno per gioco)
 
 3) COME FUNZIONA
    - Prima pagina: 4 blocchi, uno per gioco. I giochi bloccati mostrano 🔒.
+   - Il pulsante "Istruzioni" (in home e nella schermata iniziale di ogni
+     gioco) mostra regole e comandi: di base restano nascosti.
    - Toccando un gioco bloccato: inquadra il QR allo stand oppure
      scrivi il codice. Il QR apre l'app e sblocca il gioco da solo.
    - Sblocco: "Apri la fotocamera" legge il QR direttamente nell'app;
