@@ -91,6 +91,40 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 .lqr{grid-column:1/-1;display:flex;justify-content:center;padding:8px 0}
 .lqr svg{width:200px;height:auto}
 @media (max-width:700px){ .lrow{grid-template-columns:1fr} }
+/* Tutorial a slide */
+.tlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.tcard{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.tcard img{width:100%;aspect-ratio:12/7;object-fit:cover;display:block;border-bottom:1px solid var(--line)}
+.tcard .vb{padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.tcard h3{margin:0;font-family:var(--title);font-size:15px;color:var(--ink)}
+.deck{border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+.deck:fullscreen{border-radius:0;border:0}
+.deck .dtop{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--row)}
+.deck .dtop b{font-family:var(--title);color:var(--ink);font-size:15px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.deck .cnt{font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted);white-space:nowrap}
+.deck .dtop .btn{padding:6px 10px;font-size:12px}
+.slide{display:grid;grid-template-columns:3fr 2fr;gap:0;min-height:430px;flex:1;touch-action:pan-y}
+.slide .im img{-webkit-user-drag:none;user-select:none;pointer-events:none}
+.deck:fullscreen .slide{min-height:0}
+.slide .im{background:#f3f1ec;display:flex;align-items:center;justify-content:center;padding:14px;border-right:1px solid var(--line)}
+.slide .im img{max-width:100%;max-height:100%;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.10)}
+.deck:fullscreen .slide .im img{max-height:calc(100vh - 150px)}
+.slide .tx{padding:24px 26px;display:flex;flex-direction:column;gap:12px;overflow:auto}
+.slide .kk{font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--orange)}
+.slide h2{font-size:24px;line-height:1.25;letter-spacing:-.6px}
+.slide p,.slide li{font-size:15px;line-height:1.6;color:var(--text);margin:0}
+.slide ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.slide .time{align-self:flex-start;background:#e3f3ff;color:var(--navy);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600}
+.prompt{border:1px solid #e3ddd2;background:#faf7f2;border-radius:10px;padding:12px 14px;font-size:14.5px;line-height:1.55;position:relative}
+.prompt .btn{margin-top:10px;padding:6px 10px;font-size:12px}
+.deck .dnav{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-top:1px solid var(--line)}
+.deck .arrow{width:52px;height:44px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:22px;cursor:pointer;color:var(--ink)}
+.deck .arrow.next{background:var(--orange);border-color:var(--orange);color:#fff}
+.deck .arrow:disabled{opacity:.35;cursor:default}
+.deck .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.deck .dots button{width:10px;height:10px;border-radius:50%;border:0;background:#d6dbe3;padding:0;cursor:pointer}
+.deck .dots button.on{background:var(--orange);width:24px;border-radius:5px}
+@media (max-width:760px){ .slide{grid-template-columns:1fr} .slide .im{border-right:0;border-bottom:1px solid var(--line)} .slide h2{font-size:20px} }
 /* Video utili */
 .videos{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
 .vcard{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
@@ -159,13 +193,14 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <button class="tab on" data-tab="players" type="button">Giocatori</button>
         <button class="tab" data-tab="log" type="button">Registro</button>
         <span class="tsep" aria-hidden="true"></span>
-        <!-- materiali per stand e schermi -->
+        <!-- strumenti: QR, link e skill -->
         <button class="tab" data-tab="qr" type="button">QR</button>
         <button class="tab" data-tab="links" type="button">Link</button>
-        <span class="tsep" aria-hidden="true"></span>
-        <!-- guide -->
-        <button class="tab" data-tab="videos" type="button">Video utili</button>
         <button class="tab" data-tab="skills" type="button">Skills</button>
+        <span class="tsep" aria-hidden="true"></span>
+        <!-- guide: video e tutorial -->
+        <button class="tab" data-tab="videos" type="button">Video utili</button>
+        <button class="tab" data-tab="tutorials" type="button">Tutorial</button>
         <span class="tsep" aria-hidden="true"></span>
         <!-- manutenzione: le operazioni delicate in fondo -->
         <button class="tab" data-tab="backup" type="button">Backup</button>
@@ -244,6 +279,19 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <p class="dim">Video brevi che mostrano come usare Claude e gli strumenti dell'evento.</p>
         <div class="videos" id="vList" style="margin-top:12px"></div>
         <div class="msg" id="vMsg" aria-live="polite" style="margin-top:8px"></div>
+      </section>
+
+      <section data-pane="tutorials" hidden>
+        <div id="tuList">
+          <p class="dim">Tutorial passo passo, da sfogliare come una presentazione: frecce, tasti ← → della tastiera o swipe sul telefono. I prompt si copiano con un clic.</p>
+          <div class="tlist" id="tuCards" style="margin-top:12px"></div>
+        </div>
+        <div class="deck" id="deck" hidden tabindex="-1" aria-roledescription="presentazione">
+          <div class="dtop"><b id="dTitle"></b><span class="cnt" id="dCnt"></span><button class="btn ghost" id="dFull" type="button">Schermo intero</button><button class="btn ghost" id="dClose" type="button">Chiudi</button></div>
+          <div class="slide" id="dSlide" aria-live="polite"></div>
+          <div class="dnav"><button class="arrow" id="dPrev" type="button" aria-label="Slide precedente">←</button><div class="dots" id="dDots"></div><button class="arrow next" id="dNext" type="button" aria-label="Slide successiva">→</button></div>
+        </div>
+        <div class="msg" id="tuMsg" aria-live="polite" style="margin-top:8px"></div>
       </section>
 
       <section data-pane="skills" hidden>
@@ -347,6 +395,7 @@ document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
   if (t.dataset.tab === 'links') renderLinks();
   if (t.dataset.tab === 'videos') renderVideos();
   if (t.dataset.tab === 'skills') renderSkills();
+  if (t.dataset.tab === 'tutorials') renderTutorials();
 });
 
 /* ---------- giocatori ---------- */
@@ -546,11 +595,70 @@ function renderSkills(){
   }
 }
 
+/* ---------- tutorial a slide ---------- */
+const TUTORIALS = [
+  { id:'forza4', title:'Crea e gioca a Forza 4 con Claude', cover:'tutorial/forza4/win.jpg', desc:'Quattro prompt per creare il gioco e una partita vinta: tutto in meno di 15 minuti.',
+    slides:[
+      { k:'Tutorial', h:'Crea e gioca a Forza 4 con Claude', img:'win.jpg', html:'<p>In meno di <b>15 minuti</b> crei il tuo videogioco con quattro richieste a Claude e lo giochi subito.</p><ul><li>4 prompt per costruire il gioco</li><li>una partita completa contro il computer</li><li>tempo totale: circa 9 minuti</li></ul>' },
+      { k:'Prima di iniziare', h:'Cosa ti serve', img:'chat.jpg', html:'<ul><li>un account Claude (claude.ai)</li><li>un computer o un tablet con il browser</li><li>15 minuti</li></ul><p>Non serve saper programmare: scrivi a Claude cosa vuoi, come lo diresti a una persona.</p>' },
+      { k:'Passo 1', h:'Apri Claude e inizia una nuova chat', img:'chat.jpg', time:'circa 0:20', html:'<p>Vai su <b>claude.ai</b> e premi <b>Nuova chat</b>. Clicca nel riquadro in basso per scrivere.</p>' },
+      { k:'Passo 2 · primo prompt', h:'Chiedi a Claude di creare il gioco', img:'gen.jpg', time:'Claude ci mette circa 1:30', prompt:"Creami un gioco di Forza 4 da giocare nel browser: griglia 7x6, gettoni rossi e gialli, contro il computer oppure in due giocatori.", html:'<p>Scrivi con calma, rileggi e premi invio. Claude scrive il codice: mentre lavora vedi l’avanzamento.</p>' },
+      { k:'Passo 2 · risultato', h:'Il gioco è pronto: versione 1', img:'p1.jpg', html:'<p>A destra compare il gioco (si chiama <b>Artifact</b>): puoi già provarlo. Nella chat resta la scheda della versione.</p>' },
+      { k:'Passo 3 · secondo prompt', h:'Livelli di difficoltà e punteggio', img:'p2.jpg', time:'Claude ci mette circa 1:05', prompt:"Aggiungi tre livelli di difficoltà per il computer (facile, medio e difficile) e un punteggio che conti vittorie e pareggi.", html:'<p>Ogni richiesta migliora il gioco: Claude crea una nuova versione partendo da quella di prima.</p>' },
+      { k:'Passo 4 · terzo prompt', h:'Euro e dollaro sui gettoni', img:'p3.jpg', time:'Claude ci mette circa 0:40', prompt:"Sui gettoni rossi metti il simbolo dell'euro e su quelli gialli il dollaro.", html:'<p>Le modifiche piccole sono le più veloci: meno di un minuto.</p>' },
+      { k:'Passo 5 · quarto prompt', h:'Festa quando vinci', img:'p4.jpg', time:'Claude ci mette circa 1:15', prompt:"Quando vinco fai partire i fuochi d'artificio. Quando vince il computer, fai esplodere i gettoni fuori dallo schermo!", html:'<p>Il gioco è completo. Sono passati circa <b>9 minuti</b>: ne restano 6 per giocare.</p>' },
+      { k:'Passo 6 · gioca', h:'Livello Facile e gettoni al centro', img:'play.jpg', html:'<p>Scegli <b>Contro il computer</b> e il livello <b>Facile</b>. Metti il primo gettone al centro (colonna <b>4</b>), poi accanto: colonne <b>3</b> e <b>5</b>.</p>' },
+      { k:'Passo 7 · la trappola', h:'Tre in fila con due lati liberi', img:'trap.jpg', html:'<p>Con tre gettoni in fila e <b>entrambi i lati liberi</b>, il computer può bloccarne uno solo. Tu chiudi l’altro: qui la colonna <b>6</b>.</p>' },
+      { k:'Fatto', h:'Hai vinto!', img:'win.jpg', html:'<p>Quattro in fila e fuochi d’artificio. Gioco creato e partita vinta in circa <b>9 minuti</b>.</p><p>Con il tempo che resta prova il livello <b>Difficile</b> o sfida un amico in modalità <b>2 giocatori</b>.</p>' },
+      { k:'Idee per continuare', h:'Altri prompt da provare', img:'p4.jpg', prompt:"Aggiungi un pulsante per il tema scuro e fai dire al computer una frase scherzosa quando vince.", html:'<p>Puoi chiedere a Claude qualsiasi modifica: colori, suoni, regole nuove. Una richiesta alla volta, poi prova il risultato.</p>' },
+    ] },
+];
+let tuDone = false, deckT = null, deckI = 0;
+function renderTutorials(){
+  if (tuDone) return; tuDone = true;
+  for (const tu of TUTORIALS){
+    const c = document.createElement('div'); c.className = 'tcard';
+    c.innerHTML = '<img alt=""><div class="vb"><h3></h3><p class="dim"></p><div class="bar"><button class="btn" type="button">Apri il tutorial</button><span class="dim"></span></div></div>';
+    c.querySelector('img').src = tu.cover; c.querySelector('h3').textContent = tu.title; c.querySelector('p').textContent = tu.desc;
+    c.querySelector('.bar .dim').textContent = tu.slides.length + ' slide';
+    c.querySelector('button').onclick = () => openDeck(tu);
+    $('tuCards').appendChild(c);
+  }
+}
+function openDeck(tu){ deckT = tu; deckI = 0; $('tuList').hidden = true; $('deck').hidden = false; $('dTitle').textContent = tu.title;
+  $('dDots').innerHTML = ''; tu.slides.forEach((_, i) => { const d = document.createElement('button'); d.type = 'button'; d.setAttribute('aria-label', 'Slide ' + (i+1)); d.onclick = () => goSlide(i); $('dDots').appendChild(d); });
+  goSlide(0); $('deck').focus(); }
+function closeDeck(){ if (document.fullscreenElement) document.exitFullscreen(); deckT = null; $('deck').hidden = true; $('tuList').hidden = false; }
+function goSlide(i){
+  const S = deckT.slides; deckI = Math.max(0, Math.min(S.length - 1, i)); const s = S[deckI];
+  const box = $('dSlide'); box.innerHTML = '<div class="im"><img alt=""></div><div class="tx"><span class="kk"></span><h2></h2><div class="body"></div></div>';
+  box.querySelector('img').src = 'tutorial/' + deckT.id + '/' + s.img; box.querySelector('img').alt = s.h;
+  box.querySelector('.kk').textContent = s.k; box.querySelector('h2').textContent = s.h;
+  const body = box.querySelector('.body'); body.style.cssText = 'display:flex;flex-direction:column;gap:12px'; body.innerHTML = s.html;
+  if (s.prompt){ const pr = document.createElement('div'); pr.className = 'prompt'; pr.innerHTML = '<div></div><button class="btn ghost" type="button">Copia il prompt</button>'; pr.firstChild.textContent = '“' + s.prompt + '”';
+    pr.querySelector('button').onclick = async () => setMsg($('tuMsg'), (await copyText(s.prompt)) ? 'Prompt copiato: incollalo nella chat di Claude.' : 'Copia non riuscita: seleziona il testo a mano.', 'ok');
+    body.prepend(pr); }
+  if (s.time){ const t = document.createElement('span'); t.className = 'time'; t.textContent = '⏱ ' + s.time; body.appendChild(t); }
+  $('dCnt').textContent = (deckI + 1) + ' / ' + S.length;
+  $('dPrev').disabled = deckI === 0; $('dNext').disabled = deckI === S.length - 1;
+  [...$('dDots').children].forEach((d, j) => d.classList.toggle('on', j === deckI));
+  box.animate([{opacity:0, transform:'translateX(12px)'}, {opacity:1, transform:'none'}], {duration:220, easing:'ease-out'});
+}
+$('dPrev').onclick = () => goSlide(deckI - 1);
+$('dNext').onclick = () => goSlide(deckI + 1);
+$('dClose').onclick = closeDeck;
+$('dFull').onclick = () => { const d = $('deck'); if (document.fullscreenElement) document.exitFullscreen(); else if (d.requestFullscreen) d.requestFullscreen(); };
+document.addEventListener('fullscreenchange', () => { $('dFull').textContent = document.fullscreenElement ? 'Esci da schermo intero' : 'Schermo intero'; });
+document.addEventListener('keydown', e => { if (!deckT || $('deck').hidden) return; if (e.key === 'ArrowRight' || e.key === 'PageDown') { goSlide(deckI + 1); e.preventDefault(); } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { goSlide(deckI - 1); e.preventDefault(); } else if (e.key === 'Escape' && !document.fullscreenElement) closeDeck(); });
+{ let x0 = null; $('dSlide').addEventListener('pointerdown', e => { x0 = e.clientX; }); $('dSlide').addEventListener('pointerup', e => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) goSlide(deckI + (dx < 0 ? 1 : -1)); }); }
+
 /* ---------- video utili ---------- */
 // per aggiungere un video: file in video/ (mp4 H.264) + copertina jpg, poi una riga qui
 const VIDEOS = [
   { title:'Ordina una cena su The Fork con l’estensione di Claude', file:'video/thefork-claude.mp4', poster:'video/thefork-claude.jpg',
     desc:'Installazione di Claude in Chrome e prompt; poi Claude prende il controllo del mouse e prenota un tavolo per due su TheFork, con il timer del tempo reale. Alla fine la notifica e la mail di conferma sullo smartphone. 78 secondi.' },
+  { title:'Crea e gioca a Forza 4 con Claude', file:'video/forza4-claude.mp4', poster:'video/forza4-claude.jpg',
+    desc:'Quattro prompt in Claude per creare il gioco, con i tempi reali di ogni passaggio, poi una partita completa vinta in poche mosse. Tutto in meno di 15 minuti. 2 minuti e 16 secondi.' },
 ];
 let videosDone = false;
 async function fileVersion(f){
