@@ -18,5 +18,7 @@
     { "nome": "Inncloud Invaders (artifact)", "url": "https://claude.ai/artifact/SvTmC6vb1gjUobJfQeNckc" },
     { "nome": "Sessioni Claude Code", "url": "https://claude.ai/code" }
   ],
-  "chatgpt": []
+  "chatgpt": [
+    { "nome": "ChatGPT", "url": "https://chatgpt.com/", "note": "per aprire ChatGPT" }
+  ]
 }
