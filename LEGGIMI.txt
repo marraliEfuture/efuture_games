@@ -56,6 +56,8 @@ CODICI DI SBLOCCO (uno per gioco)
    - Chiave: cambia la chiave admin.
    - QR: "Genera i QR" mostra a video i 5 QR (app + sblocco dei 4
      giochi); "Stampa" li mette tutti su un foglio A4 in bianco e nero.
+   - Link: tutti i link (app, installazione, classifica, admin, GitHub,
+     Claude, ChatGPT) con i pulsanti Apri, Copia e QR.
    Se perdi la chiave: Supabase > SQL Editor >
      select efg_admin_init('NUOVA-CHIAVE-LUNGA');
    Dopo 8 chiavi sbagliate in 10 minuti il pannello si blocca 10 minuti.

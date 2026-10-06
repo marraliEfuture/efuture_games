@@ -77,6 +77,18 @@ p{margin:0;line-height:1.55}
 .dim{color:var(--muted);font-size:13px}
 code{background:var(--row);padding:1px 5px;border-radius:3px}
 @media (max-width:600px){ .hright{margin-left:0;width:100%} }
+/* Link */
+.links{display:flex;flex-direction:column;gap:16px}
+.lgroup h3{margin:0 0 6px;font-family:var(--title);font-size:15px;color:var(--ink)}
+.lrow{display:grid;grid-template-columns:minmax(150px,1fr) minmax(0,2fr) auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:#fff}
+.lrow+.lrow{margin-top:6px}
+.lrow b{display:block;color:var(--ink);font-size:13px} .lrow small{color:var(--muted);font-size:12px}
+.lrow a.u{font-family:ui-monospace,monospace;font-size:12px;color:var(--navy);word-break:break-all}
+.lrow .acts{display:flex;gap:6px}
+.lrow .btn{padding:6px 10px;font-size:12px}
+.lqr{grid-column:1/-1;display:flex;justify-content:center;padding:8px 0}
+.lqr svg{width:200px;height:auto}
+@media (max-width:700px){ .lrow{grid-template-columns:1fr} }
 /* QR: cartellini in bianco e nero, 5 su un foglio A4 */
 .codes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
 .codes input{font-family:ui-monospace,monospace;text-transform:uppercase}
@@ -135,6 +147,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <button class="tab" data-tab="reset" type="button">Reset</button>
         <button class="tab" data-tab="key" type="button">Chiave</button>
         <button class="tab" data-tab="qr" type="button">QR</button>
+        <button class="tab" data-tab="links" type="button">Link</button>
       </div>
 
       <section data-pane="players">
@@ -196,6 +209,12 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
           <button class="btn" type="submit">Cambia chiave</button>
         </form>
         <div class="msg" id="kMsg" aria-live="polite"></div>
+      </section>
+
+      <section data-pane="links" hidden>
+        <p class="dim">Tutti i link di Efuture Games: apri, copia o mostra il QR di ciascuno.</p>
+        <div class="links" id="lkList" style="margin-top:12px"></div>
+        <div class="msg" id="lkMsg" aria-live="polite" style="margin-top:8px"></div>
       </section>
 
       <section data-pane="qr" hidden>
@@ -291,6 +310,7 @@ document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
   if (t.dataset.tab === 'players') loadPlayers();
   if (t.dataset.tab === 'log') loadLogs();
   if (t.dataset.tab === 'backup') loadBackups();
+  if (t.dataset.tab === 'links') renderLinks();
 });
 
 /* ---------- giocatori ---------- */
@@ -469,6 +489,66 @@ $('qGen').onclick = async () => {
   $('qGen').disabled = false;
 };
 $('qPrint').onclick = () => window.print();
+
+/* ---------- link ---------- */
+// i link del sito si calcolano da PUBLIC_URL; gli altri sono fissi (stessi della skill efuture-games-links)
+const LINKS = () => {
+  const b = appUrl();
+  return [
+    ['Sito', [
+      ['App (giocatori)', b, 'pagina principale, installabile sul telefono'],
+      ['App – installazione', b + '?installa=1', 'il link del QR: apre l’app e propone l’installazione'],
+      ['Classifica da proiettare', b + 'classifica.html', 'per PC / ledwall, si aggiorna da sola'],
+      ['Admin', b + 'admin.html', 'questo pannello (serve la chiave)'],
+    ]],
+    ['GitHub', [
+      ['Repository', 'https://github.com/marraliEfuture/efuture_games', 'codice del sito'],
+      ['Pubblicazioni', 'https://github.com/marraliEfuture/efuture_games/actions', 'stato degli aggiornamenti del sito'],
+    ]],
+    ['Claude', [
+      ['Claude', 'https://claude.ai/', 'apri Claude'],
+      ['Claude Code', 'https://claude.ai/code', 'sessioni di lavoro sul codice'],
+      ['Efuture Games (artifact)', 'https://claude.ai/artifact/SP9Kk2UndgdSKYWdvarENf', ''],
+      ['SysAdmin Runner Efuture (artifact)', 'https://claude.ai/artifact/Ch9xMtgjtGbAGReq5qdyQJ', ''],
+      ['CoreTech Pac (artifact)', 'https://claude.ai/artifact/A9ZzBrDF2Rp2uXAArVNuHj', ''],
+      ['Timenet Breakout (artifact)', 'https://claude.ai/artifact/YR5HxarMv6q8hqeqwa64Pc', ''],
+      ['Inncloud Invaders (artifact)', 'https://claude.ai/artifact/SvTmC6vb1gjUobJfQeNckc', ''],
+    ]],
+    ['ChatGPT', [
+      ['ChatGPT', 'https://chatgpt.com/', 'apri ChatGPT'],
+    ]],
+  ];
+};
+async function copyText(t){
+  try { await navigator.clipboard.writeText(t); return true; }
+  catch(e){ const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); const ok = document.execCommand('copy'); a.remove(); return ok; }
+}
+function renderLinks(){
+  const list = $('lkList'); list.innerHTML = '';
+  for (const [group, rows] of LINKS()){
+    const g = document.createElement('div'); g.className = 'lgroup';
+    g.innerHTML = '<h3></h3>'; g.querySelector('h3').textContent = group;
+    for (const [name, url, note] of rows){
+      const r = document.createElement('div'); r.className = 'lrow';
+      r.innerHTML = '<div><b></b><small></small></div><a class="u" target="_blank" rel="noopener"></a>' +
+        '<div class="acts"><a class="btn ghost" target="_blank" rel="noopener" style="text-decoration:none">Apri</a><button class="btn ghost" type="button">Copia</button><button class="btn navy" type="button">QR</button></div>';
+      r.querySelector('b').textContent = name; r.querySelector('small').textContent = note;
+      const a = r.querySelector('a.u'); a.href = url; a.textContent = url;
+      r.querySelector('.acts a').href = url;
+      const [bCopy, bQr] = r.querySelectorAll('.acts button');
+      bCopy.onclick = async () => setMsg($('lkMsg'), (await copyText(url)) ? 'Copiato: ' + url : 'Copia non riuscita: seleziona il link a mano.', 'ok');
+      bQr.onclick = () => {
+        const open = r.querySelector('.lqr');
+        if (open){ open.remove(); bQr.textContent = 'QR'; return; }
+        const q = document.createElement('div'); q.className = 'lqr'; q.innerHTML = qrSvg(url);
+        q.querySelector('svg').setAttribute('aria-label', 'QR ' + name);
+        r.appendChild(q); bQr.textContent = 'Chiudi QR';
+      };
+      g.appendChild(r);
+    }
+    list.appendChild(g);
+  }
+}
 
 if (KEY) enter().catch(err => logout(err.auth ? err.message : ''));
 })();
