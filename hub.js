@@ -39,10 +39,11 @@ let toastT = 0;
 function toast(msg, ms){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(()=>{ t.hidden = true; }, ms||3200); }
 function setMsg(el, text, kind){ el.textContent = text; el.className = 'msg' + (kind ? ' ' + kind : ''); }
 function openModal(id){ $(id).hidden = false; }
+$('btnHelp').addEventListener('click', ()=>openModal('mHelp'));
 document.querySelectorAll('.modal').forEach(m=>{
   m.addEventListener('click', e=>{ if ((e.target === m && m.id !== 'mResult') || e.target.closest('[data-close]')){ m.hidden = true; if (m.id === 'mUnlock') stopCam(); } });
 });
-document.addEventListener('keydown', e=>{ if (e.key === 'Escape'){ ['mUnlock','mAuth','mBoard','mInstall'].forEach(id=>$(id).hidden = true); stopCam(); } });
+document.addEventListener('keydown', e=>{ if (e.key === 'Escape'){ ['mUnlock','mAuth','mBoard','mInstall','mHelp'].forEach(id=>$(id).hidden = true); stopCam(); } });
 
 /* ================= STATE ================= */
 let unlocked = new Set(store.get('efgUnlocked', []));
@@ -77,7 +78,7 @@ function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v18' : 'Modalità demo: account e classifica restano su questo telefono. · v18';
+  mn.textContent = remote ? 'Classifica online · v19' : 'Modalità demo: account e classifica restano su questo telefono. · v19';
 }
 
 /* ================= UNLOCK: camera + code ================= */

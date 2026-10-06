@@ -247,6 +247,7 @@ img{max-width:100%}
     line-height:1.55;
     text-align:left;
   }
+  #howBox:not([hidden]){display:flex;flex-direction:column;gap:10px;margin-top:4px}
   .btnrow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px;}
   button.game-btn{
     font-family:'Press Start 2P','IBM Plex Mono',monospace;
@@ -418,21 +419,24 @@ img{max-width:100%}
         <div class="kicker" id="kickerLv">Livello 1 di 10 &middot; missione IT</div>
         <h1 class="pixel">SYSADMIN RUNNER</h1>
         <p>Sei il sysadmin di guardia. Server in fiamme, firewall bucati, mouse impazziti: dieci clienti ti aspettano, e all'ultimo piano si nasconde un hacker.</p>
-        <div class="bubble">
-          <b>Come si gioca:</b><br>
-          Muoviti ed evita i bug. Saltaci sopra per schiacciarli, oppure lanciagli il mouse. Attenzione a chiodi, archi elettrici e seghe circolari lungo il percorso: sono trappole d'ufficio, non si eliminano, si schivano! Batti 3 bug di fila senza farti colpire per sbloccare l'antivirus, l'arma speciale: un colpo subito e la perdi. In fondo a ogni piano trovi una scala: il cliente ti aspetta in cima e ti ringrazia quando lo raggiungi. Se sali con dei bug ancora in giro, il cliente se ne accorge e sta a te decidere: tornare a debuggare (più pulito, ma più lento) o chiudere comunque il ticket (più veloce, ma meno pulito). Punta al miglior tempo o alla pulizia perfetta: entrambi i record restano salvati!
-        </div>
         <p class="dim" id="bestTimeLineTitle" style="display:none;">Record attuale: <b id="bestTimeTitle" style="color:var(--ef-yellow)"></b></p>
         <p class="dim" id="bestDebugLineTitle" style="display:none;">Miglior pulizia: <b id="bestDebugTitle" style="color:var(--ef-yellow)"></b></p>
         <div class="btnrow">
           <button class="game-btn" id="btnStart">Timbra il cartellino</button>
           <button class="game-btn secondary" id="btnContinue" hidden>Continua &middot; Liv. <span id="continueLevel"></span></button>
+          <button class="game-btn secondary" id="btnHow" type="button" aria-expanded="false" aria-controls="howBox">Istruzioni</button>
+        </div>
+        <div id="howBox" hidden>
+        <div class="bubble">
+          <b>Come si gioca:</b><br>
+          Muoviti ed evita i bug. Saltaci sopra per schiacciarli, oppure lanciagli il mouse. Attenzione a chiodi, archi elettrici e seghe circolari lungo il percorso: sono trappole d'ufficio, non si eliminano, si schivano! Batti 3 bug di fila senza farti colpire per sbloccare l'antivirus, l'arma speciale: un colpo subito e la perdi. In fondo a ogni piano trovi una scala: il cliente ti aspetta in cima e ti ringrazia quando lo raggiungi. Se sali con dei bug ancora in giro, il cliente se ne accorge e sta a te decidere: tornare a debuggare (più pulito, ma più lento) o chiudere comunque il ticket (più veloce, ma meno pulito). Punta al miglior tempo o alla pulizia perfetta: entrambi i record restano salvati!
         </div>
         <div class="controls-hint">
           <div><b>&larr; &rarr;</b> muovi</div>
           <div><b>&uarr;</b> salta</div>
           <div><b>X</b> mouse</div>
           <div><b>V</b> antivirus</div>
+        </div>
         </div>
       </div>
     </div>
@@ -2569,5 +2573,18 @@ if (window.claude && window.claude.hot && window.claude.hot.ready){
 })();
 </script>
 
+<script>
+// Istruzioni: nascoste finché il giocatore non le chiede
+(function(){
+  var b = document.getElementById('btnHow'), box = document.getElementById('howBox');
+  if (!b || !box) return;
+  b.addEventListener('click', function(){
+    box.hidden = !box.hidden;
+    b.setAttribute('aria-expanded', String(!box.hidden));
+    b.textContent = box.hidden ? 'Istruzioni' : 'Nascondi istruzioni';
+    if (!box.hidden) box.scrollIntoView({ block:'nearest', behavior:'smooth' });
+  });
+})();
+</script>
 </body>
 </html>
