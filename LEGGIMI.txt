@@ -64,6 +64,12 @@ CODICI DI SBLOCCO (uno per gioco)
      dentro admin.html.
    - Skills: elenco delle skill di Claude Code create per il progetto,
      con cosa fa ognuna e un esempio di richiesta.
+   - Tutorial: guide passo passo da sfogliare come una presentazione
+     (frecce, tasti ← → o swipe; schermo intero). I prompt si copiano
+     con un clic. Primo tutorial: "Crea e gioca a Forza 4 con Claude"
+     (immagini in tutorial/forza4/, testi in TUTORIALS dentro admin.html).
+   Le schede sono in gruppi: Giocatori, Registro · QR, Link, Skills ·
+     Video utili, Tutorial · Backup, Chiave, Reset.
    Se perdi la chiave: Supabase > SQL Editor >
      select efg_admin_init('NUOVA-CHIAVE-LUNGA');
    Dopo 8 chiavi sbagliate in 10 minuti il pannello si blocca 10 minuti.
