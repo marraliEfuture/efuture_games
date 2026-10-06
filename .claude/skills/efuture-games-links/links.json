@@ -1,0 +1,22 @@
+{
+  "_nota": "Link di Efuture Games. App, classifica e admin si calcolano da PUBLIC_URL in config.js: qui ci sono solo i percorsi. Per aggiungere o correggere un link modifica questo file.",
+  "sito": [
+    { "nome": "App (giocatori)", "percorso": "", "note": "pagina principale, installabile sul telefono" },
+    { "nome": "App – installazione (link del QR)", "percorso": "?installa=1", "note": "apre l'app e propone subito l'installazione" },
+    { "nome": "Classifica da proiettare", "percorso": "classifica.html", "note": "per PC / ledwall; si aggiorna da sola ogni 15 s" },
+    { "nome": "Admin", "percorso": "admin.html", "note": "serve la chiave admin; scheda QR per stampare i 5 QR" }
+  ],
+  "github": [
+    { "nome": "Repository GitHub", "url": "https://github.com/marraliEfuture/efuture_games" },
+    { "nome": "Pubblicazioni GitHub Pages", "url": "https://github.com/marraliEfuture/efuture_games/actions" }
+  ],
+  "claude": [
+    { "nome": "Efuture Games (artifact)", "url": "https://claude.ai/artifact/SP9Kk2UndgdSKYWdvarENf" },
+    { "nome": "SysAdmin Runner Efuture (artifact)", "url": "https://claude.ai/artifact/Ch9xMtgjtGbAGReq5qdyQJ" },
+    { "nome": "CoreTech Pac (artifact)", "url": "https://claude.ai/artifact/A9ZzBrDF2Rp2uXAArVNuHj" },
+    { "nome": "Timenet Breakout (artifact)", "url": "https://claude.ai/artifact/YR5HxarMv6q8hqeqwa64Pc" },
+    { "nome": "Inncloud Invaders (artifact)", "url": "https://claude.ai/artifact/SvTmC6vb1gjUobJfQeNckc" },
+    { "nome": "Sessioni Claude Code", "url": "https://claude.ai/code" }
+  ],
+  "chatgpt": []
+}
