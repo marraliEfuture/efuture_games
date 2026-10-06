@@ -58,6 +58,12 @@ CODICI DI SBLOCCO (uno per gioco)
      giochi); "Stampa" li mette tutti su un foglio A4 in bianco e nero.
    - Link: tutti i link (app, installazione, classifica, admin, GitHub,
      Claude, ChatGPT) con i pulsanti Apri, Copia e QR.
+   - Video utili: video brevi su Claude (si guardano nella pagina, si
+     aprono, si copia il link o si scaricano). Per aggiungerne uno: file
+     .mp4 + copertina .jpg nella cartella video/ e una riga in VIDEOS
+     dentro admin.html.
+   - Skills: elenco delle skill di Claude Code create per il progetto,
+     con cosa fa ognuna e un esempio di richiesta.
    Se perdi la chiave: Supabase > SQL Editor >
      select efg_admin_init('NUOVA-CHIAVE-LUNGA');
    Dopo 8 chiavi sbagliate in 10 minuti il pannello si blocca 10 minuti.
