@@ -59,6 +59,8 @@ input[type=text],input[type=password],select{width:100%;padding:10px 12px;border
 .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
 .tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px;cursor:pointer;color:var(--muted);font-weight:600}
 .tab.on{color:var(--ink);border-bottom-color:var(--sky)}
+.tab.danger{color:#b84a4a} .tab.danger.on{color:var(--danger);border-bottom-color:var(--danger)}
+.tsep{width:1px;background:var(--line);margin:8px 4px}
 .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .bar .grow{flex:1}
 .tablewrap{overflow:auto;border:1px solid var(--line);border-radius:4px;max-height:65vh}
@@ -76,7 +78,7 @@ tr:hover td{background:#fbfcfd}
 p{margin:0;line-height:1.55}
 .dim{color:var(--muted);font-size:13px}
 code{background:var(--row);padding:1px 5px;border-radius:3px}
-@media (max-width:600px){ .hright{margin-left:0;width:100%} }
+@media (max-width:600px){ .hright{margin-left:0;width:100%} .tsep{display:none} }
 /* Link */
 .links{display:flex;flex-direction:column;gap:16px}
 .lgroup h3{margin:0 0 6px;font-family:var(--title);font-size:15px;color:var(--ink)}
@@ -153,15 +155,22 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
     <div class="stats" id="stats"></div>
     <div class="card">
       <div class="tabs" role="tablist">
+        <!-- evento: giocatori e attività -->
         <button class="tab on" data-tab="players" type="button">Giocatori</button>
         <button class="tab" data-tab="log" type="button">Registro</button>
-        <button class="tab" data-tab="backup" type="button">Backup</button>
-        <button class="tab" data-tab="reset" type="button">Reset</button>
-        <button class="tab" data-tab="key" type="button">Chiave</button>
+        <span class="tsep" aria-hidden="true"></span>
+        <!-- materiali per stand e schermi -->
         <button class="tab" data-tab="qr" type="button">QR</button>
         <button class="tab" data-tab="links" type="button">Link</button>
+        <span class="tsep" aria-hidden="true"></span>
+        <!-- guide -->
         <button class="tab" data-tab="videos" type="button">Video utili</button>
         <button class="tab" data-tab="skills" type="button">Skills</button>
+        <span class="tsep" aria-hidden="true"></span>
+        <!-- manutenzione: le operazioni delicate in fondo -->
+        <button class="tab" data-tab="backup" type="button">Backup</button>
+        <button class="tab" data-tab="key" type="button">Chiave</button>
+        <button class="tab danger" data-tab="reset" type="button">Reset</button>
       </div>
 
       <section data-pane="players">
