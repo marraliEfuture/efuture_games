@@ -43,7 +43,9 @@ const Backend = remote ? {
     if (group && group !== 'tutti'){
       try { return (await rpc('efg_board_group', { p_game:game, p_group:group })) || []; }
       catch(e){ if (!/efg_board_group|PGRST202|does not exist/i.test(String(e && (e.code + ' ' + e.message)))) throw e; }
-      // funzione non ancora creata su Supabase: classifica completa
+      // funzione non ancora creata su Supabase: classifica completa, segnalata come NON filtrata
+      const all = (await rpc('efg_board', { p_game:game })) || [];
+      all.filtroMancante = true; return all;
     }
     return (await rpc('efg_board', { p_game:game })) || [];
   },
@@ -74,7 +76,7 @@ const Backend = remote ? {
     rows[k] = { email:user.email, game, score, levels }; store.set('efgDemoScores4', rows); return true;
   },
   async board(game, group){
-    const isEf = e => /@efuture\.it$/i.test(e || '');
+    const isEf = e => /@([a-z0-9-]+\.)*efuture\.it$/i.test(String(e || '').trim());
     const users = store.get('efgDemoUsers3', {});
     const tot = {};
     for (const r of Object.values(store.get('efgDemoScores4', {}))){

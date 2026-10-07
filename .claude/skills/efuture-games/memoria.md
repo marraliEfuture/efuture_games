@@ -50,7 +50,7 @@ Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente
 Raccolte alla presentazione del 07/10. Si fanno uno step alla volta: l'utente prova ogni step e conferma prima del successivo.
 
 - [x] **Step 1 – Privacy e utenti (v23):** cellulare tolto da registrazione, admin, CSV e database (anche dai backup); in admin "Elimina" cancella giocatore e punteggi (sparisce dalla classifica), il registro resta. SQL: `supabase-privacy-utenti.sql`.
-- [ ] **Step 2 – Classifiche:** sull'app i nomi dei vincitori non si vedono e si legge male; su desktop il filtro "Efuture" non filtra le mail @efuture.it.
+- [x] **Step 2 – Classifiche (v24):** sull'app righe su due livelli (nome grande, dettaglio sotto, punti a destra, podio colorato); filtro Efuture: `supabase-classifica-gruppi.sql` aggiornato (anche sottodomini, ordine livelli poi punti) e avviso visibile sulla classifica se la funzione manca su Supabase, invece di mostrare tutti in silenzio (era la causa più probabile del problema).
 - [ ] **Step 3 – Aspetto:** colori meno scuri; testi più corti; togliere "powered by Efuture" da tutte le app; "Installa sul telefono" piccolo in fondo, non obbligatorio.
 - [ ] **Step 4 – Comandi dei giochi:** joystick a manopola al posto dei pulsanti; comandi più grandi ma senza coprire il gioco, anche in orizzontale.
 - [ ] **Step 5 – SysAdmin Runner:** testa girata a sinistra quando cammina all'indietro; "Timbra il cartellino" diventa "Risolvi il ticket del cliente"; anche mentre lampeggia dopo un colpo deve poter pestare i bug.
