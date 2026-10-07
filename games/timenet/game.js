@@ -11,8 +11,8 @@ function efgPost(m){ try { if (window.parent !== window) window.parent.postMessa
 
 /* ================= CONSTANTS ================= */
 const W = 360, H = 600;                  // logical field
-const WATER_Y = 548;                     // sea surface
-const DOLPHIN_TOP = 530;                 // where the ball bounces off the dolphin
+const WATER_Y = 512;                     // sea surface (07/10: alzato, il delfino non tocca più la barra in basso)
+const DOLPHIN_TOP = 494;                 // where the ball bounces off the dolphin
 let BALL_R = 8;                          // set per level: big ball first, smaller later
 let COLS = 12, BW = 28, BH = 14;         // set per level from the map
 const BX0 = 12, BY0 = 64;
