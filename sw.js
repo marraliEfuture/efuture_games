@@ -60,6 +60,7 @@ const ASSETS = [
   "backend.js",
   "classifica.html",
   "qr/qr-app.png",
+  "qr/qr-app.svg",
   "fonts/poppins-latin-600-normal.woff2",
   "fonts/poppins-latin-400-normal.woff2",
   "fonts/poppins-latin-300-normal.woff2",

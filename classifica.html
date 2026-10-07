@@ -284,7 +284,7 @@ const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)
 const rowsByKey = {};   // board key -> Map(pid -> {li, sig})
 function render(key, rows, top){
   const ol = $('list-' + key);
-  rows = rows.slice().sort((x, y) => (Number(y.score) || 0) - (Number(x.score) || 0)).slice(0, top);
+  rows = rows.slice().sort((x, y) => (Number(y.levels) || 0) - (Number(x.levels) || 0) || (Number(y.score) || 0) - (Number(x.score) || 0)).slice(0, top);   // prima i livelli, poi i punti
   const firstTime = !rowsByKey[key];
   const map = rowsByKey[key] = rowsByKey[key] || new Map();
   if (!rows.length){ map.clear(); ol.innerHTML = ''; const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Ancora nessun punteggio. Sarai il primo?'; ol.appendChild(li); return; }

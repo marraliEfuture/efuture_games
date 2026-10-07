@@ -231,6 +231,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
           <button class="btn ghost" id="lReload" type="button">Aggiorna</button>
           <button class="btn navy" id="lCsv" type="button">Scarica CSV</button>
         </div>
+        <div class="msg" id="lMsg" aria-live="polite"></div>
         <div class="tablewrap" style="margin-top:10px"><table id="lTable"></table></div>
       </section>
 
@@ -442,7 +443,7 @@ const describe = l => {
 };
 async function loadLogs(){
   try { logs = await call('efg_admin_logs', { p_limit: parseInt($('lLimit').value, 10), p_kind: $('lKind').value || null }) || []; }
-  catch(err){ return onErr(err, $('pInfo')); }
+  catch(err){ return onErr(err, $('lMsg')); }
   fillTable($('lTable'), ['Quando', 'Evento', 'Email', 'Gioco', 'Dettagli'],
     logs.map(l => { const t = document.createElement('span'); t.className = 'tag' + (/errata/.test(l.kind) ? ' err' : l.kind.startsWith('admin') ? ' admin' : ''); t.textContent = l.kind;
       return [fmtDate(l.at), t, l.email || '', l.game ? (GAMES[l.game] || l.game) : '', describe(l)]; }),

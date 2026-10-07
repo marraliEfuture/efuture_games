@@ -69,7 +69,7 @@ Stile del sito efuture.it:
 ## Dati, ordine e aggiornamento
 
 - A ogni aggiornamento la pagina chiede in parallelo 5 classifiche: `all` e i 4 giochi. Ognuna restituisce al massimo 50 righe `{pid, name, levels, score, games}`. Le email non arrivano mai alla pagina.
-- **Ordine del server:** livelli superati, poi punti, poi chi ha fatto il record prima. La pagina poi **riordina nel browser solo per punti** (`render()`, ordinamento stabile) e taglia a Top N. Vedi la nota in fondo.
+- **Ordine del server:** livelli superati, poi punti, poi chi ha fatto il record prima. Anche la pagina, in `render()`, ordina per livelli e poi per punti (ordinamento stabile) e taglia a Top N.
 - **Frequenza:** ogni **15 s** (`EVERY`), più quando la pagina torna visibile. In demo anche all'evento `storage`, cioè quando l'app scrive nello stesso browser.
 - **Stato:**
   - riuscito: "Live · aggiornata alle hh:mm:ss";
@@ -130,10 +130,6 @@ La finestra "Countdown della gara" contiene:
 ## Modalità demo
 
 Senza Supabase compare la nota "Modalità demo: il database online non è ancora configurato, qui vedi solo i punteggi fatti su questo dispositivo." I dati sono quelli del `localStorage` del browser (vedi [app-giocatori.md](app-giocatori.md#modalità-demo-e-online)).
-
-## Note sul codice
-
-- `render()` riordina le righe solo per punti e ignora i livelli. Questo contraddice il sottotitolo "livelli, poi punti" e l'ordine del server e dell'app. Segnalato come da correggere.
 
 ---
 Ultimo aggiornamento: 07/10/2026 (v26)
