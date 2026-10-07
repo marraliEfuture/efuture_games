@@ -132,4 +132,4 @@ La finestra "Countdown della gara" contiene:
 Senza Supabase compare la nota "Modalità demo: il database online non è ancora configurato, qui vedi solo i punteggi fatti su questo dispositivo." I dati sono quelli del `localStorage` del browser (vedi [app-giocatori.md](app-giocatori.md#modalità-demo-e-online)).
 
 ---
-Ultimo aggiornamento: 07/10/2026 (v26)
+Ultimo aggiornamento: 07/10/2026 (v27)

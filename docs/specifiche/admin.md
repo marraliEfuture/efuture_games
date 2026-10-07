@@ -249,4 +249,4 @@ Tutti gli elenchi sono array nello script di `admin.html`. Dopo la modifica:
   Va aggiornato anche `.claude/skills/efuture-games-links/links.json`.
 
 ---
-Ultimo aggiornamento: 07/10/2026 (v26)
+Ultimo aggiornamento: 07/10/2026 (v27)

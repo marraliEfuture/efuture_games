@@ -43,7 +43,7 @@ Questa cartella contiene le specifiche funzionali e tecniche di ogni parte. **Pe
   - `supabase.js` (+ `591.supabase.js`): client Supabase;
   - `jsQR.js`: lettura dei QR dalla fotocamera;
   - `qrcode.js`: generazione dei QR, solo in admin.
-- **Service worker `sw.js`:** tiene in cache i file elencati in `ASSETS`, così l'app funziona anche con poca rete. Il nome della cache è `efuture-games-vN`, dove N è la versione dell'app (oggi v26).
+- **Service worker `sw.js`:** tiene in cache i file elencati in `ASSETS`, così l'app funziona anche con poca rete. Il nome della cache è `efuture-games-vN`, dove N è la versione dell'app (oggi v27).
 - **Font locali** in `fonts/`, senza CDN:
   - app e giochi: Press Start 2P e IBM Plex Mono;
   - classifica e admin: Montserrat e Poppins.

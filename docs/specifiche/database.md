@@ -191,4 +191,4 @@ Formato di `efg_backups.data`, che è anche il file JSON scaricato dall'admin. P
 4. `select efg_admin_init('…');`.
 
 ---
-Ultimo aggiornamento: 07/10/2026 (v26)
+Ultimo aggiornamento: 07/10/2026 (v27)
