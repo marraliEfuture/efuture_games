@@ -1,0 +1,316 @@
+/* Efuture Games - "console portatile" in verticale.
+   Solo con il telefono in verticale: la pagina diventa il corpo della console,
+   il gioco sta nello schermo con la cornice scura, sotto ci sono la scritta,
+   il joystick (o la fascia di trascinamento) al posto della croce, i tasti del
+   gioco al posto di A/B e due tastini centrali. In orizzontale non cambia nulla.
+   Le parti aggiunte (gb-*) le crea gameboy.js. */
+.gb-top,.gb-brand,.gb-grille,.gb-pills,.gb-ab{display:none}
+
+@media (orientation:portrait){
+  :root{
+    --gb-shell-hi:#e6e3dc;
+    --gb-shell:#d9d6cf;
+    --gb-shell-lo:#c9c5bd;
+    --gb-bezel:#4a4e5a;
+    --gb-bezel-hi:#565a67;
+    --gb-bz:10px;              /* spessore della cornice dello schermo */
+    --gb-lcd:#e9eef2;          /* fascia punteggio dentro la cornice */
+    --gb-ink:#004675;          /* scritte sul corpo, blu Efuture */
+    --gb-font:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  }
+  html,body{background:#b7b2a8}
+  body{padding:5px;height:100%}
+  #app{
+    position:relative;
+    height:100%;
+    width:100%;
+    max-width:500px;
+    margin:0 auto;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    padding:calc(8px + env(safe-area-inset-top,0px)) calc(10px + env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) calc(10px + env(safe-area-inset-left,0px));
+    background:
+      radial-gradient(120% 60% at 20% 0%, rgba(255,255,255,.55), rgba(255,255,255,0) 60%),
+      linear-gradient(180deg, var(--gb-shell-hi) 0%, var(--gb-shell) 45%, var(--gb-shell-lo) 100%);
+    border-radius:16px 16px 64px 16px;
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.75), inset 0 -4px 0 rgba(0,0,0,.08), inset 3px 0 0 rgba(255,255,255,.25), 0 4px 14px rgba(40,34,24,.35);
+  }
+
+  /* ---------- cornice dello schermo: riga in alto, punteggio, gioco ---------- */
+  .gb-top{
+    display:flex;
+    flex:0 0 auto;
+    align-items:center;
+    gap:5px;
+    padding:7px 14px 3px;
+    background:var(--gb-bezel);
+    border-radius:10px 10px 0 0;
+    box-shadow:inset 0 1px 0 var(--gb-bezel-hi);
+  }
+  .gb-led{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffc2b8 0,#ff4a33 50%,#b3180c 100%);box-shadow:0 0 6px 1px rgba(255,80,50,.7)}
+  .gb-on{flex:0 0 auto;font:600 7px/1 var(--gb-font);letter-spacing:.16em;color:#b3b7c2}
+  .gb-lines{flex:1 1 auto;height:5px;margin-left:6px;background:linear-gradient(180deg,#f18c22 0 2px,transparent 2px 3px,#6ea8d8 3px 5px)}
+
+  #hud{
+    position:relative;
+    z-index:3;
+    isolation:isolate;
+    flex:0 0 auto;
+    min-height:0;
+    margin:0;
+    padding:6px calc(var(--gb-bz) + 8px) 7px;
+    border:0;
+    background:var(--gb-bezel);
+    gap:8px;
+  }
+  #hud::before{
+    content:"";
+    position:absolute;
+    inset:2px var(--gb-bz) 1px;
+    z-index:-1;
+    border-radius:5px;
+    background:linear-gradient(180deg,#f4f7f9,var(--gb-lcd));
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.18), inset 0 2px 3px rgba(0,0,0,.12);
+  }
+
+  #stage{
+    z-index:1;
+    flex:1 1 auto;
+    margin:0 var(--gb-bz) calc(var(--gb-bz) + 8px);
+    padding:6px;
+    background:var(--gb-bezel);
+    border-radius:2px 2px 30px 2px;
+    box-shadow:0 0 0 var(--gb-bz) var(--gb-bezel), 0 8px 0 var(--gb-bz) var(--gb-bezel);
+  }
+  #stage .overlay{border-radius:2px 2px 30px 2px}
+  #game{border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+
+  .gb-brand{
+    display:block;
+    flex:0 0 auto;
+    padding:0 6px 2px;
+    font-family:'Trebuchet MS','Segoe UI','Helvetica Neue',Arial,sans-serif;
+    font-style:italic;
+    font-size:16px;
+    line-height:1.15;
+    letter-spacing:.02em;
+    color:var(--gb-ink);
+    white-space:nowrap;
+  }
+  .gb-brand i{font-weight:600}
+  .gb-brand b{font-weight:900;font-size:19px;letter-spacing:.03em}
+
+  /* ---------- fascia comandi ---------- */
+  #controls{
+    position:relative;
+    background:none;
+    border:0;
+    padding:0;
+    margin:0;
+  }
+  .gb-pills{display:flex;justify-content:center;gap:4px}
+  .gb-pill{
+    width:66px;height:54px;
+    margin:0;padding:0;border:0;background:none;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+    cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+    font-family:var(--gb-font);
+  }
+  .gb-pill i{
+    display:block;width:42px;height:11px;border-radius:6px;
+    background:linear-gradient(180deg,#9a9da6,#6e717b);
+    box-shadow:0 0 0 3px rgba(0,0,0,.07),0 0 0 4px rgba(255,255,255,.35),inset 0 1px 0 rgba(255,255,255,.35),0 2px 0 #55585f;
+    transform:rotate(-24deg);
+    transition:transform .06s;
+  }
+  .gb-pill span{font-size:8px;font-weight:600;letter-spacing:.12em;color:var(--gb-ink);line-height:1}
+  .gb-pill.down i{transform:rotate(-24deg) translateY(2px);box-shadow:0 0 0 3px rgba(0,0,0,.07),0 0 0 4px rgba(255,255,255,.35),0 0 0 #55585f;filter:brightness(.9)}
+  .gb-pill.off{opacity:.45}
+  .gb-pill:focus-visible{outline:2px solid #f18c22;outline-offset:2px;border-radius:8px}
+
+  .gb-grille{
+    display:flex;
+    position:absolute;
+    right:calc(30px + env(safe-area-inset-right,0px));
+    bottom:calc(30px + env(safe-area-inset-bottom,0px));
+    gap:6px;
+    transform:rotate(-28deg);
+    transform-origin:100% 100%;
+    pointer-events:none;
+    z-index:0;
+  }
+  .gb-grille i{display:block;width:5px;height:36px;border-radius:3px;background:#b6b2a9;box-shadow:inset 1px 2px 2px rgba(0,0,0,.32),0 1px 0 rgba(255,255,255,.65)}
+
+  /* tasti A/B spostati da gameboy.js (giochi con fascia di trascinamento) */
+  .gb-ab{
+    display:grid;
+    grid-template-columns:auto auto;
+    grid-template-rows:auto auto;
+    grid-template-areas:". a" "b .";
+    column-gap:8px;
+    position:relative;
+    padding:0 2px 14px;
+  }
+  /* incavo inclinato dietro A e B (centri: B 30,68 - A 98,30) */
+  .gb-ab::before{
+    content:"";
+    position:absolute;
+    left:-8px;top:15px;
+    width:144px;height:68px;
+    border-radius:34px;
+    background:rgba(0,0,0,.06);
+    box-shadow:inset 0 2px 3px rgba(0,0,0,.13),0 1px 0 rgba(255,255,255,.55);
+    transform:rotate(-29deg);
+    pointer-events:none;
+  }
+  .gb-ab .gb-a,.gb-ab .gb-b{
+    position:relative;
+    width:60px;height:60px;
+    border-radius:50%;
+    font-family:'Press Start 2P',var(--gb-font);
+    font-size:15px;
+    color:#fff;
+    cursor:pointer;
+    touch-action:manipulation;
+  }
+  .gb-ab .gb-a{grid-area:a;background:radial-gradient(circle at 38% 30%,#ffb469 0,#f18c22 55%,#c96d10 100%);border:1px solid #a9570a;box-shadow:0 4px 0 #a9570a,0 6px 10px rgba(60,40,10,.25);color:#1d0f00}
+  .gb-ab .gb-b{grid-area:b;margin-top:-22px;background:radial-gradient(circle at 38% 30%,#3d7fb0 0,#004675 60%,#00335a 100%);border:1px solid #00335a;box-shadow:0 4px 0 #00283f,0 6px 10px rgba(0,30,60,.25)}
+  .gb-ab .gb-a:active,.gb-ab .gb-b:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.4)}
+  .gb-ab .gb-a::after,.gb-ab .gb-b::after{
+    position:absolute;left:50%;top:100%;transform:translate(-50%,7px);
+    font:600 8px/1 var(--gb-font);letter-spacing:.12em;color:var(--gb-ink);white-space:nowrap;
+  }
+  #pauseBtn.gb-a::after,#pauseBtn.gb-b::after{content:"PAUSA"}
+  #soundBtn.gb-a::after,#soundBtn.gb-b::after{content:"MUSICA"}
+
+  /* ---------- giochi con la fascia di trascinamento (Timenet, Inncloud) ---------- */
+  html[data-gb=strip] #main{min-height:0}
+  html[data-gb=strip] #controls{
+    flex:0 0 auto;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:"pad ab" "pills ab";
+    align-items:center;
+    column-gap:14px;
+    padding:2px 2px 0 0;
+  }
+  html[data-gb=strip] #strip{
+    grid-area:pad;
+    height:62px;
+    border:0;
+    border-radius:31px;
+    padding-inline:10px;
+    gap:6px;
+    background:linear-gradient(180deg,#5e616b,#3f424b);
+    color:#d6d9e0;
+    font-size:10px;
+    box-shadow:inset 0 3px 5px rgba(0,0,0,.45),inset 0 -1px 0 rgba(255,255,255,.12),0 0 0 3px rgba(0,0,0,.06),0 1px 0 4px rgba(255,255,255,.45);
+  }
+  html[data-gb=strip] #strip b{color:#fff}
+  html[data-gb=strip] #strip .arrow{color:#f18c22}
+  html[data-gb=strip] .gb-pills{grid-area:pills;margin-top:-4px}
+  html[data-gb=strip] .gb-ab{grid-area:ab}
+  html[data-gb=strip] .gb-grille{display:none}
+
+  /* ---------- SysAdmin: gioco 16:9, joystick e tasti grandi ---------- */
+  html[data-gb=sysadmin] #stage{flex:0 0 auto;aspect-ratio:16/9;padding:0;z-index:auto}   /* gli overlay (fixed) devono stare sopra ai comandi */
+  html[data-gb=sysadmin] #pauseBtn{display:none}
+  html[data-gb=sysadmin] #bossBarWrap{top:6px}
+  /* overlay su tutta la console (lo schermo 16:9 è troppo basso per i testi);
+     i tastini ISTRUZIONI / AVVIA restano sopra, utilizzabili */
+  html[data-gb=sysadmin] .overlay{position:fixed;z-index:20;border-radius:0;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  html[data-gb=sysadmin] #controls{z-index:auto}
+  html[data-gb=sysadmin] .gb-pills{position:relative;z-index:21}
+  html[data-gb=sysadmin] #controls{
+    --joy:clamp(124px, 36vw, 156px);
+    --knob:clamp(54px, 15.5vw, 66px);
+    flex:1 1 auto;
+    min-height:0;
+    display:grid;
+    grid-template-columns:auto 1fr;
+    grid-template-rows:auto auto;
+    grid-template-areas:"joy act" "pills pills";
+    align-items:center;
+    align-content:space-evenly;
+    gap:0 6px;
+    padding:0 2px;
+  }
+  html[data-gb=sysadmin] #joyWrap{grid-area:joy}
+  html[data-gb=sysadmin] .clabel{display:none}
+  html[data-gb=sysadmin] .gb-pills{grid-area:pills;padding-bottom:6px}
+  html[data-gb=sysadmin] #joy,html[data-gb=joy] #joy{
+    border:0;
+    background:radial-gradient(circle at 50% 40%, #d2cec6 0%, #c6c2b9 62%, #b9b5ac 100%);
+    box-shadow:inset 0 4px 9px rgba(0,0,0,.28),inset 0 -2px 0 rgba(255,255,255,.35),0 1px 0 2px rgba(255,255,255,.5);
+  }
+  html[data-gb=sysadmin] #joy .jarr,html[data-gb=joy] #joy .jmark{color:#8e8a82}
+  html[data-gb=sysadmin] #joy.left .jarr.l,html[data-gb=sysadmin] #joy.right .jarr.r,html[data-gb=sysadmin] #joy.up .jarr.u{color:#f18c22}
+  html[data-gb=sysadmin] #actions{
+    grid-area:act;
+    justify-self:end;
+    position:relative;
+    grid-template-columns:auto auto;
+    grid-template-rows:auto auto;
+    grid-template-areas:"av a" "b .";
+    gap:0 10px;
+    align-items:start;
+  }
+  /* incavo inclinato dietro MOUSE (B, centro 38,102) e SALTA (A, centro 128,42) */
+  html[data-gb=sysadmin] #actions::before{
+    content:"";
+    position:absolute;
+    left:-14px;top:27px;
+    width:194px;height:90px;
+    border-radius:45px;
+    background:rgba(0,0,0,.06);
+    box-shadow:inset 0 2px 3px rgba(0,0,0,.13),0 1px 0 rgba(255,255,255,.55);
+    transform:rotate(-33.7deg);
+    pointer-events:none;
+  }
+  html[data-gb=sysadmin] #btnJump{grid-area:a;width:84px;height:84px}
+  html[data-gb=sysadmin] #btnThrow{grid-area:b;width:76px;height:76px;margin-top:-20px}
+  html[data-gb=sysadmin] #btnSpecial{grid-area:av;width:58px;height:58px;justify-self:center;font-size:15px}
+  html[data-gb=sysadmin] #btnSpecial span{font-size:7.5px}
+  html[data-gb=sysadmin] #btnSpecial:not(.unlocked){background:#cfcbc3;color:#8e8a82;border:1px dashed #a9a59c;opacity:.75}
+}
+
+/* ---------- CoreTech: labirinto, joystick a sinistra, PAUSA/MUSICA come A/B ---------- */
+@media (orientation:portrait){
+  html[data-gb=joy] #main{min-height:0}
+  /* schermo alto al massimo quanto il labirinto più alto (19x21): lo spazio in più va ai comandi */
+  html[data-gb=joy] #stage{flex:0 1 auto;min-height:0;aspect-ratio:19/21.6}
+  html[data-gb=joy] #controls{
+    flex:1 0 auto;
+    align-content:space-evenly;
+    display:grid;
+    grid-template-columns:auto 1fr;
+    grid-template-areas:"joy ab" "pills pills";
+    align-items:center;
+    column-gap:8px;
+    padding:0 2px;
+  }
+  html[data-gb=joy] #joy{grid-area:joy;--joy:clamp(124px,35vw,156px);margin-left:2px}
+  html[data-gb=joy] #joy::before{border-color:rgba(0,0,0,.14)}
+  html[data-gb=joy] #joyKnob{border-color:#e9e6df}
+  html[data-gb=joy] .gb-ab{grid-area:ab;justify-self:end;margin-right:4px}
+  html[data-gb=joy] .gb-pills{grid-area:pills;margin-top:-8px;padding-bottom:2px}
+  html[data-gb=joy] .gb-grille{right:calc(24px + env(safe-area-inset-right,0px));bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+  html[data-gb=joy] .gb-grille i{height:30px}
+}
+
+/* telefoni bassi in verticale: si stringe la cornice per lasciare spazio al gioco */
+@media (orientation:portrait) and (max-height:700px){
+  .gb-top{padding-top:5px}
+  #hud{padding-top:4px;padding-bottom:5px}
+  .gb-brand{font-size:14px}
+  .gb-brand b{font-size:16px}
+}
+
+/* telefoni grandi in verticale: SysAdmin ha spazio libero, comandi più grandi */
+@media (orientation:portrait) and (min-width:390px) and (min-height:780px){
+  html[data-gb=sysadmin] #controls{--joy:clamp(150px, 38vw, 168px);--knob:clamp(62px, 16vw, 70px)}
+  html[data-gb=sysadmin] #actions{transform:scale(1.12);transform-origin:100% 50%}
+  html[data-gb=joy] #joy{--joy:clamp(150px, 38vw, 168px)}
+  html[data-gb=joy] .gb-ab{transform:scale(1.12);transform-origin:100% 50%}
+}

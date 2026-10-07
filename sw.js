@@ -1,12 +1,14 @@
 // Efuture Games - service worker: tiene i giochi sul telefono per giocare anche con poca rete.
 // Quando aggiorni l'app, cambia il numero di versione qui sotto.
-const CACHE = 'efuture-games-v26';
+const CACHE = 'efuture-games-v27';
 const ASSETS = [
   "./",
   "config.js",
   "fonts/ibm-plex-mono-latin-400-normal.woff2",
   "fonts/ibm-plex-mono-latin-600-normal.woff2",
   "fonts/press-start-2p-latin-400-normal.woff2",
+  "games/gameboy.css",
+  "games/gameboy.js",
   "games/coretech/fonts/ibm-plex-mono-latin-400-normal.woff2",
   "games/coretech/fonts/ibm-plex-mono-latin-600-normal.woff2",
   "games/coretech/fonts/press-start-2p-latin-400-normal.woff2",
@@ -60,6 +62,7 @@ const ASSETS = [
   "backend.js",
   "classifica.html",
   "qr/qr-app.png",
+  "qr/qr-app.svg",
   "fonts/poppins-latin-600-normal.woff2",
   "fonts/poppins-latin-400-normal.woff2",
   "fonts/poppins-latin-300-normal.woff2",

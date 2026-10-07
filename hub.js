@@ -74,7 +74,7 @@ function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v26' : 'Modalità demo: account e classifica restano su questo telefono. · v26';
+  mn.textContent = remote ? 'Classifica online · v27' : 'Modalità demo: account e classifica restano su questo telefono. · v27';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -302,7 +302,7 @@ $('btnBoard').onclick = ()=>{
    Android/Chrome: usa la richiesta di installazione del browser (beforeinstallprompt).
    iPhone/iPad: Safari non ha una richiesta automatica, quindi mostriamo le istruzioni.
    Si apre da sola solo dal QR di installazione (?installa=1); per il resto c'è il link
-   piccolo "Installa l'app sul telefono" in fondo alla home (07/10: non deve essere invadente). */
+   pulsante "Installa app" in fondo alla home (07/10: non deve essere invadente). */
 const ua = navigator.userAgent || '';
 const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isAndroid = /Android/i.test(ua);

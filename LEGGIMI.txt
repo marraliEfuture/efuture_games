@@ -85,8 +85,9 @@ CODICI DI SBLOCCO (uno per gioco)
      con cosa fa ognuna e un esempio di richiesta.
    - Tutorial: guide passo passo da sfogliare come una presentazione
      (frecce, tasti ← → o swipe; schermo intero). I prompt si copiano
-     con un clic. Primo tutorial: "Crea e gioca a Forza 4 con Claude"
-     (immagini in tutorial/forza4/, testi in TUTORIALS dentro admin.html).
+     con un clic. Tutorial: "Crea e gioca a Forza 4 con Claude" e il foglio
+     "Attività giornaliere" con Claude in Chrome
+     (immagini in tutorial/<nome>/, testi in TUTORIALS dentro admin.html).
    Le schede sono in gruppi: Giocatori, Registro · QR, Link, Skills ·
      Video utili, Tutorial · Backup, Chiave, Reset.
    Se perdi la chiave: Supabase > SQL Editor >
@@ -105,7 +106,7 @@ CODICI DI SBLOCCO (uno per gioco)
      del telefono funziona: il QR apre l'app e sblocca il gioco.
    - Installazione: la finestra "Installa l'app" si apre da sola solo
      dal QR di installazione (?installa=1); altrimenti c'è il link piccolo
-     "Installa l'app sul telefono" in fondo alla home.
+     "Installa app" in fondo alla home (insieme a Classifica e Istruzioni).
    - In fondo: "Registrati / Accedi". Registrazione: nome ed email
      (il cellulare non si chiede più). Accesso: basta l'email, nessuna password.
    - REGOLE DI GARA (solo dentro l'app): ogni gioco ha 3 livelli, al
@@ -123,7 +124,9 @@ CODICI DI SBLOCCO (uno per gioco)
 
 
 4) AGGIORNARE
-   Sostituisci i file e in sw.js cambia 'efuture-games-v8' in v9, v10...
+   Sostituisci i file e aumenta la versione (efuture-games-vN in sw.js, ?v=N
+   negli html, · vN in hub.js) con la skill /efuture-games-commit, che usa
+   .claude/skills/efuture-games-commit/scripts/prepara.py.
 
 Nota: lo sblocco e i punteggi sono controllati dal telefono del
 giocatore. Per un evento va benissimo, ma un utente esperto potrebbe

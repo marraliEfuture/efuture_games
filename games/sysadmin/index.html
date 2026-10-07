@@ -255,6 +255,7 @@ img{max-width:100%}
     color:#1d0f00;
     cursor:pointer;
     letter-spacing:.02em;
+    line-height:1.6;
     box-shadow:0 4px 0 #a9570a;
   }
   button.game-btn:active{ box-shadow:0 1px 0 #a9570a; transform:translateY(3px); }
@@ -438,6 +439,7 @@ img{max-width:100%}
     #actions{gap:6px;}
   }
 </style>
+<link rel="stylesheet" href="../gameboy.css">
 
 <div id="app">
   <div id="hud">
@@ -462,7 +464,7 @@ img{max-width:100%}
         <p class="dim" id="bestTimeLineTitle" style="display:none;">Record attuale: <b id="bestTimeTitle" style="color:var(--ef-yellow)"></b></p>
         <p class="dim" id="bestDebugLineTitle" style="display:none;">Miglior pulizia: <b id="bestDebugTitle" style="color:var(--ef-yellow)"></b></p>
         <div class="btnrow">
-          <button class="game-btn" id="btnStart">Timbra il cartellino</button>
+          <button class="game-btn" id="btnStart">Risolvi il ticket del cliente</button>
           <button class="game-btn secondary" id="btnContinue" hidden>Continua &middot; Liv. <span id="continueLevel"></span></button>
           <button class="game-btn secondary" id="btnHow" type="button" aria-expanded="false" aria-controls="howBox">Istruzioni</button>
         </div>
@@ -570,6 +572,7 @@ img{max-width:100%}
     </div>
   </div>
 </div>
+<script src="../gameboy.js" data-game="sysadmin" data-select="btnHow" data-pause="pauseBtn" data-paused="ov-pause" data-primary=".overlay button.game-btn:not(.secondary)"></script>
 
 <script>
 (function(){
@@ -1242,13 +1245,15 @@ function updateEnemiesAndCombat(dt, t){
     else if (e.type==='flybug') updateFlyBug(e, dt, t);
     else if (e.type==='boss') updateBoss(e, dt);
 
-    if (e.alive && player.invuln<=0){
-      if (aabb(player, e)){
-        const stomp = e.type!=='boss' && player.vy > 0 && (player.y + player.h - e.y) < (e.h*0.6 + Math.abs(player.vy*dt)+6);
-        if (stomp && e.type!=='boss'){
-          killEnemy(e, true);
-          player.vy = STOMP_BOUNCE;
-        } else if (e.type==='boss' && player.vy>0 && (player.y+player.h-e.y) < e.h*0.45){
+    if (e.alive && aabb(player, e)){
+      // pestare un bug funziona anche mentre si lampeggia dopo un colpo;
+      // l'invulnerabilità annulla solo il danno
+      const stomp = e.type!=='boss' && player.vy > 0 && (player.y + player.h - e.y) < (e.h*0.6 + Math.abs(player.vy*dt)+6);
+      if (stomp){
+        killEnemy(e, true);
+        player.vy = STOMP_BOUNCE;
+      } else if (player.invuln<=0){
+        if (e.type==='boss' && player.vy>0 && (player.y+player.h-e.y) < e.h*0.45){
           damageBoss(e, 1);
           player.vy = STOMP_BOUNCE*0.8;
         } else {
@@ -1997,25 +2002,17 @@ HEAD_LOGO.src = 'img/logo-testa.png';
 function headLogoReady(){ return headLogoOk && HEAD_LOGO.naturalWidth>0; }
 function drawLogoHead(c, cx, cy, r, facing){
   // the Efuture mark as the head, no background. cx = where the "e" sits (on the neck).
-  // The "e" is never mirrored so it stays readable; the blue squares ("ponytail")
-  // always trail behind the direction the player faces.
+  // The whole mark turns with the player: mirrored (around the "e" centre) when facing left.
   const iw = HEAD_LOGO.naturalWidth, ih = HEAD_LOGO.naturalHeight;
   const box = r*2.35, k = box/Math.max(iw, ih);
   const dw = iw*k, dh = ih*k;
-  const E_CENTER = 0.6715, SPLIT = 0.32;          // fractions of the mark's width
+  const E_CENTER = 0.6715;                        // fraction of the mark's width
   const left = cx - E_CENTER*dw, top = cy - dh/2;
   c.save();
   c.shadowColor = 'rgba(237,237,237,0.55)';
   c.shadowBlur = 3;
-  if (facing < 0){
-    // the "e" as is
-    c.drawImage(HEAD_LOGO, iw*SPLIT, 0, iw*(1-SPLIT), ih, left + dw*SPLIT, top, dw*(1-SPLIT), dh);
-    // squares mirrored around the "e" centre, so they sit on its right (behind)
-    c.translate(cx, 0); c.scale(-1, 1);
-    c.drawImage(HEAD_LOGO, 0, 0, iw*SPLIT, ih, left - cx, top, dw*SPLIT, dh);
-  } else {
-    c.drawImage(HEAD_LOGO, left, top, dw, dh);
-  }
+  if (facing < 0){ c.translate(cx, 0); c.scale(-1, 1); c.drawImage(HEAD_LOGO, left - cx, top, dw, dh); }
+  else c.drawImage(HEAD_LOGO, left, top, dw, dh);
   c.restore();
 }
 
@@ -2035,7 +2032,7 @@ function drawHumanLogoFigure(c, w, h, o){
   const shoulderY = h*0.45, hipY = h*0.69;
   const legLen = h*0.28, armLen = h*0.24;
   const legW = Math.max(3, w*0.13), armW = Math.max(2.5, w*0.1);
-  // body is drawn in "facing right" space and mirrored; the logo is drawn afterwards unmirrored
+  // body is drawn in "facing right" space and mirrored; the logo head is mirrored with it (drawLogoHead)
   c.save();
   if (o.facing < 0){ c.translate(w,0); c.scale(-1,1); }
   // back arm and back leg (darker, behind torso)
@@ -2066,7 +2063,7 @@ function drawHumanLogoFigure(c, w, h, o){
     if (o.mouse){ c.fillStyle = '#c8d0d8'; c.fillRect(a[0]+1, a[1]-3, 7, 6); c.fillStyle='#8a96a3'; c.fillRect(a[0]+4, a[1]-3, 1, 3); }
   }
   c.restore();
-  // head: the Efuture mark, never mirrored; shifted so the "e" (not the whole mark) sits on the neck
+  // head: the Efuture mark, mirrored when facing left; shifted so the "e" (not the whole mark) sits on the neck
   // the "e" alone is about the size of a bug (~38x30); may rise a little above the hitbox
   const hr = w*0.56, box = hr*2.35, logoH = box*0.795;
   const neckTop = shoulderY - h*0.09;

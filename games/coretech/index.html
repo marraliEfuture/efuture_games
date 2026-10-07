@@ -119,6 +119,7 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
 #ov-title .dim{font-size:10px}
 #howBox:not([hidden]){display:flex;flex-direction:column;gap:10px}
 </style>
+<link rel="stylesheet" href="../gameboy.css">
 </head>
 <body>
 <div id="app">
@@ -150,7 +151,7 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
               <div class="legend">
                 <canvas id="lgCoin" width="44" height="44"></canvas><span>Mangia tutte le <b style="color:var(--coin)">monetine</b>.</span>
                 <canvas id="lgBug" width="44" height="44"></canvas><span>Evita i <b style="color:var(--danger)">bug</b>: costano una vita.</span>
-                <canvas id="lgPatch" width="44" height="44"></canvas><span>Col <b>floppy</b> mangi tu i bug.</span>
+                <canvas id="lgPatch" width="44" height="44"></canvas><span>Col <b>floppy</b> mangi tu i bug: non tornano più.</span>
               </div>
               <span class="dim">5 livelli, sempre più veloci.</span>
             </div>
@@ -227,6 +228,7 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
     </div>
   </div>
 </div>
+<script src="../gameboy.js" data-game="joy" data-a="pauseBtn" data-b="soundBtn" data-select="btnHow" data-pause="pauseBtn" data-paused="ov-pause" data-primary=".overlay button.btn:not(.alt)"></script>
 <script>
 /* Efuture Games: send scores to the hub that hosts this game */
 window.efgReport = function(game, score, level, won){
