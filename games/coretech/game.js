@@ -18,7 +18,7 @@ const MAZES = [
    "#...##-##...#",
    "#.#.#GGG#.#.#",
    "#.#.#####.#.#",
-   "#...........#",
+   " ........... ",
    "#.#...P...#.#",
    "#.###.#.###.#",
    "#o....#....o#",
@@ -32,7 +32,7 @@ const MAZES = [
    "#.##..##-##..##.#",
    "#.##..#GGG#..##.#",
    "#.##..#####..##.#",
-   "#...............#",
+   " ............... ",
    "#.##.###.###.##.#",
    "#o...#..P..#...o#",
    "#.##.#.#.#.#.##.#",
@@ -107,19 +107,24 @@ const MAZES = [
 let COLS = 19, ROWS = 21;          // set per level: mazes grow from level to level
 let HOUSE_EXIT = {x:9, y:7};       // tile just above the door (the 'B' in the map)
 let HOUSE_IN   = {x:9, y:9};       // centre of the bug house
-let TUNNEL_ROW = -1;               // row that wraps around the screen, if any
+let TUNNEL_ROW = -1;               // row that wraps around the screen (every maze has one)
+let TUNNEL_LEN = 1;                // open cells at each end of the tunnel row (bugs slow down there)
 
+// Speeds in tiles/s. Player ~22% slower than v1 (client: "troppo veloce");
+// bugs scaled so they never gain on the player, and levels 1-3 (the three
+// played in the app's competition) are easier: slower bugs, longer patches,
+// more random wandering and longer scatter breaks.
 const LEVELS = [
   { name:"Rete aziendale",  text:"Labirinto piccolo, bug lenti.",
-    pac:7.2, bug:4.0, fright:2.6, frightTime:7.0, bugs:2, rand:0.40, release:[0,4],        cycle:[7,18,7,18,5,999] },
+    pac:5.6, bug:2.9, fright:2.0, frightTime:9.0, bugs:2, rand:0.45, release:[0,5],        cycle:[9,15,9,15,7,999] },
   { name:"Server farm",     text:"Più grande, un bug in più.",
-    pac:7.6, bug:4.7, fright:2.8, frightTime:6.0, bugs:3, rand:0.30, release:[0,3,7],     cycle:[7,20,6,20,5,999] },
+    pac:5.9, bug:3.3, fright:2.1, frightTime:8.0, bugs:3, rand:0.38, release:[0,4,9],     cycle:[8,17,8,17,6,999] },
   { name:"Cloud ibrido",    text:"Labirinto completo: usa le patch.",
-    pac:8.0, bug:5.3, fright:3.0, frightTime:5.0, bugs:3, rand:0.22, release:[0,3,6],     cycle:[6,20,5,20,4,999] },
+    pac:6.2, bug:3.7, fright:2.3, frightTime:7.0, bugs:3, rand:0.30, release:[0,4,8],     cycle:[8,18,7,18,5,999] },
   { name:"Data center",     text:"Bug più veloci, patch brevi.",
-    pac:8.0, bug:6.0, fright:3.0, frightTime:3.8, bugs:4, rand:0.08, release:[0,2,4,7],   cycle:[5,22,4,22,3,999] },
+    pac:6.3, bug:4.7, fright:2.4, frightTime:4.8, bugs:4, rand:0.08, release:[0,2,4,7],   cycle:[5,22,4,22,3,999] },
   { name:"Core di sistema", text:"Livello finale: ripulisci il core!",
-    pac:8.2, bug:6.6, fright:3.2, frightTime:2.8, bugs:4, rand:0.03, release:[0,1,2.5,4], cycle:[4,24,3,24,2,999] },
+    pac:6.4, bug:5.1, fright:2.5, frightTime:3.6, bugs:4, rand:0.03, release:[0,1,2.5,4], cycle:[4,24,3,24,2,999] },
 ];
 
 const BUGS = [
@@ -190,6 +195,7 @@ let dots = [];         // 0 none, 1 coin, 2 patch
 let dotsLeft = 0;
 let score = 0, levelStartScore = 0, lives = 3, levelBugsEaten = 0, levelTime = 0;
 let player, bugs = [];
+let goneBugs = new Set(); // ids of bugs eaten this level: no respawn
 let globalMode = 'scatter', modeIdx = 0, modeTimer = 0;
 let frightTimer = 0, eatCombo = 0;
 let readyTimer = 0, dyingTimer = 0;
@@ -225,6 +231,8 @@ function loadLevel(i){
   ROWS = grid.length; COLS = grid[0].length;
   const bpos = findChar('B'); HOUSE_EXIT = { x:bpos.x, y:bpos.y }; HOUSE_IN = { x:bpos.x, y:bpos.y+2 };
   TUNNEL_ROW = grid.findIndex(r => r[0] !== '#' && r[COLS-1] !== '#');
+  TUNNEL_LEN = TUNNEL_ROW < 0 ? 0 : Math.max(1, grid[TUNNEL_ROW].findIndex(c => c !== ' '));
+  goneBugs = new Set();   // bugs eaten in this level never come back
   BUGS[0].home = {x:COLS-1, y:-2}; BUGS[1].home = {x:0, y:-2}; BUGS[2].home = {x:COLS-1, y:ROWS+1}; BUGS[3].home = {x:0, y:ROWS+1};
   dots = []; dotsLeft = 0;
   for (let y=0;y<ROWS;y++){
@@ -253,6 +261,7 @@ function resetActors(){
   const hx = HOUSE_EXIT.x, hy = HOUSE_IN.y;
   const starts = [ {x:hx,y:HOUSE_EXIT.y,mode:'scatter',dir:DIR.left}, {x:hx,y:hy,mode:'house',dir:DIR.left}, {x:hx-1,y:hy,mode:'house',dir:DIR.right}, {x:hx+1,y:hy,mode:'house',dir:DIR.left} ];
   for (let i=0;i<L.bugs;i++){
+    if (goneBugs.has(i)) continue;
     const s = starts[i];
     bugs.push({ id:i, ...BUGS[i], x:s.x, y:s.y, dir:s.dir, mode:s.mode, isBug:true, release:L.release[i]||0, reverse:false, wob:Math.random()*6 });
   }
@@ -322,7 +331,7 @@ function bugTarget(b){
     case 0: return {x:px, y:py};
     case 1: return {x:px + pd.x*4, y:py + pd.y*4};
     case 2: {
-      const ax = px + pd.x*2, ay = py + pd.y*2, g = bugs[0];
+      const ax = px + pd.x*2, ay = py + pd.y*2, g = bugs.find(o => o.id === 0);
       return g ? {x: ax*2 - Math.round(g.x), y: ay*2 - Math.round(g.y)} : {x:px,y:py};
     }
     case 3: {
@@ -371,7 +380,7 @@ function bugSpeed(b){
   if (b.mode==='eaten') return 11;
   if (b.mode==='house') return 2.2;
   if (b.mode==='exit') return 3.2;
-  const inTunnel = Math.round(b.y)===TUNNEL_ROW && (b.x < 4 || b.x > COLS-5);
+  const inTunnel = Math.round(b.y)===TUNNEL_ROW && (b.x < TUNNEL_LEN || b.x > COLS-1-TUNNEL_LEN);
   let s = b.mode==='fright' ? L.fright : L.bug;
   // the last few coins make bugs a touch faster, like the arcade
   if (b.mode!=='fright' && dotsLeft < 20) s *= 1.06;
@@ -429,6 +438,7 @@ function update(dt){
   // eat the coin under the player even when passing between centres quickly
   if (player.moving) player.mouth += dt*14;
 
+  bugs = bugs.filter(b => b.mode !== 'eaten');
   for (const b of bugs){
     if (b.mode === 'house'){
       b.release -= dt;
@@ -447,12 +457,13 @@ function update(dt){
         eatCombo++; const pts = 200 * Math.pow(2, eatCombo-1);
         score += pts; levelBugsEaten++;
         popups.push({x:b.x, y:b.y, text:String(pts), t:1});
-        b.mode = 'eaten'; b.goingIn = false; sfx.eat();
+        b.mode = 'eaten'; b.goingIn = false; goneBugs.add(b.id); sfx.eat();   // eaten = gone for the rest of the level
       } else if (b.mode !== 'eaten'){
         loseLife(); return;
       }
     }
   }
+  bugs = bugs.filter(b => b.mode !== 'eaten');
   for (const p of popups) p.t -= dt;
   popups = popups.filter(p => p.t > 0);
   updateHud();
