@@ -18,10 +18,11 @@ Questa cartella contiene le specifiche funzionali e tecniche di ogni parte. **Pe
 | App | File principali | Specifica |
 |---|---|---|
 | App giocatori (home, sblocco, account, gara, classifica in app, installazione) | `index.html`, `hub.js`, `backend.js`, `config.js`, `sw.js`, `manifest.webmanifest` | [app-giocatori.md](app-giocatori.md) |
-| Gioco SysAdmin Runner (Efuture) | `games/sysadmin/` | [gioco-sysadmin.md](gioco-sysadmin.md) *(da scrivere)* |
-| Gioco CoreTech Pac | `games/coretech/` | [gioco-coretech.md](gioco-coretech.md) *(da scrivere)* |
-| Gioco Timenet Breakout | `games/timenet/` | [gioco-timenet.md](gioco-timenet.md) *(da scrivere)* |
-| Gioco Inncloud Invaders | `games/inncloud/` | [gioco-inncloud.md](gioco-inncloud.md) *(da scrivere)* |
+| Gioco SysAdmin Runner (Efuture) | `games/sysadmin/` | [gioco-sysadmin.md](gioco-sysadmin.md) |
+| Gioco CoreTech Pac | `games/coretech/` | [gioco-coretech.md](gioco-coretech.md) |
+| Gioco Timenet Breakout | `games/timenet/` | [gioco-timenet.md](gioco-timenet.md) |
+| Gioco Inncloud Invaders | `games/inncloud/` | [gioco-inncloud.md](gioco-inncloud.md) |
+| Parti comuni dei giochi (modalità gara, scocca "Game Boy" in verticale) | `games/gameboy.css`, `games/gameboy.js` | [giochi-comune.md](giochi-comune.md) |
 | Classifica da proiettare (PC / ledwall) | `classifica.html` (+ `backend.js`) | [classifica.md](classifica.md) |
 | Pannello admin | `admin.html` | [admin.md](admin.md) |
 | Database Supabase (tabelle, funzioni, file SQL) | `supabase*.sql` | [database.md](database.md) |
@@ -37,7 +38,7 @@ Questa cartella contiene le specifiche funzionali e tecniche di ogni parte. **Pe
 - **`backend.js`:** è l'accesso ai dati, condiviso da app e classifica. Usa Supabase quando `config.js` contiene `SUPABASE_URL` e `SUPABASE_ANON_KEY` e la libreria `vendor/supabase.js` è caricata. Altrimenti usa la **modalità demo**: account, punteggi e countdown restano nel `localStorage` del dispositivo. L'admin funziona solo online.
 - **`config.js`:** contiene l'URL del progetto Supabase, la chiave `anon` e `PUBLIC_URL`, cioè l'indirizzo pubblico usato per i QR e per i link alla classifica. La chiave `anon` è pubblica per definizione. I dati sono protetti da RLS e dalle funzioni, come spiegato in [database.md](database.md).
 - **Supabase:** il sito non legge mai le tabelle direttamente: chiama solo funzioni RPC `efg_*`. Le funzioni admin chiedono la chiave admin, che nel database è salvata solo come hash bcrypt.
-- **Giochi:** ogni gioco è una pagina a sé in `games/<id>/index.html`. L'app lo apre in un iframe con `?hub=1` (modalità gara) e riceve gli eventi con `postMessage`. Aperto da solo, il gioco ha tutti i livelli e nessun limite.
+- **Giochi:** ogni gioco è una pagina a sé in `games/<id>/index.html`. L'app lo apre in un iframe con `?hub=1` (modalità gara) e riceve gli eventi con `postMessage`. Aperto da solo, il gioco ha tutti i livelli e nessun limite. In verticale i giochi hanno la scocca "Game Boy" condivisa (`games/gameboy.css`, `games/gameboy.js`), descritta in [giochi-comune.md](giochi-comune.md).
 - **Librerie in `vendor/`:**
   - `supabase.js` (+ `591.supabase.js`): client Supabase;
   - `jsQR.js`: lettura dei QR dalla fotocamera;
@@ -94,4 +95,4 @@ La chiave admin si imposta o si recupera solo dallo SQL Editor con `select efg_a
 - Skill di Claude Code in `.claude/skills/`, elencate anche nella scheda Skills dell'admin.
 
 ---
-Ultimo aggiornamento: 07/10/2026 (v26)
+Ultimo aggiornamento: 07/10/2026 (v27)

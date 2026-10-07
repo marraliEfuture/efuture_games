@@ -54,12 +54,12 @@ Raccolte alla presentazione del 07/10. Si fanno uno step alla volta: l'utente pr
 - [x] **Step 3 – Aspetto (v25):** tema chiaro in app e nei 4 giochi (sfondo #eef4fa, pannelli bianchi, testo #0d2b45, arancio testi #c56a0c); testi accorciati; "powered by" tolto da app, classifica e giochi; la finestra Installa si apre da sola solo dal QR di installazione.
   - Richiesta aggiunta il 07/10: in fondo alla home 3 pulsanti Classifica · Installa app · Istruzioni (Esci accanto al nome); sotto "CARE Conference Edition" la frase "Sblocca, gioca e vinci!".
 - [x] **Step 4 – Comandi dei giochi (v26):** joystick a manopola in SysAdmin (destra/sinistra, su = salto) e CoreTech (4 direzioni, svolta prenotata); pulsanti SALTA/MOUSE/ANTIVIRUS più grandi; comandi in una fascia separata (verticale) o ai lati del gioco (orizzontale), mai sopra il campo.
-- [ ] **Step 5 – SysAdmin Runner:** testa girata a sinistra quando cammina all'indietro; "Timbra il cartellino" diventa "Risolvi il ticket del cliente"; anche mentre lampeggia dopo un colpo deve poter pestare i bug.
-- [ ] **Step 6 – CoreTech Pac:** omino più lento; 3 livelli più facili; i mostri mangiati non rinascono; uscita laterale che fa rientrare dal lato opposto in tutti e 3 i livelli; joystick.
+- [x] **Step 5 – SysAdmin Runner (v27):** testa (logo "e") specchiata quando va a sinistra; pulsante "Risolvi il ticket del cliente"; i bug si possono pestare anche mentre il personaggio lampeggia (contro il boss resta come prima).
+- [x] **Step 6 – CoreTech Pac (v27):** C più lenta del ~22% (bug in proporzione); livelli 1–3 più facili (bug più lenti e meno insistenti, floppy più lunghi); bug mangiati non rinascono nel livello; uscita laterale in tutti i 5 labirinti; monetine ridotte nei livelli di gara per finirli in meno di un minuto.
 - [x] **Step 7 – Timenet Breakout (v26):** mare e delfino alzati di 36 punti, più spazio sopra la barra di trascinamento.
-- [ ] **Step 8 – Video e tutorial:** l'estensione di Claude crea su Google Drive il foglio "Attività giornaliere" (tempi, descrizione, utente), aggiunge in fondo la riga con totali, somme e medie, salva e invia il file con Gmail a un responsabile di esempio.
-- [ ] **Step 9 – Look Game Boy (richiesta del 07/10):** in verticale i giochi devono sembrare un Game Boy (scocca chiara, schermo con cornice in alto, controlli sotto); al posto della croce il joystick, al posto dei due pulsanti rossi i tasti già creati (SysAdmin: SALTA/MOUSE; CoreTech: pausa/musica).
-- [ ] **Poi:** specifiche markdown di tutte le app in `docs/specifiche/`. (app, classifica, admin, database iniziate il 07/10; giochi alla fine).
+- [x] **Step 8 – Video e tutorial (v27):** video `video/sheets-claude.mp4` (88 s) e tutorial `tutorial/sheets/` (11 slide) "Un foglio Google con Claude": foglio Attività giornaliere, TOTALE/MEDIA, salvataggio su Drive, mail con Gmail dopo conferma.
+- [x] **Step 9 – Look Game Boy (v27):** in verticale i giochi sembrano un Game Boy (`games/gameboy.css` + `games/gameboy.js`): joystick o barra al posto della croce, A/B = SALTA/MOUSE (SysAdmin) o PAUSA/MUSICA, pulsantini ISTRUZIONI e AVVIA/PAUSA; in orizzontale invariato.
+- [x] **Specifiche (v27):** `docs/specifiche/` con README, app-giocatori, classifica, admin, database, giochi-comune e una scheda per gioco. Da qui ogni modifica aggiorna la sua specifica.
 
 Risposte dell'utente (07/10):
 - L'utente eliminato si cancella davvero dal database e sparisce dalla classifica; il registro eventi resta.
