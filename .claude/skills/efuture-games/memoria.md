@@ -20,6 +20,10 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 - Uscite di prova, anteprime e PDF vanno nello scratchpad, non nel repository.
 - La chiave admin non è nel sito: è salvata cifrata nel database.
 - Le skill di progetto vanno elencate anche nella scheda **Skills** di `admin.html` (array `SKILLS`).
+- **Specifiche in markdown (decisione del 07/10):** finito il piano di modifiche qui sotto, si scrivono le specifiche di tutte le app in `docs/specifiche/`: app, 4 giochi, classifica online, pannello admin. Da quel momento:
+  - ogni modifica all'app aggiorna anche il markdown corrispondente, nello stesso commit;
+  - per studiare l'app si leggono prima i markdown e poi, solo se serve, il sorgente.
+- Le modifiche si fanno **un po' alla volta**: uno step, l'utente lo prova, poi si chiede se andare avanti.
 
 ## Regole di gara (decise il 30/09)
 
@@ -40,6 +44,27 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 07/10 | Claude Code `session_01E5nckLsAM9uFBEZoNu3pXB` | Spiegato perché le skill di progetto si vedono solo in Claude Code; creata la skill `/efuture-games` con questa memoria (v22). |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
+
+## Piano di modifiche dopo la presentazione (07/10)
+
+Raccolte alla presentazione del 07/10. Si fanno uno step alla volta: l'utente prova ogni step e conferma prima del successivo.
+
+- [ ] **Step 1 – Privacy e utenti:** togliere il cellulare da registrazione, log, elenco giocatori e CSV, in tutta l'app; in admin "Elimina utente" che cancella il giocatore ma tiene log e punti in classifica (serve un nuovo SQL da eseguire in Supabase).
+- [ ] **Step 2 – Classifiche:** sull'app i nomi dei vincitori non si vedono e si legge male; su desktop il filtro "Efuture" non filtra le mail @efuture.it.
+- [ ] **Step 3 – Aspetto:** colori meno scuri; testi più corti; togliere "powered by Efuture" da tutte le app; "Installa sul telefono" piccolo in fondo, non obbligatorio.
+- [ ] **Step 4 – Comandi dei giochi:** joystick a manopola al posto dei pulsanti; comandi più grandi ma senza coprire il gioco, anche in orizzontale.
+- [ ] **Step 5 – SysAdmin Runner:** testa girata a sinistra quando cammina all'indietro; "Timbra il cartellino" diventa "Risolvi il ticket del cliente"; anche mentre lampeggia dopo un colpo deve poter pestare i bug.
+- [ ] **Step 6 – CoreTech Pac:** omino più lento; 3 livelli più facili; i mostri mangiati non rinascono; uscita laterale che fa rientrare dal lato opposto in tutti e 3 i livelli; joystick.
+- [ ] **Step 7 – Timenet Breakout:** delfino più in alto, staccato dalla barra in basso.
+- [ ] **Step 8 – Video e tutorial:** l'estensione di Claude crea su Google Drive il foglio "Attività giornaliere" (tempi, descrizione, utente), aggiunge in fondo la riga con totali, somme e medie, salva e invia il file con Gmail a un responsabile di esempio.
+- [ ] **Poi:** specifiche markdown di tutte le app in `docs/specifiche/`.
+
+Domande aperte (fatte il 07/10, in attesa di risposta):
+1. Cancellare anche i cellulari già salvati nel database, dopo un backup?
+2. In classifica, l'utente eliminato resta col suo nome o diventa "Utente eliminato"?
+3. Colori più chiari solo nell'app o anche nei giochi, nella classifica e nell'admin?
+4. Joystick in quali giochi? Proposta: SysAdmin e CoreTech; Timenet resta col trascinamento; Inncloud da decidere.
+5. Pubblicare ogni step su main appena pronto, per provarlo sul telefono?
 
 ## In sospeso / da ricordare
 

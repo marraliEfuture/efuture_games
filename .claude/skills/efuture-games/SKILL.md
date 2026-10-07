@@ -19,6 +19,7 @@ Rispondi all'utente in italiano, in modo semplice.
    - **Sessioni di Claude Code:** `list_sessions` (server claude-code-remote) con `mine: true`. Tieni quelle con titolo o repository efuture_games, anche quelle senza commit.
    - **Pull request:** `list_pull_requests` su `marraliEfuture/efuture_games` (aperte e ultime chiuse).
 3. Non leggere i file del sito per intero adesso: aprili quando servono per il lavoro richiesto.
+4. **Per studiare un'app parti dalle specifiche** in `docs/specifiche/`, se ci sono, e apri il sorgente solo quando serve. Se modifichi un'app, aggiorna la sua specifica nello stesso commit.
 
 ## 2. Rispondi con un riepilogo breve
 
