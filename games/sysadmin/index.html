@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>SysAdmin Runner</title>
 <meta name="description" content="Platform game a 10 livelli: sei il sysadmin di guardia contro bug, trappole e un hacker finale.">
-<meta name="theme-color" content="#0b1624">
-<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#eef4fa">
+<meta name="color-scheme" content="light">
 <link rel="icon" type="image/png" href="icons/favicon.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="SysAdmin">
 <link rel="preload" href="fonts/press-start-2p-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -19,35 +19,31 @@
 @font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/ibm-plex-mono-latin-400-normal.woff2) format('woff2');}
 @font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ibm-plex-mono-latin-500-normal.woff2) format('woff2');}
 @font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/ibm-plex-mono-latin-600-normal.woff2) format('woff2');}
-html,body{background:#0b1624;overscroll-behavior:none;touch-action:manipulation;}
+html,body{background:#eef4fa;overscroll-behavior:none;touch-action:manipulation;}
 [hidden]:not([hidden=until-found i]){display:none!important}
 img{max-width:100%}
 
-/* persistent footer: powered by efuture, visible on every screen and level */
-.powered-bar{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:7px;padding:4px 12px calc(6px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line)}
-.powered-bar span{font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim)}
-.powered-bar .chip{background:#ffffff;border-radius:6px;padding:3px 7px;display:flex;align-items:center}
-.powered-bar img{height:14px;width:auto;display:block}
 </style>
 </head>
 <body>
 <style>
   :root{
-    /* Efuture: #ffcc00 giallo, #336699 blu, #ededed grigio chiaro */
-    --ef-yellow:#ffcc00;
-    --ef-blue:#336699;
-    --ef-light:#ededed;
-    --bg:#0b1624;
-    --panel:#11233a;
-    --panel-2:#183152;
-    --line:#2c4b72;
-    --text:#ededed;
-    --text-dim:#a3b6cc;
-    --accent:#ffcc00;
-    --accent-2:#7fb0e0;
-    --danger:#ff5d56;
-    --ok:#7ee787;
-    --hacker:#c65bff;
+    /* tema chiaro (07/10), come l'app: blu Efuture #004675, arancio #f18c22 */
+    color-scheme:light;
+    --ef-yellow:#c56a0c;   /* arancio scuro: testo evidenziato su fondo chiaro */
+    --ef-blue:#004675;
+    --ef-light:#ffffff;
+    --bg:#eef4fa;
+    --panel:#ffffff;
+    --panel-2:#f2f7fc;
+    --line:#cddcea;
+    --text:#0d2b45;
+    --text-dim:#56718a;
+    --accent:#f18c22;
+    --accent-2:#004675;
+    --danger:#d93a2b;
+    --ok:#1f9d55;
+    --hacker:#8a2fc9;
     --av:#39e07a;
   }
   *{box-sizing:border-box;}
@@ -68,7 +64,7 @@ img{max-width:100%}
     display:flex;
     flex-direction:column;
     background:
-      radial-gradient(ellipse at 50% -10%, #1a3150 0%, var(--bg) 55%);
+      radial-gradient(ellipse at 50% -10%, #d6e8f7 0%, var(--bg) 55%);
   }
 
   /* ---------- HUD ---------- */
@@ -80,16 +76,16 @@ img{max-width:100%}
     gap:10px;
     padding:8px 12px;
     padding-top:calc(8px + env(safe-area-inset-top,0px));
-    background:linear-gradient(180deg, #102238, var(--bg) 90%);
+    background:linear-gradient(180deg, #ffffff, var(--panel-2) 90%);
     border-bottom:1px solid var(--line);
     font-size:12px;
     letter-spacing:.02em;
     z-index:5;
   }
   #hud .grp{display:flex;align-items:center;gap:10px;min-width:0;}
-  #lives{display:flex;gap:4px;font-size:15px;letter-spacing:2px;}
+  #lives{display:flex;gap:4px;font-size:15px;letter-spacing:2px;color:var(--danger);}
   #lives span.dim{opacity:.25;}
-  #scoreWrap{color:var(--ef-yellow);white-space:nowrap;}
+  #scoreWrap{color:var(--ef-yellow);white-space:nowrap;font-weight:600;}
   #timerWrap{color:var(--text-dim);white-space:nowrap;font-size:11px;font-variant-numeric:tabular-nums;}
   #levelWrap{
     color:var(--text-dim);
@@ -131,7 +127,7 @@ img{max-width:100%}
   #bossBarOuter{
     height:10px;
     border-radius:6px;
-    background:#000a;
+    background:#ffffffcc;
     border:1px solid var(--hacker);
     overflow:hidden;
   }
@@ -154,7 +150,7 @@ img{max-width:100%}
     font-size:10.5px;
     padding:10px 16px;
     border-radius:8px;
-    box-shadow:0 8px 22px rgba(0,0,0,.5), 0 0 0 1px #0e6b3a;
+    box-shadow:0 8px 22px rgba(13,43,69,.22), 0 0 0 1px #0e6b3a;
     opacity:0;
     pointer-events:none;
     transition:opacity .25s ease, transform .25s ease;
@@ -171,12 +167,12 @@ img{max-width:100%}
     display:flex;
     align-items:center;
     justify-content:center;
-    background:#07101b;
+    background:#dde8f2;
   }
   #game{
     display:block;
-    background:#0e141c;
-    box-shadow:0 0 0 1px var(--line), 0 20px 60px rgba(0,0,0,.55);
+    background:#f2f7fc;
+    box-shadow:0 0 0 1px var(--line), 0 12px 32px rgba(13,43,69,.14);
     border-radius:4px;
   }
 
@@ -187,7 +183,7 @@ img{max-width:100%}
     align-items:center;
     justify-content:center;
     padding:20px;
-    background:rgba(6,9,13,.82);
+    background:rgba(226,236,246,.86);
     backdrop-filter:blur(2px);
     z-index:10;
     text-align:center;
@@ -201,13 +197,13 @@ img{max-width:100%}
     border:1px solid var(--line);
     border-radius:14px;
     padding:22px 20px;
-    box-shadow:0 16px 40px rgba(0,0,0,.5);
+    box-shadow:0 16px 40px rgba(13,43,69,.16);
     margin:auto;
   }
   .card h1{
     font-size:18px;
     margin:0 0 6px;
-    color:var(--accent);
+    color:var(--ef-blue);
     line-height:1.5;
   }
   .card h2{
@@ -226,17 +222,17 @@ img{max-width:100%}
   .client-tag{
     display:inline-block;
     font-size:10px;
-    color:var(--bg);
+    color:#1d0f00;
     background:var(--accent);
     padding:3px 8px;
     border-radius:20px;
     margin-bottom:10px;
     letter-spacing:.04em;
   }
-  .client-tag.done{background:var(--ok);}
+  .client-tag.done{background:var(--ok);color:#fff;}
   .client-tag.boss{background:var(--hacker);color:#fff;}
-  .client-tag.promo{background:var(--ef-yellow); color:#1a1400;}
-  .client-tag.warn{background:var(--ef-yellow); color:#1a1400;}
+  .client-tag.promo{background:var(--accent); color:#1d0f00;}
+  .client-tag.warn{background:var(--accent); color:#1d0f00;}
   .bubble{
     background:var(--panel-2);
     border:1px solid var(--line);
@@ -254,20 +250,21 @@ img{max-width:100%}
     font-size:11px;
     padding:12px 16px;
     border-radius:8px;
-    border:1px solid var(--line);
+    border:1px solid #b8610b;
     background:var(--accent);
-    color:#1a1400;
+    color:#1d0f00;
     cursor:pointer;
     letter-spacing:.02em;
-    box-shadow:0 4px 0 #b38f00, 0 6px 14px rgba(0,0,0,.4);
+    box-shadow:0 4px 0 #a9570a;
   }
-  button.game-btn:active{ box-shadow:0 1px 0 #b38f00; transform:translateY(3px); }
+  button.game-btn:active{ box-shadow:0 1px 0 #a9570a; transform:translateY(3px); }
   button.game-btn.secondary{
-    background:var(--ef-blue);
-    color:var(--ef-light);
-    box-shadow:0 4px 0 #1f4060, 0 6px 14px rgba(0,0,0,.4);
+    background:#ffffff;
+    border-color:var(--line);
+    color:var(--ef-blue);
+    box-shadow:0 4px 0 #c3d3e2;
   }
-  button.game-btn.secondary:active{ box-shadow:0 1px 0 #1f4060; transform:translateY(3px);}
+  button.game-btn.secondary:active{ box-shadow:0 1px 0 #c3d3e2; transform:translateY(3px);}
   .kicker{
     font-size:10px;
     color:var(--text-dim);
@@ -290,7 +287,7 @@ img{max-width:100%}
     width:100%;
     aspect-ratio:2.15;
     border-radius:10px;
-    background:#0c1017;
+    background:#e4eef8;
     border:1px solid var(--line);
     margin-bottom:14px;
   }
@@ -302,9 +299,9 @@ img{max-width:100%}
     align-items:center;
     justify-content:space-between;
     padding:10px 14px;
-    padding-bottom:10px;
+    padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
     gap:8px;
-    background:linear-gradient(0deg, #102238, var(--bg) 85%);
+    background:linear-gradient(0deg, #ffffff, var(--panel-2) 85%);
     border-top:1px solid var(--line);
     touch-action:none;
     z-index:5;
@@ -320,12 +317,13 @@ img{max-width:100%}
     border-radius:14px;
     background:var(--panel-2);
     border:1px solid var(--line);
-    color:var(--text);
+    color:var(--ef-blue);
     display:flex;align-items:center;justify-content:center;
     font-size:20px;
+    box-shadow:0 3px 0 #c3d3e2;
     -webkit-tap-highlight-color:transparent;
   }
-  .dbtn.active{ background:var(--accent); color:#1a1400; border-color:var(--accent);}
+  .dbtn.active{ background:var(--accent); color:#1d0f00; border-color:#b8610b;}
   #actions{
     display:flex;
     gap:10px;
@@ -341,15 +339,15 @@ img{max-width:100%}
     -webkit-tap-highlight-color:transparent;
   }
   .abtn span{ font-family:'IBM Plex Mono',monospace; font-size:7.5px; margin-top:2px; letter-spacing:.05em;}
-  #btnThrow{ background:var(--ef-blue); color:var(--ef-light); border-color:#4d7fb3; }
+  #btnThrow{ background:var(--ef-blue); color:#ffffff; border-color:#00335a; box-shadow:0 3px 0 #00335a; }
   #btnThrow.active{ filter:brightness(1.25); }
-  #btnJump{ background:var(--accent); color:#1a1400; margin-top:-16px;}
+  #btnJump{ background:var(--accent); color:#1d0f00; border-color:#b8610b; box-shadow:0 3px 0 #a9570a; margin-top:-16px;}
   #btnJump.active{ filter:brightness(1.25); }
   #btnSpecial{
     width:44px;height:44px;
     font-size:16px;
-    background:#1c2430;
-    color:#465064;
+    background:#e4ecf4;
+    color:#8aa0b5;
     border:1px dashed var(--line);
     opacity:.6;
     align-self:flex-end;
@@ -377,25 +375,22 @@ img{max-width:100%}
   }
 
   /* ---------- Telefono in orizzontale: gioco a tutto schermo ----------
-     HUD, comandi e "powered by" vanno sopra al gioco, il canvas usa tutta l'altezza */
+     HUD e comandi vanno sopra al gioco, il canvas usa tutta l'altezza */
   @media (orientation:landscape) and (max-height:560px){
     #app{position:relative;}
     #hud{position:absolute;top:0;left:0;right:0;border-bottom:0;
-      background:linear-gradient(180deg, rgba(11,22,36,.88), rgba(11,22,36,0));
+      background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,0));
       padding:4px calc(12px + env(safe-area-inset-right,0px)) 10px calc(12px + env(safe-area-inset-left,0px));
       padding-top:calc(4px + env(safe-area-inset-top,0px));}
     #pauseBtn{width:30px;height:30px;}
     #bossBarWrap{top:calc(36px + env(safe-area-inset-top,0px));}
-    #stage{background:#000;}
+    #stage{background:#eef4fa;}
     #game{box-shadow:none;border-radius:0;}
     #controls{position:absolute;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));
       background:none;border-top:0;pointer-events:none;
       padding:0 calc(16px + env(safe-area-inset-right,0px)) 0 calc(16px + env(safe-area-inset-left,0px));}
     #controls > *{pointer-events:auto;}
-    #controls .dbtn, #controls .abtn{opacity:.78;}
-    .powered-bar{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:6;
-      border:0;border-radius:8px 8px 0 0;background:rgba(11,22,36,.7);padding:3px 10px calc(3px + env(safe-area-inset-bottom,0px));}
-    .powered-bar img{height:12px;}
+    #controls .dbtn, #controls .abtn{opacity:.85;}
   }
 </style>
 
@@ -418,7 +413,7 @@ img{max-width:100%}
       <div class="card">
         <div class="kicker" id="kickerLv">Livello 1 di 10 &middot; missione IT</div>
         <h1 class="pixel">SYSADMIN RUNNER</h1>
-        <p>Sei il sysadmin di guardia. Server in fiamme, firewall bucati, mouse impazziti: dieci clienti ti aspettano, e all'ultimo piano si nasconde un hacker.</p>
+        <p>Sei il sysadmin di guardia: elimina i bug e raggiungi il cliente.</p>
         <p class="dim" id="bestTimeLineTitle" style="display:none;">Record attuale: <b id="bestTimeTitle" style="color:var(--ef-yellow)"></b></p>
         <p class="dim" id="bestDebugLineTitle" style="display:none;">Miglior pulizia: <b id="bestDebugTitle" style="color:var(--ef-yellow)"></b></p>
         <div class="btnrow">
@@ -428,8 +423,10 @@ img{max-width:100%}
         </div>
         <div id="howBox" hidden>
         <div class="bubble">
-          <b>Come si gioca:</b><br>
-          Muoviti ed evita i bug. Saltaci sopra per schiacciarli, oppure lanciagli il mouse. Attenzione a chiodi, archi elettrici e seghe circolari lungo il percorso: sono trappole d'ufficio, non si eliminano, si schivano! Batti 3 bug di fila senza farti colpire per sbloccare l'antivirus, l'arma speciale: un colpo subito e la perdi. In fondo a ogni piano trovi una scala: il cliente ti aspetta in cima e ti ringrazia quando lo raggiungi. Se sali con dei bug ancora in giro, il cliente se ne accorge e sta a te decidere: tornare a debuggare (più pulito, ma più lento) o chiudere comunque il ticket (più veloce, ma meno pulito). Punta al miglior tempo o alla pulizia perfetta: entrambi i record restano salvati!
+          &bull; Salta sui bug o lanciagli il mouse<br>
+          &bull; Schiva chiodi, scosse e seghe<br>
+          &bull; 3 bug di fila: sblocchi l'antivirus<br>
+          &bull; Sali la scala e raggiungi il cliente
         </div>
         <div class="controls-hint">
           <div><b>&larr; &rarr;</b> muovi</div>
@@ -458,7 +455,7 @@ img{max-width:100%}
         <p class="dim">Bug ancora in giro: <b id="complaintCount" style="color:var(--ef-yellow)">0</b></p>
         <div class="btnrow">
           <button class="game-btn" id="btnComplaintBack">Torna a debuggare</button>
-          <button class="game-btn secondary" id="btnComplaintFinish">Chiudi comunque il ticket</button>
+          <button class="game-btn secondary" id="btnComplaintFinish">Chiudi il ticket</button>
         </div>
       </div>
     </div>
@@ -478,7 +475,7 @@ img{max-width:100%}
         <canvas id="victoryCanvas"></canvas>
         <div class="client-tag promo">Promozione!</div>
         <h1 class="pixel">SYSADMIN SUPREMO</h1>
-        <p>Hai sconfitto l'hacker prima che rubasse i dati. Il capo ti promuove sul posto, e tutti i clienti che hai salvato sono venuti ad abbracciarti.</p>
+        <p>Hacker sconfitto: il capo ti promuove!</p>
         <p class="dim">Punteggio finale: <b id="victoryScore" style="color:var(--ef-yellow)">0</b></p>
         <p class="dim">Tempo: <b id="victoryTime" style="color:var(--ef-yellow)"></b></p>
         <p class="dim" id="recordLine" style="color:var(--ok);"></p>
@@ -492,7 +489,7 @@ img{max-width:100%}
       <div class="card">
         <div class="client-tag" style="background:var(--danger);color:#2a0000;">Sistema compromesso</div>
         <h1 class="pixel">GAME OVER</h1>
-        <p>I bug hanno avuto la meglio questa volta.</p>
+        <p>Stavolta hanno vinto i bug.</p>
         <p class="dim">Punteggio: <b id="overScore" style="color:var(--ef-yellow)">0</b> &middot; Cliente <b id="overLevel"></b> di 10</p>
         <div class="btnrow">
           <button class="game-btn" id="btnRetryLevel">Riprova ticket</button>
@@ -524,7 +521,6 @@ img{max-width:100%}
       <div class="abtn" id="btnJump"><span style="font-size:16px;margin-top:0;">&uarr;</span><span>SALTA</span></div>
     </div>
   </div>
-  <div class="powered-bar" id="poweredBar"><span>powered by</span><img src="img/efuture-white.png" alt="efuture"></div>
 </div>
 
 <script>
@@ -561,29 +557,29 @@ const COYOTE_TIME = 0.09;
 const JUMP_BUFFER = 0.12;
 
 const THEMES = {
-  office:   { name:"Ufficio",          sky:["#101a26","#182635"], ground:"#243447", groundTop:"#3a5068", props:["monitor","printer","cable","monitor"], fx:"none",     bug:{species:"roundBug",  color:"#ff5d56"}, fly:"#e07a6b" },
-  server:   { name:"Sala Server",      sky:["#0a1420","#0f1e2e"], ground:"#1c2a3a", groundTop:"#2f4459", props:["rack","cable","rack"],    fx:"scan",     bug:{species:"glitchBug", color:"#42e0ff"}, fly:"#4fc7e0" },
-  firewall: { name:"Zona Firewall",    sky:["#1a0f0f","#2a1414"], ground:"#3a2320", groundTop:"#5a332c", props:["brick","flame","shield"],   fx:"embers",   bug:{species:"spikyBug",  color:"#ff9a3c"}, fly:"#ff8a5c" },
-  network:  { name:"Sala Rete",        sky:["#0c1420","#101f30"], ground:"#1e2c3c", groundTop:"#33495f", props:["router","cable","cable"],  fx:"pulse",    bug:{species:"wireBug",   color:"#4fd6c0"}, fly:"#5adfca" },
-  cloud:    { name:"Data Center Cloud",sky:["#0b1626","#13233a"], ground:"#20304a", groundTop:"#3a5580", props:["cloudsrv","cloudbig","cable"],fx:"clouds",   bug:{species:"blobBug",   color:"#8ecbff"}, fly:"#a9d8ff" },
-  control:  { name:"Sala Controllo",   sky:["#0d1420","#12202f"], ground:"#22303f", groundTop:"#3a5266", props:["monitor","monitor","rack"],  fx:"radar",    bug:{species:"eyeBug",    color:"#b48cff"}, fly:"#c7a8ff" },
-  code:     { name:"Sala Sviluppo",    sky:["#0c0f1c","#141a2e"], ground:"#1b2138", groundTop:"#2c3556", props:["codeblock","tag","codeblock","tag"],  fx:"coderain", bug:{species:"tagBug",    color:"#7c5cff"}, fly:"#a08cff" },
-  database: { name:"Sala Database",    sky:["#0a1420","#0f1e2e"], ground:"#1c2a3a", groundTop:"#2f4459", props:["dbcyl","rack","dbcyl"],    fx:"grid",     bug:{species:"hexBug",    color:"#6c7bff"}, fly:"#8b97ff" },
-  critical: { name:"Difesa Critica",   sky:["#1c0d0d","#2c1212"], ground:"#3a2020", groundTop:"#5a2c2c", props:["brick","flame","flame"],   fx:"alarm",    bug:{species:"fireBug",   color:"#ff4d4d"}, fly:"#ff7d7d" },
-  bunker:   { name:"Bunker dell'Hacker",sky:["#0a0512","#170826"], ground:"#1c0f2e", groundTop:"#3a1f5a", props:["monitor","glitch"],fx:"matrix",   bug:{species:"virusBug",  color:"#c65bff"}, fly:"#d98cff" }
+  office:   { name:"Ufficio",          sky:["#e3effa","#cfe1f1"], ground:"#9fb6cc", groundTop:"#5d7f9f", props:["monitor","printer","cable","monitor"], fx:"none",     bug:{species:"roundBug",  color:"#ff5d56"}, fly:"#d9584a" },
+  server:   { name:"Sala Server",      sky:["#e2eef6","#cadded"], ground:"#97adc2", groundTop:"#56738f", props:["rack","cable","rack"],    fx:"scan",     bug:{species:"glitchBug", color:"#12a9cf"}, fly:"#1597b8" },
+  firewall: { name:"Zona Firewall",    sky:["#fbece4","#f3d9cc"], ground:"#c9a596", groundTop:"#9a6656", props:["brick","flame","shield"],   fx:"embers",   bug:{species:"spikyBug",  color:"#f07a12"}, fly:"#e8603a" },
+  network:  { name:"Sala Rete",        sky:["#e1f3f1","#c9e6e2"], ground:"#93b5b2", groundTop:"#4f7d79", props:["router","cable","cable"],  fx:"pulse",    bug:{species:"wireBug",   color:"#1fa88f"}, fly:"#21a58f" },
+  cloud:    { name:"Data Center Cloud",sky:["#dff0fd","#c4e0f7"], ground:"#9ab4d4", groundTop:"#5878a6", props:["cloudsrv","cloudbig","cable"],fx:"clouds",   bug:{species:"blobBug",   color:"#3d8fd9"}, fly:"#3f8ad0" },
+  control:  { name:"Sala Controllo",   sky:["#ebe8f8","#d8d3f0"], ground:"#a9a4c6", groundTop:"#6c6596", props:["monitor","monitor","rack"],  fx:"radar",    bug:{species:"eyeBug",    color:"#8a5ce0"}, fly:"#8f63e0" },
+  code:     { name:"Sala Sviluppo",    sky:["#e9e8f7","#d6d4ee"], ground:"#a3a1c4", groundTop:"#5f5a92", props:["codeblock","tag","codeblock","tag"],  fx:"coderain", bug:{species:"tagBug",    color:"#7c5cff"}, fly:"#6b4fe0" },
+  database: { name:"Sala Database",    sky:["#e2e9f8","#ccd7f0"], ground:"#9ba8cc", groundTop:"#5a6699", props:["dbcyl","rack","dbcyl"],    fx:"grid",     bug:{species:"hexBug",    color:"#5563e8"}, fly:"#5866e0" },
+  critical: { name:"Difesa Critica",   sky:["#fbe7e5","#f2d0cd"], ground:"#c99a96", groundTop:"#9a5652", props:["brick","flame","flame"],   fx:"alarm",    bug:{species:"fireBug",   color:"#e8302f"}, fly:"#e04a4a" },
+  bunker:   { name:"Bunker dell'Hacker",sky:["#ece3f5","#dccdee"], ground:"#a690bf", groundTop:"#6a4a8e", props:["monitor","glitch"],fx:"matrix",   bug:{species:"virusBug",  color:"#a63fe6"}, fly:"#a650e0" }
 };
 
 const CLIENTS = [
-  { name:"Marco",   theme:"office",   msg:"La mia stampante non stampa più e ho una scadenza tra un'ora! Ci sono dei bug ovunque sulla scrivania virtuale!" , thanks:"Sei stato velocissimo, Marco può tornare a stampare in pace.", shape:"suit",     color:"#3a6ea5", skin:"#e8b98a", accessory:"none" },
-  { name:"Giulia",  theme:"server",   msg:"Il server principale si è bloccato e i bug si stanno moltiplicando tra i rack!", thanks:"Il server gira di nuovo liscio, grazie mille!", shape:"labcoat",  color:"#eef2f5", skin:"#8a5a3c", accessory:"glasses" },
-  { name:"Paolo",   theme:"firewall", msg:"Il firewall è stato bucato: i bug stanno entrando da ogni breccia nel muro!", thanks:"Firewall sigillato, i bug non passeranno più.", shape:"uniform",  color:"#c65b3c", skin:"#e0a878", accessory:"cap" },
-  { name:"Elena",   theme:"network",  msg:"Non ho più connessione in tutto l'ufficio, i cavi di rete sono infestati!", thanks:"Rete ripristinata, ping perfetto ovunque.", shape:"hoodie2",  color:"#3ba893", skin:"#f0c9a0", accessory:"headset" },
-  { name:"Davide",  theme:"cloud",    msg:"I nostri dati nel cloud sono nel caos, dei bug volanti si aggirano tra i server sospesi!", thanks:"Cloud ripulito, i dati sono di nuovo al sicuro lassù.", shape:"poncho",   color:"#5b9bd9", skin:"#c9925f", accessory:"none" },
-  { name:"Sara",    theme:"control",  msg:"Tutti i monitor della sala controllo mostrano solo schermate blu e bug impazziti!", thanks:"Tutti gli schermi sono tornati verdi, ottimo lavoro.", shape:"dress",    color:"#9a6fd9", skin:"#e8b98a", accessory:"glasses" },
-  { name:"Fabio",   theme:"code",     msg:"Il sito web è invaso dai bug nel codice: tag HTML rotti, PHP impazzito e JavaScript ovunque!", thanks:"Codice ripulito e sito online di nuovo, grazie mille!", shape:"hoodie2", color:"#7c5cff", skin:"#c9925f", accessory:"none" },
-  { name:"Ilaria",  theme:"database", msg:"Il database è corrotto, i bug stanno divorando righe di dati importanti!", thanks:"Database ripulito e backup al sicuro.", shape:"robe",     color:"#5566cc", skin:"#f0c9a0", accessory:"glasses" },
-  { name:"Team IT", theme:"critical", msg:"Ultimo avviso prima dell'attacco finale: il sistema critico è quasi compromesso, resisti!", thanks:"Il sistema critico ha retto, ottimo lavoro sotto pressione.", shape:"apron",    color:"#d9503c", skin:"#c9925f", accessory:"cap" },
-  { name:"???",     theme:"bunker",   msg:"Un hacker si è infiltrato nel bunker centrale e minaccia di rubare i dati di tutti i clienti che hai salvato finora!", thanks:"", shape:"none", color:"#000000", skin:"#000000", accessory:"none" }
+  { name:"Marco",   theme:"office",   msg:"La stampante non va e ci sono bug ovunque!", thanks:"Marco torna a stampare, grazie!", shape:"suit",     color:"#3a6ea5", skin:"#e8b98a", accessory:"none" },
+  { name:"Giulia",  theme:"server",   msg:"Il server è bloccato, bug tra i rack!", thanks:"Server di nuovo in piedi, grazie!", shape:"labcoat",  color:"#eef2f5", skin:"#8a5a3c", accessory:"glasses" },
+  { name:"Paolo",   theme:"firewall", msg:"Firewall bucato: entrano i bug!", thanks:"Firewall sigillato!", shape:"uniform",  color:"#c65b3c", skin:"#e0a878", accessory:"cap" },
+  { name:"Elena",   theme:"network",  msg:"Niente rete: cavi infestati dai bug!", thanks:"Rete ripristinata!", shape:"hoodie2",  color:"#3ba893", skin:"#f0c9a0", accessory:"headset" },
+  { name:"Davide",  theme:"cloud",    msg:"Bug volanti nel cloud!", thanks:"Cloud ripulito!", shape:"poncho",   color:"#5b9bd9", skin:"#c9925f", accessory:"none" },
+  { name:"Sara",    theme:"control",  msg:"Monitor in tilt, bug ovunque!", thanks:"Schermi tornati verdi!", shape:"dress",    color:"#9a6fd9", skin:"#e8b98a", accessory:"glasses" },
+  { name:"Fabio",   theme:"code",     msg:"Il sito è pieno di bug nel codice!", thanks:"Sito di nuovo online!", shape:"hoodie2", color:"#7c5cff", skin:"#c9925f", accessory:"none" },
+  { name:"Ilaria",  theme:"database", msg:"Il database è corrotto dai bug!", thanks:"Database ripulito!", shape:"robe",     color:"#5566cc", skin:"#f0c9a0", accessory:"glasses" },
+  { name:"Team IT", theme:"critical", msg:"Sistema critico sotto attacco: resisti!", thanks:"Il sistema ha retto, ottimo lavoro!", shape:"apron",    color:"#d9503c", skin:"#c9925f", accessory:"cap" },
+  { name:"???",     theme:"bunker",   msg:"Un hacker è nel bunker: fermalo!", thanks:"", shape:"none", color:"#000000", skin:"#000000", accessory:"none" }
 ];
 
 const CAPO = { name:"Il Capo", shape:"suitTie", color:"#e0a83c", skin:"#e8b98a", accessory:"glasses" };
@@ -905,7 +901,7 @@ function resetLevelRuntime(){
   }
 }
 
-(function(){ const k = document.getElementById('kickerLv'); if (k && EFG.on) k.innerHTML = '3 livelli &middot; 1 minuto ciascuno &middot; 3 vite per livello'; })();
+(function(){ const k = document.getElementById('kickerLv'); if (k && EFG.on) k.innerHTML = '3 livelli &middot; 1 minuto &middot; 3 vite'; })();
 function startLevel(idx){
   if (EFG.on){ lives = LIVES_START; EFG.lvT = 0; if (idx === 0){ EFG.used = 0; EFG.times = []; EFG.livesAt = []; EFG.done = false; efgPost({ev:'start'}); } }
   levelIndex = idx;
@@ -1317,8 +1313,8 @@ function openComplaint(){
   state = 'complaint';
   const c = level.client;
   const missed = Math.max(0, level.totalEnemies - (level.kills||0));
-  el.complaintTitle.textContent = c.name + " non è convinto...";
-  el.complaintMsg.textContent = "Aspetta, non hai ancora finito! Ci sono ancora " + missed + (missed===1?" bug":" bug") + " in giro nel sistema. Vuoi tornare a stanarli, o chiudere comunque il ticket così com'è?";
+  el.complaintTitle.textContent = c.name + " non è convinto";
+  el.complaintMsg.textContent = "Ci sono ancora " + missed + " bug in giro. Torni a stanarli?";
   el.complaintCount.textContent = missed;
   hideAllOverlays();
   el.ovComplaint.hidden = false;
@@ -1344,13 +1340,13 @@ function onLevelComplete(){
     runEnemiesTotal += 1;
     runKillsTotal += 1;
     el.completeTitle.textContent = "Hacker sconfitto!";
-    el.completeMsg.textContent = "L'hacker è stato espulso dal sistema. Tutti i clienti sono di nuovo al sicuro.";
+    el.completeMsg.textContent = "Hacker espulso, clienti al sicuro.";
   } else {
     runEnemiesTotal += level.totalEnemies;
     runKillsTotal += Math.min(level.kills||0, level.totalEnemies);
     el.completeTitle.textContent = c.name + (dirty ? " ringrazia, ma..." : " ringrazia!");
     el.completeMsg.textContent = dirty
-      ? c.thanks + " Però occhio: qualche bug è rimasto in giro nel sistema, prima o poi si farà sentire di nuovo."
+      ? c.thanks + " Ma qualche bug è rimasto in giro."
       : c.thanks;
   }
   el.completeScore.textContent = score;
@@ -1389,7 +1385,7 @@ function enterVictory(){
   victorySeed = [];
   const rnd = mulberry32(777);
   for (let i=0;i<28;i++){
-    victorySeed.push({x:rnd()*480, y:-rnd()*200, spd:40+rnd()*60, drift:(rnd()-0.5)*20, hue: rnd()<0.5? '#ffcc00':'#336699'});
+    victorySeed.push({x:rnd()*480, y:-rnd()*200, spd:40+rnd()*60, drift:(rnd()-0.5)*20, hue: rnd()<0.5? '#f18c22':'#004675'});
   }
 }
 
@@ -1548,7 +1544,7 @@ function drawThemeFX(fx, t){
       ctx.stroke();
       break; }
     case 'clouds': {
-      ctx.fillStyle='rgba(255,255,255,0.04)';
+      ctx.fillStyle='rgba(255,255,255,0.55)';
       for (let i=0;i<5;i++){
         const cx = ((i*260 + t*18) % (VW+300))-150;
         ctx.beginPath(); ctx.ellipse(cx,60+i*22,90,26,0,0,7); ctx.fill();
@@ -1601,7 +1597,7 @@ function drawBackground(t){
   ctx.fillStyle = g;
   ctx.fillRect(0,0,VW,VH);
 
-  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  ctx.fillStyle = 'rgba(0,70,117,0.08)';
   for (let i=0;i<40;i++){
     const px = (i*137 - camX*0.15) % (VW+80);
     const py = (i*53)%(VH*0.5);
@@ -1613,6 +1609,7 @@ function drawBackground(t){
 
   const parX = camX*0.4;
   const rand = mulberry32(idxForProps());
+  ctx.save(); ctx.globalAlpha = 0.5;
   for (let i=0;i<16;i++){
     const kind = th.props[i%th.props.length];
     const px = (i*260 + 60) - parX;
@@ -1620,17 +1617,31 @@ function drawBackground(t){
     const py = GROUND_Y - 40 - rand()*160;
     propIcon(kind, px, py, 46 + (rand()*14), t + i);
   }
+  ctx.restore();
 }
 
-/* ---- logo Efuture in trasparenza nel cielo (parallasse lenta) ---- */
-const BG_LOGO = new Image(); let bgLogoOk = false;
-BG_LOGO.onload = ()=>{ bgLogoOk = true; }; BG_LOGO.src = 'img/efuture-white.png';
+/* ---- logo Efuture in trasparenza nel cielo (parallasse lenta) ----
+   il png è bianco: lo ricoloriamo in blu Efuture per il fondo chiaro */
+const BG_LOGO = new Image(); let bgLogoOk = false; let BG_LOGO_TINT = null;
+BG_LOGO.onload = ()=>{
+  bgLogoOk = true;
+  try {
+    const oc = document.createElement('canvas');
+    oc.width = BG_LOGO.naturalWidth; oc.height = BG_LOGO.naturalHeight;
+    const o = oc.getContext('2d');
+    o.drawImage(BG_LOGO, 0, 0);
+    o.globalCompositeOperation = 'source-in';
+    o.fillStyle = '#004675'; o.fillRect(0, 0, oc.width, oc.height);
+    BG_LOGO_TINT = oc;
+  } catch(e){ BG_LOGO_TINT = null; }
+};
+BG_LOGO.src = 'img/efuture-white.png';
 function drawBgLogo(){
-  if (!bgLogoOk || !BG_LOGO.naturalWidth) return;
+  if (!bgLogoOk || !BG_LOGO.naturalWidth || !BG_LOGO_TINT) return;
   const w = Math.min(VW*0.62, 620), h = w * BG_LOGO.naturalHeight / BG_LOGO.naturalWidth;
   const gap = w * 1.9, off = (camX*0.12) % gap;
-  ctx.save(); ctx.globalAlpha = 0.13;
-  for (let x = -off + VW*0.5 - w/2 - gap; x < VW + w; x += gap) ctx.drawImage(BG_LOGO, x, VH*0.22, w, h);
+  ctx.save(); ctx.globalAlpha = 0.08;
+  for (let x = -off + VW*0.5 - w/2 - gap; x < VW + w; x += gap) ctx.drawImage(BG_LOGO_TINT, x, VH*0.22, w, h);
   ctx.restore();
 }
 
@@ -1645,7 +1656,7 @@ function drawGround(){
     ctx.fillRect(x1, GROUND_Y, x2-x1, 10);
     ctx.fillStyle = th.ground;
     ctx.fillRect(x1, GROUND_Y+10, x2-x1, VH-GROUND_Y-10+40);
-    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillStyle = 'rgba(13,43,69,0.18)';
     ctx.fillRect(x1, GROUND_Y+10, x2-x1, 4);
   }
   for (const p of level.platforms){
@@ -1689,7 +1700,7 @@ function drawTraps(t){
       const n = Math.max(3, Math.round(tr.w/16));
       for (let i=0;i<n;i++){
         const sx = (i+0.5)*(tr.w/n);
-        ctx.fillStyle = (i%2===0)? '#ffd166' : '#ff5d56';
+        ctx.fillStyle = (i%2===0)? '#f18c22' : '#d93a2b';
         ctx.beginPath();
         ctx.moveTo(sx-7,tr.h*0.72); ctx.lineTo(sx,-4); ctx.lineTo(sx+7,tr.h*0.72);
         ctx.closePath(); ctx.fill();
@@ -1700,7 +1711,7 @@ function drawTraps(t){
       ctx.fillRect(-6, tr.topY-10, tr.w+12, 12);
       ctx.fillRect(-6, GROUND_Y-6, tr.w+12, 12);
       if (tr.active){
-        ctx.strokeStyle = (Math.floor(t*30)%2===0)?'#eafcff':'#7ef7ff';
+        ctx.strokeStyle = (Math.floor(t*30)%2===0)?'#0b84c6':'#1fb8e8';
         ctx.lineWidth = 3;
         ctx.beginPath();
         let py = tr.topY;
@@ -1711,11 +1722,11 @@ function drawTraps(t){
         }
         ctx.stroke();
         ctx.globalAlpha = 0.18;
-        ctx.fillStyle = '#7ef7ff';
+        ctx.fillStyle = '#1fb8e8';
         ctx.fillRect(-4, tr.topY, tr.w+8, GROUND_Y-tr.topY);
         ctx.globalAlpha = 1;
       } else {
-        ctx.strokeStyle = 'rgba(126,247,255,0.25)'; ctx.lineWidth=2;
+        ctx.strokeStyle = 'rgba(11,132,198,0.35)'; ctx.lineWidth=2;
         ctx.setLineDash([4,5]);
         ctx.beginPath(); ctx.moveTo(tr.w/2, tr.topY); ctx.lineTo(tr.w/2, GROUND_Y); ctx.stroke();
         ctx.setLineDash([]);
@@ -1726,6 +1737,7 @@ function drawTraps(t){
       ctx.fillStyle = '#aab4bf';
       polyPath(ctx, 0, 0, tr.w/2, tr.w/2*0.68, 8, 0);
       ctx.fill();
+      ctx.strokeStyle = '#3b4654'; ctx.lineWidth = 2; ctx.stroke();
       ctx.fillStyle = '#5a6472';
       ctx.beginPath(); ctx.arc(0,0,tr.w*0.28,0,7); ctx.fill();
       ctx.fillStyle = '#ff5d56';
@@ -1742,7 +1754,7 @@ function drawStairs(t){
   const landing = level.stairs[level.stairs.length-1];
 
   // riser posts connecting each step down to the ground, so it reads as one staircase
-  ctx.fillStyle = 'rgba(0,0,0,0.28)';
+  ctx.fillStyle = 'rgba(13,43,69,0.18)';
   for (const s of steps){
     const x = s.x - camX;
     if (x+s.w < -20 || x > VW+20) continue;
@@ -1782,7 +1794,8 @@ function drawStairs(t){
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('▲', doorCx, landing.y-24+Math.sin(t*3)*2);
-    ctx.font = '8px "IBM Plex Mono",monospace';
+    ctx.fillStyle = '#1a7a3c';
+    ctx.font = '600 9px "IBM Plex Mono",monospace';
     ctx.fillText('PIANO SUP.', doorCx, landing.y-52);
   }
 }
@@ -2191,6 +2204,7 @@ function drawBug(e, t){
   const bob = Math.sin(t*8+e.wobble)*2;
   ctx.translate(0,bob);
   const spec = e.type==='virusminion' ? THEMES.bunker.bug : level.theme.bug;
+  ctx.shadowColor = 'rgba(13,43,69,0.55)'; ctx.shadowBlur = 3;
   drawBugSpecies(spec.species, spec.color, e, t, bob);
   ctx.restore();
 }
@@ -2202,6 +2216,7 @@ function drawFlyBug(e, t){
   ctx.save();
   ctx.translate(x, e.y);
   const wing = Math.sin(t*20)*10;
+  ctx.shadowColor = 'rgba(13,43,69,0.55)'; ctx.shadowBlur = 3;
   ctx.fillStyle = color;
   ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-14,wing-8); ctx.lineTo(-4,10); ctx.fill();
   ctx.beginPath(); ctx.moveTo(e.w,0); ctx.lineTo(e.w+14,wing-8); ctx.lineTo(e.w+4,10); ctx.fill();
@@ -2244,9 +2259,10 @@ function drawProjectile(p){
   if (p.kind==='mouse'){
     ctx.fillStyle = '#dfe6ee';
     ctx.beginPath(); ctx.ellipse(p.w/2, p.h/2, p.w/2, p.h/2, 0,0,7); ctx.fill();
+    ctx.strokeStyle = '#56718a'; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.fillStyle = '#9aa7b5';
     ctx.fillRect(p.w*0.35, 1, p.w*0.12, p.h*0.35);
-    ctx.strokeStyle = '#c1cad3'; ctx.lineWidth=2;
+    ctx.strokeStyle = '#8aa0b5'; ctx.lineWidth=2;
     ctx.beginPath();
     ctx.moveTo(p.vx>0? 0:p.w, p.h/2);
     ctx.lineTo(p.vx>0? -14:p.w+14, p.h/2+4);
@@ -2280,7 +2296,7 @@ function drawParticles(){
 
 function render(t){
   ctx.clearRect(0,0,VW,VH);
-  if (!level){ ctx.fillStyle='#0a0e14'; ctx.fillRect(0,0,VW,VH); return; }
+  if (!level){ ctx.fillStyle='#eef4fa'; ctx.fillRect(0,0,VW,VH); return; }
   drawBackground(t);
   drawGround();
   drawStairs(t);
@@ -2297,7 +2313,7 @@ function render(t){
   if (player) drawPlayer(t);
 
   const vg = ctx.createRadialGradient(VW/2,VH/2,VH*0.35,VW/2,VH/2,VH*0.9);
-  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,0.35)');
+  vg.addColorStop(0,'rgba(13,43,69,0)'); vg.addColorStop(1,'rgba(13,43,69,0.12)');
   ctx.fillStyle = vg; ctx.fillRect(0,0,VW,VH);
 }
 
@@ -2310,7 +2326,7 @@ function drawVictoryScene(t){
 
   vctx.clearRect(0,0,VVW,VVH);
   const g = vctx.createLinearGradient(0,0,0,VVH);
-  g.addColorStop(0,'#140a24'); g.addColorStop(1,'#05030a');
+  g.addColorStop(0,'#e6f0fa'); g.addColorStop(1,'#cfe0f0');
   vctx.fillStyle = g; vctx.fillRect(0,0,VVW,VVH);
 
   // confetti
@@ -2322,9 +2338,9 @@ function drawVictoryScene(t){
   }
 
   const groundY = VVH-30;
-  vctx.fillStyle = '#1c1030';
+  vctx.fillStyle = '#9fb6cc';
   vctx.fillRect(0, groundY, VVW, VVH-groundY);
-  vctx.fillStyle = '#2c1c48';
+  vctx.fillStyle = '#5d7f9f';
   vctx.fillRect(0, groundY, VVW, 4);
 
   // clients arc converging behind/around player+capo
@@ -2358,8 +2374,8 @@ function drawVictoryScene(t){
   // player, arms up celebrating
   drawSysadminFigure(vctx, cx-30, groundY-58, 30, 58, t, true);
 
-  vctx.fillStyle = 'rgba(255,255,255,0.9)';
-  vctx.font = '11px monospace';
+  vctx.fillStyle = '#004675';
+  vctx.font = 'bold 11px monospace';
   vctx.textAlign='center';
   vctx.fillText('★ PROMOSSO A SENIOR SYSADMIN ★', VVW/2, 20);
 }

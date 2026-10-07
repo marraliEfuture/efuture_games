@@ -71,10 +71,10 @@ function renderGrid(){
   }
 }
 function renderDock(){
-  $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
+  $('dockOut').hidden = !!session; $('dockIn').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v24' : 'Modalità demo: account e classifica restano su questo telefono. · v24';
+  mn.textContent = remote ? 'Classifica online · v25' : 'Modalità demo: account e classifica restano su questo telefono. · v25';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -114,7 +114,7 @@ let camStream = null, camRAF = 0, camCanvas = null;
 async function startCam(){
   setMsg($('camMsg'), '');
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.jsQR){
-    return setMsg($('camMsg'), 'Questo telefono non permette di aprire la fotocamera qui: usa la fotocamera del telefono o inserisci il codice.', 'err');
+    return setMsg($('camMsg'), 'Fotocamera non disponibile: scrivi il codice.', 'err');
   }
   try {
     camStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ ideal:'environment' } }, audio:false });
@@ -294,14 +294,15 @@ async function loadBoard(){
   });
 }
 $('btnBoard').onclick = ()=>{
-  $('bNote').textContent = (boardTab === 'all' ? 'Totale = somma dei record nei 4 giochi. Prima contano i livelli superati, poi i punti. ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
+  $('bNote').textContent = (boardTab === 'all' ? 'Totale = somma dei 4 giochi. ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
   renderBoardTabs(); openModal('mBoard'); loadBoard();
 };
 
 /* ================= INSTALLA L'APP =================
    Android/Chrome: usa la richiesta di installazione del browser (beforeinstallprompt).
    iPhone/iPad: Safari non ha una richiesta automatica, quindi mostriamo le istruzioni.
-   Si apre da sola alla prima visita e ogni volta che si arriva da un QR. */
+   Si apre da sola solo dal QR di installazione (?installa=1); per il resto c'è il link
+   piccolo "Installa l'app sul telefono" in fondo alla home (07/10: non deve essere invadente). */
 const ua = navigator.userAgent || '';
 const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isAndroid = /Android/i.test(ua);
@@ -310,6 +311,7 @@ const isAndroid = /Android/i.test(ua);
 const isSamsung = /SamsungBrowser/i.test(ua);
 const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 const fromQr = /[?&](sblocca|installa)=/.test(location.search);
+const fromInstallQr = /[?&]installa=/.test(location.search);
 if (/[?&]installa=/.test(location.search)) history.replaceState(null, '', location.pathname);
 let installEvt = null, autoShown = false;
 // "già installata" vale solo 3 giorni e non conta quando si arriva dal QR o da Samsung Internet
@@ -346,8 +348,7 @@ $('btnOpenChrome').href = 'intent://' + location.host + location.pathname + '?in
 $('mInstall').addEventListener('click', e=>{ if (e.target === $('mInstall') || e.target.closest('[data-close]')) store.set('efgInstallLater', Date.now()); });
 function autoInstallDue(){
   if (autoShown || !canInstall()) return false;
-  const later = store.get('efgInstallLater', 0);
-  return fromQr || !later || Date.now() - later > 2*3600*1000;   // dal QR sempre; altrimenti al massimo ogni 2 ore
+  return fromInstallQr;   // solo dal QR di installazione
 }
 (function autoInstall(){
   updateInstallBtn();

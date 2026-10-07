@@ -103,6 +103,9 @@ CODICI DI SBLOCCO (uno per gioco)
    - Sblocco: "Apri la fotocamera" legge il QR direttamente nell'app;
      in alternativa si scrive il codice. Anche la fotocamera normale
      del telefono funziona: il QR apre l'app e sblocca il gioco.
+   - Installazione: la finestra "Installa l'app" si apre da sola solo
+     dal QR di installazione (?installa=1); altrimenti c'è il link piccolo
+     "Installa l'app sul telefono" in fondo alla home.
    - In fondo: "Registrati / Accedi". Registrazione: nome ed email
      (il cellulare non si chiede più). Accesso: basta l'email, nessuna password.
    - REGOLE DI GARA (solo dentro l'app): ogni gioco ha 3 livelli, al

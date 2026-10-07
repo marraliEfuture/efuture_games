@@ -110,15 +110,15 @@ let HOUSE_IN   = {x:9, y:9};       // centre of the bug house
 let TUNNEL_ROW = -1;               // row that wraps around the screen, if any
 
 const LEVELS = [
-  { name:"Rete aziendale",  text:"Primo giro di pulizia in un labirinto piccolo: due bug lenti e patch lunghe.",
+  { name:"Rete aziendale",  text:"Labirinto piccolo, bug lenti.",
     pac:7.2, bug:4.0, fright:2.6, frightTime:7.0, bugs:2, rand:0.40, release:[0,4],        cycle:[7,18,7,18,5,999] },
-  { name:"Server farm",     text:"Labirinto più grande e un terzo bug. Occhio agli angoli.",
+  { name:"Server farm",     text:"Più grande, un bug in più.",
     pac:7.6, bug:4.7, fright:2.8, frightTime:6.0, bugs:3, rand:0.30, release:[0,3,7],     cycle:[7,20,6,20,5,999] },
-  { name:"Cloud ibrido",    text:"Il labirinto completo: tre bug in circolazione. Usa le patch per ripulirlo.",
+  { name:"Cloud ibrido",    text:"Labirinto completo: usa le patch.",
     pac:8.0, bug:5.3, fright:3.0, frightTime:5.0, bugs:3, rand:0.22, release:[0,3,6],     cycle:[6,20,5,20,4,999] },
-  { name:"Data center",     text:"I bug sono più svegli e più veloci. La patch dura poco: usala bene.",
+  { name:"Data center",     text:"Bug più veloci, patch brevi.",
     pac:8.0, bug:6.0, fright:3.0, frightTime:3.8, bugs:4, rand:0.08, release:[0,2,4,7],   cycle:[5,22,4,22,3,999] },
-  { name:"Core di sistema", text:"Livello finale: bug quasi veloci quanto te e patch lampo. Ripulisci il core!",
+  { name:"Core di sistema", text:"Livello finale: ripulisci il core!",
     pac:8.2, bug:6.6, fright:3.2, frightTime:2.8, bugs:4, rand:0.03, release:[0,1,2.5,4], cycle:[4,24,3,24,2,999] },
 ];
 
@@ -140,6 +140,7 @@ const DIR_ORDER = [DIR.up, DIR.left, DIR.down, DIR.right]; // classic tie-break 
 
 const C_BLUE = '#4b8ac9', C_BLUE_L = '#a5c4e4', C_DEEP = '#2f6399';
 const COIN = '#ffcf4a';
+const MAZE_BG = '#f7fbff', WALL_FILL = '#d9e7f5', TXT_GOLD = '#c56a0c';   // light theme
 
 /* ================= DOM ================= */
 const $ = id => document.getElementById(id);
@@ -516,7 +517,7 @@ function showLevelCard(i){
   state = 'levelcard';
   $('lvTag').textContent = 'Livello ' + (i+1) + '/' + (EFG.on ? EFG.max : 5);
   $('lvName').textContent = L.name;
-  $('lvText').textContent = L.text + ' Bug in gioco: ' + L.bugs + '.';
+  $('lvText').textContent = L.text + ' Bug: ' + L.bugs + '.';
   showOnly(ov.level); updateHud();
 }
 function startGame(fromLevel){
@@ -599,15 +600,15 @@ function buildMazeLayer(){
   mazeLayer.width = Math.round(W*dpr); mazeLayer.height = Math.round(H*dpr);
   const m = mazeLayer.getContext('2d');
   m.setTransform(dpr,0,0,dpr,0,0);
-  m.fillStyle = '#060a12'; m.fillRect(0,0,W,H);
+  m.fillStyle = MAZE_BG; m.fillRect(0,0,W,H);
   // faint grid, like an old CRT
-  m.strokeStyle = 'rgba(75,138,201,0.05)'; m.lineWidth = 1;
+  m.strokeStyle = 'rgba(75,138,201,0.08)'; m.lineWidth = 1;
   for (let x=0;x<=COLS;x++){ m.beginPath(); m.moveTo(x*T,0); m.lineTo(x*T,H); m.stroke(); }
   for (let y=0;y<=ROWS;y++){ m.beginPath(); m.moveTo(0,y*T); m.lineTo(W,y*T); m.stroke(); }
   // wall masses
   const wall = (x,y)=> y<0||y>=ROWS||x<0||x>=COLS ? true : isWallCh(grid[y][x]);
   const inset = T*0.28;
-  m.fillStyle = '#0c1a30';
+  m.fillStyle = WALL_FILL;
   for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++){
     if (!wall(x,y)) continue;
     const l = !wall(x-1,y)?inset:0, r = !wall(x+1,y)?inset:0, t = !wall(x,y-1)?inset:0, b = !wall(x,y+1)?inset:0;
@@ -615,7 +616,7 @@ function buildMazeLayer(){
   }
   // neon outline along every wall edge that faces a corridor
   m.strokeStyle = C_BLUE; m.lineWidth = Math.max(1.5, T*0.1); m.lineCap = 'round';
-  m.shadowColor = 'rgba(75,138,201,0.7)'; m.shadowBlur = T*0.35;
+  m.shadowColor = 'rgba(47,99,153,0.35)'; m.shadowBlur = T*0.2;
   m.beginPath();
   for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++){
     if (!wall(x,y)) continue;
@@ -640,14 +641,14 @@ function buildMazeLayer(){
   m.shadowBlur = 0;
   // bug-house door
   for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++) if (grid[y][x]==='-'){
-    m.fillStyle = '#ff8ad8'; m.fillRect(x*T+T*0.1, y*T+T*0.42, T*0.8, T*0.16);
+    m.fillStyle = '#e0559f'; m.fillRect(x*T+T*0.1, y*T+T*0.42, T*0.8, T*0.16);
   }
 }
 
 function drawCoin(c, x, y, s){
   c.fillStyle = COIN;
   c.beginPath(); c.arc(x, y, s, 0, Math.PI*2); c.fill();
-  c.strokeStyle = '#b8860b'; c.lineWidth = Math.max(0.8, s*0.35); c.stroke();
+  c.strokeStyle = '#a8640a'; c.lineWidth = Math.max(0.8, s*0.35); c.stroke();
   c.fillStyle = 'rgba(255,255,255,0.7)';
   c.beginPath(); c.arc(x - s*0.3, y - s*0.3, s*0.28, 0, Math.PI*2); c.fill();
 }
@@ -655,7 +656,7 @@ function drawCoin(c, x, y, s){
 function drawFloppy(c, x, y, s, t){
   const k = s*(1 + Math.sin(t*6)*0.08);
   c.save(); c.translate(x, y);
-  c.shadowColor = 'rgba(165,196,228,0.9)'; c.shadowBlur = k*0.8;
+  c.shadowColor = 'rgba(47,99,153,0.45)'; c.shadowBlur = k*0.6;
   c.fillStyle = C_BLUE; c.fillRect(-k, -k, k*2, k*2);
   c.shadowBlur = 0;
   c.fillStyle = '#dfe9f5'; c.fillRect(-k*0.55, -k, k*1.1, k*0.7);          // metal shutter
@@ -670,7 +671,7 @@ function drawC(c, x, y, r, angle, open, color){
   const lw = r*0.62;
   c.save(); c.translate(x, y); c.rotate(angle);
   c.strokeStyle = color || C_BLUE; c.lineWidth = lw; c.lineCap = 'butt';
-  c.shadowColor = 'rgba(75,138,201,0.8)'; c.shadowBlur = r*0.5;
+  c.shadowColor = 'rgba(13,43,69,0.35)'; c.shadowBlur = r*0.35;
   c.beginPath(); c.arc(0, 0, r - lw/2, open, Math.PI*2 - open); c.stroke();
   c.restore();
 }
@@ -695,6 +696,7 @@ function drawBug(c, b, x, y, s, t){
     // body
     c.fillStyle = body;
     c.beginPath(); c.ellipse(0, 0, s*0.62, s*0.72, 0, 0, Math.PI*2); c.fill();
+    c.strokeStyle = fr ? (blinking?'#9aa9c0':'#1a2f80') : shade(b.color, -0.45); c.lineWidth = Math.max(1, s*0.1); c.stroke();
     c.fillStyle = 'rgba(0,0,0,0.18)'; c.fillRect(-s*0.62, s*0.05, s*1.24, s*0.1);
   }
   // eyes (look where the bug is going)
@@ -724,8 +726,8 @@ function shade(hex, f){
 
 function renderIntro(){
   const W = COLS*T, H = ROWS*T;
-  ctx.fillStyle = '#060a12'; ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle = 'rgba(75,138,201,0.06)'; ctx.lineWidth = 1;
+  ctx.fillStyle = MAZE_BG; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle = 'rgba(75,138,201,0.08)'; ctx.lineWidth = 1;
   for (let x=0;x<=COLS;x++){ ctx.beginPath(); ctx.moveTo(x*T,0); ctx.lineTo(x*T,H); ctx.stroke(); }
   for (let y=0;y<=ROWS;y++){ ctx.beginPath(); ctx.moveTo(0,y*T); ctx.lineTo(W,y*T); ctx.stroke(); }
   const img = $('logoImg');
@@ -741,7 +743,7 @@ function renderIntro(){
   if (moving){
     const open = 0.12*Math.PI + (Math.sin(introT*16)*0.5+0.5)*0.24*Math.PI;
     // hide whatever is inside the C's circle: letters vanish as they enter the mouth
-    ctx.fillStyle = '#060a12'; ctx.beginPath(); ctx.arc(x0 + cx*k, y0 + LOGO_H*k*0.49, LOGO_C_R*k*1.02, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = MAZE_BG; ctx.beginPath(); ctx.arc(x0 + cx*k, y0 + LOGO_H*k*0.49, LOGO_C_R*k*1.02, 0, Math.PI*2); ctx.fill();
     drawC(ctx, x0 + cx*k, y0 + LOGO_H*k*0.49, LOGO_C_R*k, 0, open);
     // crumbs where the last letter was bitten
     ctx.fillStyle = COIN;
@@ -754,10 +756,10 @@ function renderIntro(){
   }
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   if (cut >= LOGO_W - 1){
-    ctx.fillStyle = COIN; ctx.font = `${Math.max(10, T*0.9)}px 'Press Start 2P', monospace`;
+    ctx.fillStyle = TXT_GOLD; ctx.font = `${Math.max(10, T*0.9)}px 'Press Start 2P', monospace`;
     ctx.fillText('PAC', W/2, y0 + LOGO_H*k*0.5);
   }
-  ctx.fillStyle = 'rgba(143,165,191,0.8)'; ctx.font = `${Math.max(7, T*0.34)}px 'Press Start 2P', monospace`;
+  ctx.fillStyle = '#56718a'; ctx.font = `${Math.max(7, T*0.34)}px 'Press Start 2P', monospace`;
   ctx.fillText('TOCCA PER SALTARE', W/2, H*0.86);
 }
 
@@ -765,7 +767,7 @@ function render(){
   if (state === 'intro'){ ctx.setTransform(dpr,0,0,dpr,0,0); renderIntro(); return; }
   ctx.setTransform(dpr,0,0,dpr,0,0);
   if (mazeLayer) ctx.drawImage(mazeLayer, 0, 0, COLS*T, ROWS*T);
-  else { ctx.fillStyle = '#060a12'; ctx.fillRect(0,0,COLS*T,ROWS*T); }
+  else { ctx.fillStyle = MAZE_BG; ctx.fillRect(0,0,COLS*T,ROWS*T); }
   if (!grid.length) return;
   // coins & patches
   for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++){
@@ -793,11 +795,11 @@ function render(){
   // popups
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.font = `${Math.max(7, T*0.38)}px 'Press Start 2P', monospace`;
-  for (const p of popups){ ctx.fillStyle = `rgba(255,207,74,${Math.min(1,p.t*1.5)})`; ctx.fillText(p.text, (p.x+0.5)*T, (p.y+0.5)*T - (1-p.t)*T); }
+  for (const p of popups){ ctx.fillStyle = `rgba(197,106,12,${Math.min(1,p.t*1.5)})`; ctx.fillText(p.text, (p.x+0.5)*T, (p.y+0.5)*T - (1-p.t)*T); }
   // READY
   if (state === 'ready'){
     ctx.font = `${Math.max(8, T*0.55)}px 'Press Start 2P', monospace`;
-    ctx.fillStyle = COIN; ctx.fillText('PRONTI!', (COLS/2)*T, (HOUSE_IN.y+2.5)*T);
+    ctx.fillStyle = TXT_GOLD; ctx.fillText('PRONTI!', (COLS/2)*T, (HOUSE_IN.y+2.5)*T);
   }
 }
 
