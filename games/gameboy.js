@@ -91,6 +91,18 @@
     var mark = doc.createComment('gb:' + p[1]);
     el.parentNode.insertBefore(mark, el);
     moves.push({ el: el, mark: mark, cls: 'gb-' + p[0] });
+    /* alcuni giochi annullano il touchstart sulla fascia comandi (niente click dal dito):
+       nella coppia A/B il pulsante scatta al rilascio, senza doppioni col click */
+    var down = null, upAt = 0, own = false;
+    el.addEventListener('pointerdown', function(e){ if (el.parentNode === ab) down = e.pointerId; });
+    el.addEventListener('pointerup', function(e){
+      if (el.parentNode !== ab || down !== e.pointerId) return;
+      down = null; upAt = Date.now(); own = true; el.click(); own = false;
+    });
+    el.addEventListener('pointercancel', function(){ down = null; });
+    el.addEventListener('click', function(e){
+      if (el.parentNode === ab && !own && Date.now() - upAt < 700){ e.stopImmediatePropagation(); e.preventDefault(); }
+    }, true);
   });
   var mq = window.matchMedia('(orientation:portrait)');
   function place(){

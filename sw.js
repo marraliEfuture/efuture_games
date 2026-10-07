@@ -7,6 +7,8 @@ const ASSETS = [
   "fonts/ibm-plex-mono-latin-400-normal.woff2",
   "fonts/ibm-plex-mono-latin-600-normal.woff2",
   "fonts/press-start-2p-latin-400-normal.woff2",
+  "games/gameboy.css",
+  "games/gameboy.js",
   "games/coretech/fonts/ibm-plex-mono-latin-400-normal.woff2",
   "games/coretech/fonts/ibm-plex-mono-latin-600-normal.woff2",
   "games/coretech/fonts/press-start-2p-latin-400-normal.woff2",
