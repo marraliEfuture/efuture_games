@@ -13,10 +13,11 @@ Controlli:
 La versione va aumentata quando cambiano file del sito, così i telefoni che hanno
 già l'app scaricano la nuova copia.
 """
-import json, re, shutil, subprocess, sys
+import json, os, re, shutil, subprocess, sys
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[4]
+# repository: EFG_REPO, altrimenti quello che contiene la skill, altrimenti la cartella corrente
+REPO = Path(os.environ.get("EFG_REPO") or next((p for p in Path(__file__).resolve().parents if (p / "config.js").exists()), Path.cwd()))
 PATTERNS = [  # (file glob, regex con il numero nel gruppo 1, sostituzione)
     ("sw.js", r"efuture-games-v(\d+)", "efuture-games-v{n}"),
     ("*.html", r"\.js\?v=(\d+)", ".js?v={n}"),
