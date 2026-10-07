@@ -292,68 +292,93 @@ img{max-width:100%}
     margin-bottom:14px;
   }
 
-  /* ---------- Virtual controls ---------- */
+  /* ---------- Comandi touch: joystick a sinistra, tasti azione a destra ----------
+     I comandi stanno in una fascia tutta loro (sotto il gioco in verticale,
+     ai lati del gioco in orizzontale): non coprono mai la schermata di gioco. */
   #controls{
+    --joy:clamp(112px, 33vw, 136px);
+    --knob:clamp(50px, 14.5vw, 58px);
     flex:0 0 auto;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:10px 14px;
-    padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
-    gap:8px;
+    padding:10px calc(14px + env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) calc(14px + env(safe-area-inset-left,0px));
+    gap:10px;
     background:linear-gradient(0deg, #ffffff, var(--panel-2) 85%);
     border-top:1px solid var(--line);
     touch-action:none;
+    -webkit-user-select:none; user-select:none;
+    -webkit-touch-callout:none;
     z-index:5;
   }
-  #dpad{
-    display:grid;
-    grid-template-columns:52px 52px;
-    grid-template-rows:52px;
-    gap:8px;
+  #controls *{ touch-action:none; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; }
+  #joyWrap{
+    flex:0 0 auto;
+    display:flex;flex-direction:column;align-items:center;gap:4px;
   }
-  .dbtn{
-    width:52px;height:52px;
-    border-radius:14px;
-    background:var(--panel-2);
-    border:1px solid var(--line);
-    color:var(--ef-blue);
-    display:flex;align-items:center;justify-content:center;
-    font-size:20px;
-    box-shadow:0 3px 0 #c3d3e2;
-    -webkit-tap-highlight-color:transparent;
+  #joy{
+    position:relative;
+    width:var(--joy);height:var(--joy);
+    border-radius:50%;
+    background:radial-gradient(circle at 50% 45%, #ffffff 0%, var(--panel-2) 60%, #e2ecf6 100%);
+    border:2px solid var(--line);
+    box-shadow:inset 0 2px 8px rgba(13,43,69,.12), 0 3px 0 #c3d3e2;
+    cursor:pointer;
   }
-  .dbtn.active{ background:var(--accent); color:#1d0f00; border-color:#b8610b;}
+  /* frecce guida sulla base */
+  #joy .jarr{
+    position:absolute; top:50%; transform:translateY(-50%);
+    color:#9fb6cb; font-size:14px; line-height:1; pointer-events:none;
+  }
+  #joy .jarr.l{left:9px;} #joy .jarr.r{right:9px;}
+  #joy .jarr.u{left:50%; top:7px; transform:translateX(-50%);}
+  #joy.left .jarr.l, #joy.right .jarr.r, #joy.up .jarr.u{color:var(--accent);}
+  #joyKnob{
+    position:absolute; left:50%; top:50%;
+    width:var(--knob);height:var(--knob);
+    margin:calc(var(--knob) / -2) 0 0 calc(var(--knob) / -2);
+    border-radius:50%;
+    background:radial-gradient(circle at 38% 32%, #3d7fb0 0%, var(--ef-blue) 62%, #00335a 100%);
+    border:1px solid #00335a;
+    box-shadow:0 4px 10px rgba(13,43,69,.28);
+    pointer-events:none;
+    transition:transform .14s cubic-bezier(.3,1.6,.5,1);
+  }
+  #joy.held #joyKnob{ transition:none; background:radial-gradient(circle at 38% 32%, #ffb469 0%, var(--accent) 62%, #b8610b 100%); border-color:#b8610b; }
+  .clabel{ font-size:9px; letter-spacing:.08em; color:var(--text-dim); text-transform:uppercase; }
   #actions{
-    display:flex;
-    gap:10px;
-    align-items:flex-end;
+    flex:0 0 auto;
+    display:grid;
+    grid-template-columns:auto auto;
+    grid-template-rows:auto auto;
+    gap:10px 12px;
+    align-items:center;
+    justify-items:center;
   }
   .abtn{
-    width:56px;height:56px;
+    width:76px;height:76px;
     border-radius:50%;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     font-family:'Press Start 2P',monospace;
-    font-size:13px;
+    font-size:15px;
     border:1px solid var(--line);
-    -webkit-tap-highlight-color:transparent;
+    cursor:pointer;
   }
-  .abtn span{ font-family:'IBM Plex Mono',monospace; font-size:7.5px; margin-top:2px; letter-spacing:.05em;}
-  #btnThrow{ background:var(--ef-blue); color:#ffffff; border-color:#00335a; box-shadow:0 3px 0 #00335a; }
-  #btnThrow.active{ filter:brightness(1.25); }
-  #btnJump{ background:var(--accent); color:#1d0f00; border-color:#b8610b; box-shadow:0 3px 0 #a9570a; margin-top:-16px;}
-  #btnJump.active{ filter:brightness(1.25); }
+  .abtn span{ font-family:'IBM Plex Mono',monospace; font-size:9.5px; font-weight:600; margin-top:3px; letter-spacing:.05em;}
+  #btnThrow{ grid-column:1; grid-row:2; background:var(--ef-blue); color:#ffffff; border-color:#00335a; box-shadow:0 4px 0 #00335a; }
+  #btnThrow.active{ filter:brightness(1.25); transform:translateY(2px); box-shadow:0 2px 0 #00335a; }
+  #btnJump{ grid-column:2; grid-row:1 / span 2; width:88px;height:88px; background:var(--accent); color:#1d0f00; border-color:#b8610b; box-shadow:0 4px 0 #a9570a; }
+  #btnJump.active{ filter:brightness(1.15); transform:translateY(2px); box-shadow:0 2px 0 #a9570a; }
   #btnSpecial{
-    width:44px;height:44px;
-    font-size:16px;
+    grid-column:1; grid-row:1;
+    width:72px;height:72px;
+    font-size:18px;
     background:#e4ecf4;
     color:#8aa0b5;
     border:1px dashed var(--line);
     opacity:.6;
-    align-self:flex-end;
-    margin-bottom:2px;
   }
-  #btnSpecial span{display:none;}
+  #btnSpecial span{font-size:8.5px;margin-top:2px;}
   #btnSpecial.unlocked{
     opacity:1;
     background:linear-gradient(180deg,var(--av),#1c8a4a);
@@ -366,31 +391,51 @@ img{max-width:100%}
     0%,100%{ box-shadow:0 0 0 0 rgba(57,224,122,.55); }
     50%{ box-shadow:0 0 0 8px rgba(57,224,122,0); }
   }
-
-  @media (min-width:640px){
-    .dbtn{width:60px;height:60px;font-size:22px;}
-    .abtn{width:66px;height:66px;font-size:16px;}
-    #btnJump{margin-top:-18px;}
-    #btnSpecial{width:50px;height:50px;font-size:18px;}
+  /* schermi verticali bassi: fascia comandi più compatta */
+  @media (orientation:portrait) and (max-height:640px){
+    #controls{ --joy:112px; --knob:50px; padding-top:6px; }
+    .clabel{display:none;}
+    #actions{gap:6px 10px;}
+    #btnSpecial{width:72px;height:72px;}
+    #btnJump{width:80px;height:80px;}
   }
 
-  /* ---------- Telefono in orizzontale: gioco a tutto schermo ----------
-     HUD e comandi vanno sopra al gioco, il canvas usa tutta l'altezza */
+  /* ---------- Telefono in orizzontale ----------
+     HUD sottile in alto, joystick nella colonna di sinistra, tasti azione nella
+     colonna di destra; il gioco sta al centro e si ridimensiona nello spazio libero. */
   @media (orientation:landscape) and (max-height:560px){
-    #app{position:relative;}
-    #hud{position:absolute;top:0;left:0;right:0;border-bottom:0;
-      background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,0));
-      padding:4px calc(12px + env(safe-area-inset-right,0px)) 10px calc(12px + env(safe-area-inset-left,0px));
-      padding-top:calc(4px + env(safe-area-inset-top,0px));}
-    #pauseBtn{width:30px;height:30px;}
-    #bossBarWrap{top:calc(36px + env(safe-area-inset-top,0px));}
-    #stage{background:#eef4fa;}
-    #game{box-shadow:none;border-radius:0;}
-    #controls{position:absolute;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));
-      background:none;border-top:0;pointer-events:none;
-      padding:0 calc(16px + env(safe-area-inset-right,0px)) 0 calc(16px + env(safe-area-inset-left,0px));}
-    #controls > *{pointer-events:auto;}
-    #controls .dbtn, #controls .abtn{opacity:.85;}
+    #app{
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr) auto;
+      grid-template-rows:auto minmax(0,1fr);
+      grid-template-areas:"hud hud hud" "joy stage act";
+    }
+    #hud{grid-area:hud;border-bottom:1px solid var(--line);
+      padding:3px calc(12px + env(safe-area-inset-right,0px)) 3px calc(12px + env(safe-area-inset-left,0px));
+      padding-top:calc(3px + env(safe-area-inset-top,0px));}
+    #pauseBtn{width:28px;height:28px;}
+    #bossBarWrap{top:8px;}
+    #stage{grid-area:stage;background:#eef4fa;}
+    #game{box-shadow:0 0 0 1px var(--line);border-radius:0;}
+    /* overlay (menu, intro, pausa) a tutto schermo, sopra anche ai comandi */
+    .overlay{position:fixed;z-index:20;}
+    #controls{display:contents;}
+    #joyWrap{grid-area:joy;align-self:end;justify-content:flex-end;
+      padding:6px 10px calc(14px + env(safe-area-inset-bottom,0px)) calc(10px + env(safe-area-inset-left,0px));}
+    #controls{ --joy:clamp(108px, 30vh, 128px); --knob:clamp(48px, 13vh, 56px); }
+    #actions{grid-area:act;align-self:end;
+      grid-template-columns:auto; grid-template-rows:auto auto auto; gap:8px;
+      padding:6px calc(10px + env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) 10px;}
+    #btnSpecial{grid-column:1;grid-row:1;width:72px;height:72px;}
+    #btnThrow{grid-column:1;grid-row:2;}
+    #btnJump{grid-column:1;grid-row:3;width:84px;height:84px;}
+    .clabel{display:none;}
+  }
+  @media (orientation:landscape) and (max-height:360px){
+    #btnSpecial{width:62px;height:62px;}
+    #btnThrow{width:68px;height:68px;}
+    #btnJump{width:76px;height:76px;}
+    #actions{gap:6px;}
   }
 </style>
 
@@ -511,14 +556,17 @@ img{max-width:100%}
   </div>
 
   <div id="controls">
-    <div id="dpad">
-      <div class="dbtn" id="btnLeft" style="grid-column:1;">&larr;</div>
-      <div class="dbtn" id="btnRight" style="grid-column:2;">&rarr;</div>
+    <div id="joyWrap">
+      <div id="joy" role="application" aria-label="Joystick: trascina a sinistra o a destra per muoverti, in alto per saltare">
+        <span class="jarr l">&#9664;</span><span class="jarr r">&#9654;</span><span class="jarr u">&#9650;</span>
+        <div id="joyKnob"></div>
+      </div>
+      <div class="clabel">muovi</div>
     </div>
     <div id="actions">
-      <div class="abtn" id="btnSpecial">&#10010;</div>
-      <div class="abtn" id="btnThrow"><span>X</span><span>MOUSE</span></div>
-      <div class="abtn" id="btnJump"><span style="font-size:16px;margin-top:0;">&uarr;</span><span>SALTA</span></div>
+      <div class="abtn" id="btnSpecial" aria-label="Antivirus">&#10010;<span>ANTIVIRUS</span></div>
+      <div class="abtn" id="btnThrow" aria-label="Lancia il mouse"><span style="font-size:15px;margin-top:0;font-family:'Press Start 2P',monospace;font-weight:400;">X</span><span>MOUSE</span></div>
+      <div class="abtn" id="btnJump" aria-label="Salta"><span style="font-size:20px;margin-top:0;">&uarr;</span><span>SALTA</span></div>
     </div>
   </div>
 </div>
@@ -952,7 +1000,7 @@ window.addEventListener('keyup', (e)=>{
 });
 
 function bindHold(elmt, onDown, onUp){
-  const down = (ev)=>{ ev.preventDefault(); onDown(); };
+  const down = (ev)=>{ ev.preventDefault(); try{ elmt.setPointerCapture(ev.pointerId); }catch(e){} onDown(); };
   const up = (ev)=>{ ev.preventDefault(); onUp(); };
   elmt.addEventListener('pointerdown', down);
   elmt.addEventListener('pointerup', up);
@@ -961,14 +1009,59 @@ function bindHold(elmt, onDown, onUp){
   elmt.addEventListener('contextmenu', (ev)=>ev.preventDefault());
 }
 
-const btnLeft = document.getElementById('btnLeft');
-const btnRight = document.getElementById('btnRight');
 const btnJump = document.getElementById('btnJump');
 const btnThrow = document.getElementById('btnThrow');
 const btnSpecial = document.getElementById('btnSpecial');
 
-bindHold(btnLeft, ()=>{touch.left=true; btnLeft.classList.add('active');}, ()=>{touch.left=false; btnLeft.classList.remove('active');});
-bindHold(btnRight, ()=>{touch.right=true; btnRight.classList.add('active');}, ()=>{touch.right=false; btnRight.classList.remove('active');});
+/* ---- Joystick virtuale (manopola): orizzontale = muovi, spinta in alto = salta ----
+   Movimento digitale come le frecce (stessa velocità), zona morta del 20%. */
+const joy = document.getElementById('joy');
+const joyKnob = document.getElementById('joyKnob');
+const JOY_DEAD = 0.2, JOY_UP_ON = 0.6, JOY_UP_OFF = 0.35;
+let joyId = null, joyUp = false;
+function joyUpdate(ev){
+  const r = joy.getBoundingClientRect();
+  const R = r.width/2;
+  let dx = ev.clientX - (r.left + R), dy = ev.clientY - (r.top + R);
+  const d = Math.hypot(dx, dy), max = R*0.62;
+  if (d > max){ dx = dx*max/d; dy = dy*max/d; }
+  joyKnob.style.transform = 'translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px)';
+  const nx = dx/max, ny = dy/max;
+  touch.left = nx < -JOY_DEAD;
+  touch.right = nx > JOY_DEAD;
+  const upNow = joyUp ? (ny < -JOY_UP_OFF) : (ny < -JOY_UP_ON && -ny > Math.abs(nx)*0.8);
+  if (upNow && !joyUp) jumpPressedEdge = true;
+  joyUp = upNow;
+  joy.classList.toggle('left', touch.left);
+  joy.classList.toggle('right', touch.right);
+  joy.classList.toggle('up', joyUp);
+}
+function joyRelease(ev){
+  if (ev.pointerId !== joyId) return;
+  ev.preventDefault();
+  joyId = null; joyUp = false;
+  touch.left = touch.right = false;
+  joyKnob.style.transform = '';
+  joy.classList.remove('held','left','right','up');
+}
+joy.addEventListener('pointerdown', (ev)=>{
+  ev.preventDefault();
+  if (joyId !== null) return;
+  joyId = ev.pointerId;
+  try{ joy.setPointerCapture(ev.pointerId); }catch(e){}
+  joy.classList.add('held');
+  joyUpdate(ev);
+});
+joy.addEventListener('pointermove', (ev)=>{ if (ev.pointerId === joyId){ ev.preventDefault(); joyUpdate(ev); } });
+joy.addEventListener('pointerup', joyRelease);
+joy.addEventListener('pointercancel', joyRelease);
+joy.addEventListener('lostpointercapture', joyRelease);
+joy.addEventListener('contextmenu', (ev)=>ev.preventDefault());
+/* niente scroll/zoom/menu sui comandi (anche su browser senza touch-action) */
+const ctrlBox = document.getElementById('controls');
+['touchstart','touchmove','touchend'].forEach(t=>ctrlBox.addEventListener(t, (ev)=>{ if (ev.cancelable) ev.preventDefault(); }, {passive:false}));
+ctrlBox.addEventListener('contextmenu', (ev)=>ev.preventDefault());
+
 bindHold(btnJump, ()=>{ jumpPressedEdge = true; keys.jumpHeld = true; btnJump.classList.add('active'); }, ()=>{ keys.jumpHeld = false; btnJump.classList.remove('active'); });
 bindHold(btnThrow, ()=>{ throwPressedEdge = true; btnThrow.classList.add('active'); }, ()=>{ btnThrow.classList.remove('active'); });
 bindHold(btnSpecial, ()=>{ specialPressedEdge = true; btnSpecial.classList.add('active'); }, ()=>{ btnSpecial.classList.remove('active'); });
