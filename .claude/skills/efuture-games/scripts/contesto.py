@@ -31,6 +31,7 @@ RUOLI = {
     "supabase.sql": "database principale (da eseguire nel SQL Editor di Supabase)",
     "supabase-classifica-gruppi.sql": "filtro Giocatori Ospiti/Efuture della classifica",
     "supabase-countdown.sql": "countdown di apertura e chiusura della gara",
+    "supabase-privacy-utenti.sql": "niente cellulare + Elimina giocatore dall'admin",
     "LEGGIMI.txt": "guida completa del progetto (contiene i codici di sblocco: non ripeterli)",
     "README.md": "descrizione breve del repository",
     ".nojekyll": "serve a GitHub Pages",

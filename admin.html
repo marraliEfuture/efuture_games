@@ -44,6 +44,7 @@ mark{background:none;color:var(--sky);padding:0}
 .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
 .btn.navy{background:var(--navy)}
 .btn.danger{background:var(--danger)}
+.btn.del{background:#fff;color:var(--danger);border:1px solid var(--danger);padding:4px 10px;font-size:12px}
 main{flex:1;width:100%;max-width:1200px;margin:0 auto;padding:20px clamp(16px,3vw,40px) 40px;display:flex;flex-direction:column;gap:18px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 30px rgba(20,29,40,.06);padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .login{max-width:420px;margin:40px auto 0;width:100%}
@@ -254,7 +255,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         </div>
         <div class="danger-box" style="margin-top:12px">
           <h3>Cancella tutto</h3>
-          <p>Cancella punteggi <b>e giocatori registrati</b> (nomi, email, cellulari). Tutti dovranno registrarsi di nuovo.</p>
+          <p>Cancella punteggi <b>e giocatori registrati</b> (nomi ed email). Tutti dovranno registrarsi di nuovo.</p>
           <div class="bar"><input type="text" id="rConf2" placeholder="Scrivi CANCELLA TUTTO per confermare" style="max-width:300px"><button class="btn danger" id="rAll" type="button">Cancella tutto</button></div>
         </div>
         <div class="msg" id="rMsg" aria-live="polite" style="margin-top:10px"></div>
@@ -318,7 +319,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
   <p class="dim" id="noRemote" hidden>Il database online non è configurato in <code>config.js</code>: il pannello admin funziona solo con Supabase.</p>
 </main>
 
-<script src="config.js?v=22"></script>
+<script src="config.js?v=23"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script>
@@ -406,15 +407,26 @@ async function loadPlayers(){
   $('pInfo').textContent = players.length + ' giocatori registrati';
   const det = p => Object.keys(GAMES).map(g => { const x = p.dettaglio && p.dettaglio[g]; return x ? GAMES[g] + ' ' + x.livelli + '/3 · ' + x.punti : null; }).filter(Boolean).join(' — ');
   const sorted = players.slice().sort((a, b) => b.livelli - a.livelli || b.punti - a.punti);
-  fillTable($('pTable'), ['#', 'Nome', 'Email', 'Cellulare', 'Registrato', 'Giochi', 'Livelli', 'Punti', 'Dettaglio per gioco'],
-    sorted.map((p, i) => [i + 1, p.name, p.email, p.phone, fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p)]),
-    [null, null, null, null, 'small', 'num', 'num', 'num', 'small']);
+  fillTable($('pTable'), ['#', 'Nome', 'Email', 'Registrato', 'Giochi', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
+    sorted.map((p, i) => [i + 1, p.name, p.email, fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), delBtn(p)]),
+    [null, null, null, 'small', 'num', 'num', 'num', 'small', null]);
+}
+// elimina un giocatore: sparisce dai giocatori e dalla classifica, il registro resta
+function delBtn(p){
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'btn del'; b.textContent = 'Elimina';
+  b.onclick = async () => {
+    if (!confirm('Eliminare ' + p.name + ' (' + p.email + ')?\n\nIl giocatore e i suoi punteggi vengono cancellati dal database e spariscono dalla classifica. Il registro eventi resta. Non si può annullare.')) return;
+    b.disabled = true;
+    try { const r = await call('efg_admin_delete_player', { p_email: p.email }); await loadPlayers(); $('pInfo').textContent += ' · eliminato ' + r.nome; refreshStats(); }
+    catch(err){ b.disabled = false; onErr(err, $('pInfo')); }
+  };
+  return b;
 }
 $('pReload').onclick = loadPlayers;
 $('pCsv').onclick = () => {
-  const head = ['Nome', 'Email', 'Cellulare', 'Registrato', 'Giochi usati', 'Livelli totali', 'Punti totali'];
+  const head = ['Nome', 'Email', 'Registrato', 'Giochi usati', 'Livelli totali', 'Punti totali'];
   Object.values(GAMES).forEach(n => head.push(n + ' livelli', n + ' punti'));
-  const rows = players.map(p => { const r = [p.name, p.email, p.phone, fmtDate(p.created_at), p.giochi, p.livelli, p.punti];
+  const rows = players.map(p => { const r = [p.name, p.email, fmtDate(p.created_at), p.giochi, p.livelli, p.punti];
     Object.keys(GAMES).forEach(g => { const x = p.dettaglio && p.dettaglio[g]; r.push(x ? x.livelli : '', x ? x.punti : ''); }); return r; });
   download('efuture-games-giocatori-' + stamp() + '.csv', toCsv(head, rows), 'text/csv;charset=utf-8');
 };

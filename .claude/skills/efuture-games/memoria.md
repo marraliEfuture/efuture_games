@@ -49,7 +49,7 @@ Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente
 
 Raccolte alla presentazione del 07/10. Si fanno uno step alla volta: l'utente prova ogni step e conferma prima del successivo.
 
-- [ ] **Step 1 – Privacy e utenti:** togliere il cellulare da registrazione, log, elenco giocatori e CSV, in tutta l'app; in admin "Elimina utente" che cancella il giocatore ma tiene log e punti in classifica (serve un nuovo SQL da eseguire in Supabase).
+- [x] **Step 1 – Privacy e utenti (v23):** cellulare tolto da registrazione, admin, CSV e database (anche dai backup); in admin "Elimina" cancella giocatore e punteggi (sparisce dalla classifica), il registro resta. SQL: `supabase-privacy-utenti.sql`.
 - [ ] **Step 2 – Classifiche:** sull'app i nomi dei vincitori non si vedono e si legge male; su desktop il filtro "Efuture" non filtra le mail @efuture.it.
 - [ ] **Step 3 – Aspetto:** colori meno scuri; testi più corti; togliere "powered by Efuture" da tutte le app; "Installa sul telefono" piccolo in fondo, non obbligatorio.
 - [ ] **Step 4 – Comandi dei giochi:** joystick a manopola al posto dei pulsanti; comandi più grandi ma senza coprire il gioco, anche in orizzontale.
@@ -59,12 +59,12 @@ Raccolte alla presentazione del 07/10. Si fanno uno step alla volta: l'utente pr
 - [ ] **Step 8 – Video e tutorial:** l'estensione di Claude crea su Google Drive il foglio "Attività giornaliere" (tempi, descrizione, utente), aggiunge in fondo la riga con totali, somme e medie, salva e invia il file con Gmail a un responsabile di esempio.
 - [ ] **Poi:** specifiche markdown di tutte le app in `docs/specifiche/`.
 
-Domande aperte (fatte il 07/10, in attesa di risposta):
-1. Cancellare anche i cellulari già salvati nel database, dopo un backup?
-2. In classifica, l'utente eliminato resta col suo nome o diventa "Utente eliminato"?
-3. Colori più chiari solo nell'app o anche nei giochi, nella classifica e nell'admin?
-4. Joystick in quali giochi? Proposta: SysAdmin e CoreTech; Timenet resta col trascinamento; Inncloud da decidere.
-5. Pubblicare ogni step su main appena pronto, per provarlo sul telefono?
+Risposte dell'utente (07/10):
+- L'utente eliminato si cancella davvero dal database e sparisce dalla classifica; il registro eventi resta.
+- Cellulare: via da tutto, anche dal database.
+- Colori più chiari sia nei 4 giochi sia nell'app Efuture Games.
+- Joystick solo in SysAdmin e CoreTech (Timenet e Inncloud restano come sono).
+- Ogni step si pubblica su main appena pronto, per provarlo sul telefono.
 
 ## In sospeso / da ricordare
 
