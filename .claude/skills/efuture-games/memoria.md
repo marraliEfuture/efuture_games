@@ -58,7 +58,8 @@ Raccolte alla presentazione del 07/10. Si fanno uno step alla volta: l'utente pr
 - [ ] **Step 6 – CoreTech Pac:** omino più lento; 3 livelli più facili; i mostri mangiati non rinascono; uscita laterale che fa rientrare dal lato opposto in tutti e 3 i livelli; joystick.
 - [x] **Step 7 – Timenet Breakout (v26):** mare e delfino alzati di 36 punti, più spazio sopra la barra di trascinamento.
 - [ ] **Step 8 – Video e tutorial:** l'estensione di Claude crea su Google Drive il foglio "Attività giornaliere" (tempi, descrizione, utente), aggiunge in fondo la riga con totali, somme e medie, salva e invia il file con Gmail a un responsabile di esempio.
-- [ ] **Poi:** specifiche markdown di tutte le app in `docs/specifiche/`.
+- [ ] **Step 9 – Look Game Boy (richiesta del 07/10):** in verticale i giochi devono sembrare un Game Boy (scocca chiara, schermo con cornice in alto, controlli sotto); al posto della croce il joystick, al posto dei due pulsanti rossi i tasti già creati (SysAdmin: SALTA/MOUSE; CoreTech: pausa/musica).
+- [ ] **Poi:** specifiche markdown di tutte le app in `docs/specifiche/`. (app, classifica, admin, database iniziate il 07/10; giochi alla fine).
 
 Risposte dell'utente (07/10):
 - L'utente eliminato si cancella davvero dal database e sparisce dalla classifica; il registro eventi resta.
