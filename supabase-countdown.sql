@@ -72,3 +72,6 @@ end $$;
 
 revoke all on function public.efg_gate_state(), public.efg_gate_open(interval), public.efg_admin_gate(text, text, int) from public;
 grant execute on function public.efg_gate_state(), public.efg_admin_gate(text, text, int) to anon, authenticated;
+
+-- fa vedere subito le nuove funzioni all'app (senza aspettare)
+notify pgrst, 'reload schema';
