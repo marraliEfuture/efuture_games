@@ -255,6 +255,7 @@ img{max-width:100%}
     color:#1d0f00;
     cursor:pointer;
     letter-spacing:.02em;
+    line-height:1.6;
     box-shadow:0 4px 0 #a9570a;
   }
   button.game-btn:active{ box-shadow:0 1px 0 #a9570a; transform:translateY(3px); }
@@ -2029,7 +2030,7 @@ function drawHumanLogoFigure(c, w, h, o){
   const shoulderY = h*0.45, hipY = h*0.69;
   const legLen = h*0.28, armLen = h*0.24;
   const legW = Math.max(3, w*0.13), armW = Math.max(2.5, w*0.1);
-  // body is drawn in "facing right" space and mirrored; the logo is drawn afterwards unmirrored
+  // body is drawn in "facing right" space and mirrored; the logo head is mirrored with it (drawLogoHead)
   c.save();
   if (o.facing < 0){ c.translate(w,0); c.scale(-1,1); }
   // back arm and back leg (darker, behind torso)
@@ -2060,7 +2061,7 @@ function drawHumanLogoFigure(c, w, h, o){
     if (o.mouse){ c.fillStyle = '#c8d0d8'; c.fillRect(a[0]+1, a[1]-3, 7, 6); c.fillStyle='#8a96a3'; c.fillRect(a[0]+4, a[1]-3, 1, 3); }
   }
   c.restore();
-  // head: the Efuture mark, never mirrored; shifted so the "e" (not the whole mark) sits on the neck
+  // head: the Efuture mark, mirrored when facing left; shifted so the "e" (not the whole mark) sits on the neck
   // the "e" alone is about the size of a bug (~38x30); may rise a little above the hitbox
   const hr = w*0.56, box = hr*2.35, logoH = box*0.795;
   const neckTop = shoulderY - h*0.09;
