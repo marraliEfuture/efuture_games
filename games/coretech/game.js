@@ -572,13 +572,54 @@ stage.addEventListener('pointermove', e=>{
 });
 ['pointerup','pointercancel','pointerleave'].forEach(t=>stage.addEventListener(t, ()=>{ sw = null; }));
 
-// d-pad (tap sets the next turn, like a joystick nudge)
-[['dUp','up'],['dLeft','left'],['dRight','right'],['dDown','down']].forEach(([id,n])=>{
-  const el = $(id);
-  el.addEventListener('pointerdown', e=>{ e.preventDefault(); setDesired(DIR[n]); el.classList.add('active'); });
-  ['pointerup','pointerleave','pointercancel'].forEach(t=>el.addEventListener(t, ()=>el.classList.remove('active')));
-  el.addEventListener('contextmenu', e=>e.preventDefault());
-});
+// virtual joystick: the knob follows the thumb and springs back on release.
+// The dominant axis (outside a ~25% dead zone) picks the direction, which is
+// buffered as the next turn exactly like a swipe or an arrow key.
+(function(){
+  const joy = $('joy'), knob = $('joyKnob');
+  if (!joy || !knob) return;
+  const marks = { up:$('jmU'), right:$('jmR'), down:$('jmD'), left:$('jmL') };
+  let pid = null, cx = 0, cy = 0, rad = 1, cur = null;
+  function mark(n){
+    if (n === cur) return;
+    if (cur && marks[cur]) marks[cur].classList.remove('on');
+    cur = n;
+    if (n && marks[n]) marks[n].classList.add('on');
+  }
+  function move(e){
+    let dx = e.clientX - cx, dy = e.clientY - cy;
+    const d = Math.hypot(dx, dy);
+    if (d > rad){ dx = dx/d*rad; dy = dy/d*rad; }
+    knob.style.transform = 'translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px)';
+    if (d < rad*0.25) { mark(null); return; }
+    const n = Math.abs(dx) > Math.abs(dy) ? (dx>0?'right':'left') : (dy>0?'down':'up');
+    mark(n);
+    setDesired(DIR[n]);
+  }
+  function release(e){
+    if (pid === null || (e && e.pointerId !== pid)) return;
+    try { joy.releasePointerCapture(pid); } catch(_){}
+    pid = null; joy.classList.remove('drag');
+    knob.style.transform = ''; mark(null);   // spring back; the buffered turn stays
+  }
+  joy.addEventListener('pointerdown', e=>{
+    e.preventDefault();
+    if (state === 'intro'){ endIntro(); return; }
+    if (pid !== null) return;
+    pid = e.pointerId;
+    try { joy.setPointerCapture(pid); } catch(_){}
+    const r = joy.getBoundingClientRect();
+    cx = r.left + r.width/2; cy = r.top + r.height/2;
+    rad = Math.max(10, (r.width - knob.offsetWidth)/2);
+    joy.classList.add('drag');
+    move(e);
+  });
+  joy.addEventListener('pointermove', e=>{ if (e.pointerId === pid){ e.preventDefault(); move(e); } });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(t=>joy.addEventListener(t, release));
+  ['contextmenu','selectstart','dragstart'].forEach(t=>joy.addEventListener(t, e=>e.preventDefault()));
+  // belt and braces for iOS: no scroll / zoom / long-press callout from the control band
+  ['touchstart','touchmove'].forEach(t=>$('controls').addEventListener(t, e=>{ if (e.cancelable) e.preventDefault(); }, {passive:false}));
+})();
 
 /* ================= RENDER ================= */
 function fit(){
