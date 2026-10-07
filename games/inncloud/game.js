@@ -12,7 +12,8 @@ function efgPost(m){ try { if (window.parent !== window) window.parent.postMessa
 /* ================= CONSTANTS ================= */
 const W = 360, H = 600;
 const SHIP_Y = 548;
-const RED = '#c00000', RED_HI = '#ff3b3b', INK = '#272727', CLOUD = '#f2f2f2', HACK = '#39e07a';
+const RED = '#c00000', RED_HI = '#ff3b3b', INK = '#272727', CLOUD = '#ffffff', HACK = '#13a04a';
+const NAVY = '#0d2b45', OUTLINE = '#56718a';   // light theme: text and cloud outline on the pale sky
 const PX = 3;                                   // size of one sprite pixel
 
 // original pixel sprites (two frames each). X = body, W = white, G = green glow, R = dark detail
@@ -36,7 +37,7 @@ const SPRITES = {
     "X.XXXXXXX.X",
     "...XXXXX...",
     "...X...X..."]]},
-  V: { color:'#b48cff', pts:20, frames:[[
+  V: { color:'#7b47d6', pts:20, frames:[[
     "X....X....X",
     ".X...X...X.",
     "..XXXXXXX..",
@@ -55,7 +56,7 @@ const SPRITES = {
     "..XXXXXXX..",
     "..X..X..X..",
     ".....X....."]]},
-  K: { color:'#c7ccd3', pts:30, frames:[[   // the hacker: hood + glowing face
+  K: { color:'#4f6478', pts:30, frames:[[   // the hacker: hood + glowing face
     "...XXXXX...",
     "..XXXXXXX..",
     ".XXRRRRRXX.",
@@ -78,15 +79,15 @@ const SPRITES = {
 const DRONE = ["....XXX....","..XXXXXXX..",".XXGXGXGXX.","XXXXXXXXXXX","..XX...XX.."];
 
 const LEVELS = [
-  { name:"Login sospetto", text:"Qualcuno prova a entrare. Tre file di attaccanti lenti: prendi la mira.",
+  { name:"Login sospetto", text:"Tre file lente: prendi la mira.",
     rows:['K','V','B'],             cols:8, speed:16, fire:0.55, bspeed:170 },
-  { name:"Phishing",       text:"Arrivano i virus travestiti da email. Una fila in più, un po' più veloci.",
+  { name:"Phishing",       text:"Virus via email: più file, più veloci.",
     rows:['K','V','V','B'],         cols:8, speed:20, fire:0.85, bspeed:185 },
-  { name:"Malware",        text:"Cinque file e colpi più frequenti. Riparati dietro le nuvolette.",
+  { name:"Malware",        text:"Cinque file, più colpi. Usa le nuvolette.",
     rows:['K','V','V','B','B'],     cols:8, speed:24, fire:1.15, bspeed:200 },
-  { name:"Botnet",         text:"Una rete di hacker coordinati: più numerosi, più veloci, più aggressivi.",
+  { name:"Botnet",         text:"Hacker coordinati, più aggressivi.",
     rows:['K','K','V','V','B','B'], cols:8, speed:23, fire:1.3, bspeed:210 },
-  { name:"Ransomware",     text:"Il boss finale tiene i dati in ostaggio. Colpiscilo finché la barra non si svuota.",
+  { name:"Ransomware",     text:"Boss finale: svuota la sua barra.",
     rows:['V','B'],                 cols:7, speed:22, fire:1.1, bspeed:220, boss:true },
 ];
 
@@ -278,14 +279,14 @@ function update(dt){
     if (s.dead) continue;
     if (drone && hit(sb, {x:drone.x-17, y:drone.y-8, w:34, h:16})){
       const pts = [100,150,200,300][Math.floor(Math.random()*4)];
-      score += pts; burst(drone.x, drone.y, HACK, 18); toast('+' + pts + ' · DOPPIO COLPO', RED_HI);
+      score += pts; burst(drone.x, drone.y, HACK, 18); toast('+' + pts + ' · DOPPIO COLPO', RED);
       doubleT = 10; drone = null; droneT = 14; s.dead = true; sfx.kill(); continue;
     }
     for (const b of ebul){ if (!b.dead && Math.abs(b.x - s.x) < 6 && Math.abs(b.y - s.y) < 8){ b.dead = true; s.dead = true; burst(s.x, s.y, RED_HI, 5); break; } }
     if (s.dead) continue;
     if (boss && boss.hp > 0 && hit(sb, {x:boss.x-34, y:boss.y-30, w:68, h:66})){
       s.dead = true; boss.hp--; boss.flash = 0.08; score += 25; burst(s.x, s.y, RED_HI, 4);
-      if (boss.hp <= 0){ score += 2000; for (let i=0;i<5;i++) burst(boss.x + (Math.random()-0.5)*60, boss.y + (Math.random()-0.5)*50, i%2?HACK:'#c7ccd3', 20); sfx.kill(); toast('RANSOMWARE SCONFITTO +2000', '#fff'); for (const f of foes) f.alive = false; }
+      if (boss.hp <= 0){ score += 2000; for (let i=0;i<5;i++) burst(boss.x + (Math.random()-0.5)*60, boss.y + (Math.random()-0.5)*50, i%2?HACK:'#4f6478', 20); sfx.kill(); toast('RANSOMWARE SCONFITTO +2000', NAVY); for (const f of foes) f.alive = false; }
     }
   }
   shots = shots.filter(s=>!s.dead);
@@ -313,7 +314,7 @@ function killFoe(f){
 }
 function killShip(){
   if (ship.dead > 0) return;
-  lives--; ship.dead = 1.4; sfx.hit(); burst(ship.x, SHIP_Y, CLOUD, 26); burst(ship.x, SHIP_Y, RED_HI, 10);
+  lives--; ship.dead = 1.4; sfx.hit(); burst(ship.x, SHIP_Y, OUTLINE, 26); burst(ship.x, SHIP_Y, RED_HI, 10);
   ebul = []; updateHud();
 }
 
@@ -385,7 +386,7 @@ function updateIntro(dt){
     const tx = I.hacker.x, ty = I.hacker.y + 12;
     const dx = tx - I.dot.x, dy = ty - I.dot.y, d = Math.hypot(dx,dy);
     const step = 520*dt;
-    if (d <= step){ I.dot = null; I.boom = true; I.boomT = I.t; burst(tx, ty, HACK, 30); burst(tx, ty, '#c7ccd3', 20); sfx.kill(); }
+    if (d <= step){ I.dot = null; I.boom = true; I.boomT = I.t; burst(tx, ty, HACK, 30); burst(tx, ty, '#4f6478', 20); sfx.kill(); }
     else { I.dot.x += dx/d*step; I.dot.y += dy/d*step; }
   }
   updateParts(dt);
@@ -400,10 +401,10 @@ function renderIntro(){
   if (morph < 1){
     ctx.globalAlpha = 1 - Math.max(0, morph);
     const pad = 12, y = LOGO.y + Math.max(0,morph)*120;
-    ctx.fillStyle = '#f7f7f7'; roundRect(ctx, LOGO.x-pad, y-pad, LOGO.w+pad*2, lh+pad*2, 12); ctx.fill();
+    ctx.fillStyle = '#ffffff'; roundRect(ctx, LOGO.x-pad, y-pad, LOGO.w+pad*2, lh+pad*2, 12); ctx.fill(); ctx.strokeStyle = '#cddcea'; ctx.lineWidth = 1; ctx.stroke();
     if (img && img.naturalWidth){
       ctx.drawImage(img, LOGO.x, y, LOGO.w, lh);
-      if (I.dot || I.boom){ ctx.fillStyle = '#f7f7f7'; ctx.beginPath(); ctx.arc(LOGO.x + LOGO.dotX*k, y + LOGO.dotY*k, LOGO.dotR*k + 1.5, 0, Math.PI*2); ctx.fill(); }
+      if (I.dot || I.boom){ ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(LOGO.x + LOGO.dotX*k, y + LOGO.dotY*k, LOGO.dotR*k + 1.5, 0, Math.PI*2); ctx.fill(); }
     }
     ctx.globalAlpha = 1;
   }
@@ -415,8 +416,8 @@ function renderIntro(){
   if (I.dot) drawShot(I.dot.x, I.dot.y, 4);
   drawParts();
   ctx.textAlign='center'; ctx.textBaseline='middle';
-  if (I.boom && I.t > I.boomT + 1.4){ ctx.fillStyle = '#fff'; ctx.font = "16px 'Press Start 2P', monospace"; ctx.fillText('INVADERS', W/2, 250); }
-  ctx.fillStyle = 'rgba(163,171,183,0.8)'; ctx.font = "8px 'Press Start 2P', monospace"; ctx.fillText('TOCCA PER SALTARE', W/2, H - 14);
+  if (I.boom && I.t > I.boomT + 1.4){ ctx.fillStyle = NAVY; ctx.font = "16px 'Press Start 2P', monospace"; ctx.fillText('INVADERS', W/2, 250); }
+  ctx.fillStyle = OUTLINE; ctx.font = "8px 'Press Start 2P', monospace"; ctx.fillText('TOCCA PER SALTARE', W/2, H - 14);
 }
 function easeOut(t){ return 1 - Math.pow(1-t, 3); }
 
@@ -531,7 +532,7 @@ function buildSkyLogo(){
   const c = document.createElement('canvas'); c.width = w*k; c.height = h*k;
   const o = c.getContext('2d'); o.scale(k,k);
   o.drawImage(img, 0, 0, w, h);
-  o.globalCompositeOperation = 'source-in'; o.fillStyle = '#e8ecf1'; o.fillRect(0, 0, w, h);
+  o.globalCompositeOperation = 'source-in'; o.fillStyle = '#004675'; o.fillRect(0, 0, w, h);
   o.globalCompositeOperation = 'source-over';
   // keep the red dot of the "i" red
   const dk = w/LOGO.nw; o.fillStyle = RED; o.beginPath(); o.arc(LOGO.dotX*dk, LOGO.dotY*dk, LOGO.dotR*dk, 0, Math.PI*2); o.fill();
@@ -548,7 +549,7 @@ function logoClarity(){
 function drawSkyLogo(){
   if (!skyLogo) skyLogo = buildSkyLogo();
   if (!skyLogo) return;
-  const a = logoClarity();
+  const a = logoClarity() * 0.45;   // navy wordmark on a light sky: keep it a soft watermark
   const y = 300 + Math.sin(clock*0.4)*6;
   ctx.globalAlpha = a;
   ctx.drawImage(skyLogo.c, (W - skyLogo.w)/2, y - skyLogo.h/2, skyLogo.w, skyLogo.h);
@@ -556,15 +557,15 @@ function drawSkyLogo(){
 }
 function drawSky(){
   const g = ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'#101318'); g.addColorStop(0.7,'#1d222b'); g.addColorStop(1,'#272d38');
+  g.addColorStop(0,'#cfe3f5'); g.addColorStop(0.7,'#e4f0fa'); g.addColorStop(1,'#f2f7fc');
   ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
-  for (const s of STARS){ ctx.fillStyle = `rgba(242,242,242,${0.15 + 0.2*Math.sin(clock*1.7 + s.p)})`; ctx.fillRect(s.x, s.y, 1.5, 1.5); }
+  for (const s of STARS){ ctx.fillStyle = `rgba(255,255,255,${0.35 + 0.3*Math.sin(clock*1.7 + s.p)})`; ctx.fillRect(s.x, s.y, 1.5, 1.5); }
   if (state !== 'intro') drawSkyLogo();
   for (const cl of CLOUDS){
     const sp = [6, 12, 20][cl.d];
     let x = ((cl.x + clock*sp) % (W + cl.w*2)) - cl.w;
-    const a = [0.05, 0.075, 0.1][cl.d];
-    drawCloudShape(ctx, x, cl.y, cl.w, `rgba(226,232,240,${a})`);
+    const a = [0.35, 0.48, 0.6][cl.d];
+    drawCloudShape(ctx, x, cl.y, cl.w, `rgba(255,255,255,${a})`);
   }
 }
 function drawSprite(S, fr, x, y, override){
@@ -579,7 +580,9 @@ function drawShip(x, y, a, dotK){
   // the Inncloud cloud, with the red dot of the "i" as its cannon; dotK 0..1 = how much of the dot has grown back
   if (dotK === undefined) dotK = 1;
   ctx.save(); ctx.translate(x, y);
-  ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.ellipse(0, 14, 22, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(13,43,69,0.22)'; ctx.beginPath(); ctx.ellipse(0, 14, 22, 3, 0, 0, Math.PI*2); ctx.fill();
+  // outline so the white cloud stays visible on the pale sky
+  for (const [ox, oy] of [[-2,0],[2,0],[0,-2],[0,2],[-1.4,-1.4],[1.4,-1.4],[-1.4,1.4],[1.4,1.4]]) drawCloudShape(ctx, ox, 2+oy, 44, OUTLINE);
   drawCloudShape(ctx, 0, 2, 44, CLOUD);
   ctx.fillStyle = '#cfd4da'; ctx.fillRect(-18, 8, 36, 3);
   if (dotK > 0.05){
@@ -597,7 +600,7 @@ function drawShot(x, y, r){
 function drawBoss(){
   const b = boss, x = b.x, y = b.y;
   ctx.save(); ctx.translate(x, y);
-  const body = b.flash > 0 ? '#ffffff' : '#c7ccd3';
+  const body = b.flash > 0 ? '#c00000' : '#4f6478';
   // shackle
   ctx.strokeStyle = body; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(0, -8, 20, Math.PI, 0); ctx.stroke();
   ctx.fillStyle = body; roundRect(ctx, -32, -10, 64, 46, 6); ctx.fill();
@@ -609,9 +612,9 @@ function drawBoss(){
   ctx.fillStyle = '#ff5d56'; ctx.font = "7px 'Press Start 2P', monospace"; ctx.textAlign='center'; ctx.fillText('PAY $', 0, 44);
   ctx.restore();
   // health bar
-  ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fillRect(40, 30, W-80, 6);
+  ctx.fillStyle = 'rgba(13,43,69,0.15)'; ctx.fillRect(40, 30, W-80, 6);
   ctx.fillStyle = RED_HI; ctx.fillRect(40, 30, (W-80)*(b.hp/b.max), 6);
-  ctx.fillStyle = '#fff'; ctx.font = "7px 'Press Start 2P', monospace"; ctx.textAlign='center'; ctx.fillText('RANSOMWARE', W/2, 22);
+  ctx.fillStyle = NAVY; ctx.font = "7px 'Press Start 2P', monospace"; ctx.textAlign='center'; ctx.fillText('RANSOMWARE', W/2, 22);
 }
 function drawParts(){
   for (const p of parts){ ctx.globalAlpha = Math.max(0, Math.min(1, p.t*2)); ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, p.s, p.s); }
@@ -623,16 +626,16 @@ function render(){
   drawSky();
   if (state === 'title'){ drawShip(W/2, SHIP_Y, 1); return; }
   // ground line
-  ctx.fillStyle = 'rgba(242,242,242,0.25)'; ctx.fillRect(0, SHIP_Y + 20, W, 1);
+  ctx.fillStyle = 'rgba(13,43,69,0.25)'; ctx.fillRect(0, SHIP_Y + 20, W, 1);
   // firewalls: little clouds that wear away under the hackers' code
-  for (const w of walls){ if (w.dead) continue; ctx.fillStyle = (Math.floor(w.x/4 + w.y/4) % 2) ? '#c9d0d9' : '#dde2e8'; ctx.fillRect(w.x, w.y, w.s, w.s); }
+  for (const w of walls){ if (w.dead) continue; ctx.fillStyle = (Math.floor(w.x/4 + w.y/4) % 2) ? '#7f9bb6' : '#9bb3ca'; ctx.fillRect(w.x, w.y, w.s, w.s); }
   // attackers
   for (const f of foes){ if (!f.alive) continue; drawSprite(SPRITES[f.t], frame, f.x+fx, f.y+fy); }
   if (boss && boss.hp > 0) drawBoss();
-  if (drone){ const S = { color:'#c7ccd3', frames:[DRONE, DRONE] }; drawSprite(S, 0, drone.x - 16.5, drone.y - 7.5); }
+  if (drone){ const S = { color:'#4f6478', frames:[DRONE, DRONE] }; drawSprite(S, 0, drone.x - 16.5, drone.y - 7.5); }
   // enemy code bullets
   ctx.font = "8px 'Press Start 2P', monospace"; ctx.textAlign='center'; ctx.textBaseline='middle';
-  for (const b of ebul){ ctx.fillStyle = HACK; ctx.fillText(b.ch, b.x, b.y); ctx.fillStyle='rgba(57,224,122,0.25)'; ctx.fillText(b.ch, b.x, b.y-7); }
+  for (const b of ebul){ ctx.fillStyle = HACK; ctx.fillText(b.ch, b.x, b.y); ctx.fillStyle='rgba(19,160,74,0.3)'; ctx.fillText(b.ch, b.x, b.y-7); }
   // player shots
   for (const s of shots) drawShot(s.x, s.y, DOT_R);
   // ship
@@ -640,7 +643,7 @@ function render(){
   drawParts();
   // status
   ctx.textBaseline='middle';
-  if (doubleT > 0){ ctx.textAlign='left'; ctx.fillStyle = RED_HI; ctx.font = "7px 'Press Start 2P', monospace"; ctx.fillText('x2 ' + Math.ceil(doubleT), 8, H-14); }
+  if (doubleT > 0){ ctx.textAlign='left'; ctx.fillStyle = RED; ctx.font = "7px 'Press Start 2P', monospace"; ctx.fillText('x2 ' + Math.ceil(doubleT), 8, H-14); }
   ctx.textAlign='center';
   toasts.forEach((t, i)=>{ ctx.globalAlpha = Math.min(1, t.t*1.5); ctx.fillStyle = t.color; ctx.font = "8px 'Press Start 2P', monospace"; ctx.fillText(t.text, W/2, 420 - i*16); });
   ctx.globalAlpha = 1;
@@ -655,7 +658,7 @@ function drawLegend(){
   const draw = (id, fn)=>{ const c = $(id).getContext('2d'); c.setTransform(1,0,0,1,0,0); c.clearRect(0,0,44,44); fn(c); };
   draw('lgShot', c=>{ c.fillStyle=RED; c.beginPath(); c.arc(22,24,9,0,7); c.fill(); c.fillStyle=RED_HI; c.beginPath(); c.arc(19,21,3.5,0,7); c.fill(); });
   draw('lgBug', c=>{ const m=SPRITES.B.frames[0]; m.forEach((row,r)=>[...row].forEach((ch,col)=>{ if(ch==='.')return; c.fillStyle = ch==='X'?HACK:ch==='W'?'#fff':'#1a1d22'; c.fillRect(5+col*3,8+r*3,3,3); })); });
-  draw('lgWall', c=>{ ["....XXXX....","..XXXXXXX.X.",".XXXXXXXXXXX","XXXXXXXXXXXX","XXXXXXXXXXXX",".XXXXXXXXXX."].forEach((row,r)=>[...row].forEach((ch,col)=>{ if(ch==='.')return; c.fillStyle=((col+r)%2)?'#c9d0d9':'#dde2e8'; c.fillRect(1+col*3.5,12+r*3.5,3.5,3.5); })); });
+  draw('lgWall', c=>{ ["....XXXX....","..XXXXXXX.X.",".XXXXXXXXXXX","XXXXXXXXXXXX","XXXXXXXXXXXX",".XXXXXXXXXX."].forEach((row,r)=>[...row].forEach((ch,col)=>{ if(ch==='.')return; c.fillStyle=((col+r)%2)?'#7f9bb6':'#9bb3ca'; c.fillRect(1+col*3.5,12+r*3.5,3.5,3.5); })); });
 }
 
 /* ================= LOOP ================= */
