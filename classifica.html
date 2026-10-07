@@ -220,7 +220,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   <div class="boards" id="boards">
   <div class="games" id="games"></div>
   <section class="panel total" id="secTotal" aria-labelledby="tTotal">
-    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale<span class="who-tag" id="whoTag" hidden></span></h2><div class="sub">Somma dei record nei 4 giochi · ordinata per punti</div></div></div>
+    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale<span class="who-tag" id="whoTag" hidden></span></h2><div class="sub">Somma dei record nei 4 giochi · livelli, poi punti</div></div></div>
     <ol id="list-all"></ol>
   </section>
   </div>
@@ -254,9 +254,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=23"></script>
+<script src="config.js?v=24"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=23"></script>
+<script src="backend.js?v=24"></script>
 <script>
 (function(){
 "use strict";
@@ -276,7 +276,7 @@ $('demoNote').hidden = B.remote;
 // game panels
 for (const g of GAMES){
   const sec = document.createElement('section'); sec.className = 'panel'; sec.setAttribute('aria-label', g.name);
-  sec.innerHTML = '<div class="ph"><img alt=""><div><h2></h2><div class="sub">Top ' + TOP_GAME + ' · ordinata per punti</div></div></div><ol></ol>';
+  sec.innerHTML = '<div class="ph"><img alt=""><div><h2></h2><div class="sub">Top ' + TOP_GAME + ' · livelli, poi punti</div></div></div><ol></ol>';
   sec.querySelector('img').src = g.icon; sec.querySelector('h2').textContent = g.name;
   sec.querySelector('ol').id = 'list-' + g.id;
   $('games').appendChild(sec);
@@ -358,7 +358,7 @@ const view = {
     }));
     const label = st.group === 'efuture' ? 'Solo utenti Efuture' : st.group === 'ospiti' ? 'Solo ospiti' : '';
     $('whoTag').hidden = !label; $('whoTag').textContent = label;
-    document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · ordinata per punti' + (label ? ' · ' + label.toLowerCase() : ''));
+    document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · livelli, poi punti' + (label ? ' · ' + label.toLowerCase() : ''));
     store.set('efgBoardView3', st);
   }
 };
@@ -388,7 +388,10 @@ async function refresh(){
     render('all', boards[0], TOP_GAME);   // "Top" vale per tutte le classifiche
     GAMES.forEach((g, i) => render(g.id, boards[i + 1], TOP_GAME));
     const t = new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-    $('status').textContent = 'Live · aggiornata alle ' + t; $('dot').classList.remove('off');
+    $('status').textContent = boards.some(b => b.filtroMancante)
+      ? '⚠ Filtro Giocatori non attivo: eseguire supabase-classifica-gruppi.sql su Supabase (mostro tutti) · ' + t
+      : 'Live · aggiornata alle ' + t;
+    $('dot').classList.remove('off');
   } catch(e){
     console.warn('classifica', e);
     $('status').textContent = 'Classifica non raggiungibile (' + String(e && e.message || e).slice(0, 60) + '), riprovo…'; $('dot').classList.add('off');

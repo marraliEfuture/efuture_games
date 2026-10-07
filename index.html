@@ -108,12 +108,16 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
 .tab{flex:0 0 auto;font-size:10.5px;padding:7px 10px;border-radius:20px;border:1px solid var(--line);background:none;color:var(--dim);cursor:pointer}
 .tab.on{background:var(--ef-navy);border-color:#1f6aa3;color:#fff}
-.board{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
-.board li{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border-radius:9px;background:var(--panel-2);font-size:12px}
-.board li .r{font-family:var(--pixel);font-size:9px;color:var(--dim)}
-.board li:nth-child(1) .r{color:#ffd166}.board li:nth-child(2) .r{color:#cfd8e3}.board li:nth-child(3) .r{color:#e0a36b}
-.board li .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.board li .s{font-family:var(--pixel);font-size:10px;font-variant-numeric:tabular-nums}
+.board{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+/* riga: posizione | nome (grande) + dettaglio sotto | punti */
+.board li{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;background:var(--panel-2)}
+.board li .r{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:14px;color:var(--text);background:rgba(255,255,255,.08)}
+.board li:nth-child(1) .r{background:#ffd166;color:#3a2a00}.board li:nth-child(2) .r{background:#d9e2ec;color:#1d2b3a}.board li:nth-child(3) .r{background:#e0a36b;color:#3a1f05}
+.board li .who{min-width:0;display:flex;flex-direction:column;gap:2px}
+.board li .n{font-size:16px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board li .d{font-size:12px;color:var(--dim)}
+.board li .s{font-size:18px;font-weight:600;color:var(--ef-orange);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.board li .s small{font-size:11px;color:var(--dim);font-weight:400;margin-left:3px}
 .board li.me{outline:1px solid var(--ef-orange)}
 .empty{font-size:12px;color:var(--dim);text-align:center;padding:14px 0}
 
@@ -298,11 +302,11 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=23"></script>
+<script src="config.js?v=24"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=23"></script>
+<script src="backend.js?v=24"></script>
 <script src="vendor/jsQR.js"></script>
-<script src="hub.js?v=23"></script>
+<script src="hub.js?v=24"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });

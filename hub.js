@@ -74,7 +74,7 @@ function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v23' : 'Modalità demo: account e classifica restano su questo telefono. · v23';
+  mn.textContent = remote ? 'Classifica online · v24' : 'Modalità demo: account e classifica restano su questo telefono. · v24';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -283,9 +283,14 @@ async function loadBoard(){
   rows.forEach((r, i)=>{
     const li = document.createElement('li'); if (session && r.pid === session.id) li.className = 'me';
     const a = document.createElement('span'); a.className = 'r'; a.textContent = i+1;
+    const w = document.createElement('span'); w.className = 'who';
     const n = document.createElement('span'); n.className = 'n'; n.textContent = r.name;
-    const s = document.createElement('span'); s.className = 's'; s.textContent = (boardTab === 'all' ? (r.games||0) + '/' + GAMES.length + ' giochi · ' + (r.levels||0) + '/' + LEVELS*GAMES.length : (r.levels||0) + '/' + LEVELS) + ' liv · ' + r.score + ' pt';
-    li.append(a, n, s); list.appendChild(li);
+    const d = document.createElement('span'); d.className = 'd';
+    d.textContent = (boardTab === 'all' ? (r.games||0) + '/' + GAMES.length + ' giochi · ' + (r.levels||0) + '/' + LEVELS*GAMES.length : (r.levels||0) + '/' + LEVELS) + ' livelli';
+    w.append(n, d);
+    const s = document.createElement('span'); s.className = 's'; s.textContent = r.score;
+    const u = document.createElement('small'); u.textContent = 'pt'; s.appendChild(u);
+    li.append(a, w, s); list.appendChild(li);
   });
 }
 $('btnBoard').onclick = ()=>{
