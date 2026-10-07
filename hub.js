@@ -27,13 +27,6 @@ async function sha256(txt){
   return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 const normCode = c => String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
-function normPhone(p){
-  let s = String(p||'').replace(/[^\d+]/g,'');
-  if (s.startsWith('00')) s = '+' + s.slice(2);
-  if (!s.startsWith('+')) s = '+39' + s;        // Italian numbers by default
-  return s;
-}
-const validPhone = p => /^\+\d{8,15}$/.test(p);
 const fmt = s => { s = Math.max(0, Math.round(s)); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); };
 let toastT = 0;
 function toast(msg, ms){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(()=>{ t.hidden = true; }, ms||3200); }
@@ -81,7 +74,7 @@ function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v21' : 'Modalità demo: account e classifica restano su questo telefono. · v21';
+  mn.textContent = remote ? 'Classifica online · v23' : 'Modalità demo: account e classifica restano su questo telefono. · v23';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -252,13 +245,12 @@ async function loggedIn(user){
 }
 $('fSignup').addEventListener('submit', async e=>{
   e.preventDefault();
-  const name = $('sName').value.trim(), phone = normPhone($('sPhone').value), email = $('sEmail').value.trim();
+  const name = $('sName').value.trim(), email = $('sEmail').value.trim();
   const m = $('sMsg');
   if (name.length < 2 || name.length > 20) return setMsg(m, 'Il nome deve avere da 2 a 20 caratteri.', 'err');
-  if (!validPhone(phone)) return setMsg(m, 'Scrivi un numero di cellulare valido, ad esempio +39 333 1234567.', 'err');
   if (!validEmail(email)) return setMsg(m, 'Scrivi un indirizzo email valido.', 'err');
   setMsg(m, 'Un attimo…');
-  try { const r = await Backend.signUp({ name, phone, email }); loggedIn(r.user); }
+  try { const r = await Backend.signUp({ name, email }); loggedIn(r.user); }
   catch(err){ setMsg(m, friendly(err), 'err'); }
 });
 $('fLogin').addEventListener('submit', async e=>{

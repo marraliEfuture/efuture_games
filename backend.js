@@ -25,8 +25,8 @@ const one = d => Array.isArray(d) ? d[0] : d;
 const Backend = remote ? {
   remote:true,
   async current(){ return store.get('efgSessionLive', null); },
-  async signUp({ name, phone, email }){
-    const r = one(await rpc('efg_register', { p_email:normEmail(email), p_name:name, p_phone:phone }));
+  async signUp({ name, email }){
+    const r = one(await rpc('efg_register', { p_email:normEmail(email), p_name:name }));
     const u = { id:r.pid, email:normEmail(email), nickname:r.name };
     store.set('efgSessionLive', u); return { user:u };
   },
@@ -55,10 +55,10 @@ const Backend = remote ? {
 } : {
   remote:false,
   async current(){ return store.get('efgSession3', null); },
-  async signUp({ name, phone, email }){
+  async signUp({ name, email }){
     const users = store.get('efgDemoUsers3', {}); const key = normEmail(email);
     if (users[key]) throw new Error('already registered');
-    users[key] = { pid:'local-'+Date.now().toString(36), email:key, name, phone };
+    users[key] = { pid:'local-'+Date.now().toString(36), email:key, name };
     store.set('efgDemoUsers3', users);
     const u = { id:users[key].pid, email:key, nickname:name }; store.set('efgSession3', u); return { user:u };
   },

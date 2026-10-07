@@ -63,7 +63,10 @@ CODICI DI SBLOCCO (uno per gioco)
    https://marraliefuture.github.io/efuture_games/admin.html
    Si entra con la chiave admin (non è nel sito: è salvata cifrata nel
    database). Dal pannello:
-   - Giocatori: elenco con email, cellulare, punti per gioco; CSV.
+   - Giocatori: elenco con nome, email, punti per gioco; CSV. Il pulsante
+     "Elimina" cancella un giocatore e i suoi punteggi (sparisce dalla
+     classifica); il registro eventi resta. Una volta sola esegui
+     supabase-privacy-utenti.sql nel SQL Editor.
    - Registro: registrazioni, accessi, partite e operazioni admin; CSV.
    - Backup: crea e scarica una copia (JSON), ripristina una copia.
    - Reset: azzera i punti (i giocatori restano) o cancella tutto.
@@ -99,8 +102,8 @@ CODICI DI SBLOCCO (uno per gioco)
    - Sblocco: "Apri la fotocamera" legge il QR direttamente nell'app;
      in alternativa si scrive il codice. Anche la fotocamera normale
      del telefono funziona: il QR apre l'app e sblocca il gioco.
-   - In fondo: "Registrati / Accedi". Registrazione: nome, cellulare,
-     email. Accesso: basta l'email, nessuna password.
+   - In fondo: "Registrati / Accedi". Registrazione: nome ed email
+     (il cellulare non si chiede più). Accesso: basta l'email, nessuna password.
    - REGOLE DI GARA (solo dentro l'app): ogni gioco ha 3 livelli, al
      massimo 1 minuto ciascuno. Ogni livello superato vale
      numero del livello x secondi che avanzano x vite rimaste, poi si
