@@ -81,7 +81,7 @@ function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v21' : 'Modalità demo: account e classifica restano su questo telefono. · v21';
+  mn.textContent = remote ? 'Classifica online · v22' : 'Modalità demo: account e classifica restano su questo telefono. · v22';
 }
 
 /* ================= UNLOCK: camera + code ================= */

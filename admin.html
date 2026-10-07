@@ -318,7 +318,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
   <p class="dim" id="noRemote" hidden>Il database online non è configurato in <code>config.js</code>: il pannello admin funziona solo con Supabase.</p>
 </main>
 
-<script src="config.js?v=21"></script>
+<script src="config.js?v=22"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script>
@@ -578,6 +578,7 @@ $('qPrint').onclick = () => window.print();
 /* ---------- skills ---------- */
 // stesso elenco di .claude/skills/ (la skill /efuture-games-skills lo legge dai file)
 const SKILLS = [
+  ['/efuture-games', 'Carica tutto il progetto in memoria: stato dell\u2019app, file, skill, link, artifact, chat passate e decisioni, così si riparte da dove si era rimasti.', '\u201criprendiamo efuture games\u201d'],
   ['/efuture-games-qr', 'Crea i 5 QR (app + sblocco dei 4 giochi) come cartellini da stampare e controlla che ogni codice apra il gioco giusto.', '“dammi i QR da stampare”'],
   ['/efuture-games-links', 'Elenca tutti i link del gioco: app, installazione, classifica, admin, GitHub, Claude e ChatGPT.', '“dammi i link del gioco”'],
   ['/efuture-games-commit', 'Salva e carica le modifiche su GitHub: controlla i file, aumenta la versione dell’app se serve e pubblica su main solo se lo chiedi.', '“carica le modifiche su GitHub”'],
