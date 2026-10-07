@@ -55,8 +55,26 @@ mark{background:none;color:var(--sky);padding:0}
 @keyframes pulse{70%{box-shadow:0 0 0 10px rgba(47,179,107,0)}100%{box-shadow:0 0 0 0 rgba(47,179,107,0)}}
 .btn{background:var(--orange);color:#fff;border:0;border-radius:3px;padding:8px 14px;font-weight:600;font-size:clamp(12px,.9vw,15px);cursor:pointer}
 .btn:hover{background:#e66200}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);text-decoration:none}
+.btn.ghost:hover{background:var(--row)}
+:fullscreen .btn.ghost,:fullscreen .controls{display:none}
+/* interruttori di visualizzazione */
+.controls{background:#fff;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;padding:10px clamp(16px,3vw,48px);font-size:clamp(12px,.9vw,14px);color:var(--text)}
+.controls .seg-grp + .seg-grp{border-left:1px solid var(--line);padding-left:22px}
+.controls .ttl{font-family:var(--title);font-weight:700;font-size:.8em;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seg-grp{display:flex;align-items:center;gap:10px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--row)}
+.seg button{border:0;background:none;padding:7px 14px;font:inherit;font-weight:600;color:var(--muted);cursor:pointer;min-width:44px}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button:hover{background:#e9eef4;color:var(--ink)}
+.seg button[aria-checked="true"]{background:var(--orange);color:#fff}
+.seg button:focus-visible{outline:2px solid var(--sky);outline-offset:-2px}
+.who-tag{display:inline-block;font-family:var(--body);font-size:.6em;font-weight:600;letter-spacing:.04em;vertical-align:.25em;margin-left:.5em;padding:.2em .6em;border-radius:3px;background:var(--orange);color:#fff}
+@media (max-width:560px){.controls .seg-grp + .seg-grp{border-left:0;padding-left:0}}
 
-main{flex:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr);gap:clamp(14px,1.6vw,28px);padding:clamp(16px,2vw,32px) clamp(16px,3vw,48px);align-items:start}
+main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) auto;}
+main.no-qr{grid-template-columns:minmax(0,1fr)}
+main{gap:clamp(14px,1.6vw,28px);padding:clamp(16px,2vw,32px) clamp(16px,3vw,48px);align-items:start}
 .games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:inherit}
 .panel{background:var(--card);border-radius:6px;padding:clamp(14px,1.4vw,24px);display:flex;flex-direction:column;gap:12px;min-width:0;box-shadow:0 10px 30px rgba(20,29,40,.07);border:1px solid var(--line)}
 .ph{display:flex;align-items:center;gap:14px}
@@ -71,6 +89,8 @@ li .s{font-family:var(--title);font-weight:800;color:var(--ink);font-variant-num
 li .lv{font-family:var(--title);font-weight:700;font-size:.72em;color:var(--navy);background:#e3f3ff;border-radius:3px;padding:.25em .55em;white-space:nowrap}
 .total li .lv{background:rgba(138,208,255,.18);color:var(--sky)}
 li .s{min-width:4.2em;text-align:right}
+li .s b{font-weight:inherit}
+li{will-change:transform;position:relative}
 li .s small{font-family:var(--body);font-weight:300;font-size:.75em;color:var(--muted);margin-left:.3em}
 li:nth-child(1) .r{background:var(--gold);border-color:var(--gold);color:#fff}
 li:nth-child(2) .r{background:var(--silver);border-color:var(--silver);color:var(--navy)}
@@ -78,6 +98,18 @@ li:nth-child(3) .r{background:var(--bronze);border-color:var(--bronze);color:var
 li.fresh{background:#ffe7d4}
 .empty{display:block;background:none;color:var(--muted);text-align:center;font-weight:300;font-size:clamp(12px,.9vw,15px);padding:14px 0}
 
+/* contenitore delle classifiche: giochi e generale affiancati */
+.boards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:inherit;align-items:start;min-width:0}
+main.only-total .boards,main.only-games .boards{grid-template-columns:minmax(0,1fr)}
+/* QR grande per scansionare da lontano: il più alto possibile senza uscire dallo schermo.
+   Regola pratica: lato del QR ≈ distanza ÷ 10–15 (da 20 m serve un QR di circa 1,3–2 m sul ledwall) */
+.qrbig{align-self:start;position:sticky;top:12px;display:flex;flex-direction:column;align-items:center;gap:4px;background:#fff;border:1px solid var(--line);border-radius:6px;padding:4px 4px clamp(10px,1vw,16px);box-shadow:0 10px 30px rgba(20,29,40,.07)}
+.qrbig img{display:block;width:var(--qr);height:var(--qr);image-rendering:pixelated}
+.qrbig{--qr:min(40vw, calc(100vh - 440px))}
+.qrcap{text-align:center;font-family:var(--title)}
+.qrcap b{display:block;font-weight:700;font-size:clamp(18px,2vw,40px);letter-spacing:-.5px;color:var(--ink)}
+.qrcap span{font-family:var(--body);font-weight:300;font-size:clamp(12px,1vw,20px);color:var(--muted)}
+:fullscreen .qrbig{--qr:min(44vw, calc(100vh - 290px))}
 /* classifica generale: sezione blu notte come sul sito */
 .panel.total{background:var(--navy);border-color:var(--navy);box-shadow:0 16px 40px rgba(0,34,56,.25)}
 .total .ph h2{color:#fff;font-size:clamp(18px,1.7vw,30px);letter-spacing:-1px}
@@ -107,6 +139,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 
 @media (max-width:900px){
   main{grid-template-columns:minmax(0,1fr)}
+  .boards{grid-template-columns:minmax(0,1fr)}
+  .panel.total{order:-1}
+  .qrbig{position:static;--qr:min(72vw,380px)}
   .live .upd{display:none}
 }
 @media (max-width:560px){
@@ -142,28 +177,53 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
     <span class="dot" id="dot" aria-hidden="true"></span>
     <span id="status" aria-live="polite">Carico…</span>
     <button class="btn" id="btnFull" type="button">Schermo intero</button>
+    <a class="btn ghost" id="btnAdmin" href="admin.html" title="Area amministratori">Admin</a>
   </div>
 </header>
+<div class="controls" id="controls" aria-label="Cosa mostrare">
+  <div class="seg-grp"><span class="ttl" id="lbBoard">Classifica</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lbBoard" data-key="board">
+      <button type="button" role="radio" data-v="generale">Generale</button><button type="button" role="radio" data-v="giochi">Giochi</button><button type="button" role="radio" data-v="tutti">Tutti</button>
+    </div></div>
+  <div class="seg-grp"><span class="ttl" id="lbTop">Top</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lbTop" data-key="top">
+      <button type="button" role="radio" data-v="3">3</button><button type="button" role="radio" data-v="5">5</button><button type="button" role="radio" data-v="10">10</button>
+    </div></div>
+  <div class="seg-grp"><span class="ttl" id="lbWho">Giocatori</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lbWho" data-key="group">
+      <button type="button" role="radio" data-v="ospiti">Ospiti</button><button type="button" role="radio" data-v="efuture">Efuture</button><button type="button" role="radio" data-v="tutti">Tutti</button>
+    </div></div>
+  <div class="seg-grp"><span class="ttl" id="lbQr">QR</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lbQr" data-key="qr">
+      <button type="button" role="radio" data-v="si">Sì</button><button type="button" role="radio" data-v="no">No</button>
+    </div></div>
+</div>
 
-<main>
-  <section class="panel total" aria-labelledby="tTotal">
-    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale</h2><div class="sub">Somma dei record nei 4 giochi · giochi usati, livelli superati e punti</div></div></div>
+<main id="main">
+  <div class="boards" id="boards">
+  <div class="games" id="games"></div>
+  <section class="panel total" id="secTotal" aria-labelledby="tTotal">
+    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale<span class="who-tag" id="whoTag" hidden></span></h2><div class="sub">Somma dei record nei 4 giochi · ordinata per punti</div></div></div>
     <ol id="list-all"></ol>
   </section>
-  <div class="games" id="games"></div>
+  </div>
+  <aside class="qrbig" id="qrBig" aria-label="QR per giocare">
+    <img src="qr/qr-app.svg" alt="QR per aprire Efuture Games">
+    <div class="qrcap"><b>Gioca <mark>anche tu</mark></b><span>Inquadra il QR con la fotocamera</span></div>
+  </aside>
 </main>
 
 <p class="note" id="demoNote" hidden>Modalità demo: il database online non è ancora configurato, qui vedi solo i punteggi fatti su questo dispositivo.</p>
 
 <footer>
-  <div class="join"><img src="qr/qr-app.png" alt="QR per aprire Efuture Games"><div><b>Gioca <mark>anche tu</mark></b><span>Inquadra il QR, sblocca i giochi agli stand e scala la classifica.</span></div></div>
-  <div class="rules">3 livelli per gioco, massimo 1 minuto ciascuno. Ogni livello superato vale numero del livello × secondi che avanzano × vite rimaste, poi si sommano. In classifica contano prima i livelli superati, poi i punti.</div>
+  <div class="join"><div><b>Sblocca i giochi <mark>agli stand</mark></b><span>Inquadra il QR allo stand di ogni sponsor e scala la classifica.</span></div></div>
+  <div class="rules">3 livelli per gioco, massimo 1 minuto ciascuno. Ogni livello superato vale numero del livello × secondi che avanzano × vite rimaste, poi si sommano. In classifica vale il punteggio migliore.</div>
   <div class="powered">powered by <img src="img/efuture-white.png" alt="efuture"></div>
 </footer>
 
-<script src="config.js?v=19"></script>
+<script src="config.js?v=20"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=19"></script>
+<script src="backend.js?v=20"></script>
 <script>
 (function(){
 "use strict";
@@ -174,8 +234,7 @@ const GAMES = [
   { id:'inncloud', name:'Inncloud Invaders', icon:'img/g-inncloud.png' },
 ];
 const Q = new URLSearchParams(location.search);
-const TOP_ALL  = Math.max(3, Math.min(50, parseInt(Q.get('top'), 10) || 10));   // ?top=15 mostra più righe
-const TOP_GAME = Math.max(3, Math.min(20, parseInt(Q.get('topgioco'), 10) || 5));
+let TOP_GAME = 5;   // righe per gioco: scelta con i pulsanti "Top"
 const EVERY = 15;   // secondi tra un aggiornamento e l'altro
 const B = window.EFG_BACKEND;
 const $ = id => document.getElementById(id);
@@ -184,35 +243,116 @@ $('demoNote').hidden = B.remote;
 // game panels
 for (const g of GAMES){
   const sec = document.createElement('section'); sec.className = 'panel'; sec.setAttribute('aria-label', g.name);
-  sec.innerHTML = '<div class="ph"><img alt=""><div><h2></h2><div class="sub">Top ' + TOP_GAME + ' · livelli superati e punti</div></div></div><ol></ol>';
+  sec.innerHTML = '<div class="ph"><img alt=""><div><h2></h2><div class="sub">Top ' + TOP_GAME + ' · ordinata per punti</div></div></div><ol></ol>';
   sec.querySelector('img').src = g.icon; sec.querySelector('h2').textContent = g.name;
   sec.querySelector('ol').id = 'list-' + g.id;
   $('games').appendChild(sec);
 }
 
-const last = {};   // board key -> "pid:score" signatures, to flash rows that changed
+// righe riusate per giocatore: a ogni aggiornamento chi entra o sale prende il suo posto
+// e chi sta sotto scala di una posizione con un'animazione (tecnica FLIP)
+const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const rowsByKey = {};   // board key -> Map(pid -> {li, sig})
 function render(key, rows, top){
-  const ol = $('list-' + key); ol.innerHTML = '';
-  rows = rows.slice(0, top);
-  if (!rows.length){ const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Ancora nessun punteggio. Sarai il primo?'; ol.appendChild(li); return; }
-  const prev = last[key]; last[key] = new Set(rows.map(r => r.pid + ':' + r.levels + ':' + r.score));
+  const ol = $('list-' + key);
+  rows = rows.slice().sort((x, y) => (Number(y.score) || 0) - (Number(x.score) || 0)).slice(0, top);
+  const firstTime = !rowsByKey[key];
+  const map = rowsByKey[key] = rowsByKey[key] || new Map();
+  if (!rows.length){ map.clear(); ol.innerHTML = ''; const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Ancora nessun punteggio. Sarai il primo?'; ol.appendChild(li); return; }
+  ol.querySelectorAll('li.empty').forEach(x => x.remove());
+  // 1. posizioni prima dell'aggiornamento
+  const before = new Map(); map.forEach((v, pid) => before.set(pid, v.li.getBoundingClientRect().top));
+  // 2. aggiorna, crea e riordina le righe
+  const keep = new Set();
   rows.forEach((r, i) => {
-    const li = document.createElement('li');
-    const a = document.createElement('span'); a.className = 'r'; a.textContent = i + 1;
-    const n = document.createElement('span'); n.className = 'n'; n.textContent = r.name;
-    const lv = document.createElement('span'); lv.className = 'lv'; lv.textContent = (key === 'all' ? (r.games || 0) + '/4 giochi · ' + (r.levels || 0) + '/12 liv' : (r.levels || 0) + '/3 liv');
-    const s = document.createElement('span'); s.className = 's'; s.textContent = r.score; const u = document.createElement('small'); u.textContent = 'pt'; s.appendChild(u);
-    li.append(a, n, lv, s); ol.appendChild(li);
-    if (prev && !prev.has(r.pid + ':' + r.levels + ':' + r.score)){ li.classList.add('fresh'); setTimeout(() => li.classList.remove('fresh'), 2500); }
+    keep.add(r.pid);
+    const sig = r.levels + ':' + r.score;
+    let e = map.get(r.pid), isNew = false;
+    if (!e){
+      const li = document.createElement('li');
+      li.innerHTML = '<span class="r"></span><span class="n"></span><span class="lv"></span><span class="s"><b></b><small>pt</small></span>';
+      e = { li, sig:null }; map.set(r.pid, e); isNew = true;
+    }
+    const li = e.li;
+    li.querySelector('.r').textContent = i + 1;
+    li.querySelector('.n').textContent = r.name;
+    li.querySelector('.lv').textContent = (key === 'all' ? (r.games || 0) + '/4 giochi · ' + (r.levels || 0) + '/12 liv' : (r.levels || 0) + '/3 liv');
+    li.querySelector('.s b').textContent = r.score;
+    const changed = !firstTime && (isNew || e.sig !== sig);
+    e.sig = sig; e.changed = changed; e.isNew = isNew && !firstTime;
+    ol.appendChild(li);   // appendChild sposta le righe esistenti nell'ordine giusto
+  });
+  map.forEach((v, pid) => { if (!keep.has(pid)){ v.li.remove(); map.delete(pid); } });
+  if (reduce || firstTime) return;
+  // 3. anima dallo stato vecchio al nuovo
+  map.forEach((v, pid) => {
+    const li = v.li;
+    if (v.isNew){
+      li.animate([{ opacity:0, transform:'translateX(-24px) scale(.96)' }, { opacity:1, transform:'none' }], { duration:650, easing:'cubic-bezier(.2,.8,.2,1)' });
+    } else if (before.has(pid)){
+      const dy = before.get(pid) - li.getBoundingClientRect().top;
+      if (Math.abs(dy) > 1) li.animate([{ transform:'translateY(' + dy + 'px)' }, { transform:'none' }], { duration:700, easing:'cubic-bezier(.2,.8,.2,1)' });
+    }
+    if (v.changed){ li.classList.add('fresh'); setTimeout(() => li.classList.remove('fresh'), 2500); }
   });
 }
+
+/* ---------- pulsanti: Classifica / Top / Giocatori / QR ----------
+   Le scelte restano su questo schermo; si possono anche fissare dall'indirizzo:
+   classifica.html?classifica=generale|giochi|tutti&top=3|5|10&giocatori=ospiti|efuture|tutti&qr=si|no */
+const store = { get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
+                set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
+const OPTS = { board:['generale','giochi','tutti'], top:['3','5','10'], group:['ospiti','efuture','tutti'], qr:['si','no'] };
+const DEF  = { board:'giochi', top:'5', group:'tutti', qr:'si' };
+const URLK = { board:'classifica', top:'top', group:'giocatori', qr:'qr' };
+const saved = store.get('efgBoardView3', {});
+const st = {};
+for (const k in OPTS){
+  let v = Q.get(URLK[k]); if (k === 'qr' && (v === '1' || v === '0')) v = v === '1' ? 'si' : 'no';
+  st[k] = OPTS[k].includes(v) ? v : (OPTS[k].includes(saved[k]) ? saved[k] : DEF[k]);
+}
+const view = {
+  group(){ return st.group; },
+  apply(){
+    const t = st.board !== 'giochi', g = st.board !== 'generale';
+    TOP_GAME = parseInt(st.top, 10);
+    $('secTotal').hidden = !t; $('games').hidden = !g;
+    $('qrBig').hidden = st.qr === 'no'; $('main').classList.toggle('no-qr', st.qr === 'no');
+    $('main').classList.toggle('only-total', t && !g);
+    $('main').classList.toggle('only-games', g && !t);
+    document.querySelectorAll('.seg').forEach(seg => seg.querySelectorAll('button').forEach(b => {
+      const on = b.dataset.v === st[seg.dataset.key]; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1;
+    }));
+    const label = st.group === 'efuture' ? 'Solo utenti Efuture' : st.group === 'ospiti' ? 'Solo ospiti' : '';
+    $('whoTag').hidden = !label; $('whoTag').textContent = label;
+    document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · ordinata per punti' + (label ? ' · ' + label.toLowerCase() : ''));
+    store.set('efgBoardView3', st);
+  }
+};
+function choose(key, v){
+  if (st[key] === v) return;
+  st[key] = v; view.apply();
+  if (key === 'group' || key === 'top'){   // ridisegna le liste senza animazioni
+    Object.keys(rowsByKey).forEach(k => delete rowsByKey[k]); document.querySelectorAll('main ol').forEach(o => o.innerHTML = ''); refresh();
+  }
+}
+document.querySelectorAll('.seg').forEach(seg => {
+  seg.addEventListener('click', e => { const b = e.target.closest('button'); if (b) choose(seg.dataset.key, b.dataset.v); });
+  seg.addEventListener('keydown', e => {   // frecce sinistra/destra come in un gruppo di opzioni
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const list = OPTS[seg.dataset.key], i = list.indexOf(st[seg.dataset.key]);
+    const v = list[(i + (e.key === 'ArrowRight' ? 1 : list.length - 1)) % list.length];
+    choose(seg.dataset.key, v); seg.querySelector('[data-v="' + v + '"]').focus(); e.preventDefault();
+  });
+});
+view.apply();
 
 let timer = 0;
 async function refresh(){
   clearTimeout(timer);
   try {
-    const boards = await Promise.all(['all', ...GAMES.map(g => g.id)].map(k => B.board(k)));
-    render('all', boards[0], TOP_ALL);
+    const boards = await Promise.all(['all', ...GAMES.map(g => g.id)].map(k => B.board(k, view.group())));
+    render('all', boards[0], TOP_GAME);   // "Top" vale per tutte le classifiche
     GAMES.forEach((g, i) => render(g.id, boards[i + 1], TOP_GAME));
     const t = new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
     $('status').textContent = 'Live · aggiornata alle ' + t; $('dot').classList.remove('off');
