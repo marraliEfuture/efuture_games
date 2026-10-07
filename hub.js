@@ -52,6 +52,7 @@ let bests = store.get('efgBests4', {});
 const better = (a, b) => !b || a.l > b.l || (a.l === b.l && a.s > b.s);
 const fmtRes = r => r.l + '/' + LEVELS + ' liv · ' + r.s + ' pt';
 let session = null;                          // {id, email, nickname}
+let gate = { mode:null }, gateOffset = 0, lastPhase = null;   // countdown di apertura/chiusura
 
 /* ================= BACKEND (backend.js) ================= */
 const Backend = window.EFG_BACKEND, friendly = window.EFG_FRIENDLY, remote = Backend.remote;
@@ -70,7 +71,9 @@ function renderGrid(){
     const best = document.createElement('span'); best.className = 'best';
     if (bests[g.id]){ best.innerHTML = 'Record: <b></b>'; best.querySelector('b').textContent = fmtRes(bests[g.id]); }
     b.append(img, name, st, best);
-    b.addEventListener('click', ()=> open ? play(g) : askUnlock(g));
+    const gp = gatePhase().phase, blocked = gp === 'prima' || gp === 'chiuso';
+    if (blocked){ b.disabled = true; b.setAttribute('aria-label', g.name + (gp === 'prima' ? ', non ancora aperto' : ', gara chiusa')); }
+    b.addEventListener('click', ()=>{ if (isBlocked()) return; open ? play(g) : askUnlock(g); });
     grid.appendChild(b);
   }
 }
@@ -78,7 +81,7 @@ function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v20' : 'Modalità demo: account e classifica restano su questo telefono. · v20';
+  mn.textContent = remote ? 'Classifica online · v21' : 'Modalità demo: account e classifica restano su questo telefono. · v21';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -168,6 +171,7 @@ $('btnCam').addEventListener('click', startCam);
 /* ================= PLAY (competition mode: 3 levels x 60 s) ================= */
 let playing = null, runUsed = 0;
 function play(g){
+  if (isBlocked()){ toast(gatePhase().phase === 'prima' ? 'I giochi non sono ancora aperti.' : 'La gara è chiusa.'); return; }
   playing = g; runUsed = 0;
   $('playerTitle').textContent = g.name;
   $('playerClock').textContent = '';
@@ -358,7 +362,34 @@ function autoInstallDue(){
 // link alla classifica sempre verso il sito pubblico (anche dall'anteprima in Claude)
 try { const pu = (window.EFG_CONFIG || {}).PUBLIC_URL; if (pu) $('lnkBoard').href = pu.replace(/\/?$/, '/') + 'classifica.html'; } catch(e){}
 
+/* ================= COUNTDOWN DI APERTURA / CHIUSURA =================
+   Lo fa partire un amministratore dalla classifica. L'ora è quella del server,
+   così tutti i telefoni vedono lo stesso conto alla rovescia. */
+function gatePhase(){ return window.EFG_GATE_PHASE(gate, Date.now() + gateOffset); }
+function isBlocked(){ const p = gatePhase().phase; return p === 'prima' || p === 'chiuso'; }
+async function loadGate(){
+  try { const g = await Backend.gate(); if (g){ gate = g; if (g.now) gateOffset = new Date(g.now).getTime() - Date.now(); } } catch(e){}
+  renderGate();
+}
+function renderGate(){
+  const ph = gatePhase(), bar = $('gateBar');
+  const fmtLong = s => s >= 3600 ? Math.floor(s / 3600) + ':' + String(Math.floor(s % 3600 / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') : fmt(s);
+  bar.hidden = ph.phase === 'libero' || (ph.phase === 'aperto' && !ph.closing);
+  if (ph.phase === 'prima'){ bar.className = 'gatebar wait'; $('gateTxt').textContent = '🔒 I giochi si aprono tra'; $('gateClock').textContent = fmtLong(ph.left); }
+  else if (ph.phase === 'aperto' && ph.closing){ bar.className = 'gatebar closing' + (ph.left <= 60 ? ' warn' : ''); $('gateTxt').textContent = '⏳ La gara si chiude tra'; $('gateClock').textContent = fmtLong(ph.left); }
+  else if (ph.phase === 'chiuso'){ bar.className = 'gatebar closed'; $('gateTxt').textContent = '🏁 Gara chiusa: la classifica è definitiva'; $('gateClock').textContent = ''; }
+  if (ph.phase !== lastPhase){
+    const was = lastPhase; lastPhase = ph.phase; renderGrid();
+    if (was === 'prima' && ph.phase === 'aperto') toast('I giochi sono aperti: buon divertimento!');
+    if (ph.phase === 'chiuso' && was !== null){ if (playing){ closePlayer(); } toast('Tempo scaduto: la gara è chiusa.', 4500); }
+  }
+}
+setInterval(renderGate, 1000);
+setInterval(loadGate, 15000);
+document.addEventListener('visibilitychange', ()=>{ if (!document.hidden) loadGate(); });
+window.addEventListener('storage', e=>{ if (e.key === 'efgDemoGate') loadGate(); });   // demo: countdown avviato dalla classifica nello stesso browser
+
 /* ================= BOOT ================= */
-renderGrid(); renderDock();
+renderGrid(); renderDock(); loadGate();
 Backend.current().then(u=>{ session = u; renderDock(); });
 })();
