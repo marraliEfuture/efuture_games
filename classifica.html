@@ -148,8 +148,6 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 .join b mark{color:var(--sky)}
 .join span{font-size:clamp(11px,.85vw,14px);font-weight:300;color:#c9d3de}
 .rules{font-size:clamp(11px,.85vw,14px);font-weight:300;color:#c9d3de;max-width:560px;line-height:1.6;border-left:3px solid var(--sky);padding-left:16px}
-.powered{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:clamp(10px,.75vw,12px);font-weight:300;color:#c9d3de;letter-spacing:.8px}
-.powered img{height:clamp(16px,1.4vw,22px);width:auto;display:block}
 .note{font-size:12px;font-weight:300;color:var(--muted);text-align:center;padding:0 16px 10px;margin:0}
 
 @media (max-width:900px){
@@ -162,8 +160,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 @media (max-width:560px){
   .games{grid-template-columns:minmax(0,1fr)}
   .live{margin-left:0;width:100%;justify-content:space-between}
-  .powered{margin:0 auto}
-  .topbar .pill{display:none}
+    .topbar .pill{display:none}
 }
 /* schermo grande (ledwall / TV 16:9): tutto in una schermata */
 @media (min-width:1200px){
@@ -233,9 +230,8 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 <p class="note" id="demoNote" hidden>Modalità demo: il database online non è ancora configurato, qui vedi solo i punteggi fatti su questo dispositivo.</p>
 
 <footer>
-  <div class="join"><div><b>Sblocca i giochi <mark>agli stand</mark></b><span>Inquadra il QR allo stand di ogni sponsor e scala la classifica.</span></div></div>
-  <div class="rules">3 livelli per gioco, massimo 1 minuto ciascuno. Ogni livello superato vale numero del livello × secondi che avanzano × vite rimaste, poi si sommano. In classifica vale il punteggio migliore.</div>
-  <div class="powered">powered by <img src="img/efuture-white.png" alt="efuture"></div>
+  <div class="join"><div><b>Sblocca i giochi <mark>agli stand</mark></b><span>Inquadra il QR allo stand.</span></div></div>
+  <div class="rules">3 livelli per gioco, 1 minuto ciascuno · punti = livello × secondi avanzati × vite</div>
 </footer>
 
 <div class="gmodal" id="gateDlg" hidden role="dialog" aria-modal="true" aria-labelledby="gdT">
