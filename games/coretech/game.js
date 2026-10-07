@@ -842,7 +842,13 @@ function render(){
   }
   // bugs
   if (state !== 'dying' || dyingTimer > 1.2){
-    for (const b of bugs) drawBug(ctx, b, (b.x+0.5)*T, (b.y+0.5)*T, T*0.5, clock);
+    for (const b of bugs){
+      const bx = (b.x+0.5)*T, by = (b.y+0.5)*T;
+      drawBug(ctx, b, bx, by, T*0.5, clock);
+      // tunnel: draw the other half on the opposite side while wrapping
+      if (b.x < 0.5) drawBug(ctx, b, bx + COLS*T, by, T*0.5, clock);
+      if (b.x > COLS-1.5) drawBug(ctx, b, bx - COLS*T, by, T*0.5, clock);
+    }
   }
   // popups
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';

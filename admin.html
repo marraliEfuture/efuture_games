@@ -625,6 +625,20 @@ const TUTORIALS = [
       { k:'Fatto', h:'Hai vinto!', img:'win.jpg', html:'<p>Quattro in fila e fuochi d’artificio. Gioco creato e partita vinta in circa <b>9 minuti</b>.</p><p>Con il tempo che resta prova il livello <b>Difficile</b> o sfida un amico in modalità <b>2 giocatori</b>.</p>' },
       { k:'Idee per continuare', h:'Altri prompt da provare', img:'p4.jpg', prompt:"Aggiungi un pulsante per il tema scuro e fai dire al computer una frase scherzosa quando vince.", html:'<p>Puoi chiedere a Claude qualsiasi modifica: colori, suoni, regole nuove. Una richiesta alla volta, poi prova il risultato.</p>' },
     ] },
+  { id:'sheets', title:'Foglio "Attività giornaliere" con Claude in Chrome', cover:'tutorial/sheets/foglio.jpg', desc:'Un prompt: Claude crea il foglio in Drive, calcola totale e media e lo invia con Gmail. Circa 4 minuti.',
+    slides:[
+      { k:'Tutorial', h:'Un foglio Google fatto da Claude', img:'foglio.jpg', html:'<p>Con <b>un solo prompt</b> Claude:</p><ul><li>crea il foglio «Attività giornaliere» in Drive</li><li>scrive 8 attività, totale e media</li><li>lo invia al responsabile con Gmail</li></ul><p>Tempo reale: circa <b>4 minuti</b>.</p>' },
+      { k:'Prima di iniziare', h:'Cosa ti serve', img:'drive.jpg', html:'<ul><li>il browser <b>Chrome</b></li><li>l’estensione <b>Claude in Chrome</b></li><li>un account <b>Google</b> con Drive e Gmail</li><li>un account <b>Claude</b></li></ul>' },
+      { k:'Passo 1', h:'Apri Drive e il pannello di Claude', img:'drive.jpg', time:'circa 0:20', html:'<p>Vai su <b>drive.google.com</b> e clicca l’icona di Claude in alto a destra: si apre il pannello.</p>' },
+      { k:'Passo 2 · il prompt', h:'Scrivi cosa vuoi', img:'prompt.jpg', prompt:"Crea in Google Drive un nuovo foglio Google «Attività giornaliere» con le colonne Data, Utente, Descrizione attività, Ora inizio, Ora fine e Durata (min) e inserisci 8 attività di oggi di Luca, Sara e Paolo. In fondo aggiungi una riga TOTALE con la somma delle durate e una riga MEDIA con la media, in grassetto. Salva il file e invialo con Gmail a responsabile@esempio.it (Responsabile di reparto).", html:'<p>Incolla il prompt nel pannello e premi invio. Metti nomi e indirizzo veri al posto di quelli di esempio.</p>' },
+      { k:'Passo 3', h:'Claude crea e compila il foglio', img:'righe.jpg', time:'circa 2 minuti', html:'<p>Crea il file, gli dà il nome e scrive colonne e attività. Il bordo arancione indica che Claude sta lavorando sulla pagina.</p>' },
+      { k:'Passo 4', h:'Totale e media', img:'formule.jpg', time:'circa 35 secondi', html:'<p>In fondo aggiunge <b>TOTALE</b> con =SOMMA(F2:F9) e <b>MEDIA</b> con =MEDIA(F2:F9), in grassetto.</p>' },
+      { k:'Passo 5', h:'Il file è salvato su Drive', img:'salvato.jpg', html:'<p>Fogli Google salva da solo: il file è in <b>Il mio Drive</b>.</p>' },
+      { k:'Passo 6', h:'Claude prepara la mail', img:'mail.jpg', time:'circa 35 secondi', html:'<p>Apre Gmail e scrive destinatario, oggetto, testo e link al foglio.</p>' },
+      { k:'Passo 7 · tocca a te', h:'Controlla e conferma', img:'conferma.jpg', html:'<p>Prima di inviare Claude <b>chiede conferma</b>. Controlla destinatario e testo, poi premi <b>Invia</b>.</p>' },
+      { k:'Fatto', h:'Mail inviata', img:'inviato.jpg', html:'<p>Il responsabile riceve il foglio. Tempo reale: circa <b>4 minuti</b>.</p>' },
+      { k:'Idee per continuare', h:'Altri prompt da provare', img:'foglio.jpg', prompt:"Aggiungi un secondo foglio «Riepilogo» con i minuti totali di ogni utente e un grafico a colonne.", html:'<p>Una richiesta alla volta, poi controlla il risultato.</p>' },
+    ] },
 ];
 let tuDone = false, deckT = null, deckI = 0;
 function renderTutorials(){
@@ -672,6 +686,8 @@ const VIDEOS = [
     desc:'Installazione di Claude in Chrome e prompt; poi Claude prende il controllo del mouse e prenota un tavolo per due su TheFork, con il timer del tempo reale. Alla fine la notifica e la mail di conferma sullo smartphone. 78 secondi.' },
   { title:'Crea e gioca a Forza 4 con Claude', file:'video/forza4-claude.mp4', poster:'video/forza4-claude.jpg',
     desc:'Quattro prompt in Claude per creare il gioco, con i tempi reali di ogni passaggio, poi una partita completa vinta in poche mosse. Tutto in meno di 15 minuti. 2 minuti e 16 secondi.' },
+  { title:'Foglio Google «Attività giornaliere» con l’estensione di Claude', file:'video/sheets-claude.mp4', poster:'video/sheets-claude.jpg',
+    desc:'Un prompt in Claude in Chrome: Claude crea il foglio in Drive con 8 attività, aggiunge totale e media, lo salva e, dopo la tua conferma, lo invia con Gmail al responsabile. Con il timer del tempo reale. 88 secondi.' },
 ];
 let videosDone = false;
 async function fileVersion(f){
