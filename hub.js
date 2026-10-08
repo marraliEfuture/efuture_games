@@ -214,14 +214,11 @@ async function showResult(g, ok, reason, seconds, level, used, times, lives){
   $('rsIcon').src = g.icon; $('rsGame').textContent = g.name;
   $('rsTitle').textContent = ok ? 'Tre livelli completati!' : (reason === 'time' ? 'Tempo scaduto' : 'Vite finite');
   $('rsScore').textContent = score;
-  $('rsLine').textContent = 'punti · ' + levels + (levels === 1 ? ' livello superato' : ' livelli superati') + ' su ' + LEVELS;
   $('rsLevels').textContent = levels + '/' + LEVELS;
   $('rsTime').textContent = fmt(times.reduce((a,b)=>a+b,0));
-  $('rsCalc').textContent = parts.length ? parts.map(p=> p.n + '×' + p.left + '×' + p.v).join(' + ') + ' = ' + score : '';
   const prev = bests[g.id];
   const isBest = levels > 0 && better(res, prev);
   if (isBest){ bests[g.id] = res; store.set('efgBests4', bests); }
-  $('rsBest').textContent = bests[g.id] ? fmtRes(bests[g.id]) : '—';
   const msg = $('rsMsg');
   if (levels === 0) setMsg(msg, 'Supera almeno un livello entro il minuto per entrare in classifica.' + (prev ? ' Il tuo record resta valido.' : ''));
   else if (!isBest) setMsg(msg, 'Il tuo record resta ' + fmtRes(prev) + ': in classifica conta solo il risultato migliore.');
