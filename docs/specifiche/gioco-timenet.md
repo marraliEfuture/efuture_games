@@ -27,7 +27,7 @@ Breakout (rompi-mattoncini) con il delfino di Timenet. Il delfino nuota sul pelo
 | Schermata | Contenuto | Pulsanti |
 |---|---|---|
 | **Titolo** (`ov-title`) | Logo Timenet su badge bianco, BREAKOUT, "Muovi il delfino e rompi i mattoncini col pallone.", "Record: N" se esiste. Sotto, sul campo, il delfino che ondeggia | **Inizia**, **Continua · Liv. N** (solo modalità libera, se c'è un livello raggiunto), **Istruzioni** |
-| **Istruzioni** (`howBox`) | Tre righe con disegnino: mattoncini ("alcuni reggono più colpi"), pallone ("Non far cadere il pallone in acqua"), capsule ("C 3 palloni · S rete · ✓ delfino grande · T pallone lento"). "5 livelli, dalle 08:00 alle 18:00." Tasti: Trascina o frecce · spazio lancia · P pausa | – |
+| **Istruzioni** (`howBox`) | Tre righe con disegnino: mattoncini ("alcuni reggono più colpi"), pallone ("Non far cadere il pallone in acqua"), capsule ("C 3 palloni · S rete · ✓ delfino grande · T pallone grande e lento"). "5 livelli, dalle 08:00 alle 18:00." Tasti: Trascina o frecce · spazio lancia · P pausa | – |
 | **Animazione iniziale** | Dopo **Inizia** (e **Gioca ancora**): il delfino salta fuori dall'acqua, lancia il pallone, il logo va in frantumi, compare BREAKOUT. Dura 4,2 s; "TOCCA PER SALTARE": un tocco o un tasto la salta | – |
 | **Scheda del livello** (`ov-level`) | Etichetta "08:00 · Livello 1/5" (gara: "/3"), nome e frase del livello | **Via!** |
 | **Livello completato** (`ov-clear`) | Dopo 0,9 s (1,9 s nei livelli col logo finale): "Ora completata", "Ore 08:00 completate!", punti, mattoncini rotti, tempo | **Prossimo livello** |
@@ -37,7 +37,7 @@ Breakout (rompi-mattoncini) con il delfino di Timenet. Il delfino nuota sul pelo
 
 **HUD:** Punti, Palloni (pallini colorati come il pallone), nome del livello (`08:00 · Apertura`), pulsante musica `♪` (spento: `×`), pulsante pausa `II`.
 
-**Scritte sul campo:** in alto a sinistra i timer dei poteri attivi (`✓ 12`, `T 7`, `S rete`), in alto a destra l'ora del livello, sopra il delfino i messaggi brevi ("Tocca per lanciare", "Tocca per rilanciare", "Salvato!", nome del potere preso).
+**Scritte sul campo:** sulla riga più in alto del campo (y = 14, sopra il muro) a sinistra i timer dei poteri attivi (`✓ 12`, `T 7`, `S rete`), a destra l'ora del livello; sopra il delfino i messaggi brevi ("Tocca per lanciare", "Tocca per rilanciare", "Salvato!", nome del potere preso).
 
 ## Modalità libera e modalità gara
 
@@ -59,7 +59,7 @@ Regole comuni e protocollo: [giochi-comune.md](giochi-comune.md#modalità-libera
 
 ## Livelli
 
-Campo logico 360 × 600. Il muro occupa tutta la larghezza (bordi di 12 px) e parte da y = 64. Il mare inizia a y = 512, il pallone rimbalza sul delfino a y = 494.
+Campo logico 360 × 600. Il muro occupa tutta la larghezza (bordi di 12 px) e parte da y = 28 (dalla v28; prima 64): sopra resta solo la riga dei timer e dell'ora. Il mare inizia a y = 512, il pallone rimbalza sul delfino a y = 494.
 
 | Liv. | Ora – nome | Frase | Muro (colonne × righe) | Mattoncini | Da 2 colpi | Dorati ★ | Velocità pallone | Larghezza delfino | Raggio pallone | Logo |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -69,7 +69,7 @@ Campo logico 360 × 600. Il muro occupa tutta la larghezza (bordi di 12 px) e pa
 | 4 | 16:00 Scadenza | "42 blocchi. Il logo appare alla fine." | 7 × 6 | 42 | 26 | 1 | 435 | 80 | 8 | Compare alla fine |
 | 5 | 18:00 Chiusura | "56 blocchi. Ultimo sforzo!" | 8 × 7 | 56 | 44 | 2 | 470 | 74 | 7 | Compare alla fine |
 
-- Velocità in unità logiche al secondo; l'altezza dei mattoncini scende da 50 a 21,4 così il muro copre sempre il logo.
+- Velocità in unità logiche al secondo; l'altezza dei mattoncini scende da 50 a 21,4 così il muro (alto 150 in tutti i livelli, da y = 28 a 178) copre sempre il logo. Il pannello del logo segue la posizione del muro.
 - I muri sono simmetrici: bordo di mattoncini blu medi da 2 colpi, interno azzurro e blu scuro, dorati al centro.
 
 **Tipi di mattoncino:**
@@ -99,10 +99,12 @@ Il codice prevede anche mattoncini da 3 colpi (`h`) e di acciaio indistruttibili
 | `C` | CONNESSI | 27% | Ogni pallone in volo (max 3) si divide in 3 |
 | `S` | SICURI | 24% | Rete sul fondo: salva un pallone una volta ("Salvato!") |
 | `✓` | SODDISFATTI | 24% | Delfino largo 1,4 volte per 15 s |
-| `T` | TEMPO | 20% | Pallone più lento (×0,68) per 10 s |
+| `T` | TEMPO | 20% | Per 10 s il pallone è più lento (×0,68) e più grande (raggio ×1,7), con un alone viola. Messaggio "TEMPO · pallone grande e lento" |
 | `+` | +1 PALLONE | 5% | Un pallone (vita) in più |
 
-**Pallone perso:** quando tutti i palloni in gioco cadono in acqua (spruzzo), si perde una vita; delfino grande, pallone lento e capsule in caduta si annullano, la rete resta.
+**Pallone grande (capsula `T`):** il raggio cresce e torna normale in modo graduale (circa 0,4 s). Il raggio attuale vale per tutte le collisioni: pareti, mattoncini (colpi più larghi), delfino (più facile da prendere) e rete. Il pallone cresce solo dove c'è spazio libero, quindi non resta mai incastrato in pareti o mattoncini; i palloni nati da `C` mantengono la dimensione del pallone da cui nascono. Il pallone nuovo sul delfino ha la dimensione normale.
+
+**Pallone perso:** quando tutti i palloni in gioco cadono in acqua (spruzzo), si perde una vita; delfino grande, pallone grande e lento e capsule in caduta si annullano, la rete resta.
 
 **Punteggio interno** (HUD, non va in classifica): mattoncino rotto 50/100/200, colpo su un mattoncino che resiste 10, capsula presa 100. Record in `timenetBreakBest`.
 
@@ -151,4 +153,4 @@ Effetti sintetizzati con Web Audio (nessun file audio): mattoncino rotto (nota c
 - Il tempo di gara scorre anche mentre il pallone aspetta il lancio.
 
 ---
-Ultimo aggiornamento: 07/10/2026 (v27)
+Ultimo aggiornamento: 08/10/2026 (v28)

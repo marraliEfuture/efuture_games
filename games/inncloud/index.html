@@ -64,10 +64,29 @@ body{font-family:var(--mono);overflow:hidden;-webkit-user-select:none;user-selec
 #strip{height:74px;border-radius:14px;border:1px dashed var(--line);background:linear-gradient(180deg,#ffffff,rgba(192,0,0,.06));display:flex;align-items:center;justify-content:center;gap:10px;color:var(--dim);font-size:11px;letter-spacing:.06em;text-align:center;padding-inline:12px}
 #strip b{color:var(--ct-light)}
 #strip .arrow{font-size:18px;color:var(--tn-light)}
+/* SPARA: grande tasto rondo rosso; tenuto premuto spara a raffica (stesso ritmo massimo) */
+#controls{display:flex;align-items:center;gap:12px}
+#strip{flex:1 1 auto;min-width:0}
+#fireBtn{flex:0 0 auto;width:80px;height:80px;border-radius:50%;padding:0;border:1px solid var(--ct-deep);
+  background:radial-gradient(circle at 38% 30%,#ff5a5a 0,var(--ic-red) 58%,#8f0000 100%);color:#fff;
+  font-family:var(--pixel);font-size:11px;letter-spacing:.02em;cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 4px 0 var(--ct-deep),0 6px 14px rgba(13,43,69,.22)}
+#fireBtn.down{transform:translateY(3px);box-shadow:0 1px 0 var(--ct-deep),0 2px 6px rgba(13,43,69,.2);filter:brightness(1.08)}
 @media (orientation:landscape) and (max-height:560px){
   #main{flex-direction:row}
-  #controls{order:-1;display:flex;padding:8px 8px 8px calc(12px + env(safe-area-inset-left,0px))}
-  #strip{height:auto;width:120px;flex-direction:column}
+  /* la fascia va a sinistra del campo, SPARA a destra (mai sopra al gioco) */
+  #controls{display:contents}
+  #strip{order:-1;flex:0 0 auto;height:auto;width:120px;flex-direction:column;margin:8px 8px 8px calc(12px + env(safe-area-inset-left,0px))}
+  #fireBtn{order:1;align-self:center;width:88px;height:88px;font-size:12px;margin:0 calc(14px + env(safe-area-inset-right,0px)) 0 8px}
+}
+/* in verticale (scocca Game Boy) SPARA prende il posto del tasto A: più grande e rosso */
+@media (orientation:portrait){
+  html[data-gb=strip] .gb-ab #fireBtn.gb-a{width:76px;height:76px;margin:0;font-size:11px;color:#fff;border:1px solid #7a0000;
+    background:radial-gradient(circle at 38% 30%,#ff6a6a 0,var(--ic-red) 58%,#8f0000 100%);box-shadow:0 4px 0 #7a0000,0 6px 10px rgba(60,10,10,.28);touch-action:none}
+  html[data-gb=strip] .gb-ab #fireBtn.gb-a.down{transform:translateY(3px);box-shadow:0 1px 0 #7a0000}
+  html[data-gb=strip] .gb-ab #soundBtn.gb-b{margin-top:-30px}
+  html[data-gb=strip] #controls .gb-ab::before{left:-6px;top:22px;width:160px;height:72px;border-radius:36px}
+  html[data-gb=strip] #strip .fire-hint{display:none}
 }
 .logo-badge{background:#ffffff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 auto;width:min(100%,320px)}
 .logo-badge img{width:100%;display:block}
@@ -135,13 +154,13 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
           <div id="howBox" hidden>
             <div class="howto">
               <div class="legend">
-                <canvas id="lgShot" width="44" height="44"></canvas><span>Spara da sola: tu <b style="color:var(--ic-red)">muoviti</b>.</span>
+                <canvas id="lgShot" width="44" height="44"></canvas><span>Premi <b style="color:var(--ic-red)">SPARA</b> per colpire, trascina per muoverti.</span>
                 <canvas id="lgBug" width="44" height="44"></canvas><span>Abbatti tutti, schiva i <b style="color:var(--hack)">codici verdi</b>.</span>
                 <canvas id="lgWall" width="44" height="44"></canvas><span>Riparati dietro le <b>nuvolette</b>.</span>
               </div>
               <span class="dim">5 livelli, boss finale.</span>
             </div>
-            <div class="hint">Trascina o <b>frecce</b> · <b>P</b> pausa</div>
+            <div class="hint">Trascina o <b>frecce</b> · <b>Spazio</b> spara · <b>P</b>&nbsp;pausa</div>
           </div>
         </div>
       </div>
@@ -204,11 +223,12 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
     </div>
 
     <div id="controls">
-      <div id="strip"><span class="arrow">◀</span><span>Trascina per <b>muoverti</b></span><span class="arrow">▶</span></div>
+      <div id="strip"><span class="arrow">◀</span><span>Trascina per <b>muoverti</b><span class="fire-hint"> · <b>SPARA</b> per colpire</span></span><span class="arrow">▶</span></div>
+      <button id="fireBtn" type="button" aria-label="Spara">SPARA</button>
     </div>
   </div>
 </div>
-<script src="../gameboy.js" data-game="strip" data-a="pauseBtn" data-b="soundBtn" data-select="btnHow" data-pause="pauseBtn" data-paused="ov-pause" data-primary=".overlay button.btn:not(.alt)"></script>
+<script src="../gameboy.js" data-game="strip" data-a="fireBtn" data-b="soundBtn" data-select="btnHow" data-pause="pauseBtn" data-paused="ov-pause" data-primary=".overlay button.btn:not(.alt)"></script>
 <script>
 /* Efuture Games: send scores to the hub that hosts this game */
 window.efgReport = function(game, score, level, won){

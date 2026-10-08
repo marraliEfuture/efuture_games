@@ -61,6 +61,10 @@ Raccolte alla presentazione del 07/10. Si fanno uno step alla volta: l'utente pr
 - [x] **Step 9 – Look Game Boy (v27):** in verticale i giochi sembrano un Game Boy (`games/gameboy.css` + `games/gameboy.js`): joystick o barra al posto della croce, A/B = SALTA/MOUSE (SysAdmin) o PAUSA/MUSICA, pulsantini ISTRUZIONI e AVVIA/PAUSA; in orizzontale invariato.
 - [x] **Specifiche (v27):** `docs/specifiche/` con README, app-giocatori, classifica, admin, database, giochi-comune e una scheda per gioco. Da qui ogni modifica aggiorna la sua specifica.
 
+Correzioni dell'08/10 (v28):
+- Timenet: muro di mattoncini più in alto (y 64→28); la capsula T rende il pallone anche grande (×1,7) con alone viola, così sembra un vantaggio.
+- Inncloud: schieramento nemici più in alto (prima fila y 84→34); niente più sparo automatico: pulsante SPARA (tasto A nel look Game Boy, a destra in orizzontale), tieni premuto = raffica; tastiera Spazio/↑/Z.
+
 Risposte dell'utente (07/10):
 - L'utente eliminato si cancella davvero dal database e sparisce dalla classifica; il registro eventi resta.
 - Cellulare: via da tutto, anche dal database.

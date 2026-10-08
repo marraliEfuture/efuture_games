@@ -12,6 +12,8 @@ function efgPost(m){ try { if (window.parent !== window) window.parent.postMessa
 /* ================= CONSTANTS ================= */
 const W = 360, H = 600;
 const SHIP_Y = 548;
+const TOP_Y = 34, BOSS_TOP_Y = 116;   // first row of the formation: just below the drone lane (y = 16)
+const FIRE_CD = 0.3, FIRE_CD_X2 = 0.18; // manual fire: shortest time between two shots (normal / double shot)
 const RED = '#c00000', RED_HI = '#ff3b3b', INK = '#272727', CLOUD = '#ffffff', HACK = '#13a04a';
 const NAVY = '#0d2b45', OUTLINE = '#56718a';   // light theme: text and cloud outline on the pale sky
 const PX = 3;                                   // size of one sprite pixel
@@ -134,7 +136,7 @@ function refreshSoundBtn(){ $('soundBtn').textContent = audioOn ? '♪' : '×'; 
 let state = 'title', prevState = null;
 let lvIndex = 0, L = LEVELS[0];
 let score = 0, levelStartScore = 0, lives = 3, levelKills = 0, levelTime = 0;
-let ship = { x:W/2, inv:0, fireCd:0, fireMax:0.34, dead:0 };
+let ship = { x:W/2, inv:0, fireCd:0, fireMax:FIRE_CD, dead:0 };
 const DOT_R = 4.5;                // same size as the dot of the "i"
 let shots = [], ebul = [], parts = [], toasts = [];
 let foes = [], total = 0, fx = 0, fdir = 1, fy = 0, frame = 0, frameT = 0, fireT = 0;
@@ -154,16 +156,17 @@ function loadLevel(i){
   // the formation must leave room to march sideways: never wider than the field minus ~60px
   GAP_X = Math.max(2, Math.min(6, (W - 60 - L.cols*SPR_W) / Math.max(1, L.cols-1)));
   const gw = L.cols*SPR_W + (L.cols-1)*GAP_X;
-  const x0 = (W - gw)/2, y0 = L.boss ? 150 : 84;
+  const x0 = (W - gw)/2, y0 = L.boss ? BOSS_TOP_Y : TOP_Y;
   L.rows.forEach((t, r)=>{
     for (let c=0;c<L.cols;c++) foes.push({ t, x:x0 + c*(SPR_W+GAP_X), y:y0 + r*(SPR_H+GAP_Y), alive:true, c });
   });
   total = foes.length; fx = 0; fy = 0; fdir = 1; frame = 0; frameT = 0; fireT = 0;
   shots = []; ebul = []; parts = []; toasts = [];
   drone = null; droneT = 7 + Math.random()*5; doubleT = 0;
-  boss = L.boss ? { x:W/2, y:78, vx:55, hp:20, max:20, t:0, shotT:1.4, flash:0 } : null;
+  boss = L.boss ? { x:W/2, y:62, vx:55, hp:20, max:20, t:0, shotT:1.4, flash:0 } : null;
   buildWalls();
-  ship = { x:W/2, inv:1.2, fireCd:0.4, fireMax:0.4, dead:0 };
+  ship = { x:W/2, inv:1.2, fireCd:0.25, fireMax:0.25, dead:0 };
+  fireQ = 0;
   levelKills = 0; levelTime = 0;
 }
 
@@ -210,16 +213,19 @@ function update(dt){
     else if (targetX !== null) ship.x += (targetX - ship.x) * Math.min(1, dt*16);
     ship.x = Math.max(24, Math.min(W-24, ship.x));
     if (ship.inv > 0) ship.inv -= dt;
-    // auto-fire red shots (the dot of the "i")
-    ship.fireCd -= dt;
+    // red shots (the dot of the "i"), only when the player fires: SPARA, Space / ArrowUp / Z, mouse button.
+    // Holding fires again as soon as the cooldown allows; a tap is remembered for a moment.
+    if (ship.fireCd > 0) ship.fireCd -= dt;
     const maxShots = doubleT > 0 ? 6 : 3;
-    if (ship.fireCd <= 0 && shots.length < maxShots){
-      ship.fireCd = ship.fireMax = doubleT > 0 ? 0.2 : 0.34;
+    if ((fireHeld() || fireQ > 0) && ship.fireCd <= 0 && shots.length < maxShots){
+      fireQ = 0;
+      ship.fireCd = ship.fireMax = doubleT > 0 ? FIRE_CD_X2 : FIRE_CD;
       if (doubleT > 0){ shots.push({x:ship.x-6, y:SHIP_Y-12}); shots.push({x:ship.x+6, y:SHIP_Y-12}); }
       else shots.push({ x:ship.x, y:SHIP_Y-12 });
       sfx.shoot();
     }
   }
+  if (fireQ > 0) fireQ -= dt;
   if (doubleT > 0) doubleT -= dt;
 
   // formation
@@ -267,7 +273,7 @@ function update(dt){
 
   // drone (bonus): crossing the top, drops a double-shot patch when hit
   droneT -= dt;
-  if (!drone && droneT <= 0 && !boss){ drone = { x: Math.random()<0.5 ? -30 : W+30, y:52, vx:0 }; drone.vx = drone.x < 0 ? 70 : -70; sfx.drone(); }
+  if (!drone && droneT <= 0 && !boss){ drone = { x: Math.random()<0.5 ? -30 : W+30, y:16, vx:0 }; drone.vx = drone.x < 0 ? 70 : -70; sfx.drone(); }
   if (drone){ drone.x += drone.vx*dt; if (drone.x < -40 || drone.x > W+40){ drone = null; droneT = 12 + Math.random()*8; } }
 
   // player shots
@@ -457,30 +463,52 @@ function refreshTitle(){
 
 /* ================= INPUT ================= */
 function fieldX(clientX){ const r = canvas.getBoundingClientRect(); return (clientX - r.left) / r.width * W; }
-let drag = null;
+let drag = null;                      // the one finger that moves the cloud (strip or field)
+const firePtrs = new Set();           // fingers / pointers holding SPARA (multi-touch: drag + fire together)
+let fireQ = 0, mouseFire = false;     // fireQ: a tap waiting for the cooldown (seconds left)
+function fireHeld(){ return firePtrs.size > 0 || mouseFire || !!(keys[' '] || keys.ArrowUp || keys.z || keys.Z); }
+function pressFire(){ if (state === 'play') fireQ = 0.25; }
 function onDown(e){
   if (state === 'intro'){ endIntro(); return; }
   if (e.target.closest && e.target.closest('.overlay')) return;
   if (state !== 'play') return;
-  drag = { sx:e.clientX, start:ship.x, strip: e.currentTarget.id === 'controls' };
+  if (e.pointerType === 'mouse'){ if (e.button === 0 && e.currentTarget === stage){ mouseFire = true; pressFire(); } return; }
+  if (drag) return;
+  drag = { id:e.pointerId, sx:e.clientX, start:ship.x, strip: e.currentTarget.id === 'controls' };
   if (!drag.strip) targetX = fieldX(e.clientX);
 }
 function onMove(e){
   if (state !== 'play') return;
   if (e.pointerType === 'mouse' && !drag){ targetX = fieldX(e.clientX); return; }
-  if (!drag) return;
+  if (!drag || e.pointerId !== drag.id) return;
   if (drag.strip){ const r = canvas.getBoundingClientRect(); targetX = drag.start + (e.clientX - drag.sx)/r.width*W*1.3; }
   else targetX = fieldX(e.clientX);
 }
 stage.addEventListener('pointerdown', onDown);
 $('controls').addEventListener('pointerdown', onDown);
 window.addEventListener('pointermove', onMove);
-window.addEventListener('pointerup', ()=>{ drag = null; });
-window.addEventListener('pointercancel', ()=>{ drag = null; });
+function onUp(e){
+  if (drag && e.pointerId === drag.id) drag = null;
+  if (e.pointerType === 'mouse') mouseFire = false;
+  if (firePtrs.delete(e.pointerId) && !firePtrs.size) fireBtn.classList.remove('down');
+}
+window.addEventListener('pointerup', onUp);
+window.addEventListener('pointercancel', onUp);
+// SPARA: tap = one shot, hold = repeated shots. It never starts a drag of the cloud.
+const fireBtn = $('fireBtn');
+fireBtn.addEventListener('pointerdown', e=>{
+  e.stopPropagation(); e.preventDefault();
+  if (state === 'intro'){ endIntro(); return; }
+  firePtrs.add(e.pointerId); fireBtn.classList.add('down'); pressFire();
+});
+fireBtn.addEventListener('lostpointercapture', onUp);
+fireBtn.addEventListener('contextmenu', e=>e.preventDefault());
+fireBtn.addEventListener('keydown', e=>{ if (e.key === 'Enter'){ e.preventDefault(); pressFire(); } });
 const keys = {};
 window.addEventListener('keydown', e=>{
   if (state === 'intro'){ e.preventDefault(); endIntro(); return; }
-  if (['ArrowLeft','ArrowRight',' ','a','d','A','D'].includes(e.key)) e.preventDefault();
+  if (['ArrowLeft','ArrowRight','ArrowUp',' ','a','d','A','D','z','Z'].includes(e.key)) e.preventDefault();
+  if (!keys[e.key] && [' ','ArrowUp','z','Z'].includes(e.key)) pressFire();
   keys[e.key] = true;
   if (e.key==='p' || e.key==='P' || e.key==='Escape') togglePause();
   if (e.key==='Enter'){
@@ -612,9 +640,9 @@ function drawBoss(){
   ctx.fillStyle = '#ff5d56'; ctx.font = "7px 'Press Start 2P', monospace"; ctx.textAlign='center'; ctx.fillText('PAY $', 0, 44);
   ctx.restore();
   // health bar
-  ctx.fillStyle = 'rgba(13,43,69,0.15)'; ctx.fillRect(40, 30, W-80, 6);
-  ctx.fillStyle = RED_HI; ctx.fillRect(40, 30, (W-80)*(b.hp/b.max), 6);
-  ctx.fillStyle = NAVY; ctx.font = "7px 'Press Start 2P', monospace"; ctx.textAlign='center'; ctx.fillText('RANSOMWARE', W/2, 22);
+  ctx.fillStyle = 'rgba(13,43,69,0.15)'; ctx.fillRect(40, 14, W-80, 6);
+  ctx.fillStyle = RED_HI; ctx.fillRect(40, 14, (W-80)*(b.hp/b.max), 6);
+  ctx.fillStyle = NAVY; ctx.font = "7px 'Press Start 2P', monospace"; ctx.textAlign='center'; ctx.fillText('RANSOMWARE', W/2, 8);
 }
 function drawParts(){
   for (const p of parts){ ctx.globalAlpha = Math.max(0, Math.min(1, p.t*2)); ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, p.s, p.s); }
