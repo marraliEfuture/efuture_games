@@ -779,15 +779,16 @@ function buildNormalLevel(idx){
       const s = segments[i];
       const pw = 110 + rand()*70;
       const px = s.x1 + (s.x2-s.x1-pw)*rand();
-      const py = GROUND_Y - (110 + rand()*90);
+      const py = GROUND_Y - (92 + rand()*38);   // 92-130 px: sempre raggiungibili col salto (max ~145)
       platforms.push({x:Math.max(px, s.x1), y:py, w:pw, h:18});
     }
   }
 
   const enemies = [];
-  const numBugs = 4 + Math.round(idx*1.15);
+  const numBugs = 6 + Math.round(idx*1.4);
+  const bugZones = [];   // percorsi già occupati: i bug non si sovrappongono
   let placed = 0, tries = 0;
-  while (placed < numBugs && tries < 260){
+  while (placed < numBugs && tries < 600){
     tries++;
     const segI = 1 + Math.floor(rand()*(segments.length-2));
     const s = segments[segI];
@@ -796,6 +797,9 @@ function buildNormalLevel(idx){
     const patrolW = Math.min(segW - 20, 90 + rand()*90);
     const patrolMin = s.x1 + 10 + rand()*Math.max(1,(segW-patrolW-20));
     const patrolMax = patrolMin + patrolW;
+    const z1 = patrolMin - 30, z2 = patrolMax + 38 + 30;
+    if (bugZones.some(([a,b]) => z2 > a && z1 < b)) continue;
+    bugZones.push([z1, z2]);
     const speed = (55 + idx*7 + rand()*30) * (rand()<0.5?1:-1);
     enemies.push({
       type:'bug', x:(patrolMin+patrolMax)/2, y:GROUND_Y, w:38, h:30,
@@ -895,8 +899,8 @@ function buildBossLevel(){
   const width = 1500;
   const segments = [{x1:0, x2:width}];
   const platforms = [
-    {x:340, y:GROUND_Y-140, w:130, h:18},
-    {x:1030, y:GROUND_Y-140, w:130, h:18},
+    {x:340, y:GROUND_Y-125, w:130, h:18},
+    {x:1030, y:GROUND_Y-125, w:130, h:18},
     {x:660, y:GROUND_Y-230, w:150, h:18},
   ];
   const boss = {
@@ -921,7 +925,7 @@ function buildBossLevel(){
 ========================================================= */
 function spawnPlayer(){
   player = {
-    x:60, y:GROUND_Y-60, w:44, h:60, vx:0, vy:0, onGround:false,
+    x:60, y:GROUND_Y-68, w:50, h:68, vx:0, vy:0, onGround:false,
     facing:1, invuln:0, walkT:0, throwCd:0, specialCd:0, dead:false, coyote:0
   };
 }
@@ -1154,6 +1158,9 @@ function updatePlayer(dt){
         vx: SPECIAL_SPEED*player.facing, w:40, h:30, owner:'player', kind:'special', alive:true, hit:[]
       });
       spawnBurst(player.x+player.w/2, player.y+player.h*0.3, '#39e07a');
+      // l'antivirus si usa una volta sola per livello
+      level.specialUnlocked = false; level.specialUsed = true; level.killStreak = 0;
+      showToast('Antivirus usato!'); updateHud();
     }
   }
 
@@ -1325,7 +1332,7 @@ function killEnemy(e, stomped){
 }
 
 function checkSpecialUnlock(){
-  if (level.specialUnlocked) return;
+  if (level.specialUnlocked || level.specialUsed) return;
   if (level.killStreak >= 3){
     level.specialUnlocked = true;
     showToast('ANTIVIRUS SBLOCCATO! Premi V');
@@ -1392,6 +1399,10 @@ function hurtPlayer(){
 }
 
 function loseLife(reason){
+  if (level){   // anche cadendo si perde l'antivirus non ancora usato
+    if (level.specialUnlocked){ level.specialUnlocked = false; showToast('Hai perso l\'antivirus!'); }
+    level.killStreak = 0;
+  }
   lives -= 1;
   updateHud();
   if (lives <= 0){
@@ -1707,7 +1718,7 @@ function drawBackground(t){
 
   const parX = camX*0.4;
   const rand = mulberry32(idxForProps());
-  ctx.save(); ctx.globalAlpha = 0.5;
+  ctx.save(); ctx.globalAlpha = 0.22;   // schermi, firewall e accessori: in trasparenza
   for (let i=0;i<16;i++){
     const kind = th.props[i%th.props.length];
     const px = (i*260 + 60) - parX;
