@@ -15,7 +15,9 @@ const WATER_Y = 512;                     // sea surface (07/10: alzato, il delfi
 const DOLPHIN_TOP = 494;                 // where the ball bounces off the dolphin
 let BALL_R = 8;                          // set per level: big ball first, smaller later
 let COLS = 12, BW = 28, BH = 14;         // set per level from the map
-const BX0 = 12, BY0 = 64;
+const BX0 = 12, BY0 = 28;                // 08/10: muro più in alto (era 64), sopra solo la riga dei timer/ora
+const HUD_Y = 14;                        // in-canvas power timers + level clock (era 50)
+const BIG_BALL = 1.7;                    // ball radius multiplier while TEMPO (T) is active
 const TN_DARK = '#195087', TN_LIGHT = '#46a0d2', TN_MID = '#2d74a8', SUN = '#ffcf4a';
 
 // a light 1 hit · b dark 1 hit · g 2 hits · h 3 hits · x steel · o gold (always drops a capsule)
@@ -69,7 +71,7 @@ const POWERS = {
   C:{label:'CONNESSI',    note:'3 palloni', color:TN_LIGHT},
   S:{label:'SICURI',      note:'rete', color:TN_DARK},
   V:{label:'SODDISFATTI', note:'delfino grande', color:'#3fbf8f'},
-  T:{label:'TEMPO',       note:'pallone lento', color:'#b48cff'},
+  T:{label:'TEMPO',       note:'pallone grande e lento', color:'#b48cff'},
   L:{label:'+1 PALLONE',  note:'vita extra', color:'#ff5d56'},
 };
 
@@ -164,9 +166,10 @@ function loadLevel(i){
 function resetBall(){
   speedMul = 1; bigTimer = 0; slowTimer = 0;
   dolphin.x = W/2; dolphin.w = L.dw;
-  balls = [{ x:W/2, y:DOLPHIN_TOP-BALL_R, vx:0, vy:0, stuck:true, spin:0 }];
+  balls = [{ x:W/2, y:DOLPHIN_TOP-BALL_R, vx:0, vy:0, stuck:true, spin:0, s:1 }];
   caps = [];
 }
+function rad(b){ return BALL_R * (b.s || 1); }   // current radius of a ball (grows with TEMPO)
 function ballSpeed(){ return L.speed * speedMul * (slowTimer>0 ? 0.68 : 1); }
 function launch(){
   for (const b of balls){
@@ -204,11 +207,12 @@ function update(dt){
 
   // balls
   for (const b of balls){
-    if (b.stuck){ b.x = dolphin.x + dolphin.face*dolphin.w*0.5; b.y = DOLPHIN_TOP - BALL_R + 2 + Math.sin(clock*6)*1.5; continue; }
+    growBall(b, dt);
+    if (b.stuck){ b.x = dolphin.x + dolphin.face*dolphin.w*0.5; b.y = DOLPHIN_TOP - rad(b) + 2 + Math.sin(clock*6)*1.5; continue; }
     const sp = Math.hypot(b.vx, b.vy), steps = Math.ceil(sp*dt/4);
     const h = dt/steps;
     for (let i=0;i<steps && !b.dead;i++) stepBall(b, h);
-    b.spin += (b.vx/BALL_R) * dt;
+    b.spin += (b.vx/rad(b)) * dt;
   }
   const alive = balls.filter(b=>!b.dead);
   if (alive.length === 0){ loseBall(); return; }
@@ -234,40 +238,58 @@ function updateParts(dt){
   toasts = toasts.filter(t=>t.t>0);
 }
 
+/* TEMPO makes the ball big (x1.7) as well as slow, so it reads as a bonus.
+   The radius changes smoothly, and it only grows where the bigger ball
+   fits (walls and bricks): it can never end up stuck inside them.     */
+function ballFits(b, r){
+  if (b.x - r < 0 || b.x + r > W || b.y - r < 0) return false;
+  for (const br of bricks) if (b.x + r > br.x && b.x - r < br.x + br.w && b.y + r > br.y && b.y - r < br.y + br.h) return false;
+  return true;
+}
+function growBall(b, dt){
+  const s = b.s || 1, target = slowTimer > 0 ? BIG_BALL : 1;
+  if (Math.abs(target - s) < 0.002){ b.s = target; return; }
+  let n = s + (target - s) * Math.min(1, dt*7);
+  if (Math.abs(target - n) < 0.01) n = target;
+  if (n > s && !b.stuck && !ballFits(b, BALL_R*n)) return;   // wait for room before growing
+  b.s = n;
+}
 function stepBall(b, h){
+  const R = rad(b);
   b.x += b.vx*h;
-  if (b.x - BALL_R < 0){ b.x = BALL_R; b.vx = Math.abs(b.vx); sfx.wall(); }
-  if (b.x + BALL_R > W){ b.x = W - BALL_R; b.vx = -Math.abs(b.vx); sfx.wall(); }
+  if (b.x - R < 0){ b.x = R; b.vx = Math.abs(b.vx); sfx.wall(); }
+  if (b.x + R > W){ b.x = W - R; b.vx = -Math.abs(b.vx); sfx.wall(); }
   if (hitBricks(b, 'x')) return;
   b.y += b.vy*h;
-  if (b.y - BALL_R < 0){ b.y = BALL_R; b.vy = Math.abs(b.vy); sfx.wall(); }
+  if (b.y - R < 0){ b.y = R; b.vy = Math.abs(b.vy); sfx.wall(); }
   if (hitBricks(b, 'y')) return;
   // dolphin
   const half = dolphin.w/2;
-  if (b.vy > 0 && b.y + BALL_R >= DOLPHIN_TOP && b.y + BALL_R <= DOLPHIN_TOP + 16 && b.x > dolphin.x - half - BALL_R && b.x < dolphin.x + half + BALL_R){
+  if (b.vy > 0 && b.y + R >= DOLPHIN_TOP && b.y + R <= DOLPHIN_TOP + 16 && b.x > dolphin.x - half - R && b.x < dolphin.x + half + R){
     const rel = Math.max(-1, Math.min(1, (b.x - dolphin.x)/half));
     const ang = rel * 1.05;                 // up to ~60° from vertical
     speedMul = Math.min(1.3, speedMul * 1.015);
     const s = ballSpeed();
     b.vx = Math.sin(ang)*s; b.vy = -Math.cos(ang)*s;
-    b.y = DOLPHIN_TOP - BALL_R;
+    b.y = DOLPHIN_TOP - R;
     dolphin.nod = 0.22; sfx.dolphin();
     return;
   }
   // safety net
-  if (net && b.vy > 0 && b.y + BALL_R >= H - 18){
-    b.y = H - 18 - BALL_R; b.vy = -Math.abs(b.vy); net = false;
+  if (net && b.vy > 0 && b.y + R >= H - 18){
+    b.y = H - 18 - R; b.vy = -Math.abs(b.vy); net = false;
     toast('Salvato!', TN_DARK); sfx.dolphin();
     return;
   }
-  if (b.y - BALL_R > H){ b.dead = true; splash(b.x); }
+  if (b.y - R > H){ b.dead = true; splash(b.x); }
 }
 
 function hitBricks(b, axis){
+  const R = rad(b);
   for (const br of bricks){
-    if (b.x + BALL_R <= br.x || b.x - BALL_R >= br.x + br.w || b.y + BALL_R <= br.y || b.y - BALL_R >= br.y + br.h) continue;
-    if (axis === 'x'){ if (b.vx > 0) b.x = br.x - BALL_R; else b.x = br.x + br.w + BALL_R; b.vx = -b.vx; }
-    else            { if (b.vy > 0) b.y = br.y - BALL_R; else b.y = br.y + br.h + BALL_R; b.vy = -b.vy; }
+    if (b.x + R <= br.x || b.x - R >= br.x + br.w || b.y + R <= br.y || b.y - R >= br.y + br.h) continue;
+    if (axis === 'x'){ if (b.vx > 0) b.x = br.x - R; else b.x = br.x + br.w + R; b.vx = -b.vx; }
+    else            { if (b.vy > 0) b.y = br.y - R; else b.y = br.y + br.h + R; b.vy = -b.vy; }
     // never let the ball settle into an almost-horizontal path
     const s = Math.hypot(b.vx, b.vy);
     if (Math.abs(b.vy) < s*0.3){ b.vy = Math.sign(b.vy||-1)*s*0.3; b.vx = Math.sign(b.vx)*Math.sqrt(s*s - b.vy*b.vy); }
@@ -307,7 +329,7 @@ function applyPower(k){
       const s = Math.hypot(b.vx, b.vy);
       for (const d of [-0.45, 0.45]){
         const a = Math.atan2(b.vx, -b.vy) + d;
-        add.push({ x:b.x, y:b.y, vx:Math.sin(a)*s, vy:-Math.abs(Math.cos(a)*s), stuck:false, spin:0 });
+        add.push({ x:b.x, y:b.y, vx:Math.sin(a)*s, vy:-Math.abs(Math.cos(a)*s), stuck:false, spin:0, s:b.s||1 });
       }
     }
     if (!add.length){ launch(); return applyPower('C'); }
@@ -701,16 +723,26 @@ function render(){
   // dolphin bobbing in the water
   const bob = Math.sin(clock*3)*1.5;
   drawDolphin(dolphin.x, WATER_Y - 4 + bob, dolphin.w*1.12, dolphin.face, 0, dolphin.nod);
-  for (const b of balls) drawBeachBall(b.x, b.y, BALL_R, b.spin);
+  for (const b of balls){
+    const R = rad(b), g = (R/BALL_R - 1) / (BIG_BALL - 1);   // 0 normal .. 1 fully big
+    if (g > 0.02){
+      // soft violet halo (the TEMPO colour): the big ball is a bonus
+      const hr = R * (1.55 + 0.1*Math.sin(clock*8));
+      const hg = ctx.createRadialGradient(b.x, b.y, R*0.8, b.x, b.y, hr);
+      hg.addColorStop(0, `rgba(180,140,255,${0.55*g})`); hg.addColorStop(1, 'rgba(180,140,255,0)');
+      ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(b.x, b.y, hr, 0, Math.PI*2); ctx.fill();
+    }
+    drawBeachBall(b.x, b.y, R, b.spin);
+  }
   drawParts();
   // timers for active powers
   ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.font = "7px 'Press Start 2P', monospace";
   let tx = 8;
-  if (bigTimer > 0){ ctx.fillStyle = '#1f8a63'; ctx.fillText('✓ ' + Math.ceil(bigTimer), tx, 50); tx += 46; }
-  if (slowTimer > 0){ ctx.fillStyle = '#7a4fd6'; ctx.fillText('T ' + Math.ceil(slowTimer), tx, 50); tx += 46; }
-  if (net){ ctx.fillStyle = TN_DARK; ctx.fillText('S rete', tx, 50); }
+  if (bigTimer > 0){ ctx.fillStyle = '#1f8a63'; ctx.fillText('✓ ' + Math.ceil(bigTimer), tx, HUD_Y); tx += 46; }
+  if (slowTimer > 0){ ctx.fillStyle = '#7a4fd6'; ctx.fillText('T ' + Math.ceil(slowTimer), tx, HUD_Y); tx += 46; }
+  if (net){ ctx.fillStyle = TN_DARK; ctx.fillText('S rete', tx, HUD_Y); }
   // clock of the level, top right
-  ctx.textAlign = 'right'; ctx.fillStyle = '#56718a'; ctx.fillText(L.clock, W-8, 50);
+  ctx.textAlign = 'right'; ctx.fillStyle = '#56718a'; ctx.fillText(L.clock, W-8, HUD_Y);
   // toasts
   ctx.textAlign = 'center';
   ctx.font = "8px 'Press Start 2P', monospace"; ctx.lineJoin = 'round';
