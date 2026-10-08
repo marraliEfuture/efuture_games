@@ -37,5 +37,5 @@ Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
 ## Note
 
 - Nell'anteprima il database online non viene contattato. L'app va in modalità demo e la classifica può mostrare "Classifica non raggiungibile": sul sito vero si carica normalmente. Dillo all'utente, non è un errore.
-- I giochi appaiono bloccati nella home: è il comportamento normale per un nuovo giocatore. Non mostrare né usare i codici di sblocco.
+- Nella home i giochi appaiono bloccati e il pulsante Classifica non c'è: è il comportamento normale per chi non ha fatto l'accesso. Non mostrare né usare i codici di sblocco.
 - Se Playwright o Chromium mancano, dillo e dai solo il link al sito online.

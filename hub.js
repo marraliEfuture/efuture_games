@@ -63,7 +63,7 @@ function renderGrid(){
     const st = document.createElement('span'); st.className = 'state'; st.textContent = open ? 'Gioca ▶' : 'Da sbloccare';
     const rank = document.createElement('span'); rank.className = 'rank';
     const rk = ranks[g.id];
-    if (!session) rank.textContent = 'Accedi per la classifica';
+    if (!session) rank.hidden = true;   // senza accesso niente riga della classifica
     else if (rk > 0){ rank.innerHTML = 'In classifica: <b></b>'; rank.querySelector('b').textContent = rk + '°'; }
     else if (rk === -2) rank.textContent = 'Oltre il 50° posto';
     else if (rk === -1) rank.textContent = 'Non ancora in classifica';
@@ -72,7 +72,11 @@ function renderGrid(){
     b.append(img, name, st, rank, best);
     const gp = gatePhase().phase, blocked = gp === 'prima' || gp === 'chiuso';
     if (blocked){ b.disabled = true; b.setAttribute('aria-label', g.name + (gp === 'prima' ? ', non ancora aperto' : ', gara chiusa')); }
-    b.addEventListener('click', ()=>{ if (isBlocked()) return; open ? play(g) : askUnlock(g); });
+    b.addEventListener('click', ()=>{
+      if (isBlocked()) return;
+      if (!session){ showAuth('login'); openModal('mAuth'); return; }   // senza accesso: prima le credenziali
+      open ? play(g) : askUnlock(g);                                     // con accesso: gioca, o chiede il codice di sblocco
+    });
     grid.appendChild(b);
   }
 }
@@ -94,9 +98,10 @@ document.addEventListener('visibilitychange', ()=>{ if (!document.hidden && $('p
 
 function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session;
+  $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v31' : 'Modalità demo: account e classifica restano su questo telefono. · v31';
+  mn.textContent = remote ? 'Classifica online · v32' : 'Modalità demo: account e classifica restano su questo telefono. · v32';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -186,6 +191,7 @@ $('btnCam').addEventListener('click', startCam);
 /* ================= PLAY (competition mode: 3 levels x 60 s) ================= */
 let playing = null, runUsed = 0;
 function play(g){
+  if (!session){ showAuth('signup'); openModal('mAuth'); return; }
   if (isBlocked()){ toast(gatePhase().phase === 'prima' ? 'I giochi non sono ancora aperti.' : 'La gara è chiusa.'); return; }
   playing = g; runUsed = 0;
   $('playerTitle').textContent = g.name;
