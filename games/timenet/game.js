@@ -293,16 +293,16 @@ function hitBricks(b, axis){
     // never let the ball settle into an almost-horizontal path
     const s = Math.hypot(b.vx, b.vy);
     if (Math.abs(b.vy) < s*0.3){ b.vy = Math.sign(b.vy||-1)*s*0.3; b.vx = Math.sign(b.vx)*Math.sqrt(s*s - b.vy*b.vy); }
-    damage(br);
+    damage(br, R > BALL_R*1.3);   // pallone grande (TEMPO): sfonda al primo colpo
     return true;
   }
   return false;
 }
 
-function damage(br){
+function damage(br, smash){
   br.flash = 0.12;
   if (br.hp === Infinity){ sfx.steel(); return; }
-  br.hp--;
+  br.hp = smash ? 0 : br.hp - 1;
   if (br.hp > 0){ sfx.hard(); score += 10; return; }
   score += BRICK[br.t].pts; levelBroken++; breakable--;
   sfx.brick(levelBroken);
