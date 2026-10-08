@@ -52,7 +52,7 @@ Dall'alto in basso:
    - non collegato: pulsante **Registrati / Accedi**;
    - collegato: **"Ciao, *nome*"** e il link **Esci**;
    - sempre, 3 pulsanti: **Classifica · Installa app · Istruzioni**. "Installa app" si vede solo se l'installazione è possibile (vedi [Installazione](#installazione));
-   - nota di modalità: `Classifica online · v27`, oppure `Modalità demo: account e classifica restano su questo telefono. · v27`.
+   - nota di modalità: `Classifica online · v28`, oppure `Modalità demo: account e classifica restano su questo telefono. · v28`.
 
 **Istruzioni** (finestra `mHelp`): spiega che i giochi si sbloccano con il QR e richiama le regole:
 - 3 livelli per gioco, 1 minuto ciascuno;
@@ -242,7 +242,7 @@ Si apre con il pulsante **Classifica** (finestra `mBoard`).
 
 ## Aggiornamenti, versione e cache
 
-- La versione (oggi **v27**) compare in fondo alla home, nella nota di modalità. Come si aumenta è spiegato nel [README](README.md#versione-dellapp-e-aggiornamenti).
+- La versione (oggi **v28**) compare in fondo alla home, nella nota di modalità. Come si aumenta è spiegato nel [README](README.md#versione-dellapp-e-aggiornamenti).
 - **Service worker** (`sw.js`):
   - **install:** apre la cache `efuture-games-vN`, scarica tutti gli `ASSETS` e chiama `skipWaiting`. Se un file dell'elenco manca, l'installazione fallisce.
   - **activate:** cancella le cache con nome diverso e chiama `clients.claim`.
