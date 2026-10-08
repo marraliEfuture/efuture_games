@@ -517,7 +517,8 @@ function showLevelCard(i){
   $('lvTag').textContent = 'Livello ' + (i+1) + '/' + (EFG.on ? EFG.max : 5);
   $('lvName').textContent = L.name;
   $('lvText').textContent = L.text + ' Bug in gioco: ' + L.bugs + '.';
-  showOnly(ov.level); updateHud();
+  updateHud();
+  $('btnGo').onclick();   // niente schermata di spiegazione: si parte subito con "PRONTI!"
 }
 function startGame(fromLevel){
   score = 0; lives = 3;
