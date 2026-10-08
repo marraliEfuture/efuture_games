@@ -7,11 +7,21 @@ description: Mostra subito l'app Efuture Games com'è adesso nel repository — 
 
 Rispondi all'utente in italiano. L'obiettivo è far vedere l'app il prima possibile: prima l'immagine, poi i dettagli.
 
+## Dove lavorare
+
+Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
+- `<skill>` è la cartella di questa skill (quella che contiene questo SKILL.md).
+- `<repo>` è il repository efuture_games. Se la cartella corrente lo è già (c'è `config.js`), usa quella. Altrimenti, per esempio in una chat, scaricalo in una cartella temporanea:
+  ```
+  git clone --depth 1 https://github.com/marraliEfuture/efuture_games <temp>/efuture_games
+  ```
+  ed esegui i comandi da lì, con `export EFG_REPO=<temp>/efuture_games`. Se il download non riesce, dillo all'utente.
+
 ## Procedura
 
 1. Genera le schermate. Lo script apre in Chromium i file del repository, quindi anche le modifiche non ancora pubblicate, su un telefono simulato (Pixel 7):
    ```
-   node .claude/skills/efuture-games-preview/scripts/anteprima.mjs <scratchpad>/anteprima
+   node <skill>/scripts/anteprima.mjs <scratchpad>/anteprima
    ```
    Salva le immagini nello scratchpad, mai nel repository.
 2. Invia **subito** `00-anteprima.png` con SendUserFile (display `render`): sono home e 4 giochi affiancati.

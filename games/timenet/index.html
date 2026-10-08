@@ -98,7 +98,10 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
 
 /* title screen: compact explanation */
 #ov-title .card{gap:10px}
-#ov-title .card > p{font-size:12px;line-height:1.5}
+#ov-title .card > p{font-size:14.5px;line-height:1.5}
+#ov-title .card > p.dim{font-size:11px}
+#ov-title .btnrow .btn{flex:1 1 0;min-width:0}   /* Inizia e Istruzioni larghi uguali */
+@media (orientation:landscape) and (max-height:560px){#ov-title .card > p{font-size:13px;line-height:1.4}}
 #ov-title .howto{font-size:11px;line-height:1.5;padding:9px 12px;gap:6px}
 #ov-title .legend{gap:5px 9px}
 #ov-title .legend canvas{width:20px;height:20px}

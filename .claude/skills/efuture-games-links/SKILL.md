@@ -7,9 +7,19 @@ description: Propone tutti i link di Efuture Games — app, installazione, class
 
 Rispondi all'utente in italiano.
 
+## Dove lavorare
+
+Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
+- `<skill>` è la cartella di questa skill (quella che contiene questo SKILL.md).
+- `<repo>` è il repository efuture_games. Se la cartella corrente lo è già (c'è `config.js`), usa quella. Altrimenti, per esempio in una chat, scaricalo in una cartella temporanea:
+  ```
+  git clone --depth 1 https://github.com/marraliEfuture/efuture_games <temp>/efuture_games
+  ```
+  ed esegui i comandi da lì, con `export EFG_REPO=<temp>/efuture_games`. Se il download non riesce, dillo all'utente.
+
 ## Procedura
 
-1. Leggi `PUBLIC_URL` da `config.js`: è la base dei link del sito. Leggi poi `.claude/skills/efuture-games-links/links.json`.
+1. Leggi `PUBLIC_URL` da `config.js`: è la base dei link del sito. Leggi poi `<skill>/links.json`.
 2. Costruisci i link:
    - **sito:** `PUBLIC_URL` + `percorso` per ogni voce;
    - **github, claude, chatgpt:** `url` così com'è;

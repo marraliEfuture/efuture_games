@@ -7,6 +7,17 @@ description: Salva e carica su GitHub tutte le modifiche di Efuture Games. Contr
 
 Rispondi all'utente in italiano. Il sito è pubblicato da GitHub Pages dal ramo `main` (https://marraliefuture.github.io/efuture_games/).
 
+## Dove lavorare
+
+Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
+- `<skill>` è la cartella di questa skill (quella che contiene questo SKILL.md).
+- `<repo>` è il repository efuture_games. Se la cartella corrente lo è già (c'è `config.js`), usa quella. Altrimenti, per esempio in una chat, scaricalo in una cartella temporanea:
+  ```
+  git clone --depth 1 https://github.com/marraliEfuture/efuture_games <temp>/efuture_games
+  ```
+  ed esegui i comandi da lì, con `export EFG_REPO=<temp>/efuture_games`. Se il download non riesce, dillo all'utente.
+- In una chat il clone non ha il permesso di push. Per caricare le modifiche usa il connettore GitHub, se è collegato; altrimenti spiega all'utente che serve una sessione di Claude Code sul repository.
+
 ## Procedura
 
 1. **Guarda cosa è cambiato:** `git status --short` e `git diff --stat` (anche `git diff --cached --stat`).
@@ -15,7 +26,7 @@ Rispondi all'utente in italiano. Il sito è pubblicato da GitHub Pages dal ramo 
 
 2. **Versione dell'app.** Aumentala se è cambiato almeno un file del sito: html, js, css, immagini, icone, font, `manifest.webmanifest`, `qr/`, `games/`. Non serve se sono cambiati solo `.claude/`, `LEGGIMI.txt`, `README.md` o `supabase.sql`, e nemmeno se la versione è già stata aumentata in un commit non ancora pubblicato su `main`.
    ```
-   python3 .claude/skills/efuture-games-commit/scripts/prepara.py versione
+   python3 <skill>/scripts/prepara.py versione
    ```
    Senza aumento di versione usa invece `prepara.py controlla`. Lo script controlla:
    - che esistano tutti i file della cache di `sw.js`;

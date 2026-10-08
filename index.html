@@ -74,6 +74,8 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 .gatebar.warn b{color:var(--danger)}
 .gatebar.closed{background:#fdecea;border-color:var(--danger);color:#8a1f15}
 .game.open .state{background:var(--ef-orange);border-color:var(--ef-orange);color:#1d0f00;font-weight:600}
+.game .rank{font-size:10px;color:var(--dim);line-height:1.4;min-height:1.4em}
+.game .rank b{color:var(--ef-orange);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
 .game .best{font-size:10px;color:var(--dim);min-height:1.2em}
 .game .best b{color:var(--text);font-variant-numeric:tabular-nums}
 
@@ -163,7 +165,7 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 <div id="lobby">
   <header>
     <h1>EFUTURE <span class="e">GAMES</span></h1>
-    <div class="edition"><b>CARE</b> Conference Edition</div>
+    <div class="edition"><b>CARE Conference</b> Edition</div>
     <div class="tagline">Sblocca, gioca e vinci!</div>
   </header>
   <main>
@@ -255,13 +257,11 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
   <div class="sheet">
     <img class="wm" src="img/efuture-logo.png" alt="efuture">
     <div class="head"><img id="rsIcon" alt=""><div><h2 id="rsTitle">Partita finita</h2><p id="rsGame"></p></div></div>
+    <div class="result-sub">Punti</div>
     <div class="result-big" id="rsScore">0</div>
-    <div class="result-sub" id="rsLine">punti</div>
     <div class="stats2">
       <span>Livelli superati</span><b id="rsLevels">0/3</b>
-      <span>Calcolo</span><b id="rsCalc" style="font-size:9px;line-height:1.5"></b>
-      <span>Tempo</span><b id="rsTime">0:00</b>
-      <span>Il tuo record</span><b id="rsBest">0</b>
+      <span>Tempo nei livelli superati</span><b id="rsTime">0:00</b>
     </div>
     <p class="msg" id="rsMsg"></p>
     <div class="row"><button class="btn" id="rsAgain">Rigioca</button><button class="btn alt" id="rsHome">Torna ai giochi</button></div>
@@ -303,11 +303,11 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=29"></script>
+<script src="config.js?v=30"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=29"></script>
+<script src="backend.js?v=30"></script>
 <script src="vendor/jsQR.js"></script>
-<script src="hub.js?v=29"></script>
+<script src="hub.js?v=30"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });

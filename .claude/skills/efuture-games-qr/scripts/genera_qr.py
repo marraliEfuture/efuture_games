@@ -15,7 +15,7 @@ Uso:  python3 genera_qr.py CARTELLA_DI_USCITA [--repo PERCORSO_REPO] [--url URL_
     qr.json             elenco dei QR con il link contenuto in ognuno
 Dipendenze: segno, pillow  (pip install segno pillow)
 """
-import argparse, hashlib, html, io, json, re, sys
+import argparse, os, hashlib, html, io, json, re, sys
 from pathlib import Path
 
 try:
@@ -104,7 +104,7 @@ def card(repo, data, title, logo_path, lines, code):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
-    ap.add_argument("--repo", default=str(Path(__file__).resolve().parents[4]))
+    ap.add_argument("--repo", default=os.environ.get("EFG_REPO") or str(next((p for p in Path(__file__).resolve().parents if (p / "config.js").exists()), Path.cwd())))
     ap.add_argument("--url")
     a = ap.parse_args()
     repo, out = Path(a.repo), Path(a.out)

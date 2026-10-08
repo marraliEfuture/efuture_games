@@ -18,7 +18,12 @@ let pw; for (const p of PW) { try { pw = await import(p); break; } catch (e) {} 
 if (!pw) { console.error('Playwright non trovato'); process.exit(1); }
 const { chromium, devices } = pw;
 
-const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
+// repository: EFG_REPO, altrimenti quello che contiene la skill, altrimenti la cartella corrente
+const REPO = process.env.EFG_REPO || (() => {
+  for (let d = path.dirname(fileURLToPath(import.meta.url)); d !== path.dirname(d); d = path.dirname(d))
+    if (fs.existsSync(path.join(d, 'config.js'))) return d;
+  return process.cwd();
+})();
 const OUT = path.resolve(process.argv[2] || 'anteprima');
 fs.mkdirSync(OUT, { recursive: true });
 const TYPES = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', '.json':'application/json', '.webmanifest':'application/manifest+json',

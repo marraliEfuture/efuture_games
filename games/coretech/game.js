@@ -192,7 +192,7 @@ let dots = [];         // 0 none, 1 coin, 2 patch
 let dotsLeft = 0;
 let score = 0, levelStartScore = 0, lives = 3, levelBugsEaten = 0, levelTime = 0;
 let player, bugs = [];
-let goneBugs = new Set(); // ids of bugs eaten this level: no respawn
+let goneBugs = new Set(); // livello 1: i bug mangiati non rinascono (id); dal livello 2 sì
 let globalMode = 'scatter', modeIdx = 0, modeTimer = 0;
 let frightTimer = 0, eatCombo = 0;
 let readyTimer = 0, dyingTimer = 0;
@@ -230,7 +230,7 @@ function loadLevel(i){
   const bpos = findChar('B'); HOUSE_EXIT = { x:bpos.x, y:bpos.y }; HOUSE_IN = { x:bpos.x, y:bpos.y+2 };
   TUNNEL_ROW = grid.findIndex(r => r[0] !== '#' && r[COLS-1] !== '#');
   TUNNEL_LEN = TUNNEL_ROW < 0 ? 0 : Math.max(1, grid[TUNNEL_ROW].findIndex(c => c !== ' '));
-  goneBugs = new Set();   // bugs eaten in this level never come back
+  goneBugs = new Set();   // nuovo livello: si riparte con tutti i bug
   BUGS[0].home = {x:COLS-1, y:-2}; BUGS[1].home = {x:0, y:-2}; BUGS[2].home = {x:COLS-1, y:ROWS+1}; BUGS[3].home = {x:0, y:ROWS+1};
   dots = []; dotsLeft = 0;
   for (let y=0;y<ROWS;y++){
@@ -500,13 +500,14 @@ function update(dt){
         eatCombo++; const pts = 200 * Math.pow(2, eatCombo-1);
         score += pts; levelBugsEaten++;
         popups.push({x:b.x, y:b.y, text:String(pts), t:1});
-        b.mode = 'eaten'; b.goingIn = false; goneBugs.add(b.id); sfx.eat();   // eaten = gone for the rest of the level
+        b.mode = 'eaten'; b.goingIn = false; sfx.eat();
+        if (lvIndex === 0){ goneBugs.add(b.id); b.gone = true; }   // dal livello 2 rinascono nella casetta
       } else if (b.mode !== 'eaten'){
         loseLife(); return;
       }
     }
   }
-  bugs = bugs.filter(b => b.mode !== 'eaten');
+  if (bugs.some(b => b.gone)) bugs = bugs.filter(b => !b.gone);
   for (const p of popups) p.t -= dt;
   popups = popups.filter(p => p.t > 0);
   updateHud();
@@ -572,7 +573,8 @@ function showLevelCard(i){
   $('lvTag').textContent = 'Livello ' + (i+1) + '/' + (EFG.on ? EFG.max : 5);
   $('lvName').textContent = L.name;
   $('lvText').textContent = L.text + ' Bug: ' + L.bugs + '.';
-  showOnly(ov.level); updateHud();
+  updateHud();
+  $('btnGo').onclick();   // niente schermata di spiegazione: si parte subito con "PRONTI!"
 }
 function startGame(fromLevel){
   score = 0; lives = 3;

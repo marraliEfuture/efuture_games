@@ -20,12 +20,22 @@ Rispondi all'utente in italiano.
 - `PUBLIC_URL` viene da `config.js`.
 - I codici di sblocco vengono da `LEGGIMI.txt`. Lo script li confronta con gli hash in `hub.js` e si ferma se non corrispondono. In quel caso non generare comunque i QR: dillo all'utente.
 
+## Dove lavorare
+
+Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
+- `<skill>` è la cartella di questa skill (quella che contiene questo SKILL.md).
+- `<repo>` è il repository efuture_games. Se la cartella corrente lo è già (c'è `config.js`), usa quella. Altrimenti, per esempio in una chat, scaricalo in una cartella temporanea:
+  ```
+  git clone --depth 1 https://github.com/marraliEfuture/efuture_games <temp>/efuture_games
+  ```
+  ed esegui i comandi da lì, con `export EFG_REPO=<temp>/efuture_games`. Se il download non riesce, dillo all'utente.
+
 ## Procedura
 
 1. Installa le dipendenze se mancano: `pip install -q segno pillow zxing-cpp`. `zxing-cpp` serve per la verifica: rilegge ogni QR generato e controlla il link.
 2. Genera i QR nello scratchpad, non in `qr/`:
    ```
-   python3 .claude/skills/efuture-games-qr/scripts/genera_qr.py <scratchpad>/qr
+   python3 <skill>/scripts/genera_qr.py <scratchpad>/qr
    ```
    Opzione: `--url https://altro-indirizzo/` per un indirizzo pubblico diverso da quello in `config.js`.
 3. Proponi i 5 QR all'utente:
