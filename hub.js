@@ -68,15 +68,37 @@ function renderGrid(){
     const img = document.createElement('img'); img.src = g.icon; img.alt = '';
     const name = document.createElement('span'); name.className = 'name'; name.textContent = g.name;
     const st = document.createElement('span'); st.className = 'state'; st.textContent = open ? 'Gioca ▶' : 'Da sbloccare';
+    const rank = document.createElement('span'); rank.className = 'rank';
+    const rk = ranks[g.id];
+    if (!session) rank.textContent = 'Accedi per la classifica';
+    else if (rk > 0){ rank.innerHTML = 'In classifica: <b></b>'; rank.querySelector('b').textContent = rk + '°'; }
+    else if (rk === -2) rank.textContent = 'Oltre il 50° posto';
+    else if (rk === -1) rank.textContent = 'Non ancora in classifica';
     const best = document.createElement('span'); best.className = 'best';
     if (bests[g.id]){ best.innerHTML = 'Record: <b></b>'; best.querySelector('b').textContent = fmtRes(bests[g.id]); }
-    b.append(img, name, st, best);
+    b.append(img, name, st, rank, best);
     const gp = gatePhase().phase, blocked = gp === 'prima' || gp === 'chiuso';
     if (blocked){ b.disabled = true; b.setAttribute('aria-label', g.name + (gp === 'prima' ? ', non ancora aperto' : ', gara chiusa')); }
     b.addEventListener('click', ()=>{ if (isBlocked()) return; open ? play(g) : askUnlock(g); });
     grid.appendChild(b);
   }
 }
+// posizione del giocatore nella classifica di ogni gioco, in questo momento
+// (numero = posizione, -1 = non ancora in classifica, -2 = oltre i primi 50, assente = non disponibile)
+let ranks = {};
+async function loadRanks(){
+  const me = session;
+  if (!me){ ranks = {}; renderGrid(); return; }
+  const res = await Promise.all(GAMES.map(g => Backend.board(g.id).then(rows => {
+    const i = rows.findIndex(r => r.pid === me.id);
+    return [g.id, i >= 0 ? i + 1 : (rows.length >= 50 ? -2 : -1)];
+  }, () => [g.id, ranks[g.id]])));
+  if (session !== me) return;
+  ranks = Object.fromEntries(res); renderGrid();
+}
+setInterval(()=>{ if (!document.hidden && $('player').hidden) loadRanks(); }, 30000);
+document.addEventListener('visibilitychange', ()=>{ if (!document.hidden && $('player').hidden) loadRanks(); });
+
 function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
@@ -181,7 +203,7 @@ function play(g){
 }
 function closePlayer(){
   $('player').hidden = true; $('mResult').hidden = true; $('frame').src = 'about:blank'; playing = null;
-  document.body.style.overflow = ''; renderGrid();
+  document.body.style.overflow = ''; renderGrid(); loadRanks();
 }
 $('btnBack').addEventListener('click', closePlayer);
 $('rsHome').addEventListener('click', closePlayer);
@@ -246,6 +268,7 @@ const validEmail = e => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
 async function loggedIn(user){
   session = user; $('mAuth').hidden = true; renderDock(); toast('Benvenuto, ' + session.nickname + '!');
   for (const g of GAMES){ const b = bests[g.id]; if (b && b.l > 0){ try { await Backend.submit(session, g.id, b.s, b.l); } catch(e){} } }   // records made before logging in
+  loadRanks();
 }
 $('fSignup').addEventListener('submit', async e=>{
   e.preventDefault();
@@ -266,7 +289,7 @@ $('fLogin').addEventListener('submit', async e=>{
   try { const r = await Backend.signIn(email); loggedIn(r.user); }
   catch(err){ setMsg(m, friendly(err), 'err'); }
 });
-$('btnLogout').onclick = async ()=>{ await Backend.signOut(); session = null; renderDock(); toast('Sei uscito.'); };
+$('btnLogout').onclick = async ()=>{ await Backend.signOut(); session = null; renderDock(); loadRanks(); toast('Sei uscito.'); };
 
 /* ================= LEADERBOARD ================= */
 let boardTab = 'all';
@@ -388,5 +411,5 @@ window.addEventListener('storage', e=>{ if (e.key === 'efgDemoGate') loadGate();
 
 /* ================= BOOT ================= */
 renderGrid(); renderDock(); loadGate();
-Backend.current().then(u=>{ session = u; renderDock(); });
+Backend.current().then(u=>{ session = u; renderDock(); loadRanks(); });
 })();
