@@ -37,6 +37,7 @@ h1{font-family:var(--title);font-weight:700;font-size:clamp(20px,2vw,30px);lette
 h2{font-family:var(--title);font-weight:700;font-size:18px;letter-spacing:-.5px;margin:0;color:var(--ink)}
 mark{background:none;color:var(--sky);padding:0}
 .label{font-size:12px;font-weight:300;letter-spacing:.6px;color:var(--muted);margin-top:2px}
+.label b{font-weight:600;color:var(--brand-orange)}
 .hright{margin-left:auto;display:flex;gap:10px;align-items:center}
 .btn{background:var(--orange);color:#fff;border:0;border-radius:3px;padding:9px 14px;font-weight:600;cursor:pointer;white-space:nowrap}
 .btn:hover{filter:brightness(.95)}
@@ -167,7 +168,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 <div class="topbar"><b>Efuture Games</b> · pannello di amministrazione</div>
 <header>
   <img class="brand" src="img/efuture-logo.png" alt="efuture">
-  <div class="special"><h1><mark>Admin</mark> Efuture Games</h1><div class="label">CARE Conference Edition · classifica, backup e registro</div></div>
+  <div class="special"><h1><mark>Admin</mark> Efuture Games</h1><div class="label"><b>CARE Conference</b> Edition · classifica, backup e registro</div></div>
   <div class="hright" id="hRight" hidden>
     <a class="btn ghost" href="classifica.html" target="_blank" rel="noopener" style="text-decoration:none">Classifica ↗</a>
     <button class="btn ghost" id="btnOut" type="button">Esci</button>
@@ -318,7 +319,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
   <p class="dim" id="noRemote" hidden>Il database online non è configurato in <code>config.js</code>: il pannello admin funziona solo con Supabase.</p>
 </main>
 
-<script src="config.js?v=21"></script>
+<script src="config.js?v=22"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script>
