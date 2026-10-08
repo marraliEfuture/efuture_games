@@ -51,18 +51,8 @@ let gate = { mode:null }, gateOffset = 0, lastPhase = null;   // countdown di ap
 const Backend = window.EFG_BACKEND, friendly = window.EFG_FRIENDLY, remote = Backend.remote;
 
 /* ================= LOBBY ================= */
-let sessionChecked = false;   // finché non so se l'utente ha fatto l'accesso non mostro niente
 function renderGrid(){
   const grid = $('grid'); grid.innerHTML = '';
-  if (!sessionChecked) return;
-  if (!session){   // senza account i giochi non si vedono
-    const box = document.createElement('div'); box.className = 'needauth';
-    box.innerHTML = '<p><b>Registrati o accedi</b> per vedere i 4 giochi, sbloccarli agli stand e entrare in classifica.</p>';
-    const btn = document.createElement('button'); btn.className = 'btn'; btn.type = 'button'; btn.textContent = 'Registrati / Accedi';
-    btn.onclick = ()=>{ showAuth('signup'); openModal('mAuth'); };
-    box.appendChild(btn); grid.appendChild(box);
-    return;
-  }
   for (const g of GAMES){
     const open = unlocked.has(g.id);
     const b = document.createElement('button');
@@ -82,7 +72,11 @@ function renderGrid(){
     b.append(img, name, st, rank, best);
     const gp = gatePhase().phase, blocked = gp === 'prima' || gp === 'chiuso';
     if (blocked){ b.disabled = true; b.setAttribute('aria-label', g.name + (gp === 'prima' ? ', non ancora aperto' : ', gara chiusa')); }
-    b.addEventListener('click', ()=>{ if (isBlocked()) return; open ? play(g) : askUnlock(g); });
+    b.addEventListener('click', ()=>{
+      if (isBlocked()) return;
+      if (!session){ showAuth('login'); openModal('mAuth'); return; }   // senza accesso: prima le credenziali
+      open ? play(g) : askUnlock(g);                                     // con accesso: gioca, o chiede il codice di sblocco
+    });
     grid.appendChild(b);
   }
 }
@@ -104,6 +98,7 @@ document.addEventListener('visibilitychange', ()=>{ if (!document.hidden && $('p
 
 function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session;
+  $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
   mn.textContent = remote ? 'Classifica online · v32' : 'Modalità demo: account e classifica restano su questo telefono. · v32';
@@ -420,5 +415,5 @@ window.addEventListener('storage', e=>{ if (e.key === 'efgDemoGate') loadGate();
 
 /* ================= BOOT ================= */
 renderGrid(); renderDock(); loadGate();
-Backend.current().then(u=>{ session = u; sessionChecked = true; renderDock(); renderGrid(); loadRanks(); });
+Backend.current().then(u=>{ session = u; renderDock(); loadRanks(); });
 })();
