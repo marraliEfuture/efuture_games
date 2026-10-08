@@ -11,35 +11,37 @@ function efgPost(m){ try { if (window.parent !== window) window.parent.postMessa
 
 /* ================= CONSTANTS ================= */
 const W = 360, H = 600;                  // logical field
-const WATER_Y = 548;                     // sea surface
-const DOLPHIN_TOP = 530;                 // where the ball bounces off the dolphin
+const WATER_Y = 512;                     // sea surface (07/10: alzato, il delfino non tocca più la barra in basso)
+const DOLPHIN_TOP = 494;                 // where the ball bounces off the dolphin
 let BALL_R = 8;                          // set per level: big ball first, smaller later
 let COLS = 12, BW = 28, BH = 14;         // set per level from the map
-const BX0 = 12, BY0 = 64;
+const BX0 = 12, BY0 = 28;                // 08/10: muro più in alto (era 64), sopra solo la riga dei timer/ora
+const HUD_Y = 14;                        // in-canvas power timers + level clock (era 50)
+const BIG_BALL = 1.7;                    // ball radius multiplier while TEMPO (T) is active
 const TN_DARK = '#195087', TN_LIGHT = '#46a0d2', TN_MID = '#2d74a8', SUN = '#ffcf4a';
 
 // a light 1 hit · b dark 1 hit · g 2 hits · h 3 hits · x steel · o gold (always drops a capsule)
 const LEVELS = [
   // the wall always covers the whole logo; 12 blocks at first, then 20, 30, 42, 56
-  { clock:"08:00", name:"Apertura", text:"Un muro di 12 blocchi grandi: dietro c'è il logo. Rompili tutti per prendere il ritmo.",
+  { clock:"08:00", name:"Apertura", text:"12 blocchi: dietro c'è il logo.",
     speed:430, dw:98, bh:50.0, r:12.5, map:[
     "abba",
     "baob",
     "abba"]},
-  { clock:"10:30", name:"Riunione", text:"Il muro si divide in 20 blocchi. I blu medi vanno colpiti due volte.",
+  { clock:"10:30", name:"Riunione", text:"20 blocchi. I blu medi: 2 colpi.",
     speed:365, dw:92, bh:37.5, r:11, map:[
     "gaaag",
     "abbba",
     "baoab",
     "gaaag"]},
-  { clock:"13:00", name:"Pausa pranzo", text:"30 blocchi più piccoli, con gli angoli da due colpi.",
+  { clock:"13:00", name:"Pausa pranzo", text:"30 blocchi, angoli da 2 colpi.",
     speed:395, dw:86, bh:30.0, r:9.5, map:[
     "gggggg",
     "gabbag",
     "abooba",
     "gabbag",
     "gggggg"]},
-  { clock:"16:00", name:"Scadenza", text:"42 blocchi e una cornice resistente: il tempo stringe. Il logo si svela solo alla fine.", revealAtEnd:true,
+  { clock:"16:00", name:"Scadenza", text:"42 blocchi. Il logo appare alla fine.", revealAtEnd:true,
     speed:435, dw:80, bh:25.0, r:8, map:[
     "ggggggg",
     "ggaaagg",
@@ -47,7 +49,7 @@ const LEVELS = [
     "gbbobbg",
     "ggaaagg",
     "ggggggg"]},
-  { clock:"18:00", name:"Chiusura", text:"Ultimo sforzo: 56 blocchi piccoli e un bordo resistente. Il logo si svela solo alla fine.", revealAtEnd:true,
+  { clock:"18:00", name:"Chiusura", text:"56 blocchi. Ultimo sforzo!", revealAtEnd:true,
     speed:470, dw:74, bh:21.43, r:7, map:[
     "gggggggg",
     "gggggggg",
@@ -66,11 +68,11 @@ const BRICK = {
   o:{hp:1, pts:200, color:SUN},
 };
 const POWERS = {
-  C:{label:'CONNESSI',    note:'3 palloni in campo', color:TN_LIGHT},
-  S:{label:'SICURI',      note:'rete di salvataggio', color:TN_DARK},
-  V:{label:'SODDISFATTI', note:'delfino più grande', color:'#3fbf8f'},
-  T:{label:'TEMPO',       note:'pallone rallentato', color:'#b48cff'},
-  L:{label:'+1 PALLONE',  note:'una vita in più', color:'#ff5d56'},
+  C:{label:'CONNESSI',    note:'3 palloni', color:TN_LIGHT},
+  S:{label:'SICURI',      note:'rete', color:TN_DARK},
+  V:{label:'SODDISFATTI', note:'delfino grande', color:'#3fbf8f'},
+  T:{label:'TEMPO',       note:'pallone grande e lento', color:'#b48cff'},
+  L:{label:'+1 PALLONE',  note:'vita extra', color:'#ff5d56'},
 };
 
 /* ================= DOM ================= */
@@ -140,9 +142,7 @@ function buildReveal(){
     const s = Math.min(maxW/img.naturalWidth, maxH/img.naturalHeight);
     const lw = img.naturalWidth*s, lh = img.naturalHeight*s;
     c.drawImage(img, (reveal.w-lw)/2, (reveal.h-lh)/2, lw, lh);
-    // turn the logo completely white; everything else stays transparent
-    c.globalCompositeOperation = 'source-in'; c.fillStyle = '#ffffff'; c.fillRect(0, 0, reveal.w, reveal.h);
-    c.globalCompositeOperation = 'source-over';
+    // light theme: the logo keeps its own Timenet blues on the pale field
   }
 }
 function loadLevel(i){
@@ -166,9 +166,10 @@ function loadLevel(i){
 function resetBall(){
   speedMul = 1; bigTimer = 0; slowTimer = 0;
   dolphin.x = W/2; dolphin.w = L.dw;
-  balls = [{ x:W/2, y:DOLPHIN_TOP-BALL_R, vx:0, vy:0, stuck:true, spin:0 }];
+  balls = [{ x:W/2, y:DOLPHIN_TOP-BALL_R, vx:0, vy:0, stuck:true, spin:0, s:1 }];
   caps = [];
 }
+function rad(b){ return BALL_R * (b.s || 1); }   // current radius of a ball (grows with TEMPO)
 function ballSpeed(){ return L.speed * speedMul * (slowTimer>0 ? 0.68 : 1); }
 function launch(){
   for (const b of balls){
@@ -206,11 +207,12 @@ function update(dt){
 
   // balls
   for (const b of balls){
-    if (b.stuck){ b.x = dolphin.x + dolphin.face*dolphin.w*0.5; b.y = DOLPHIN_TOP - BALL_R + 2 + Math.sin(clock*6)*1.5; continue; }
+    growBall(b, dt);
+    if (b.stuck){ b.x = dolphin.x + dolphin.face*dolphin.w*0.5; b.y = DOLPHIN_TOP - rad(b) + 2 + Math.sin(clock*6)*1.5; continue; }
     const sp = Math.hypot(b.vx, b.vy), steps = Math.ceil(sp*dt/4);
     const h = dt/steps;
     for (let i=0;i<steps && !b.dead;i++) stepBall(b, h);
-    b.spin += (b.vx/BALL_R) * dt;
+    b.spin += (b.vx/rad(b)) * dt;
   }
   const alive = balls.filter(b=>!b.dead);
   if (alive.length === 0){ loseBall(); return; }
@@ -236,40 +238,58 @@ function updateParts(dt){
   toasts = toasts.filter(t=>t.t>0);
 }
 
+/* TEMPO makes the ball big (x1.7) as well as slow, so it reads as a bonus.
+   The radius changes smoothly, and it only grows where the bigger ball
+   fits (walls and bricks): it can never end up stuck inside them.     */
+function ballFits(b, r){
+  if (b.x - r < 0 || b.x + r > W || b.y - r < 0) return false;
+  for (const br of bricks) if (b.x + r > br.x && b.x - r < br.x + br.w && b.y + r > br.y && b.y - r < br.y + br.h) return false;
+  return true;
+}
+function growBall(b, dt){
+  const s = b.s || 1, target = slowTimer > 0 ? BIG_BALL : 1;
+  if (Math.abs(target - s) < 0.002){ b.s = target; return; }
+  let n = s + (target - s) * Math.min(1, dt*7);
+  if (Math.abs(target - n) < 0.01) n = target;
+  if (n > s && !b.stuck && !ballFits(b, BALL_R*n)) return;   // wait for room before growing
+  b.s = n;
+}
 function stepBall(b, h){
+  const R = rad(b);
   b.x += b.vx*h;
-  if (b.x - BALL_R < 0){ b.x = BALL_R; b.vx = Math.abs(b.vx); sfx.wall(); }
-  if (b.x + BALL_R > W){ b.x = W - BALL_R; b.vx = -Math.abs(b.vx); sfx.wall(); }
+  if (b.x - R < 0){ b.x = R; b.vx = Math.abs(b.vx); sfx.wall(); }
+  if (b.x + R > W){ b.x = W - R; b.vx = -Math.abs(b.vx); sfx.wall(); }
   if (hitBricks(b, 'x')) return;
   b.y += b.vy*h;
-  if (b.y - BALL_R < 0){ b.y = BALL_R; b.vy = Math.abs(b.vy); sfx.wall(); }
+  if (b.y - R < 0){ b.y = R; b.vy = Math.abs(b.vy); sfx.wall(); }
   if (hitBricks(b, 'y')) return;
   // dolphin
   const half = dolphin.w/2;
-  if (b.vy > 0 && b.y + BALL_R >= DOLPHIN_TOP && b.y + BALL_R <= DOLPHIN_TOP + 16 && b.x > dolphin.x - half - BALL_R && b.x < dolphin.x + half + BALL_R){
+  if (b.vy > 0 && b.y + R >= DOLPHIN_TOP && b.y + R <= DOLPHIN_TOP + 16 && b.x > dolphin.x - half - R && b.x < dolphin.x + half + R){
     const rel = Math.max(-1, Math.min(1, (b.x - dolphin.x)/half));
     const ang = rel * 1.05;                 // up to ~60° from vertical
     speedMul = Math.min(1.3, speedMul * 1.015);
     const s = ballSpeed();
     b.vx = Math.sin(ang)*s; b.vy = -Math.cos(ang)*s;
-    b.y = DOLPHIN_TOP - BALL_R;
+    b.y = DOLPHIN_TOP - R;
     dolphin.nod = 0.22; sfx.dolphin();
     return;
   }
   // safety net
-  if (net && b.vy > 0 && b.y + BALL_R >= H - 18){
-    b.y = H - 18 - BALL_R; b.vy = -Math.abs(b.vy); net = false;
-    toast('Rete: salvato!', TN_LIGHT); sfx.dolphin();
+  if (net && b.vy > 0 && b.y + R >= H - 18){
+    b.y = H - 18 - R; b.vy = -Math.abs(b.vy); net = false;
+    toast('Salvato!', TN_DARK); sfx.dolphin();
     return;
   }
-  if (b.y - BALL_R > H){ b.dead = true; splash(b.x); }
+  if (b.y - R > H){ b.dead = true; splash(b.x); }
 }
 
 function hitBricks(b, axis){
+  const R = rad(b);
   for (const br of bricks){
-    if (b.x + BALL_R <= br.x || b.x - BALL_R >= br.x + br.w || b.y + BALL_R <= br.y || b.y - BALL_R >= br.y + br.h) continue;
-    if (axis === 'x'){ if (b.vx > 0) b.x = br.x - BALL_R; else b.x = br.x + br.w + BALL_R; b.vx = -b.vx; }
-    else            { if (b.vy > 0) b.y = br.y - BALL_R; else b.y = br.y + br.h + BALL_R; b.vy = -b.vy; }
+    if (b.x + R <= br.x || b.x - R >= br.x + br.w || b.y + R <= br.y || b.y - R >= br.y + br.h) continue;
+    if (axis === 'x'){ if (b.vx > 0) b.x = br.x - R; else b.x = br.x + br.w + R; b.vx = -b.vx; }
+    else            { if (b.vy > 0) b.y = br.y - R; else b.y = br.y + br.h + R; b.vy = -b.vy; }
     // never let the ball settle into an almost-horizontal path
     const s = Math.hypot(b.vx, b.vy);
     if (Math.abs(b.vy) < s*0.3){ b.vy = Math.sign(b.vy||-1)*s*0.3; b.vx = Math.sign(b.vx)*Math.sqrt(s*s - b.vy*b.vy); }
@@ -309,7 +329,7 @@ function applyPower(k){
       const s = Math.hypot(b.vx, b.vy);
       for (const d of [-0.45, 0.45]){
         const a = Math.atan2(b.vx, -b.vy) + d;
-        add.push({ x:b.x, y:b.y, vx:Math.sin(a)*s, vy:-Math.abs(Math.cos(a)*s), stuck:false, spin:0 });
+        add.push({ x:b.x, y:b.y, vx:Math.sin(a)*s, vy:-Math.abs(Math.cos(a)*s), stuck:false, spin:0, s:b.s||1 });
       }
     }
     if (!add.length){ launch(); return applyPower('C'); }
@@ -332,13 +352,13 @@ function burst(x, y, color, n){
 function splash(x){
   sfx.splash();
   for (let i=0;i<14;i++){ const a = -Math.PI/2 + (Math.random()-0.5)*1.4, v = 120 + Math.random()*160;
-    parts.push({ x, y:WATER_Y, vx:Math.cos(a)*v, vy:Math.sin(a)*v, t:0.7, c:'#bfe6f7', s:2.5 }); }
+    parts.push({ x, y:WATER_Y, vx:Math.cos(a)*v, vy:Math.sin(a)*v, t:0.7, c:'#7cc0e6', s:2.5 }); }
 }
 
 function loseBall(){
   lives--; sfx.lost(); updateHud();
   if (lives <= 0){ gameOver(); return; }
-  resetBall(); toast('Pallone in acqua! Tocca per rilanciare', '#bfe6f7');
+  resetBall(); toast('Tocca per rilanciare', '#0d2b45');
 }
 
 function efgEnd(ok, reason){
@@ -429,7 +449,8 @@ function renderIntro(){
   if (!I.hit){
     // logo on its light badge, as it appears on paper
     const pad = 14;
-    ctx.fillStyle = '#f3f8fc'; roundRect(ctx, LOGO_BOX.x - pad, LOGO_BOX.y - pad, LOGO_BOX.w + pad*2, lh + pad*2, 12); ctx.fill();
+    ctx.fillStyle = '#ffffff'; roundRect(ctx, LOGO_BOX.x - pad, LOGO_BOX.y - pad, LOGO_BOX.w + pad*2, lh + pad*2, 12); ctx.fill();
+    ctx.strokeStyle = '#cddcea'; ctx.lineWidth = 1; ctx.stroke();
     if (img && img.naturalWidth) ctx.drawImage(img, LOGO_BOX.x, LOGO_BOX.y, LOGO_BOX.w, lh);
   }
   drawParts();
@@ -444,9 +465,9 @@ function renderIntro(){
   if (I.ball) drawBeachBall(I.ball.x, I.ball.y, BALL_R+1, I.ball.spin);
   if (I.hit && I.t > 2.6){
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillStyle = SUN; ctx.font = "16px 'Press Start 2P', monospace"; ctx.fillText('BREAKOUT', W/2, 220);
+    ctx.fillStyle = TN_DARK; ctx.font = "16px 'Press Start 2P', monospace"; ctx.fillText('BREAKOUT', W/2, 220);
   }
-  ctx.fillStyle = 'rgba(143,176,204,0.8)'; ctx.font = "8px 'Press Start 2P', monospace"; ctx.textAlign='center';
+  ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.font = "8px 'Press Start 2P', monospace"; ctx.textAlign='center';
   ctx.fillText('TOCCA PER SALTARE', W/2, H - 14);
 }
 
@@ -465,7 +486,7 @@ function showLevelCard(i){
 function startGame(from){ score = 0; lives = 3; showLevelCard(from||0); }
 $('btnStart').onclick = ()=>{ score = 0; lives = 3; playIntro(); };
 $('btnContinue').onclick = ()=> startGame(reached);
-$('btnGo').onclick = ()=>{ showOnly(null); state = 'play'; sfx.start(); toast('Tocca per lanciare il pallone', '#bfe6f7'); };
+$('btnGo').onclick = ()=>{ showOnly(null); state = 'play'; sfx.start(); toast('Tocca per lanciare', '#0d2b45'); };
 $('btnNext').onclick = ()=> showLevelCard(lvIndex+1);
 $('btnRetry').onclick = ()=>{ lives = 3; score = levelStartScore; showLevelCard(lvIndex); };
 $('btnMenu').onclick = toMenu;
@@ -566,16 +587,16 @@ function drawEndReveal(){
 }
 function drawSea(){
   const g = ctx.createLinearGradient(0,0,0,WATER_Y);
-  g.addColorStop(0,'#061430'); g.addColorStop(1,'#0f3563');
+  g.addColorStop(0,'#f7fbfe'); g.addColorStop(1,'#d5e8f5');
   ctx.fillStyle = g; ctx.fillRect(0,0,W,WATER_Y);
-  for (const s of STARS){ ctx.fillStyle = `rgba(191,230,247,${0.25 + 0.25*Math.sin(clock*2 + s.p)})`; ctx.fillRect(s.x, s.y, 1.5, 1.5); }
+  for (const s of STARS){ ctx.fillStyle = `rgba(70,160,210,${0.12 + 0.1*Math.sin(clock*2 + s.p)})`; ctx.fillRect(s.x, s.y, 2, 2); }
   // sun setting on the horizon, 80s style
   const sg = ctx.createLinearGradient(0, WATER_Y-70, 0, WATER_Y);
-  sg.addColorStop(0,'rgba(255,207,74,0.0)'); sg.addColorStop(1,'rgba(255,207,74,0.16)');
+  sg.addColorStop(0,'rgba(241,140,34,0.0)'); sg.addColorStop(1,'rgba(241,140,34,0.14)');
   ctx.fillStyle = sg; ctx.fillRect(0, WATER_Y-70, W, 70);
   // water
   const wg = ctx.createLinearGradient(0,WATER_Y,0,H);
-  wg.addColorStop(0, TN_MID); wg.addColorStop(1, '#0a2c52');
+  wg.addColorStop(0, TN_MID); wg.addColorStop(1, TN_DARK);
   ctx.fillStyle = wg; ctx.fillRect(0, WATER_Y, W, H-WATER_Y);
   ctx.strokeStyle = 'rgba(191,230,247,0.5)'; ctx.lineWidth = 1.5;
   for (let row=0; row<3; row++){
@@ -595,6 +616,7 @@ function drawBrick(br){
   let col = k.color;
   ctx.fillStyle = br.flash > 0 ? '#ffffff' : col;
   ctx.fillRect(br.x+1, br.y+1, br.w-2, br.h-2);
+  ctx.strokeStyle = 'rgba(13,43,69,0.35)'; ctx.lineWidth = 1; ctx.strokeRect(br.x+1.5, br.y+1.5, br.w-3, br.h-3);
   if (br.t === 'b' || br.t === 'h'){ ctx.strokeStyle = 'rgba(159,211,239,0.55)'; ctx.lineWidth = 1; ctx.strokeRect(br.x+1.5, br.y+1.5, br.w-3, br.h-3); }
   // bevel, like an old arcade tile
   ctx.fillStyle = 'rgba(255,255,255,0.28)'; ctx.fillRect(br.x+1, br.y+1, br.w-2, 2);
@@ -617,7 +639,7 @@ function drawBeachBall(x, y, r, spin){
   for (let i=0;i<6;i++){ ctx.fillStyle = cols[i]; ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,r,i*Math.PI/3,(i+1)*Math.PI/3); ctx.closePath(); ctx.fill(); }
   ctx.restore();
   ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.beginPath(); ctx.arc(x, y, r*0.22, 0, Math.PI*2); ctx.fill();
-  ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.stroke();
+  ctx.strokeStyle = 'rgba(13,43,69,0.7)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.stroke();
   ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.beginPath(); ctx.arc(x - r*0.4, y - r*0.45, r*0.22, 0, Math.PI*2); ctx.fill();
 }
 
@@ -631,6 +653,7 @@ function drawDolphin(x, y, w, face, rot, nod){
     ctx.save(); ctx.translate(x, y); ctx.rotate(rot||0);
     ctx.scale(-face, 1);                       // l'immagine guarda a sinistra
     ctx.rotate((nod||0)*0.6);
+    ctx.shadowColor = 'rgba(13,43,69,0.55)'; ctx.shadowBlur = 4;
     ctx.drawImage(DOLPHIN_IMG, -dw/2, -dh*0.42, dw, dh);
     ctx.restore();
     return;
@@ -672,6 +695,7 @@ function drawCapsule(c){
   const P = POWERS[c.k];
   ctx.save(); ctx.translate(c.x, c.y);
   ctx.fillStyle = P.color; roundRect(ctx, -13, -7, 26, 14, 7); ctx.fill();
+  ctx.strokeStyle = 'rgba(13,43,69,0.45)'; ctx.lineWidth = 1; ctx.stroke();
   ctx.fillStyle = 'rgba(255,255,255,0.35)'; roundRect(ctx, -11, -6, 22, 4, 2); ctx.fill();
   ctx.fillStyle = '#fff'; ctx.font = "8px 'Press Start 2P', monospace"; ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillText(c.k==='V' ? '✓' : c.k==='L' ? '+' : c.k, 0, 1);
@@ -700,19 +724,32 @@ function render(){
   // dolphin bobbing in the water
   const bob = Math.sin(clock*3)*1.5;
   drawDolphin(dolphin.x, WATER_Y - 4 + bob, dolphin.w*1.12, dolphin.face, 0, dolphin.nod);
-  for (const b of balls) drawBeachBall(b.x, b.y, BALL_R, b.spin);
+  for (const b of balls){
+    const R = rad(b), g = (R/BALL_R - 1) / (BIG_BALL - 1);   // 0 normal .. 1 fully big
+    if (g > 0.02){
+      // soft violet halo (the TEMPO colour): the big ball is a bonus
+      const hr = R * (1.55 + 0.1*Math.sin(clock*8));
+      const hg = ctx.createRadialGradient(b.x, b.y, R*0.8, b.x, b.y, hr);
+      hg.addColorStop(0, `rgba(180,140,255,${0.55*g})`); hg.addColorStop(1, 'rgba(180,140,255,0)');
+      ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(b.x, b.y, hr, 0, Math.PI*2); ctx.fill();
+    }
+    drawBeachBall(b.x, b.y, R, b.spin);
+  }
   drawParts();
   // timers for active powers
   ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.font = "7px 'Press Start 2P', monospace";
   let tx = 8;
-  if (bigTimer > 0){ ctx.fillStyle = '#3fbf8f'; ctx.fillText('✓ ' + Math.ceil(bigTimer), tx, 50); tx += 46; }
-  if (slowTimer > 0){ ctx.fillStyle = '#b48cff'; ctx.fillText('T ' + Math.ceil(slowTimer), tx, 50); tx += 46; }
-  if (net){ ctx.fillStyle = TN_LIGHT; ctx.fillText('S rete', tx, 50); }
+  if (bigTimer > 0){ ctx.fillStyle = '#1f8a63'; ctx.fillText('✓ ' + Math.ceil(bigTimer), tx, HUD_Y); tx += 46; }
+  if (slowTimer > 0){ ctx.fillStyle = '#7a4fd6'; ctx.fillText('T ' + Math.ceil(slowTimer), tx, HUD_Y); tx += 46; }
+  if (net){ ctx.fillStyle = TN_DARK; ctx.fillText('S rete', tx, HUD_Y); }
   // clock of the level, top right
-  ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(191,230,247,0.6)'; ctx.fillText(L.clock, W-8, 50);
+  ctx.textAlign = 'right'; ctx.fillStyle = '#56718a'; ctx.fillText(L.clock, W-8, HUD_Y);
   // toasts
   ctx.textAlign = 'center';
-  toasts.forEach((t, i)=>{ ctx.globalAlpha = Math.min(1, t.t*1.5); ctx.fillStyle = t.color; ctx.font = "8px 'Press Start 2P', monospace"; ctx.fillText(t.text, W/2, 430 - i*16); });
+  ctx.font = "8px 'Press Start 2P', monospace"; ctx.lineJoin = 'round';
+  toasts.forEach((t, i)=>{ ctx.globalAlpha = Math.min(1, t.t*1.5); const y = 430 - i*16;
+    ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 4; ctx.strokeText(t.text, W/2, y);
+    ctx.fillStyle = t.color; ctx.fillText(t.text, W/2, y); });
   ctx.globalAlpha = 1;
 }
 

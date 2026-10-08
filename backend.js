@@ -25,8 +25,8 @@ const one = d => Array.isArray(d) ? d[0] : d;
 const Backend = remote ? {
   remote:true,
   async current(){ return store.get('efgSessionLive', null); },
-  async signUp({ name, phone, email }){
-    const r = one(await rpc('efg_register', { p_email:normEmail(email), p_name:name, p_phone:phone }));
+  async signUp({ name, email }){
+    const r = one(await rpc('efg_register', { p_email:normEmail(email), p_name:name }));
     const u = { id:r.pid, email:normEmail(email), nickname:r.name };
     store.set('efgSessionLive', u); return { user:u };
   },
@@ -43,7 +43,9 @@ const Backend = remote ? {
     if (group && group !== 'tutti'){
       try { return (await rpc('efg_board_group', { p_game:game, p_group:group })) || []; }
       catch(e){ if (!/efg_board_group|PGRST202|does not exist/i.test(String(e && (e.code + ' ' + e.message)))) throw e; }
-      // funzione non ancora creata su Supabase: classifica completa
+      // funzione non ancora creata su Supabase: classifica completa, segnalata come NON filtrata
+      const all = (await rpc('efg_board', { p_game:game })) || [];
+      all.filtroMancante = true; return all;
     }
     return (await rpc('efg_board', { p_game:game })) || [];
   },
@@ -55,10 +57,10 @@ const Backend = remote ? {
 } : {
   remote:false,
   async current(){ return store.get('efgSession3', null); },
-  async signUp({ name, phone, email }){
+  async signUp({ name, email }){
     const users = store.get('efgDemoUsers3', {}); const key = normEmail(email);
     if (users[key]) throw new Error('already registered');
-    users[key] = { pid:'local-'+Date.now().toString(36), email:key, name, phone };
+    users[key] = { pid:'local-'+Date.now().toString(36), email:key, name };
     store.set('efgDemoUsers3', users);
     const u = { id:users[key].pid, email:key, nickname:name }; store.set('efgSession3', u); return { user:u };
   },
@@ -74,7 +76,7 @@ const Backend = remote ? {
     rows[k] = { email:user.email, game, score, levels }; store.set('efgDemoScores4', rows); return true;
   },
   async board(game, group){
-    const isEf = e => /@efuture\.it$/i.test(e || '');
+    const isEf = e => /@([a-z0-9-]+\.)*efuture\.it$/i.test(String(e || '').trim());
     const users = store.get('efgDemoUsers3', {});
     const tot = {};
     for (const r of Object.values(store.get('efgDemoScores4', {}))){

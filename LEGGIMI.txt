@@ -44,8 +44,9 @@ CODICI DI SBLOCCO (uno per gioco)
        Top         3 / 5 / 10 righe per classifica (all'apertura: 5)
        Giocatori   Ospiti / Efuture (email @efuture.it) / Tutti
        QR          Sì / No
-     Per il filtro Giocatori serve una volta supabase-classifica-gruppi.sql
-     nel SQL Editor. Da indirizzo, ad esempio:
+     Per il filtro Giocatori serve supabase-classifica-gruppi.sql nel SQL
+     Editor (rieseguilo quando il file cambia). Se manca, la classifica lo
+     scrive in alto e mostra tutti i giocatori. Da indirizzo, ad esempio:
        classifica.html?classifica=tutti&top=10&giocatori=efuture&qr=no
    - Pulsante "⏱ Countdown": scegli Apertura o Chiusura, i minuti, scrivi
      la chiave admin (la stessa di admin.html) e premi Start; Stop lo annulla. Una volta sola esegui
@@ -63,7 +64,10 @@ CODICI DI SBLOCCO (uno per gioco)
    https://marraliefuture.github.io/efuture_games/admin.html
    Si entra con la chiave admin (non è nel sito: è salvata cifrata nel
    database). Dal pannello:
-   - Giocatori: elenco con email, cellulare, punti per gioco; CSV.
+   - Giocatori: elenco con nome, email, punti per gioco; CSV. Il pulsante
+     "Elimina" cancella un giocatore e i suoi punteggi (sparisce dalla
+     classifica); il registro eventi resta. Una volta sola esegui
+     supabase-privacy-utenti.sql nel SQL Editor.
    - Registro: registrazioni, accessi, partite e operazioni admin; CSV.
    - Backup: crea e scarica una copia (JSON), ripristina una copia.
    - Reset: azzera i punti (i giocatori restano) o cancella tutto.
@@ -81,8 +85,9 @@ CODICI DI SBLOCCO (uno per gioco)
      con cosa fa ognuna e un esempio di richiesta.
    - Tutorial: guide passo passo da sfogliare come una presentazione
      (frecce, tasti ← → o swipe; schermo intero). I prompt si copiano
-     con un clic. Primo tutorial: "Crea e gioca a Forza 4 con Claude"
-     (immagini in tutorial/forza4/, testi in TUTORIALS dentro admin.html).
+     con un clic. Tutorial: "Crea e gioca a Forza 4 con Claude" e il foglio
+     "Attività giornaliere" con Claude in Chrome
+     (immagini in tutorial/<nome>/, testi in TUTORIALS dentro admin.html).
    Le schede sono in gruppi: Giocatori, Registro · QR, Link, Skills ·
      Video utili, Tutorial · Backup, Chiave, Reset.
    Se perdi la chiave: Supabase > SQL Editor >
@@ -99,8 +104,11 @@ CODICI DI SBLOCCO (uno per gioco)
    - Sblocco: "Apri la fotocamera" legge il QR direttamente nell'app;
      in alternativa si scrive il codice. Anche la fotocamera normale
      del telefono funziona: il QR apre l'app e sblocca il gioco.
-   - In fondo: "Registrati / Accedi". Registrazione: nome, cellulare,
-     email. Accesso: basta l'email, nessuna password.
+   - Installazione: la finestra "Installa l'app" si apre da sola solo
+     dal QR di installazione (?installa=1); altrimenti c'è il link piccolo
+     "Installa app" in fondo alla home (insieme a Classifica e Istruzioni).
+   - In fondo: "Registrati / Accedi". Registrazione: nome ed email
+     (il cellulare non si chiede più). Accesso: basta l'email, nessuna password.
    - REGOLE DI GARA (solo dentro l'app): ogni gioco ha 3 livelli, al
      massimo 1 minuto ciascuno. Ogni livello superato vale
      numero del livello x secondi che avanzano x vite rimaste, poi si
@@ -116,7 +124,9 @@ CODICI DI SBLOCCO (uno per gioco)
 
 
 4) AGGIORNARE
-   Sostituisci i file e in sw.js cambia 'efuture-games-v8' in v9, v10...
+   Sostituisci i file e aumenta la versione (efuture-games-vN in sw.js, ?v=N
+   negli html, · vN in hub.js) con la skill /efuture-games-commit, che usa
+   .claude/skills/efuture-games-commit/scripts/prepara.py.
 
 Nota: lo sblocco e i punteggi sono controllati dal telefono del
 giocatore. Per un evento va benissimo, ma un utente esperto potrebbe

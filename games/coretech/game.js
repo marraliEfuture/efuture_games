@@ -10,39 +10,40 @@ function efgPost(m){ try { if (window.parent !== window) window.parent.postMessa
 
 
 /* ================= DATA ================= */
+// Levels 1-3 (also the app's 3-level competition, 60 s per level) are kept
+// simple (v29, client: "difficili da manovrare"): long straight rows, few
+// turns, no pockets. Side alleys and the ring round the bug house have no
+// coins, so a nearest-coin run clears each level in about 16-22 s.
 const MAZES = [
   ["#############",
-   "#o....#....o#",
-   "#.###.#.###.#",
+   "#o.........o#",
+   "#.##.###.##.#",
    "#.....B.....#",
-   "#...##-##...#",
-   "#.#.#GGG#.#.#",
-   "#.#.#####.#.#",
-   "#...........#",
-   "#.#...P...#.#",
-   "#.###.#.###.#",
-   "#o....#....o#",
+   "###.##-##.###",
+   "###.#GGG#.###",
+   "###.#####.###",
+   "   .......   ",
+   "###.#####.###",
+   "#.....P.....#",
+   "#.##.###.##.#",
+   "#o.........o#",
    "#############"],
   ["#################",
-   "#o......#......o#",
+   "#o.............o#",
    "#.##.##.#.##.##.#",
-   "#...............#",
-   "#.##.#.###.#.##.#",
-   "#....#..B..#....#",
-   "#.##..##-##..##.#",
-   "#.##..#GGG#..##.#",
-   "#.##..#####..##.#",
-   "#...............#",
-   "#.##.###.###.##.#",
-   "#o...#..P..#...o#",
-   "#.##.#.#.#.#.##.#",
-   "#...............#",
+   "#.......B.......#",
+   "####.###-###.####",
+   "####.##GGG##.####",
+   "####.#######.####",
+   "    .........    ",
+   "####.#######.####",
+   "#.......P.......#",
+   "#.##.##.#.##.##.#",
+   "#o.............o#",
    "#################"],
   ["###################",
    "#o...............o#",
-   "#.###.###.###.###.#",
-   "#.#.....#.#.....#.#",
-   "#.#.###.....###.#.#",
+   "#.###.#######.###.#",
    "#.................#",
    "####.### # ###.####",
    "####.#   B   #.####",
@@ -50,14 +51,10 @@ const MAZES = [
    "    .  #GGG#  .    ",
    "####.# ##### #.####",
    "####.#       #.####",
-   "####.# ##### #.####",
-   "#.................#",
-   "#.###.#.###.#.###.#",
-   "#...#.#..P..#.#...#",
-   "###.#.#.###.#.#.###",
-   "#o....#..#..#....o#",
-   "#.###.##.#.##.###.#",
-   "#.................#",
+   "####.### # ###.####",
+   "#........P........#",
+   "#.###.#######.###.#",
+   "#o...............o#",
    "###################"],
   ["###################",
    "#o..#.........#..o#",
@@ -107,19 +104,24 @@ const MAZES = [
 let COLS = 19, ROWS = 21;          // set per level: mazes grow from level to level
 let HOUSE_EXIT = {x:9, y:7};       // tile just above the door (the 'B' in the map)
 let HOUSE_IN   = {x:9, y:9};       // centre of the bug house
-let TUNNEL_ROW = -1;               // row that wraps around the screen, if any
+let TUNNEL_ROW = -1;               // row that wraps around the screen (every maze has one)
+let TUNNEL_LEN = 1;                // open cells at each end of the tunnel row (bugs slow down there)
 
+// Speeds in tiles/s. Levels 1-3 (the three played in the app's competition)
+// are easy: v29 made the C another ~15% slower (client: "forse troppo
+// veloce") and the bugs by the same ratio, so they never gain on the player;
+// patches got 1 s longer to make up for the slower C.
 const LEVELS = [
-  { name:"Rete aziendale",  text:"Primo giro di pulizia in un labirinto piccolo: due bug lenti e patch lunghe.",
-    pac:7.2, bug:4.0, fright:2.6, frightTime:7.0, bugs:2, rand:0.40, release:[0,4],        cycle:[7,18,7,18,5,999] },
-  { name:"Server farm",     text:"Labirinto più grande e un terzo bug. Occhio agli angoli.",
-    pac:7.6, bug:4.7, fright:2.8, frightTime:6.0, bugs:3, rand:0.30, release:[0,3,7],     cycle:[7,20,6,20,5,999] },
-  { name:"Cloud ibrido",    text:"Il labirinto completo: tre bug in circolazione. Usa le patch per ripulirlo.",
-    pac:8.0, bug:5.3, fright:3.0, frightTime:5.0, bugs:3, rand:0.22, release:[0,3,6],     cycle:[6,20,5,20,4,999] },
-  { name:"Data center",     text:"I bug sono più svegli e più veloci. La patch dura poco: usala bene.",
-    pac:8.0, bug:6.0, fright:3.0, frightTime:3.8, bugs:4, rand:0.08, release:[0,2,4,7],   cycle:[5,22,4,22,3,999] },
-  { name:"Core di sistema", text:"Livello finale: bug quasi veloci quanto te e patch lampo. Ripulisci il core!",
-    pac:8.2, bug:6.6, fright:3.2, frightTime:2.8, bugs:4, rand:0.03, release:[0,1,2.5,4], cycle:[4,24,3,24,2,999] },
+  { name:"Rete aziendale",  text:"Labirinto piccolo, bug lenti.",
+    pac:4.8, bug:2.5, fright:1.7, frightTime:10.0, bugs:2, rand:0.45, release:[0,5],        cycle:[9,15,9,15,7,999] },
+  { name:"Server farm",     text:"Più grande, un bug in più.",
+    pac:5.0, bug:2.8, fright:1.8, frightTime:9.0,  bugs:3, rand:0.38, release:[0,4,9],     cycle:[8,17,8,17,6,999] },
+  { name:"Cloud ibrido",    text:"Labirinto completo: usa le patch.",
+    pac:5.3, bug:3.1, fright:2.0, frightTime:8.0,  bugs:3, rand:0.30, release:[0,4,8],     cycle:[8,18,7,18,5,999] },
+  { name:"Data center",     text:"Bug più veloci, patch brevi.",
+    pac:6.3, bug:4.7, fright:2.4, frightTime:4.8, bugs:4, rand:0.08, release:[0,2,4,7],   cycle:[5,22,4,22,3,999] },
+  { name:"Core di sistema", text:"Livello finale: ripulisci il core!",
+    pac:6.4, bug:5.1, fright:2.5, frightTime:3.6, bugs:4, rand:0.03, release:[0,1,2.5,4], cycle:[4,24,3,24,2,999] },
 ];
 
 const BUGS = [
@@ -140,6 +142,7 @@ const DIR_ORDER = [DIR.up, DIR.left, DIR.down, DIR.right]; // classic tie-break 
 
 const C_BLUE = '#4b8ac9', C_BLUE_L = '#a5c4e4', C_DEEP = '#2f6399';
 const COIN = '#ffcf4a';
+const MAZE_BG = '#f7fbff', WALL_FILL = '#d9e7f5', TXT_GOLD = '#c56a0c';   // light theme
 
 /* ================= DOM ================= */
 const $ = id => document.getElementById(id);
@@ -189,12 +192,13 @@ let dots = [];         // 0 none, 1 coin, 2 patch
 let dotsLeft = 0;
 let score = 0, levelStartScore = 0, lives = 3, levelBugsEaten = 0, levelTime = 0;
 let player, bugs = [];
-let bugsGone = new Set();   // livello 1: i bug mangiati non rinascono (id)
+let goneBugs = new Set(); // livello 1: i bug mangiati non rinascono (id); dal livello 2 sì
 let globalMode = 'scatter', modeIdx = 0, modeTimer = 0;
 let frightTimer = 0, eatCombo = 0;
 let readyTimer = 0, dyingTimer = 0;
 let popups = [];
-let desired = null;
+let desired = null, desiredAge = 0;
+let joyTick = null;    // set by the joystick: re-checks a diagonal knob every frame
 let mazeLayer = null, T = 20, dpr = 1;
 let clock = 0;
 let introT = 0, introBites = 0;
@@ -225,6 +229,8 @@ function loadLevel(i){
   ROWS = grid.length; COLS = grid[0].length;
   const bpos = findChar('B'); HOUSE_EXIT = { x:bpos.x, y:bpos.y }; HOUSE_IN = { x:bpos.x, y:bpos.y+2 };
   TUNNEL_ROW = grid.findIndex(r => r[0] !== '#' && r[COLS-1] !== '#');
+  TUNNEL_LEN = TUNNEL_ROW < 0 ? 0 : Math.max(1, grid[TUNNEL_ROW].findIndex(c => c !== ' '));
+  goneBugs = new Set();   // nuovo livello: si riparte con tutti i bug
   BUGS[0].home = {x:COLS-1, y:-2}; BUGS[1].home = {x:0, y:-2}; BUGS[2].home = {x:COLS-1, y:ROWS+1}; BUGS[3].home = {x:0, y:ROWS+1};
   dots = []; dotsLeft = 0;
   for (let y=0;y<ROWS;y++){
@@ -235,7 +241,7 @@ function loadLevel(i){
       if (dots[y][x]) dotsLeft++;
     }
   }
-  levelBugsEaten = 0; levelTime = 0; bugsGone = new Set();
+  levelBugsEaten = 0; levelTime = 0;
   fit();
   resetActors();
 }
@@ -247,13 +253,13 @@ function findChar(ch){
 
 function resetActors(){
   const p = findChar('P');
-  player = { x:p.x, y:p.y, dir:null, face:DIR.right, moving:false, mouth:0, isBug:false };   // fermo finché il giocatore non sceglie una direzione
+  player = { x:p.x, y:p.y, gx:0, gy:0, dir:null, face:DIR.right, moving:false, mouth:0, isBug:false };   // gx/gy: drawing offset that glides to 0 after a cornering snap   // fermo finché il giocatore non sceglie una direzione
   desired = null;
   bugs = [];
   const hx = HOUSE_EXIT.x, hy = HOUSE_IN.y;
   const starts = [ {x:hx,y:HOUSE_EXIT.y,mode:'scatter',dir:DIR.left}, {x:hx,y:hy,mode:'house',dir:DIR.left}, {x:hx-1,y:hy,mode:'house',dir:DIR.right}, {x:hx+1,y:hy,mode:'house',dir:DIR.left} ];
   for (let i=0;i<L.bugs;i++){
-    if (bugsGone.has(i)) continue;
+    if (goneBugs.has(i)) continue;
     const s = starts[i];
     bugs.push({ id:i, ...BUGS[i], x:s.x, y:s.y, dir:s.dir, mode:s.mode, isBug:true, release:L.release[i]||0, reverse:false, wob:Math.random()*6 });
   }
@@ -291,9 +297,47 @@ function stepEntity(e, speed, dt, decide){
   }
 }
 
+// Cornering assist (v29): a buffered turn is taken when the C is within
+// CORNER tiles of a junction centre, before or just after it. The C is put on
+// the junction centre at once (logic stays on the grid, so it can never stick
+// to a wall) and only the drawing glides onto the new lane (gx/gy).
+const CORNER = 0.35;
+function tryCorner(){
+  const p = player, d = desired;
+  if (!d || !p.dir || d === p.dir || d === OPP[p.dir.n]) return;
+  const cx = Math.round(p.x), cy = Math.round(p.y);
+  const off = p.dir.x ? p.x - cx : p.y - cy;
+  if (Math.abs(off) < 1e-4 || Math.abs(off) > CORNER) return;   // at the centre stepEntity decides
+  // already past the centre: only if the C went straight through it, never
+  // back onto the junction where it has just turned or started from
+  if (off*(p.dir.x || p.dir.y) > 0 && p.turnAt === cx+','+cy) return;
+  if (!passable(cx+d.x, cy+d.y, p)) return;
+  p.gx += p.x - cx; p.gy += p.y - cy;
+  p.x = cx; p.y = cy; wrapX(p);
+  p.dir = d; p.turnAt = Math.round(p.x)+','+cy;
+  eatAt(cx, cy);
+}
+// can the C turn into d at the junction it is about to reach? (look ahead `max` centres)
+function canTurnSoon(d, max){
+  const p = player;
+  if (!p || !p.dir) return false;
+  let x = Math.round(p.x), y = Math.round(p.y);
+  const past = p.dir.x ? (p.x - x)*p.dir.x : (p.y - y)*p.dir.y;   // > 0: centre already passed
+  if (past > CORNER){ x += p.dir.x; y += p.dir.y; }
+  for (let i=0; i<max; i++){
+    if (!passable(x, y, p)) return false;
+    if (passable(x+d.x, y+d.y, p)) return true;
+    x += p.dir.x; y += p.dir.y;
+  }
+  return false;
+}
+
 function playerDecide(e, x, y){
   eatAt(x, y);
+  const was = e.moving ? e.dir : null;
   if (desired && passable(x+desired.x, y+desired.y, e)) e.dir = desired;
+  const here = x+','+y;                       // where the C last turned or started
+  if (e.dir !== was) e.turnAt = here; else if (e.turnAt !== here) e.turnAt = null;
 }
 
 function eatAt(x, y){
@@ -323,7 +367,7 @@ function bugTarget(b){
     case 0: return {x:px, y:py};
     case 1: return {x:px + pd.x*4, y:py + pd.y*4};
     case 2: {
-      const ax = px + pd.x*2, ay = py + pd.y*2, g = bugs[0];
+      const ax = px + pd.x*2, ay = py + pd.y*2, g = bugs.find(o => o.id === 0);
       return g ? {x: ax*2 - Math.round(g.x), y: ay*2 - Math.round(g.y)} : {x:px,y:py};
     }
     case 3: {
@@ -372,7 +416,7 @@ function bugSpeed(b){
   if (b.mode==='eaten') return 11;
   if (b.mode==='house') return 2.2;
   if (b.mode==='exit') return 3.2;
-  const inTunnel = Math.round(b.y)===TUNNEL_ROW && (b.x < 4 || b.x > COLS-5);
+  const inTunnel = Math.round(b.y)===TUNNEL_ROW && (b.x < TUNNEL_LEN || b.x > COLS-1-TUNNEL_LEN);
   let s = b.mode==='fright' ? L.fright : L.bug;
   // the last few coins make bugs a touch faster, like the arcade
   if (b.mode!=='fright' && dotsLeft < 20) s *= 1.06;
@@ -424,12 +468,20 @@ function update(dt){
   }
 
   // player: instant reversal mid-corridor feels responsive on touch
+  if (joyTick) joyTick();
   if (desired && player.dir && desired === OPP[player.dir.n]) player.dir = desired;
+  tryCorner();
+  if (state !== 'play') return;
   stepEntity(player, L.pac, dt, playerDecide);
   if (state !== 'play') return; // level may have been cleared while eating
+  // a buffered turn that is already the current direction expires after 0.6 s
+  if (desired && desired === player.dir){ desiredAge += dt; if (desiredAge > 0.6) desired = null; }
+  { const g = Math.hypot(player.gx, player.gy);   // glide the drawing back onto the lane
+    if (g > 0){ const k = Math.max(0, g - L.pac*dt)/g; player.gx *= k; player.gy *= k; } }
   // eat the coin under the player even when passing between centres quickly
   if (player.moving) player.mouth += dt*14;
 
+  bugs = bugs.filter(b => b.mode !== 'eaten');
   for (const b of bugs){
     if (b.mode === 'house'){
       b.release -= dt;
@@ -449,7 +501,7 @@ function update(dt){
         score += pts; levelBugsEaten++;
         popups.push({x:b.x, y:b.y, text:String(pts), t:1});
         b.mode = 'eaten'; b.goingIn = false; sfx.eat();
-        if (lvIndex === 0){ bugsGone.add(b.id); b.gone = true; }   // dal livello 2 rinascono nella casetta
+        if (lvIndex === 0){ goneBugs.add(b.id); b.gone = true; }   // dal livello 2 rinascono nella casetta
       } else if (b.mode !== 'eaten'){
         loseLife(); return;
       }
@@ -520,7 +572,7 @@ function showLevelCard(i){
   state = 'levelcard';
   $('lvTag').textContent = 'Livello ' + (i+1) + '/' + (EFG.on ? EFG.max : 5);
   $('lvName').textContent = L.name;
-  $('lvText').textContent = L.text + ' Bug in gioco: ' + L.bugs + '.';
+  $('lvText').textContent = L.text + ' Bug: ' + L.bugs + '.';
   updateHud();
   $('btnGo').onclick();   // niente schermata di spiegazione: si parte subito con "PRONTI!"
 }
@@ -551,7 +603,7 @@ function refreshTitle(){
 }
 
 /* ================= INPUT ================= */
-function setDesired(d){ desired = d; }
+function setDesired(d){ desired = d; desiredAge = 0; }
 const KEYMAP = {ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',a:'left',d:'right',w:'up',s:'down',A:'left',D:'right',W:'up',S:'down'};
 window.addEventListener('keydown', e=>{
   if (state === 'intro'){ e.preventDefault(); endIntro(); return; }
@@ -576,13 +628,92 @@ stage.addEventListener('pointermove', e=>{
 });
 ['pointerup','pointercancel','pointerleave'].forEach(t=>stage.addEventListener(t, ()=>{ sw = null; }));
 
-// d-pad (tap sets the next turn, like a joystick nudge)
-[['dUp','up'],['dLeft','left'],['dRight','right'],['dDown','down']].forEach(([id,n])=>{
-  const el = $(id);
-  el.addEventListener('pointerdown', e=>{ e.preventDefault(); setDesired(DIR[n]); el.classList.add('active'); });
-  ['pointerup','pointerleave','pointercancel'].forEach(t=>el.addEventListener(t, ()=>el.classList.remove('active')));
-  el.addEventListener('contextmenu', e=>e.preventDefault());
-});
+// virtual joystick: the knob follows the thumb and springs back on release.
+// v29 (client: "difficili da manovrare"):
+// - no direction change inside a 30% dead zone;
+// - hysteresis: the other axis must be 20% stronger before the direction switches;
+// - near the diagonal the knob picks the direction the C can actually take at
+//   its next junction, and keeps re-checking it every frame while held.
+// The chosen direction is buffered as the next turn like a swipe or an arrow key.
+(function(){
+  const joy = $('joy'), knob = $('joyKnob');
+  if (!joy || !knob) return;
+  const DEAD = 0.30, HYST = 1.2;
+  const marks = { up:$('jmU'), right:$('jmR'), down:$('jmD'), left:$('jmL') };
+  let pid = null, cx = 0, cy = 0, rad = 1, cur = null, kdx = 0, kdy = 0;
+  function mark(n){
+    if (n === cur) return;
+    if (cur && marks[cur]) marks[cur].classList.remove('on');
+    cur = n;
+    if (n && marks[n]) marks[n].classList.add('on');
+  }
+  function openHere(d){ return passable(Math.round(player.x)+d.x, Math.round(player.y)+d.y, player); }
+  // knob between two directions a (horizontal) and b (vertical): which one?
+  function pickDiagonal(a, b){
+    const A = DIR[a], B = DIR[b];
+    if (!player.dir || !player.moving){             // standing still: the open one
+      const oa = openHere(A), ob = openHere(B);
+      if (oa !== ob) return oa ? a : b;
+      return Math.abs(kdx) >= Math.abs(kdy) ? a : b;
+    }
+    const perp = player.dir.x ? B : A, along = perp === A ? B : A;
+    return canTurnSoon(perp, 4) ? perp.n : along.n;
+  }
+  function choose(){
+    const ax = Math.abs(kdx), ay = Math.abs(kdy);
+    const h = kdx > 0 ? 'right' : 'left', v = kdy > 0 ? 'down' : 'up';
+    if (ax > ay*HYST) return h;
+    if (ay > ax*HYST) return v;
+    if (cur !== h && cur !== v) return pickDiagonal(h, v);
+    const other = cur === h ? v : h, O = DIR[other];
+    if (state === 'play' && player.dir){
+      // moving along cur: switch only if the other way opens right at the next junction
+      if (player.moving && DIR[cur] === player.dir && O !== OPP[player.dir.n] && canTurnSoon(O, 1)) return other;
+      // stopped against a wall: take the open way
+      if (!player.moving && !openHere(DIR[cur]) && openHere(O)) return other;
+    }
+    return cur;
+  }
+  function apply(force){
+    const n = choose();
+    if (n !== cur || force){ mark(n); setDesired(DIR[n]); }
+  }
+  joyTick = function(){ if (pid !== null && cur) apply(false); };
+  function move(e){
+    let dx = e.clientX - cx, dy = e.clientY - cy;
+    const d = Math.hypot(dx, dy);
+    if (d > rad){ dx = dx/d*rad; dy = dy/d*rad; }
+    knob.style.transform = 'translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px)';
+    if (d < rad*DEAD) { mark(null); return; }
+    kdx = dx; kdy = dy;
+    const was = cur;
+    apply(false);
+    if (cur === was && cur && desired !== DIR[cur]) setDesired(DIR[cur]);   // re-buffer after the turn was taken or expired
+  }
+  function release(e){
+    if (pid === null || (e && e.pointerId !== pid)) return;
+    try { joy.releasePointerCapture(pid); } catch(_){}
+    pid = null; joy.classList.remove('drag');
+    knob.style.transform = ''; mark(null);   // spring back; the buffered turn stays
+  }
+  joy.addEventListener('pointerdown', e=>{
+    e.preventDefault();
+    if (state === 'intro'){ endIntro(); return; }
+    if (pid !== null) return;
+    pid = e.pointerId;
+    try { joy.setPointerCapture(pid); } catch(_){}
+    const r = joy.getBoundingClientRect();
+    cx = r.left + r.width/2; cy = r.top + r.height/2;
+    rad = Math.max(10, (r.width - knob.offsetWidth)/2);
+    joy.classList.add('drag');
+    move(e);
+  });
+  joy.addEventListener('pointermove', e=>{ if (e.pointerId === pid){ e.preventDefault(); move(e); } });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(t=>joy.addEventListener(t, release));
+  ['contextmenu','selectstart','dragstart'].forEach(t=>joy.addEventListener(t, e=>e.preventDefault()));
+  // belt and braces for iOS: no scroll / zoom / long-press callout from the control band
+  ['touchstart','touchmove'].forEach(t=>$('controls').addEventListener(t, e=>{ if (e.cancelable) e.preventDefault(); }, {passive:false}));
+})();
 
 /* ================= RENDER ================= */
 function fit(){
@@ -604,15 +735,15 @@ function buildMazeLayer(){
   mazeLayer.width = Math.round(W*dpr); mazeLayer.height = Math.round(H*dpr);
   const m = mazeLayer.getContext('2d');
   m.setTransform(dpr,0,0,dpr,0,0);
-  m.fillStyle = '#060a12'; m.fillRect(0,0,W,H);
+  m.fillStyle = MAZE_BG; m.fillRect(0,0,W,H);
   // faint grid, like an old CRT
-  m.strokeStyle = 'rgba(75,138,201,0.05)'; m.lineWidth = 1;
+  m.strokeStyle = 'rgba(75,138,201,0.08)'; m.lineWidth = 1;
   for (let x=0;x<=COLS;x++){ m.beginPath(); m.moveTo(x*T,0); m.lineTo(x*T,H); m.stroke(); }
   for (let y=0;y<=ROWS;y++){ m.beginPath(); m.moveTo(0,y*T); m.lineTo(W,y*T); m.stroke(); }
   // wall masses
   const wall = (x,y)=> y<0||y>=ROWS||x<0||x>=COLS ? true : isWallCh(grid[y][x]);
   const inset = T*0.28;
-  m.fillStyle = '#0c1a30';
+  m.fillStyle = WALL_FILL;
   for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++){
     if (!wall(x,y)) continue;
     const l = !wall(x-1,y)?inset:0, r = !wall(x+1,y)?inset:0, t = !wall(x,y-1)?inset:0, b = !wall(x,y+1)?inset:0;
@@ -620,7 +751,7 @@ function buildMazeLayer(){
   }
   // neon outline along every wall edge that faces a corridor
   m.strokeStyle = C_BLUE; m.lineWidth = Math.max(1.5, T*0.1); m.lineCap = 'round';
-  m.shadowColor = 'rgba(75,138,201,0.7)'; m.shadowBlur = T*0.35;
+  m.shadowColor = 'rgba(47,99,153,0.35)'; m.shadowBlur = T*0.2;
   m.beginPath();
   for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++){
     if (!wall(x,y)) continue;
@@ -645,14 +776,14 @@ function buildMazeLayer(){
   m.shadowBlur = 0;
   // bug-house door
   for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++) if (grid[y][x]==='-'){
-    m.fillStyle = '#ff8ad8'; m.fillRect(x*T+T*0.1, y*T+T*0.42, T*0.8, T*0.16);
+    m.fillStyle = '#e0559f'; m.fillRect(x*T+T*0.1, y*T+T*0.42, T*0.8, T*0.16);
   }
 }
 
 function drawCoin(c, x, y, s){
   c.fillStyle = COIN;
   c.beginPath(); c.arc(x, y, s, 0, Math.PI*2); c.fill();
-  c.strokeStyle = '#b8860b'; c.lineWidth = Math.max(0.8, s*0.35); c.stroke();
+  c.strokeStyle = '#a8640a'; c.lineWidth = Math.max(0.8, s*0.35); c.stroke();
   c.fillStyle = 'rgba(255,255,255,0.7)';
   c.beginPath(); c.arc(x - s*0.3, y - s*0.3, s*0.28, 0, Math.PI*2); c.fill();
 }
@@ -660,7 +791,7 @@ function drawCoin(c, x, y, s){
 function drawFloppy(c, x, y, s, t){
   const k = s*(1 + Math.sin(t*6)*0.08);
   c.save(); c.translate(x, y);
-  c.shadowColor = 'rgba(165,196,228,0.9)'; c.shadowBlur = k*0.8;
+  c.shadowColor = 'rgba(47,99,153,0.45)'; c.shadowBlur = k*0.6;
   c.fillStyle = C_BLUE; c.fillRect(-k, -k, k*2, k*2);
   c.shadowBlur = 0;
   c.fillStyle = '#dfe9f5'; c.fillRect(-k*0.55, -k, k*1.1, k*0.7);          // metal shutter
@@ -675,7 +806,7 @@ function drawC(c, x, y, r, angle, open, color){
   const lw = r*0.62;
   c.save(); c.translate(x, y); c.rotate(angle);
   c.strokeStyle = color || C_BLUE; c.lineWidth = lw; c.lineCap = 'butt';
-  c.shadowColor = 'rgba(75,138,201,0.8)'; c.shadowBlur = r*0.5;
+  c.shadowColor = 'rgba(13,43,69,0.35)'; c.shadowBlur = r*0.35;
   c.beginPath(); c.arc(0, 0, r - lw/2, open, Math.PI*2 - open); c.stroke();
   c.restore();
 }
@@ -700,6 +831,7 @@ function drawBug(c, b, x, y, s, t){
     // body
     c.fillStyle = body;
     c.beginPath(); c.ellipse(0, 0, s*0.62, s*0.72, 0, 0, Math.PI*2); c.fill();
+    c.strokeStyle = fr ? (blinking?'#9aa9c0':'#1a2f80') : shade(b.color, -0.45); c.lineWidth = Math.max(1, s*0.1); c.stroke();
     c.fillStyle = 'rgba(0,0,0,0.18)'; c.fillRect(-s*0.62, s*0.05, s*1.24, s*0.1);
   }
   // eyes (look where the bug is going)
@@ -729,8 +861,8 @@ function shade(hex, f){
 
 function renderIntro(){
   const W = COLS*T, H = ROWS*T;
-  ctx.fillStyle = '#060a12'; ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle = 'rgba(75,138,201,0.06)'; ctx.lineWidth = 1;
+  ctx.fillStyle = MAZE_BG; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle = 'rgba(75,138,201,0.08)'; ctx.lineWidth = 1;
   for (let x=0;x<=COLS;x++){ ctx.beginPath(); ctx.moveTo(x*T,0); ctx.lineTo(x*T,H); ctx.stroke(); }
   for (let y=0;y<=ROWS;y++){ ctx.beginPath(); ctx.moveTo(0,y*T); ctx.lineTo(W,y*T); ctx.stroke(); }
   const img = $('logoImg');
@@ -746,7 +878,7 @@ function renderIntro(){
   if (moving){
     const open = 0.12*Math.PI + (Math.sin(introT*16)*0.5+0.5)*0.24*Math.PI;
     // hide whatever is inside the C's circle: letters vanish as they enter the mouth
-    ctx.fillStyle = '#060a12'; ctx.beginPath(); ctx.arc(x0 + cx*k, y0 + LOGO_H*k*0.49, LOGO_C_R*k*1.02, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = MAZE_BG; ctx.beginPath(); ctx.arc(x0 + cx*k, y0 + LOGO_H*k*0.49, LOGO_C_R*k*1.02, 0, Math.PI*2); ctx.fill();
     drawC(ctx, x0 + cx*k, y0 + LOGO_H*k*0.49, LOGO_C_R*k, 0, open);
     // crumbs where the last letter was bitten
     ctx.fillStyle = COIN;
@@ -759,10 +891,10 @@ function renderIntro(){
   }
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   if (cut >= LOGO_W - 1){
-    ctx.fillStyle = COIN; ctx.font = `${Math.max(10, T*0.9)}px 'Press Start 2P', monospace`;
+    ctx.fillStyle = TXT_GOLD; ctx.font = `${Math.max(10, T*0.9)}px 'Press Start 2P', monospace`;
     ctx.fillText('PAC', W/2, y0 + LOGO_H*k*0.5);
   }
-  ctx.fillStyle = 'rgba(143,165,191,0.8)'; ctx.font = `${Math.max(7, T*0.34)}px 'Press Start 2P', monospace`;
+  ctx.fillStyle = '#56718a'; ctx.font = `${Math.max(7, T*0.34)}px 'Press Start 2P', monospace`;
   ctx.fillText('TOCCA PER SALTARE', W/2, H*0.86);
 }
 
@@ -770,7 +902,7 @@ function render(){
   if (state === 'intro'){ ctx.setTransform(dpr,0,0,dpr,0,0); renderIntro(); return; }
   ctx.setTransform(dpr,0,0,dpr,0,0);
   if (mazeLayer) ctx.drawImage(mazeLayer, 0, 0, COLS*T, ROWS*T);
-  else { ctx.fillStyle = '#060a12'; ctx.fillRect(0,0,COLS*T,ROWS*T); }
+  else { ctx.fillStyle = MAZE_BG; ctx.fillRect(0,0,COLS*T,ROWS*T); }
   if (!grid.length) return;
   // coins & patches
   for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++){
@@ -780,7 +912,7 @@ function render(){
     else drawFloppy(ctx, cx, cy, T*0.3, clock + x);
   }
   // player
-  const px = (player.x+0.5)*T, py = (player.y+0.5)*T;
+  const px = (player.x+player.gx+0.5)*T, py = (player.y+player.gy+0.5)*T;
   if (state === 'dying'){
     const k = 1 - Math.max(0, dyingTimer-0.3)/1.2;
     const open = 0.25*Math.PI + k*0.75*Math.PI;
@@ -793,16 +925,22 @@ function render(){
   }
   // bugs
   if (state !== 'dying' || dyingTimer > 1.2){
-    for (const b of bugs) drawBug(ctx, b, (b.x+0.5)*T, (b.y+0.5)*T, T*0.5, clock);
+    for (const b of bugs){
+      const bx = (b.x+0.5)*T, by = (b.y+0.5)*T;
+      drawBug(ctx, b, bx, by, T*0.5, clock);
+      // tunnel: draw the other half on the opposite side while wrapping
+      if (b.x < 0.5) drawBug(ctx, b, bx + COLS*T, by, T*0.5, clock);
+      if (b.x > COLS-1.5) drawBug(ctx, b, bx - COLS*T, by, T*0.5, clock);
+    }
   }
   // popups
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.font = `${Math.max(7, T*0.38)}px 'Press Start 2P', monospace`;
-  for (const p of popups){ ctx.fillStyle = `rgba(255,207,74,${Math.min(1,p.t*1.5)})`; ctx.fillText(p.text, (p.x+0.5)*T, (p.y+0.5)*T - (1-p.t)*T); }
+  for (const p of popups){ ctx.fillStyle = `rgba(197,106,12,${Math.min(1,p.t*1.5)})`; ctx.fillText(p.text, (p.x+0.5)*T, (p.y+0.5)*T - (1-p.t)*T); }
   // READY
   if (state === 'ready'){
     ctx.font = `${Math.max(8, T*0.55)}px 'Press Start 2P', monospace`;
-    ctx.fillStyle = COIN; ctx.fillText('PRONTI!', (COLS/2)*T, (HOUSE_IN.y+2.5)*T);
+    ctx.fillStyle = TXT_GOLD; ctx.fillText('PRONTI!', (COLS/2)*T, (HOUSE_IN.y+2.5)*T);
   }
 }
 

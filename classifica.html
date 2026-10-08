@@ -149,8 +149,6 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 .join b mark{color:var(--sky)}
 .join span{font-size:clamp(11px,.85vw,14px);font-weight:300;color:#c9d3de}
 .rules{font-size:clamp(11px,.85vw,14px);font-weight:300;color:#c9d3de;max-width:560px;line-height:1.6;border-left:3px solid var(--sky);padding-left:16px}
-.powered{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:clamp(10px,.75vw,12px);font-weight:300;color:#c9d3de;letter-spacing:.8px}
-.powered img{height:clamp(16px,1.4vw,22px);width:auto;display:block}
 .note{font-size:12px;font-weight:300;color:var(--muted);text-align:center;padding:0 16px 10px;margin:0}
 
 @media (max-width:900px){
@@ -163,8 +161,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 @media (max-width:560px){
   .games{grid-template-columns:minmax(0,1fr)}
   .live{margin-left:0;width:100%;justify-content:space-between}
-  .powered{margin:0 auto}
-  .topbar .pill{display:none}
+    .topbar .pill{display:none}
 }
 /* schermo grande (ledwall / TV 16:9): tutto in una schermata */
 @media (min-width:1200px){
@@ -221,7 +218,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   <div class="boards" id="boards">
   <div class="games" id="games"></div>
   <section class="panel total" id="secTotal" aria-labelledby="tTotal">
-    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale<span class="who-tag" id="whoTag" hidden></span></h2><div class="sub">Somma dei record nei 4 giochi · ordinata per punti</div></div></div>
+    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale<span class="who-tag" id="whoTag" hidden></span></h2><div class="sub">Somma dei record nei 4 giochi · livelli, poi punti</div></div></div>
     <ol id="list-all"></ol>
   </section>
   </div>
@@ -234,9 +231,8 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 <p class="note" id="demoNote" hidden>Modalità demo: il database online non è ancora configurato, qui vedi solo i punteggi fatti su questo dispositivo.</p>
 
 <footer>
-  <div class="join"><div><b>Sblocca i giochi <mark>agli stand</mark></b><span>Inquadra il QR allo stand di ogni sponsor e scala la classifica.</span></div></div>
-  <div class="rules">3 livelli per gioco, massimo 1 minuto ciascuno. Ogni livello superato vale numero del livello × secondi che avanzano × vite rimaste, poi si sommano. In classifica vale il punteggio migliore.</div>
-  <div class="powered">powered by <img src="img/efuture-white.png" alt="efuture"></div>
+  <div class="join"><div><b>Sblocca i giochi <mark>agli stand</mark></b><span>Inquadra il QR allo stand.</span></div></div>
+  <div class="rules">3 livelli per gioco, 1 minuto ciascuno · punti = livello × secondi avanzati × vite</div>
 </footer>
 
 <div class="gmodal" id="gateDlg" hidden role="dialog" aria-modal="true" aria-labelledby="gdT">
@@ -255,9 +251,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=22"></script>
+<script src="config.js?v=30"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=22"></script>
+<script src="backend.js?v=30"></script>
 <script>
 (function(){
 "use strict";
@@ -277,7 +273,7 @@ $('demoNote').hidden = B.remote;
 // game panels
 for (const g of GAMES){
   const sec = document.createElement('section'); sec.className = 'panel'; sec.setAttribute('aria-label', g.name);
-  sec.innerHTML = '<div class="ph"><img alt=""><div><h2></h2><div class="sub">Top ' + TOP_GAME + ' · ordinata per punti</div></div></div><ol></ol>';
+  sec.innerHTML = '<div class="ph"><img alt=""><div><h2></h2><div class="sub">Top ' + TOP_GAME + ' · livelli, poi punti</div></div></div><ol></ol>';
   sec.querySelector('img').src = g.icon; sec.querySelector('h2').textContent = g.name;
   sec.querySelector('ol').id = 'list-' + g.id;
   $('games').appendChild(sec);
@@ -289,7 +285,7 @@ const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)
 const rowsByKey = {};   // board key -> Map(pid -> {li, sig})
 function render(key, rows, top){
   const ol = $('list-' + key);
-  rows = rows.slice().sort((x, y) => (Number(y.score) || 0) - (Number(x.score) || 0)).slice(0, top);
+  rows = rows.slice().sort((x, y) => (Number(y.levels) || 0) - (Number(x.levels) || 0) || (Number(y.score) || 0) - (Number(x.score) || 0)).slice(0, top);   // prima i livelli, poi i punti
   const firstTime = !rowsByKey[key];
   const map = rowsByKey[key] = rowsByKey[key] || new Map();
   if (!rows.length){ map.clear(); ol.innerHTML = ''; const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Ancora nessun punteggio. Sarai il primo?'; ol.appendChild(li); return; }
@@ -359,7 +355,7 @@ const view = {
     }));
     const label = st.group === 'efuture' ? 'Solo utenti Efuture' : st.group === 'ospiti' ? 'Solo ospiti' : '';
     $('whoTag').hidden = !label; $('whoTag').textContent = label;
-    document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · ordinata per punti' + (label ? ' · ' + label.toLowerCase() : ''));
+    document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · livelli, poi punti' + (label ? ' · ' + label.toLowerCase() : ''));
     store.set('efgBoardView3', st);
   }
 };
@@ -389,7 +385,10 @@ async function refresh(){
     render('all', boards[0], TOP_GAME);   // "Top" vale per tutte le classifiche
     GAMES.forEach((g, i) => render(g.id, boards[i + 1], TOP_GAME));
     const t = new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-    $('status').textContent = 'Live · aggiornata alle ' + t; $('dot').classList.remove('off');
+    $('status').textContent = boards.some(b => b.filtroMancante)
+      ? '⚠ Filtro Giocatori non attivo: eseguire supabase-classifica-gruppi.sql su Supabase (mostro tutti) · ' + t
+      : 'Live · aggiornata alle ' + t;
+    $('dot').classList.remove('off');
   } catch(e){
     console.warn('classifica', e);
     $('status').textContent = 'Classifica non raggiungibile (' + String(e && e.message || e).slice(0, 60) + '), riprovo…'; $('dot').classList.add('off');

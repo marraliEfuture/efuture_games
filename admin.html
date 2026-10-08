@@ -45,6 +45,7 @@ mark{background:none;color:var(--sky);padding:0}
 .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
 .btn.navy{background:var(--navy)}
 .btn.danger{background:var(--danger)}
+.btn.del{background:#fff;color:var(--danger);border:1px solid var(--danger);padding:4px 10px;font-size:12px}
 main{flex:1;width:100%;max-width:1200px;margin:0 auto;padding:20px clamp(16px,3vw,40px) 40px;display:flex;flex-direction:column;gap:18px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 30px rgba(20,29,40,.06);padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .login{max-width:420px;margin:40px auto 0;width:100%}
@@ -231,6 +232,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
           <button class="btn ghost" id="lReload" type="button">Aggiorna</button>
           <button class="btn navy" id="lCsv" type="button">Scarica CSV</button>
         </div>
+        <div class="msg" id="lMsg" aria-live="polite"></div>
         <div class="tablewrap" style="margin-top:10px"><table id="lTable"></table></div>
       </section>
 
@@ -255,7 +257,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         </div>
         <div class="danger-box" style="margin-top:12px">
           <h3>Cancella tutto</h3>
-          <p>Cancella punteggi <b>e giocatori registrati</b> (nomi, email, cellulari). Tutti dovranno registrarsi di nuovo.</p>
+          <p>Cancella punteggi <b>e giocatori registrati</b> (nomi ed email). Tutti dovranno registrarsi di nuovo.</p>
           <div class="bar"><input type="text" id="rConf2" placeholder="Scrivi CANCELLA TUTTO per confermare" style="max-width:300px"><button class="btn danger" id="rAll" type="button">Cancella tutto</button></div>
         </div>
         <div class="msg" id="rMsg" aria-live="polite" style="margin-top:10px"></div>
@@ -319,7 +321,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
   <p class="dim" id="noRemote" hidden>Il database online non è configurato in <code>config.js</code>: il pannello admin funziona solo con Supabase.</p>
 </main>
 
-<script src="config.js?v=22"></script>
+<script src="config.js?v=30"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script>
@@ -407,15 +409,26 @@ async function loadPlayers(){
   $('pInfo').textContent = players.length + ' giocatori registrati';
   const det = p => Object.keys(GAMES).map(g => { const x = p.dettaglio && p.dettaglio[g]; return x ? GAMES[g] + ' ' + x.livelli + '/3 · ' + x.punti : null; }).filter(Boolean).join(' — ');
   const sorted = players.slice().sort((a, b) => b.livelli - a.livelli || b.punti - a.punti);
-  fillTable($('pTable'), ['#', 'Nome', 'Email', 'Cellulare', 'Registrato', 'Giochi', 'Livelli', 'Punti', 'Dettaglio per gioco'],
-    sorted.map((p, i) => [i + 1, p.name, p.email, p.phone, fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p)]),
-    [null, null, null, null, 'small', 'num', 'num', 'num', 'small']);
+  fillTable($('pTable'), ['#', 'Nome', 'Email', 'Registrato', 'Giochi', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
+    sorted.map((p, i) => [i + 1, p.name, p.email, fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), delBtn(p)]),
+    [null, null, null, 'small', 'num', 'num', 'num', 'small', null]);
+}
+// elimina un giocatore: sparisce dai giocatori e dalla classifica, il registro resta
+function delBtn(p){
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'btn del'; b.textContent = 'Elimina';
+  b.onclick = async () => {
+    if (!confirm('Eliminare ' + p.name + ' (' + p.email + ')?\n\nIl giocatore e i suoi punteggi vengono cancellati dal database e spariscono dalla classifica. Il registro eventi resta. Non si può annullare.')) return;
+    b.disabled = true;
+    try { const r = await call('efg_admin_delete_player', { p_email: p.email }); await loadPlayers(); $('pInfo').textContent += ' · eliminato ' + r.nome; refreshStats(); }
+    catch(err){ b.disabled = false; onErr(err, $('pInfo')); }
+  };
+  return b;
 }
 $('pReload').onclick = loadPlayers;
 $('pCsv').onclick = () => {
-  const head = ['Nome', 'Email', 'Cellulare', 'Registrato', 'Giochi usati', 'Livelli totali', 'Punti totali'];
+  const head = ['Nome', 'Email', 'Registrato', 'Giochi usati', 'Livelli totali', 'Punti totali'];
   Object.values(GAMES).forEach(n => head.push(n + ' livelli', n + ' punti'));
-  const rows = players.map(p => { const r = [p.name, p.email, p.phone, fmtDate(p.created_at), p.giochi, p.livelli, p.punti];
+  const rows = players.map(p => { const r = [p.name, p.email, fmtDate(p.created_at), p.giochi, p.livelli, p.punti];
     Object.keys(GAMES).forEach(g => { const x = p.dettaglio && p.dettaglio[g]; r.push(x ? x.livelli : '', x ? x.punti : ''); }); return r; });
   download('efuture-games-giocatori-' + stamp() + '.csv', toCsv(head, rows), 'text/csv;charset=utf-8');
 };
@@ -431,7 +444,7 @@ const describe = l => {
 };
 async function loadLogs(){
   try { logs = await call('efg_admin_logs', { p_limit: parseInt($('lLimit').value, 10), p_kind: $('lKind').value || null }) || []; }
-  catch(err){ return onErr(err, $('pInfo')); }
+  catch(err){ return onErr(err, $('lMsg')); }
   fillTable($('lTable'), ['Quando', 'Evento', 'Email', 'Gioco', 'Dettagli'],
     logs.map(l => { const t = document.createElement('span'); t.className = 'tag' + (/errata/.test(l.kind) ? ' err' : l.kind.startsWith('admin') ? ' admin' : ''); t.textContent = l.kind;
       return [fmtDate(l.at), t, l.email || '', l.game ? (GAMES[l.game] || l.game) : '', describe(l)]; }),
@@ -579,6 +592,7 @@ $('qPrint').onclick = () => window.print();
 /* ---------- skills ---------- */
 // stesso elenco di .claude/skills/ (la skill /efuture-games-skills lo legge dai file)
 const SKILLS = [
+  ['/efuture-games', 'Carica tutto il progetto in memoria: stato dell\u2019app, file, skill, link, artifact, chat passate e decisioni, così si riparte da dove si era rimasti.', '\u201criprendiamo efuture games\u201d'],
   ['/efuture-games-qr', 'Crea i 5 QR (app + sblocco dei 4 giochi) come cartellini da stampare e controlla che ogni codice apra il gioco giusto.', '“dammi i QR da stampare”'],
   ['/efuture-games-links', 'Elenca tutti i link del gioco: app, installazione, classifica, admin, GitHub, Claude e ChatGPT.', '“dammi i link del gioco”'],
   ['/efuture-games-commit', 'Salva e carica le modifiche su GitHub: controlla i file, aumenta la versione dell’app se serve e pubblica su main solo se lo chiedi.', '“carica le modifiche su GitHub”'],
@@ -612,6 +626,20 @@ const TUTORIALS = [
       { k:'Passo 7 · la trappola', h:'Tre in fila con due lati liberi', img:'trap.jpg', html:'<p>Con tre gettoni in fila e <b>entrambi i lati liberi</b>, il computer può bloccarne uno solo. Tu chiudi l’altro: qui la colonna <b>6</b>.</p>' },
       { k:'Fatto', h:'Hai vinto!', img:'win.jpg', html:'<p>Quattro in fila e fuochi d’artificio. Gioco creato e partita vinta in circa <b>9 minuti</b>.</p><p>Con il tempo che resta prova il livello <b>Difficile</b> o sfida un amico in modalità <b>2 giocatori</b>.</p>' },
       { k:'Idee per continuare', h:'Altri prompt da provare', img:'p4.jpg', prompt:"Aggiungi un pulsante per il tema scuro e fai dire al computer una frase scherzosa quando vince.", html:'<p>Puoi chiedere a Claude qualsiasi modifica: colori, suoni, regole nuove. Una richiesta alla volta, poi prova il risultato.</p>' },
+    ] },
+  { id:'sheets', title:'Foglio "Attività giornaliere" con Claude in Chrome', cover:'tutorial/sheets/foglio.jpg', desc:'Un prompt: Claude crea il foglio in Drive, calcola totale e media e lo invia con Gmail. Circa 4 minuti.',
+    slides:[
+      { k:'Tutorial', h:'Un foglio Google fatto da Claude', img:'foglio.jpg', html:'<p>Con <b>un solo prompt</b> Claude:</p><ul><li>crea il foglio «Attività giornaliere» in Drive</li><li>scrive 8 attività, totale e media</li><li>lo invia al responsabile con Gmail</li></ul><p>Tempo reale: circa <b>4 minuti</b>.</p>' },
+      { k:'Prima di iniziare', h:'Cosa ti serve', img:'drive.jpg', html:'<ul><li>il browser <b>Chrome</b></li><li>l’estensione <b>Claude in Chrome</b></li><li>un account <b>Google</b> con Drive e Gmail</li><li>un account <b>Claude</b></li></ul>' },
+      { k:'Passo 1', h:'Apri Drive e il pannello di Claude', img:'drive.jpg', time:'circa 0:20', html:'<p>Vai su <b>drive.google.com</b> e clicca l’icona di Claude in alto a destra: si apre il pannello.</p>' },
+      { k:'Passo 2 · il prompt', h:'Scrivi cosa vuoi', img:'prompt.jpg', prompt:"Crea in Google Drive un nuovo foglio Google «Attività giornaliere» con le colonne Data, Utente, Descrizione attività, Ora inizio, Ora fine e Durata (min) e inserisci 8 attività di oggi di Luca, Sara e Paolo. In fondo aggiungi una riga TOTALE con la somma delle durate e una riga MEDIA con la media, in grassetto. Salva il file e invialo con Gmail a responsabile@esempio.it (Responsabile di reparto).", html:'<p>Incolla il prompt nel pannello e premi invio. Metti nomi e indirizzo veri al posto di quelli di esempio.</p>' },
+      { k:'Passo 3', h:'Claude crea e compila il foglio', img:'righe.jpg', time:'circa 2 minuti', html:'<p>Crea il file, gli dà il nome e scrive colonne e attività. Il bordo arancione indica che Claude sta lavorando sulla pagina.</p>' },
+      { k:'Passo 4', h:'Totale e media', img:'formule.jpg', time:'circa 35 secondi', html:'<p>In fondo aggiunge <b>TOTALE</b> con =SOMMA(F2:F9) e <b>MEDIA</b> con =MEDIA(F2:F9), in grassetto.</p>' },
+      { k:'Passo 5', h:'Il file è salvato su Drive', img:'salvato.jpg', html:'<p>Fogli Google salva da solo: il file è in <b>Il mio Drive</b>.</p>' },
+      { k:'Passo 6', h:'Claude prepara la mail', img:'mail.jpg', time:'circa 35 secondi', html:'<p>Apre Gmail e scrive destinatario, oggetto, testo e link al foglio.</p>' },
+      { k:'Passo 7 · tocca a te', h:'Controlla e conferma', img:'conferma.jpg', html:'<p>Prima di inviare Claude <b>chiede conferma</b>. Controlla destinatario e testo, poi premi <b>Invia</b>.</p>' },
+      { k:'Fatto', h:'Mail inviata', img:'inviato.jpg', html:'<p>Il responsabile riceve il foglio. Tempo reale: circa <b>4 minuti</b>.</p>' },
+      { k:'Idee per continuare', h:'Altri prompt da provare', img:'foglio.jpg', prompt:"Aggiungi un secondo foglio «Riepilogo» con i minuti totali di ogni utente e un grafico a colonne.", html:'<p>Una richiesta alla volta, poi controlla il risultato.</p>' },
     ] },
 ];
 let tuDone = false, deckT = null, deckI = 0;
@@ -660,6 +688,8 @@ const VIDEOS = [
     desc:'Installazione di Claude in Chrome e prompt; poi Claude prende il controllo del mouse e prenota un tavolo per due su TheFork, con il timer del tempo reale. Alla fine la notifica e la mail di conferma sullo smartphone. 78 secondi.' },
   { title:'Crea e gioca a Forza 4 con Claude', file:'video/forza4-claude.mp4', poster:'video/forza4-claude.jpg',
     desc:'Quattro prompt in Claude per creare il gioco, con i tempi reali di ogni passaggio, poi una partita completa vinta in poche mosse. Tutto in meno di 15 minuti. 2 minuti e 16 secondi.' },
+  { title:'Foglio Google «Attività giornaliere» con l’estensione di Claude', file:'video/sheets-claude.mp4', poster:'video/sheets-claude.jpg',
+    desc:'Un prompt in Claude in Chrome: Claude crea il foglio in Drive con 8 attività, aggiunge totale e media, lo salva e, dopo la tua conferma, lo invia con Gmail al responsabile. Con il timer del tempo reale. 88 secondi.' },
 ];
 let videosDone = false;
 async function fileVersion(f){

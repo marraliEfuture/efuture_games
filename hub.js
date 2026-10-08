@@ -27,13 +27,6 @@ async function sha256(txt){
   return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 const normCode = c => String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
-function normPhone(p){
-  let s = String(p||'').replace(/[^\d+]/g,'');
-  if (s.startsWith('00')) s = '+' + s.slice(2);
-  if (!s.startsWith('+')) s = '+39' + s;        // Italian numbers by default
-  return s;
-}
-const validPhone = p => /^\+\d{8,15}$/.test(p);
 const fmt = s => { s = Math.max(0, Math.round(s)); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); };
 let toastT = 0;
 function toast(msg, ms){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(()=>{ t.hidden = true; }, ms||3200); }
@@ -100,10 +93,10 @@ setInterval(()=>{ if (!document.hidden && $('player').hidden) loadRanks(); }, 30
 document.addEventListener('visibilitychange', ()=>{ if (!document.hidden && $('player').hidden) loadRanks(); });
 
 function renderDock(){
-  $('dockOut').hidden = !!session; $('dockIn').hidden = !session; $('who').hidden = !session;
+  $('dockOut').hidden = !!session; $('dockIn').hidden = !session;
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v22' : 'Modalità demo: account e classifica restano su questo telefono. · v22';
+  mn.textContent = remote ? 'Classifica online · v30' : 'Modalità demo: account e classifica restano su questo telefono. · v30';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -143,7 +136,7 @@ let camStream = null, camRAF = 0, camCanvas = null;
 async function startCam(){
   setMsg($('camMsg'), '');
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.jsQR){
-    return setMsg($('camMsg'), 'Questo telefono non permette di aprire la fotocamera qui: usa la fotocamera del telefono o inserisci il codice.', 'err');
+    return setMsg($('camMsg'), 'Fotocamera non disponibile: scrivi il codice.', 'err');
   }
   try {
     camStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ ideal:'environment' } }, audio:false });
@@ -272,13 +265,12 @@ async function loggedIn(user){
 }
 $('fSignup').addEventListener('submit', async e=>{
   e.preventDefault();
-  const name = $('sName').value.trim(), phone = normPhone($('sPhone').value), email = $('sEmail').value.trim();
+  const name = $('sName').value.trim(), email = $('sEmail').value.trim();
   const m = $('sMsg');
   if (name.length < 2 || name.length > 20) return setMsg(m, 'Il nome deve avere da 2 a 20 caratteri.', 'err');
-  if (!validPhone(phone)) return setMsg(m, 'Scrivi un numero di cellulare valido, ad esempio +39 333 1234567.', 'err');
   if (!validEmail(email)) return setMsg(m, 'Scrivi un indirizzo email valido.', 'err');
   setMsg(m, 'Un attimo…');
-  try { const r = await Backend.signUp({ name, phone, email }); loggedIn(r.user); }
+  try { const r = await Backend.signUp({ name, email }); loggedIn(r.user); }
   catch(err){ setMsg(m, friendly(err), 'err'); }
 });
 $('fLogin').addEventListener('submit', async e=>{
@@ -311,20 +303,26 @@ async function loadBoard(){
   rows.forEach((r, i)=>{
     const li = document.createElement('li'); if (session && r.pid === session.id) li.className = 'me';
     const a = document.createElement('span'); a.className = 'r'; a.textContent = i+1;
+    const w = document.createElement('span'); w.className = 'who';
     const n = document.createElement('span'); n.className = 'n'; n.textContent = r.name;
-    const s = document.createElement('span'); s.className = 's'; s.textContent = (boardTab === 'all' ? (r.games||0) + '/' + GAMES.length + ' giochi · ' + (r.levels||0) + '/' + LEVELS*GAMES.length : (r.levels||0) + '/' + LEVELS) + ' liv · ' + r.score + ' pt';
-    li.append(a, n, s); list.appendChild(li);
+    const d = document.createElement('span'); d.className = 'd';
+    d.textContent = (boardTab === 'all' ? (r.games||0) + '/' + GAMES.length + ' giochi · ' + (r.levels||0) + '/' + LEVELS*GAMES.length : (r.levels||0) + '/' + LEVELS) + ' livelli';
+    w.append(n, d);
+    const s = document.createElement('span'); s.className = 's'; s.textContent = r.score;
+    const u = document.createElement('small'); u.textContent = 'pt'; s.appendChild(u);
+    li.append(a, w, s); list.appendChild(li);
   });
 }
 $('btnBoard').onclick = ()=>{
-  $('bNote').textContent = (boardTab === 'all' ? 'Totale = somma dei record nei 4 giochi. Prima contano i livelli superati, poi i punti. ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
+  $('bNote').textContent = (boardTab === 'all' ? 'Totale = somma dei 4 giochi. ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
   renderBoardTabs(); openModal('mBoard'); loadBoard();
 };
 
 /* ================= INSTALLA L'APP =================
    Android/Chrome: usa la richiesta di installazione del browser (beforeinstallprompt).
    iPhone/iPad: Safari non ha una richiesta automatica, quindi mostriamo le istruzioni.
-   Si apre da sola alla prima visita e ogni volta che si arriva da un QR. */
+   Si apre da sola solo dal QR di installazione (?installa=1); per il resto c'è il link
+   pulsante "Installa app" in fondo alla home (07/10: non deve essere invadente). */
 const ua = navigator.userAgent || '';
 const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isAndroid = /Android/i.test(ua);
@@ -333,6 +331,7 @@ const isAndroid = /Android/i.test(ua);
 const isSamsung = /SamsungBrowser/i.test(ua);
 const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 const fromQr = /[?&](sblocca|installa)=/.test(location.search);
+const fromInstallQr = /[?&]installa=/.test(location.search);
 if (/[?&]installa=/.test(location.search)) history.replaceState(null, '', location.pathname);
 let installEvt = null, autoShown = false;
 // "già installata" vale solo 3 giorni e non conta quando si arriva dal QR o da Samsung Internet
@@ -369,8 +368,7 @@ $('btnOpenChrome').href = 'intent://' + location.host + location.pathname + '?in
 $('mInstall').addEventListener('click', e=>{ if (e.target === $('mInstall') || e.target.closest('[data-close]')) store.set('efgInstallLater', Date.now()); });
 function autoInstallDue(){
   if (autoShown || !canInstall()) return false;
-  const later = store.get('efgInstallLater', 0);
-  return fromQr || !later || Date.now() - later > 2*3600*1000;   // dal QR sempre; altrimenti al massimo ogni 2 ore
+  return fromInstallQr;   // solo dal QR di installazione
 }
 (function autoInstall(){
   updateInstallBtn();
