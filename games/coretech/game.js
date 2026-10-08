@@ -189,6 +189,7 @@ let dots = [];         // 0 none, 1 coin, 2 patch
 let dotsLeft = 0;
 let score = 0, levelStartScore = 0, lives = 3, levelBugsEaten = 0, levelTime = 0;
 let player, bugs = [];
+let bugsGone = new Set();   // livello 1: i bug mangiati non rinascono (id)
 let globalMode = 'scatter', modeIdx = 0, modeTimer = 0;
 let frightTimer = 0, eatCombo = 0;
 let readyTimer = 0, dyingTimer = 0;
@@ -234,7 +235,7 @@ function loadLevel(i){
       if (dots[y][x]) dotsLeft++;
     }
   }
-  levelBugsEaten = 0; levelTime = 0;
+  levelBugsEaten = 0; levelTime = 0; bugsGone = new Set();
   fit();
   resetActors();
 }
@@ -252,6 +253,7 @@ function resetActors(){
   const hx = HOUSE_EXIT.x, hy = HOUSE_IN.y;
   const starts = [ {x:hx,y:HOUSE_EXIT.y,mode:'scatter',dir:DIR.left}, {x:hx,y:hy,mode:'house',dir:DIR.left}, {x:hx-1,y:hy,mode:'house',dir:DIR.right}, {x:hx+1,y:hy,mode:'house',dir:DIR.left} ];
   for (let i=0;i<L.bugs;i++){
+    if (bugsGone.has(i)) continue;
     const s = starts[i];
     bugs.push({ id:i, ...BUGS[i], x:s.x, y:s.y, dir:s.dir, mode:s.mode, isBug:true, release:L.release[i]||0, reverse:false, wob:Math.random()*6 });
   }
@@ -447,11 +449,13 @@ function update(dt){
         score += pts; levelBugsEaten++;
         popups.push({x:b.x, y:b.y, text:String(pts), t:1});
         b.mode = 'eaten'; b.goingIn = false; sfx.eat();
+        if (lvIndex === 0){ bugsGone.add(b.id); b.gone = true; }   // dal livello 2 rinascono nella casetta
       } else if (b.mode !== 'eaten'){
         loseLife(); return;
       }
     }
   }
+  if (bugs.some(b => b.gone)) bugs = bugs.filter(b => !b.gone);
   for (const p of popups) p.t -= dt;
   popups = popups.filter(p => p.t > 0);
   updateHud();
