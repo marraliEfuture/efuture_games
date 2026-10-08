@@ -121,7 +121,7 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
 
 - In verticale i pulsanti indicati da `data-a` e `data-b` vengono spostati nella coppia A/B. Tornano al loro posto (segnato da un commento nel DOM) in orizzontale. Al cambio di orientamento lo script ridisegna il gioco.
 - Nella coppia A/B il pulsante scatta al rilascio del dito, senza doppioni con il click.
-- Sotto i tasti compare una didascalia: `PAUSA` per `#pauseBtn`, `MUSICA` per `#soundBtn`.
+- Sotto i tasti compare una didascalia: `PAUSA` per `#pauseBtn`, `MUSICA` per `#soundBtn`. Il tasto SPARA di Inncloud (`#fireBtn`) ha la scritta dentro e non ha didascalia; il suo aspetto (rosso, 76 px) e il fuoco tenendo premuto sono gestiti dalla pagina del gioco, non da `gameboy.css`/`gameboy.js`.
 - SysAdmin non usa `data-a`/`data-b`: i suoi tasti SALTA, MOUSE e ANTIVIRUS sono disposti dal CSS come A, B e un terzo tasto.
 
 ### Mappa per gioco
@@ -131,7 +131,7 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
 | SysAdmin Runner | `sysadmin` | Joystick (destra/sinistra, su = salto) | SALTA | MOUSE (+ ANTIVIRUS piccolo sopra) | `btnHow` | Pulsante arancio della schermata, oppure pausa |
 | CoreTech Pac | `joy` | Joystick a 4 direzioni | PAUSA | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
 | Timenet Breakout | `strip` | Fascia di trascinamento | PAUSA | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
-| Inncloud Invaders | `strip` | Fascia di trascinamento | PAUSA | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
+| Inncloud Invaders | `strip` | Fascia di trascinamento | SPARA (rosso, più grande) | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
 
 Dettagli per gioco:
 - **SysAdmin:** lo schermo è 16:9 e il pulsante pausa dell'HUD è nascosto (la pausa si fa con il tastino). Le schermate (overlay) coprono tutta la console tranne la fila dei tastini, che resta usabile.
@@ -145,4 +145,4 @@ Dettagli per gioco:
 - I giochi non ricevono messaggi dall'app: l'unico segnale è `?hub=1`.
 
 ---
-Ultimo aggiornamento: 07/10/2026 (v27)
+Ultimo aggiornamento: 08/10/2026 (v28)
