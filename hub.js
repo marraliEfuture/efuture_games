@@ -51,8 +51,18 @@ let gate = { mode:null }, gateOffset = 0, lastPhase = null;   // countdown di ap
 const Backend = window.EFG_BACKEND, friendly = window.EFG_FRIENDLY, remote = Backend.remote;
 
 /* ================= LOBBY ================= */
+let sessionChecked = false;   // finché non so se l'utente ha fatto l'accesso non mostro niente
 function renderGrid(){
   const grid = $('grid'); grid.innerHTML = '';
+  if (!sessionChecked) return;
+  if (!session){   // senza account i giochi non si vedono
+    const box = document.createElement('div'); box.className = 'needauth';
+    box.innerHTML = '<p><b>Registrati o accedi</b> per vedere i 4 giochi, sbloccarli agli stand e entrare in classifica.</p>';
+    const btn = document.createElement('button'); btn.className = 'btn'; btn.type = 'button'; btn.textContent = 'Registrati / Accedi';
+    btn.onclick = ()=>{ showAuth('signup'); openModal('mAuth'); };
+    box.appendChild(btn); grid.appendChild(box);
+    return;
+  }
   for (const g of GAMES){
     const open = unlocked.has(g.id);
     const b = document.createElement('button');
@@ -186,6 +196,7 @@ $('btnCam').addEventListener('click', startCam);
 /* ================= PLAY (competition mode: 3 levels x 60 s) ================= */
 let playing = null, runUsed = 0;
 function play(g){
+  if (!session){ showAuth('signup'); openModal('mAuth'); return; }
   if (isBlocked()){ toast(gatePhase().phase === 'prima' ? 'I giochi non sono ancora aperti.' : 'La gara è chiusa.'); return; }
   playing = g; runUsed = 0;
   $('playerTitle').textContent = g.name;
@@ -409,5 +420,5 @@ window.addEventListener('storage', e=>{ if (e.key === 'efgDemoGate') loadGate();
 
 /* ================= BOOT ================= */
 renderGrid(); renderDock(); loadGate();
-Backend.current().then(u=>{ session = u; renderDock(); loadRanks(); });
+Backend.current().then(u=>{ session = u; sessionChecked = true; renderDock(); renderGrid(); loadRanks(); });
 })();

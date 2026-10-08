@@ -53,6 +53,9 @@ h1 .e{color:var(--ef-orange)}
 main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
 .intro{font-size:12px;line-height:1.55;color:var(--dim);text-align:center;margin:0}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.needauth{grid-column:1 / -1;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:26px 18px;border-radius:14px;background:var(--panel);border:1px solid var(--line)}
+.needauth p{margin:0;font-size:13px;line-height:1.6;color:var(--dim);max-width:320px}
+.needauth b{color:var(--text)}
 .game{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 10px 12px;border-radius:14px;background:var(--panel);border:1px solid var(--line);box-shadow:0 4px 14px rgba(13,43,69,.07);cursor:pointer;text-align:center;transition:transform .12s ease,border-color .12s ease}
 .game:hover{border-color:var(--ef-orange)}
 .game:active{transform:scale(.98)}
