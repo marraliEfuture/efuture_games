@@ -63,7 +63,7 @@ function renderGrid(){
     const st = document.createElement('span'); st.className = 'state'; st.textContent = open ? 'Gioca ▶' : 'Da sbloccare';
     const rank = document.createElement('span'); rank.className = 'rank';
     const rk = ranks[g.id];
-    if (!session) rank.textContent = 'Accedi per la classifica';
+    if (!session) rank.hidden = true;   // senza accesso niente riga della classifica
     else if (rk > 0){ rank.innerHTML = 'In classifica: <b></b>'; rank.querySelector('b').textContent = rk + '°'; }
     else if (rk === -2) rank.textContent = 'Oltre il 50° posto';
     else if (rk === -1) rank.textContent = 'Non ancora in classifica';
