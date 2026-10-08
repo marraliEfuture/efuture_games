@@ -61,13 +61,21 @@ I labirinti sono disegnati a mano in `MAZES` (`#` muro, `.` monetina, `o` floppy
 
 | Liv. | Nome | Labirinto (colonne × righe) | Monetine | Floppy | Uscita laterale | Bug | Velocità C | Velocità bug | Bug spaventati | Durata patch |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 1 | Rete aziendale | 13 × 12 | 67 | 4 | Riga 8 | 2 | 5,6 | 2,9 | 2,0 | 9,0 s |
-| 2 | Server farm | 17 × 15 | 89 | 4 | Riga 10 | 3 | 5,9 | 3,3 | 2,1 | 8,0 s |
-| 3 | Cloud ibrido | 19 × 21 | 98 | 4 | Riga 10 | 3 | 6,2 | 3,7 | 2,3 | 7,0 s |
+| 1 | Rete aziendale | 13 × 13 | 61 | 4 | Riga 8 | 2 | 4,8 | 2,5 | 1,7 | 10,0 s |
+| 2 | Server farm | 17 × 13 | 83 | 4 | Riga 8 | 3 | 5,0 | 2,8 | 1,8 | 9,0 s |
+| 3 | Cloud ibrido | 19 × 15 | 85 | 4 | Riga 8 | 3 | 5,3 | 3,1 | 2,0 | 8,0 s |
 | 4 | Data center | 19 × 21 | 144 | 4 | Riga 10 | 4 | 6,3 | 4,7 | 2,4 | 4,8 s |
 | 5 | Core di sistema | 19 × 21 | 149 | 4 | Riga 10 | 4 | 6,4 | 5,1 | 2,5 | 3,6 s |
 
-Velocità in caselle al secondo. Nei livelli 2 e 3 alcuni corridoi laterali non hanno monetine, così un giro efficiente dura circa 25 s e uno medio circa 45 s (pensato per il minuto della gara). Il livello 3 ha la casetta dei bug sulla riga dell'uscita laterale.
+Velocità in caselle al secondo.
+
+**Livelli 1–3 semplificati (v29)**, perché sono quelli della gara (1 minuto ciascuno):
+- labirinti simmetrici con poche svolte: righe lunghe da un lato all'altro in alto e in basso, due corridoi verticali ai lati della casetta, nessuna sacca;
+- i corridoi dell'uscita laterale (e nel livello 3 l'anello intorno alla casetta) non hanno monetine;
+- la C è circa il 15% più lenta della v28 (prima 5,6 / 5,9 / 6,2) e i bug rallentano nella stessa proporzione (prima 2,9 / 3,3 / 3,7; spaventati 2,0 / 2,1 / 2,3), così non diventano più veloci rispetto alla C; la patch dura 1 s in più (prima 9 / 8 / 7 s);
+- un giro che va sempre alla monetina più vicina, senza bug, finisce il livello in 18 s, 23 s e 22 s.
+
+Il livello 3 ha la casetta dei bug sulla riga dell'uscita laterale. I livelli 4 e 5 hanno ciascuno il suo labirinto e non sono cambiati.
 
 **Comportamento dei bug per livello:**
 
@@ -85,8 +93,9 @@ Il primo bug parte già fuori dalla casetta; gli altri escono ai tempi indicati.
 
 **La C (giocatore):**
 - parte ferma e si muove solo quando si sceglie una direzione;
-- la direzione scelta è **prenotata**: la C svolta al primo incrocio in cui è possibile; l'inversione di marcia è immediata anche a metà corridoio;
-- si ferma contro un muro; mangia monetine e floppy passando sopra le caselle;
+- la direzione scelta è **prenotata**: la C svolta al primo incrocio in cui è possibile; l'inversione di marcia è immediata anche a metà corridoio. La prenotazione resta valida finché la C non svolta o non si sceglie un'altra direzione; se è uguale alla direzione in cui la C sta già andando, scade dopo 0,6 s;
+- **aiuto in curva** (v29): se la C è entro 0,35 caselle dal centro di un incrocio, prima o appena dopo, la svolta prenotata viene presa subito. La C viene messa sul centro dell'incrocio e solo il disegno scivola sulla nuova corsia, così non resta mai incastrata nei muri. Non torna indietro sull'incrocio dove ha appena svoltato o da cui è partita;
+- si ferma pulita contro un muro; mangia monetine e floppy passando sopra le caselle;
 - uscendo dall'uscita laterale rientra dal lato opposto (anche i bug, che lì rallentano al 55%).
 
 **Bug:**
@@ -114,8 +123,11 @@ Il primo bug parte già fuori dalla casetta; gli altri escono ai tempi indicati.
 | Avanti nelle schermate | Invio (Inizia, Via!, Prossimo livello) | Pulsanti |
 | Musica | – | Pulsante `♪` (in verticale: tasto B) |
 
-- **Joystick a 4 direzioni:** la manopola segue il pollice entro la base e torna al centro al rilascio. Fuori da una zona morta del 25% vince l'asse più marcato; la freccia corrispondente si colora di arancio. La direzione resta prenotata anche dopo aver lasciato il joystick.
-- **Scorrere sul labirinto:** ogni spostamento di almeno 16 px sceglie una direzione; si possono concatenare più svolte senza staccare il dito.
+- **Joystick a 4 direzioni:** la manopola segue il pollice entro la base e torna al centro al rilascio. La freccia della direzione scelta si colora di arancio. La direzione resta prenotata anche dopo aver lasciato il joystick. Dalla v29:
+  - **zona morta del 30%**: dentro non cambia direzione;
+  - **isteresi**: per passare dall'asse orizzontale a quello verticale (o viceversa) l'altro asse deve essere più marcato almeno del 20%, così vicino alla diagonale la direzione non salta avanti e indietro;
+  - **manopola in diagonale** (i due assi entro il 20%): sceglie la direzione che la C può prendere al prossimo incrocio (entro 4 caselle davanti a lei; da ferma, quella libera). Mentre si tiene la diagonale, il gioco ricontrolla a ogni fotogramma: se la C sta andando nella direzione scelta e l'altra si apre all'incrocio successivo, passa all'altra; se la C è ferma contro un muro, passa a quella libera.
+- **Scorrere sul labirinto:** ogni spostamento di almeno 16 px sceglie una direzione, prenotata come per il joystick (con lo stesso aiuto in curva); si possono concatenare più svolte senza staccare il dito.
 - **Multi-touch:** il joystick segue un solo dito (`setPointerCapture`); lo scorrimento sul labirinto è indipendente. Sulla fascia comandi sono bloccati scroll, zoom e menu del tocco prolungato.
 - La pausa è possibile anche durante PRONTI!. La pagina va in pausa da sola quando passa in secondo piano.
 
@@ -148,4 +160,4 @@ Effetti sintetizzati con Web Audio (nessun file audio): monetina (due note alter
 - Se il logo non si carica, l'animazione iniziale mostra solo la C e la scritta PAC.
 
 ---
-Ultimo aggiornamento: 07/10/2026 (v27)
+Ultimo aggiornamento: 08/10/2026 (v29)

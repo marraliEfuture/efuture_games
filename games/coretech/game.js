@@ -10,56 +10,51 @@ function efgPost(m){ try { if (window.parent !== window) window.parent.postMessa
 
 
 /* ================= DATA ================= */
-// Levels 2-3 (also the app's 3-level competition, 60 s per level) leave side
-// alleys without coins so an efficient run takes ~25 s and an average one ~45 s.
+// Levels 1-3 (also the app's 3-level competition, 60 s per level) are kept
+// simple (v29, client: "difficili da manovrare"): long straight rows, few
+// turns, no pockets. Side alleys and the ring round the bug house have no
+// coins, so a nearest-coin run clears each level in about 16-22 s.
 const MAZES = [
   ["#############",
-   "#o....#....o#",
-   "#.###.#.###.#",
+   "#o.........o#",
+   "#.##.###.##.#",
    "#.....B.....#",
-   "#...##-##...#",
-   "#.#.#GGG#.#.#",
-   "#.#.#####.#.#",
-   " ........... ",
-   "#.#...P...#.#",
-   "#.###.#.###.#",
-   "#o....#....o#",
+   "###.##-##.###",
+   "###.#GGG#.###",
+   "###.#####.###",
+   "   .......   ",
+   "###.#####.###",
+   "#.....P.....#",
+   "#.##.###.##.#",
+   "#o.........o#",
    "#############"],
   ["#################",
-   "#o......#......o#",
-   "#.## ## # ## ##.#",
-   "#...............#",
-   "#.## # ### # ##.#",
-   "#....#  B  #....#",
-   "#.##  ##-##  ##.#",
-   "#.##  #GGG#  ##.#",
-   "#.##  #####  ##.#",
-   " ............... ",
-   "#.## ### ### ##.#",
-   "#o...#..P..#...o#",
-   "#.## # # # # ##.#",
-   "#...............#",
+   "#o.............o#",
+   "#.##.##.#.##.##.#",
+   "#.......B.......#",
+   "####.###-###.####",
+   "####.##GGG##.####",
+   "####.#######.####",
+   "    .........    ",
+   "####.#######.####",
+   "#.......P.......#",
+   "#.##.##.#.##.##.#",
+   "#o.............o#",
    "#################"],
   ["###################",
    "#o...............o#",
-   "#.### ### ### ###.#",
-   "#.#     # #     #.#",
-   "#.# ###     ### #.#",
+   "#.###.#######.###.#",
    "#.................#",
    "####.### # ###.####",
    "####.#   B   #.####",
    "####.# ##-## #.####",
    "    .  #GGG#  .    ",
-   "#### # ##### # ####",
-   "#### #       # ####",
-   "#### # ##### # ####",
-   "#.................#",
-   "#.### # ### # ###.#",
-   "#...# #  P  # #...#",
-   "### # # ### # # ###",
-   "#o....#  #  #....o#",
-   "#.### ## # ## ###.#",
-   "#.................#",
+   "####.# ##### #.####",
+   "####.#       #.####",
+   "####.### # ###.####",
+   "#........P........#",
+   "#.###.#######.###.#",
+   "#o...............o#",
    "###################"],
   ["###################",
    "#o..#.........#..o#",
@@ -112,17 +107,17 @@ let HOUSE_IN   = {x:9, y:9};       // centre of the bug house
 let TUNNEL_ROW = -1;               // row that wraps around the screen (every maze has one)
 let TUNNEL_LEN = 1;                // open cells at each end of the tunnel row (bugs slow down there)
 
-// Speeds in tiles/s. Player ~22% slower than v1 (client: "troppo veloce");
-// bugs scaled so they never gain on the player, and levels 1-3 (the three
-// played in the app's competition) are easier: slower bugs, longer patches,
-// more random wandering and longer scatter breaks.
+// Speeds in tiles/s. Levels 1-3 (the three played in the app's competition)
+// are easy: v29 made the C another ~15% slower (client: "forse troppo
+// veloce") and the bugs by the same ratio, so they never gain on the player;
+// patches got 1 s longer to make up for the slower C.
 const LEVELS = [
   { name:"Rete aziendale",  text:"Labirinto piccolo, bug lenti.",
-    pac:5.6, bug:2.9, fright:2.0, frightTime:9.0, bugs:2, rand:0.45, release:[0,5],        cycle:[9,15,9,15,7,999] },
+    pac:4.8, bug:2.5, fright:1.7, frightTime:10.0, bugs:2, rand:0.45, release:[0,5],        cycle:[9,15,9,15,7,999] },
   { name:"Server farm",     text:"Più grande, un bug in più.",
-    pac:5.9, bug:3.3, fright:2.1, frightTime:8.0, bugs:3, rand:0.38, release:[0,4,9],     cycle:[8,17,8,17,6,999] },
+    pac:5.0, bug:2.8, fright:1.8, frightTime:9.0,  bugs:3, rand:0.38, release:[0,4,9],     cycle:[8,17,8,17,6,999] },
   { name:"Cloud ibrido",    text:"Labirinto completo: usa le patch.",
-    pac:6.2, bug:3.7, fright:2.3, frightTime:7.0, bugs:3, rand:0.30, release:[0,4,8],     cycle:[8,18,7,18,5,999] },
+    pac:5.3, bug:3.1, fright:2.0, frightTime:8.0,  bugs:3, rand:0.30, release:[0,4,8],     cycle:[8,18,7,18,5,999] },
   { name:"Data center",     text:"Bug più veloci, patch brevi.",
     pac:6.3, bug:4.7, fright:2.4, frightTime:4.8, bugs:4, rand:0.08, release:[0,2,4,7],   cycle:[5,22,4,22,3,999] },
   { name:"Core di sistema", text:"Livello finale: ripulisci il core!",
@@ -202,7 +197,8 @@ let globalMode = 'scatter', modeIdx = 0, modeTimer = 0;
 let frightTimer = 0, eatCombo = 0;
 let readyTimer = 0, dyingTimer = 0;
 let popups = [];
-let desired = null;
+let desired = null, desiredAge = 0;
+let joyTick = null;    // set by the joystick: re-checks a diagonal knob every frame
 let mazeLayer = null, T = 20, dpr = 1;
 let clock = 0;
 let introT = 0, introBites = 0;
@@ -257,7 +253,7 @@ function findChar(ch){
 
 function resetActors(){
   const p = findChar('P');
-  player = { x:p.x, y:p.y, dir:null, face:DIR.right, moving:false, mouth:0, isBug:false };   // fermo finché il giocatore non sceglie una direzione
+  player = { x:p.x, y:p.y, gx:0, gy:0, dir:null, face:DIR.right, moving:false, mouth:0, isBug:false };   // gx/gy: drawing offset that glides to 0 after a cornering snap   // fermo finché il giocatore non sceglie una direzione
   desired = null;
   bugs = [];
   const hx = HOUSE_EXIT.x, hy = HOUSE_IN.y;
@@ -301,9 +297,47 @@ function stepEntity(e, speed, dt, decide){
   }
 }
 
+// Cornering assist (v29): a buffered turn is taken when the C is within
+// CORNER tiles of a junction centre, before or just after it. The C is put on
+// the junction centre at once (logic stays on the grid, so it can never stick
+// to a wall) and only the drawing glides onto the new lane (gx/gy).
+const CORNER = 0.35;
+function tryCorner(){
+  const p = player, d = desired;
+  if (!d || !p.dir || d === p.dir || d === OPP[p.dir.n]) return;
+  const cx = Math.round(p.x), cy = Math.round(p.y);
+  const off = p.dir.x ? p.x - cx : p.y - cy;
+  if (Math.abs(off) < 1e-4 || Math.abs(off) > CORNER) return;   // at the centre stepEntity decides
+  // already past the centre: only if the C went straight through it, never
+  // back onto the junction where it has just turned or started from
+  if (off*(p.dir.x || p.dir.y) > 0 && p.turnAt === cx+','+cy) return;
+  if (!passable(cx+d.x, cy+d.y, p)) return;
+  p.gx += p.x - cx; p.gy += p.y - cy;
+  p.x = cx; p.y = cy; wrapX(p);
+  p.dir = d; p.turnAt = Math.round(p.x)+','+cy;
+  eatAt(cx, cy);
+}
+// can the C turn into d at the junction it is about to reach? (look ahead `max` centres)
+function canTurnSoon(d, max){
+  const p = player;
+  if (!p || !p.dir) return false;
+  let x = Math.round(p.x), y = Math.round(p.y);
+  const past = p.dir.x ? (p.x - x)*p.dir.x : (p.y - y)*p.dir.y;   // > 0: centre already passed
+  if (past > CORNER){ x += p.dir.x; y += p.dir.y; }
+  for (let i=0; i<max; i++){
+    if (!passable(x, y, p)) return false;
+    if (passable(x+d.x, y+d.y, p)) return true;
+    x += p.dir.x; y += p.dir.y;
+  }
+  return false;
+}
+
 function playerDecide(e, x, y){
   eatAt(x, y);
+  const was = e.moving ? e.dir : null;
   if (desired && passable(x+desired.x, y+desired.y, e)) e.dir = desired;
+  const here = x+','+y;                       // where the C last turned or started
+  if (e.dir !== was) e.turnAt = here; else if (e.turnAt !== here) e.turnAt = null;
 }
 
 function eatAt(x, y){
@@ -434,9 +468,16 @@ function update(dt){
   }
 
   // player: instant reversal mid-corridor feels responsive on touch
+  if (joyTick) joyTick();
   if (desired && player.dir && desired === OPP[player.dir.n]) player.dir = desired;
+  tryCorner();
+  if (state !== 'play') return;
   stepEntity(player, L.pac, dt, playerDecide);
   if (state !== 'play') return; // level may have been cleared while eating
+  // a buffered turn that is already the current direction expires after 0.6 s
+  if (desired && desired === player.dir){ desiredAge += dt; if (desiredAge > 0.6) desired = null; }
+  { const g = Math.hypot(player.gx, player.gy);   // glide the drawing back onto the lane
+    if (g > 0){ const k = Math.max(0, g - L.pac*dt)/g; player.gx *= k; player.gy *= k; } }
   // eat the coin under the player even when passing between centres quickly
   if (player.moving) player.mouth += dt*14;
 
@@ -560,7 +601,7 @@ function refreshTitle(){
 }
 
 /* ================= INPUT ================= */
-function setDesired(d){ desired = d; }
+function setDesired(d){ desired = d; desiredAge = 0; }
 const KEYMAP = {ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',a:'left',d:'right',w:'up',s:'down',A:'left',D:'right',W:'up',S:'down'};
 window.addEventListener('keydown', e=>{
   if (state === 'intro'){ e.preventDefault(); endIntro(); return; }
@@ -586,28 +627,66 @@ stage.addEventListener('pointermove', e=>{
 ['pointerup','pointercancel','pointerleave'].forEach(t=>stage.addEventListener(t, ()=>{ sw = null; }));
 
 // virtual joystick: the knob follows the thumb and springs back on release.
-// The dominant axis (outside a ~25% dead zone) picks the direction, which is
-// buffered as the next turn exactly like a swipe or an arrow key.
+// v29 (client: "difficili da manovrare"):
+// - no direction change inside a 30% dead zone;
+// - hysteresis: the other axis must be 20% stronger before the direction switches;
+// - near the diagonal the knob picks the direction the C can actually take at
+//   its next junction, and keeps re-checking it every frame while held.
+// The chosen direction is buffered as the next turn like a swipe or an arrow key.
 (function(){
   const joy = $('joy'), knob = $('joyKnob');
   if (!joy || !knob) return;
+  const DEAD = 0.30, HYST = 1.2;
   const marks = { up:$('jmU'), right:$('jmR'), down:$('jmD'), left:$('jmL') };
-  let pid = null, cx = 0, cy = 0, rad = 1, cur = null;
+  let pid = null, cx = 0, cy = 0, rad = 1, cur = null, kdx = 0, kdy = 0;
   function mark(n){
     if (n === cur) return;
     if (cur && marks[cur]) marks[cur].classList.remove('on');
     cur = n;
     if (n && marks[n]) marks[n].classList.add('on');
   }
+  function openHere(d){ return passable(Math.round(player.x)+d.x, Math.round(player.y)+d.y, player); }
+  // knob between two directions a (horizontal) and b (vertical): which one?
+  function pickDiagonal(a, b){
+    const A = DIR[a], B = DIR[b];
+    if (!player.dir || !player.moving){             // standing still: the open one
+      const oa = openHere(A), ob = openHere(B);
+      if (oa !== ob) return oa ? a : b;
+      return Math.abs(kdx) >= Math.abs(kdy) ? a : b;
+    }
+    const perp = player.dir.x ? B : A, along = perp === A ? B : A;
+    return canTurnSoon(perp, 4) ? perp.n : along.n;
+  }
+  function choose(){
+    const ax = Math.abs(kdx), ay = Math.abs(kdy);
+    const h = kdx > 0 ? 'right' : 'left', v = kdy > 0 ? 'down' : 'up';
+    if (ax > ay*HYST) return h;
+    if (ay > ax*HYST) return v;
+    if (cur !== h && cur !== v) return pickDiagonal(h, v);
+    const other = cur === h ? v : h, O = DIR[other];
+    if (state === 'play' && player.dir){
+      // moving along cur: switch only if the other way opens right at the next junction
+      if (player.moving && DIR[cur] === player.dir && O !== OPP[player.dir.n] && canTurnSoon(O, 1)) return other;
+      // stopped against a wall: take the open way
+      if (!player.moving && !openHere(DIR[cur]) && openHere(O)) return other;
+    }
+    return cur;
+  }
+  function apply(force){
+    const n = choose();
+    if (n !== cur || force){ mark(n); setDesired(DIR[n]); }
+  }
+  joyTick = function(){ if (pid !== null && cur) apply(false); };
   function move(e){
     let dx = e.clientX - cx, dy = e.clientY - cy;
     const d = Math.hypot(dx, dy);
     if (d > rad){ dx = dx/d*rad; dy = dy/d*rad; }
     knob.style.transform = 'translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px)';
-    if (d < rad*0.25) { mark(null); return; }
-    const n = Math.abs(dx) > Math.abs(dy) ? (dx>0?'right':'left') : (dy>0?'down':'up');
-    mark(n);
-    setDesired(DIR[n]);
+    if (d < rad*DEAD) { mark(null); return; }
+    kdx = dx; kdy = dy;
+    const was = cur;
+    apply(false);
+    if (cur === was && cur && desired !== DIR[cur]) setDesired(DIR[cur]);   // re-buffer after the turn was taken or expired
   }
   function release(e){
     if (pid === null || (e && e.pointerId !== pid)) return;
@@ -831,7 +910,7 @@ function render(){
     else drawFloppy(ctx, cx, cy, T*0.3, clock + x);
   }
   // player
-  const px = (player.x+0.5)*T, py = (player.y+0.5)*T;
+  const px = (player.x+player.gx+0.5)*T, py = (player.y+player.gy+0.5)*T;
   if (state === 'dying'){
     const k = 1 - Math.max(0, dyingTimer-0.3)/1.2;
     const open = 0.25*Math.PI + k*0.75*Math.PI;
