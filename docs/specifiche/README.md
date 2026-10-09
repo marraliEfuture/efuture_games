@@ -6,6 +6,8 @@ Efuture Games – CARE Conference Edition è una web app (PWA installabile) con 
 
 Questa cartella contiene le specifiche funzionali e tecniche di ogni parte. **Per studiare un'app si leggono prima questi file; il sorgente solo se serve.**
 
+I **documenti tecnici** (struttura del codice, funzioni, database, come modificare) sono in [`docs/tecnico/`](../tecnico/): `piattaforma.md`, `app.md` e `gioco-<id>.md`. Si scaricano anche dall'admin (Formazione › Documentazione). Ogni modifica che cambia la struttura del codice aggiorna anche il documento tecnico.
+
 ## Regola di manutenzione
 
 - **Ogni modifica a un'app aggiorna anche la sua specifica, nello stesso commit.**

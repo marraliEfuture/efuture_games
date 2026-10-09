@@ -167,6 +167,15 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 .vcard .vb .bar{gap:6px} .vcard .btn{padding:6px 10px;font-size:12px}
 /* Skills */
 .skills{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.faq{display:flex;flex-direction:column;gap:14px;margin-top:12px}
+.faq h4{margin:6px 0 0;font-family:var(--title);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.faq details{border:1px solid var(--line);border-radius:4px;background:#fff}
+.faq summary{cursor:pointer;padding:11px 14px;font-weight:600;color:var(--ink);list-style-position:inside}
+.faq details[open] summary{border-bottom:1px solid var(--line)}
+.faq details p{margin:0;padding:10px 14px 12px;line-height:1.6;color:var(--text)}
+.doclbl b{display:block;color:var(--ink)} .doclbl span{font-size:12px;color:var(--muted)}
+.dbtns{display:flex;gap:8px;flex-wrap:wrap}
+.btn.dl{background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 10px;font-size:12px}
 .skill{position:relative;border:1px solid var(--line);border-left:3px solid var(--sky);border-radius:4px;background:#fff;padding:12px 46px 12px 14px;display:flex;flex-direction:column;gap:6px}
 .skill .cp{position:absolute;top:8px;right:8px;width:30px;height:30px;display:grid;place-items:center;background:#fff;border:1px solid var(--line);border-radius:4px;color:var(--navy);cursor:pointer}   /* copia il comando */
 .skill .cp:hover{background:var(--row)}
@@ -239,6 +248,8 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <button class="tab sub" data-tab="videos" type="button">Video utili</button>
         <button class="tab sub" data-tab="tutorials" type="button">Tutorial</button>
         <button class="tab sub" data-tab="skills" type="button">Skills</button>
+        <button class="tab sub" data-tab="faq" type="button">FAQ</button>
+        <button class="tab sub" data-tab="docs" type="button">Documentazione</button>
         <div class="grp">Admin</div>
         <button class="tab sub" data-tab="log" type="button">Log</button>
         <button class="tab sub" data-tab="backup" type="button">Backup</button>
@@ -333,6 +344,18 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
           <div class="dnav"><button class="arrow" id="dPrev" type="button" aria-label="Slide precedente">←</button><div class="dots" id="dDots"></div><button class="arrow next" id="dNext" type="button" aria-label="Slide successiva">→</button></div>
         </div>
         <div class="msg" id="tuMsg" aria-live="polite" style="margin-top:8px"></div>
+      </section>
+
+      <section data-pane="faq" hidden>
+        <div class="bar"><p class="dim grow" style="margin:0">Domande frequenti sull'uso dell'app, da usare allo stand o da girare ai giocatori. Tocca una domanda per vedere la risposta.</p>
+          <button class="btn navy" id="faqMd" type="button">Scarica FAQ (.md)</button></div>
+        <div class="faq" id="faqList"></div>
+      </section>
+
+      <section data-pane="docs" hidden>
+        <p class="dim" style="margin:0">Scarica la documentazione in Markdown. Per ogni voce: <b>Descrizione</b> (come funziona, per chi la usa) e <b>Tecnico</b> (struttura del codice, database e altre informazioni utili per chi la modifica). I file sono sempre quelli dell'ultima versione pubblicata.</p>
+        <div class="tablewrap" style="margin-top:10px"><table id="docTable"></table></div>
+        <div class="msg" id="docMsg" aria-live="polite"></div>
       </section>
 
       <section data-pane="skills" hidden>
@@ -468,6 +491,8 @@ document.querySelectorAll('.tab[data-tab]').forEach(t => t.onclick = () => {
   if (t.dataset.tab === 'links') renderLinks();
   if (t.dataset.tab === 'videos') renderVideos();
   if (t.dataset.tab === 'skills') renderSkills();
+  if (t.dataset.tab === 'faq') renderFaq();
+  if (t.dataset.tab === 'docs') renderDocs();
   if (t.dataset.tab === 'tutorials') renderTutorials();
 });
 
@@ -710,6 +735,92 @@ $('qPrint').onclick = () => window.print();
 
 /* ---------- skills ---------- */
 // stesso elenco di .claude/skills/ (la skill /efuture-games-skills lo legge dai file)
+/* ---------- FAQ sull'uso dell'app ---------- */
+const FAQ = [
+  ['Iniziare', [
+    ['Come apro l’app?', 'Inquadra con la fotocamera del telefono il QR dell’app (all’ingresso o sul ledwall) oppure apri l’indirizzo del sito. Funziona nel browser: non serve scaricare niente dallo store.'],
+    ['Come installo l’app sul telefono?', 'Aprendo l’app dal QR compare la proposta di installazione. In alternativa usa il pulsante "Installa app" in fondo alla home. Su iPhone: Condividi ↑ › Aggiungi alla schermata Home. Su Android: Installa, oppure menu ⋮ › Installa app. Con Samsung Internet conviene "Apri in Chrome e installa".'],
+    ['Devo registrarmi?', 'Sì, per giocare. Tocca un gioco o "Registrati / Accedi": bastano un nome (da 2 a 20 caratteri, è quello che compare in classifica) e l’email. Non c’è password.'],
+    ['Ho già un account: come rientro?', 'Usa "Accedi" e scrivi solo l’email con cui ti sei registrato. Se l’app dice che l’email non esiste, controlla di averla scritta uguale o registrati.'],
+    ['Posso cambiare telefono?', 'Sì: accedi con la stessa email e i tuoi record in classifica restano. I giochi sbloccati però sono salvati sul telefono: sul nuovo vanno sbloccati di nuovo con i QR.'],
+  ]],
+  ['Giocare', [
+    ['Come sblocco un gioco?', 'Ogni gioco si sblocca allo stand del suo sponsor. Tocca il gioco con il lucchetto e inquadra il QR dello stand con la fotocamera dell’app, oppure scrivi il codice stampato sotto il QR. Puoi anche inquadrare il QR con la fotocamera del telefono: l’app si apre e sblocca il gioco da sola.'],
+    ['Quali sono le regole?', 'Ogni gioco ha 3 livelli, al massimo 1 minuto ciascuno, e 3 vite per livello. Se scade il tempo o finiscono le vite la partita finisce: i livelli già superati restano validi.'],
+    ['Come si gioca a ciascun gioco?', 'In ogni gioco il pulsante "Istruzioni" spiega comandi e obiettivo. Sul telefono in verticale i giochi hanno la console con joystick e tasti; in orizzontale i comandi stanno ai lati.'],
+    ['Posso giocare più volte?', 'Sì, quante volte vuoi. In classifica conta solo il tuo risultato migliore per ogni gioco.'],
+    ['Perché i giochi sono bloccati o non partono?', 'Se c’è il countdown di apertura i giochi si aprono allo scadere del tempo; a gara chiusa non si gioca più. Lo dice la barra in alto nella home.'],
+  ]],
+  ['Punti e classifica', [
+    ['Come si calcolano i punti?', 'Ogni livello superato vale: numero del livello × secondi che avanzano sul suo minuto × vite rimaste. Il punteggio della partita è la somma dei livelli superati. Esempio: livello 2 finito con 20 secondi avanzati e 3 vite = 2 × 20 × 3 = 120 punti.'],
+    ['Come funziona la classifica?', 'Contano prima i livelli superati, poi i punti; a parità, chi ha fatto il record prima. C’è una classifica per ogni gioco e il Totale, che somma i record dei 4 giochi. Si vede nell’app (pulsante Classifica, dopo l’accesso) e sullo schermo dell’evento.'],
+    ['Dove vedo la mia posizione?', 'Dopo l’accesso, nella home, sotto ogni gioco compare "In classifica: N°".'],
+    ['Ho giocato prima di registrarmi: perdo il record?', 'No: il record resta sul telefono e viene inviato alla classifica appena ti registri o accedi.'],
+  ]],
+  ['Problemi', [
+    ['La fotocamera non legge il QR', 'Concedi il permesso alla fotocamera, avvicina il telefono e cura la luce. Se non va, scrivi il codice stampato sotto il QR.'],
+    ['"Codice non valido"', 'Controlla lettere e numeri del codice sotto il QR: il trattino non conta, maiuscole e minuscole nemmeno.'],
+    ['Il punteggio non è salito in classifica', 'Viene salvato solo se batte il tuo record su quel gioco, solo a gara aperta e solo se sei collegato a internet. Senza rete l’app avvisa: riprova quando torna la connessione.'],
+    ['"Il tuo account è stato disabilitato"', 'Un organizzatore ha disabilitato l’account: non puoi accedere né salvare punti. Rivolgiti allo stand degli organizzatori.'],
+    ['L’app sembra vecchia o non si aggiorna', 'Chiudi e riapri l’app: la nuova versione si scarica da sola. Il numero di versione è in fondo alla home.'],
+  ]],
+];
+let faqDone = false;
+function renderFaq(){
+  if (faqDone) return; faqDone = true;
+  for (const [grp, items] of FAQ){
+    const h = document.createElement('h4'); h.textContent = grp; $('faqList').appendChild(h);
+    for (const [q, a] of items){
+      const d = document.createElement('details'); const sm = document.createElement('summary'); sm.textContent = q;
+      const p = document.createElement('p'); p.textContent = a; d.append(sm, p); $('faqList').appendChild(d);
+    }
+  }
+}
+const faqMarkdown = () => '# FAQ – Efuture Games\n\nDomande frequenti sull’uso dell’app.\n\n' +
+  FAQ.map(([g, items]) => '## ' + g + '\n\n' + items.map(([q, a]) => '### ' + q + '\n\n' + a + '\n').join('\n')).join('\n');
+$('faqMd').onclick = () => download('efuture-games-faq.md', faqMarkdown(), 'text/markdown;charset=utf-8');
+
+/* ---------- documentazione da scaricare (Markdown) ---------- */
+const SP = 'docs/specifiche/', TE = 'docs/tecnico/';
+const DOCS = [
+  ['piattaforma', 'Intera piattaforma', 'app, classifica, admin, 4 giochi, database e FAQ',
+    [SP+'README.md', SP+'app-giocatori.md', SP+'classifica.md', SP+'admin.md', SP+'giochi-comune.md', SP+'gioco-sysadmin.md', SP+'gioco-coretech.md', SP+'gioco-timenet.md', SP+'gioco-inncloud.md', SP+'database.md', 'FAQ'],
+    [TE+'piattaforma.md', TE+'app.md', TE+'gioco-sysadmin.md', TE+'gioco-coretech.md', TE+'gioco-timenet.md', TE+'gioco-inncloud.md']],
+  ['app', 'App Efuture Games', 'home, sblocco, account, gara, classifica in app, installazione', [SP+'app-giocatori.md', 'FAQ'], [TE+'app.md']],
+  ['sysadmin', 'SysAdmin Runner', 'gioco di Efuture', [SP+'gioco-sysadmin.md', SP+'giochi-comune.md'], [TE+'gioco-sysadmin.md']],
+  ['coretech', 'CoreTech Pac', 'gioco di CoreTech', [SP+'gioco-coretech.md', SP+'giochi-comune.md'], [TE+'gioco-coretech.md']],
+  ['timenet', 'Timenet Breakout', 'gioco di Timenet', [SP+'gioco-timenet.md', SP+'giochi-comune.md'], [TE+'gioco-timenet.md']],
+  ['inncloud', 'Inncloud Invaders', 'gioco di Inncloud', [SP+'gioco-inncloud.md', SP+'giochi-comune.md'], [TE+'gioco-inncloud.md']],
+];
+// unisce piu' file Markdown in uno; 'FAQ' = le FAQ di questa pagina
+async function buildDoc(title, files){
+  const parts = [];
+  for (const f of files){
+    if (f === 'FAQ'){ parts.push(faqMarkdown()); continue; }
+    const res = await fetch(f + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('file non trovato: ' + f);
+    parts.push('<!-- ' + f + ' -->\n' + (await res.text()).trim() + '\n');
+  }
+  const head = '# ' + title + '\n\nEsportato dal pannello admin di Efuture Games il ' + fmtDate(new Date().toISOString()) + '.\n';
+  return files.length > 1 ? head + '\n---\n\n' + parts.join('\n\n---\n\n') : parts[0];
+}
+let docsDone = false;
+function renderDocs(){
+  if (docsDone) return; docsDone = true;
+  const mk = (label, id, kind, title, files) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn dl'; b.textContent = '⬇ ' + label;
+    b.title = 'Scarica ' + title + ' – ' + label.toLowerCase() + ' (.md)';
+    b.onclick = async () => { b.disabled = true; setMsg($('docMsg'), 'Preparo ' + title + '…');
+      try { download('efuture-games-' + id + '-' + kind + '.md', await buildDoc(title + ' – ' + label, files), 'text/markdown;charset=utf-8'); setMsg($('docMsg'), 'Scaricato: ' + title + ' – ' + label + '.', 'ok'); }
+      catch(err){ setMsg($('docMsg'), 'Non riesco a preparare il documento: ' + err.message, 'err'); }
+      b.disabled = false; };
+    return b; };
+  fillTable($('docTable'), ['Documento', 'Scarica'], DOCS.map(([id, title, sub, desc, tech]) => {
+    const l = document.createElement('div'); l.className = 'doclbl'; l.innerHTML = '<b></b><span></span>'; l.querySelector('b').textContent = title; l.querySelector('span').textContent = sub;
+    const bx = document.createElement('div'); bx.className = 'dbtns'; bx.append(mk('Descrizione', id, 'descrizione', title, desc), mk('Tecnico', id, 'tecnico', title, tech));
+    return [l, bx];
+  }));
+}
+
 const SKILLS = [
   ['/efuture-games', 'Carica tutto il progetto in memoria: stato dell\u2019app, file, skill, link, artifact, chat passate e decisioni, così si riparte da dove si era rimasti.', '\u201criprendiamo efuture games\u201d'],
   ['/efuture-games-qr', 'Crea i 5 QR (app + sblocco dei 4 giochi) come cartellini da stampare e controlla che ogni codice apra il gioco giusto.', '“dammi i QR da stampare”'],

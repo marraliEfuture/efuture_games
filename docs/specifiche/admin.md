@@ -49,7 +49,7 @@ Si aggiornano dopo Elimina, Backup, Ripristino e Reset.
 Si apre con il pulsante **☰ Menu** a sinistra nell'intestazione (visibile dopo l'accesso) e scorre da sinistra sopra la pagina. Si chiude con ✕, toccando lo sfondo, con Esc o scegliendo una voce. Il nome della sezione aperta compare come titolo sopra il contenuto. Voci:
 - **Utenti**;
 - **Collegamenti:** QR, Link;
-- **Formazione:** Video utili, Tutorial, Skills;
+- **Formazione:** Video utili, Tutorial, Skills, FAQ, Documentazione;
 - **Admin:** Log, Backup, Chiave, Reset (Reset in rosso);
 - **Logout:** dimentica la chiave e torna al login.
 
@@ -133,6 +133,22 @@ Elenco `LINKS` in `admin.html`. I link del sito si calcolano da `PUBLIC_URL`, gl
 | ChatGPT | ChatGPT (link generico) |
 
 Ogni riga ha: nome, nota, indirizzo cliccabile e i pulsanti **Apri**, **Copia** e **QR**. QR mostra o nasconde il codice QR del link sotto la riga.
+
+### FAQ
+
+Domande frequenti sull'uso dell'app, raggruppate in **Iniziare**, **Giocare**, **Punti e classifica**, **Problemi** (array `FAQ` in `admin.html`). Ogni domanda si apre e si chiude con un tocco. **Scarica FAQ (.md)** salva `efuture-games-faq.md`. Le stesse FAQ entrano nella descrizione esportata della piattaforma e dell'app. Quando cambia il comportamento dell'app, aggiornare anche le FAQ.
+
+### Documentazione
+
+Tabella con una riga per: **Intera piattaforma**, **App Efuture Games** e i 4 giochi. Ogni riga ha due pulsanti che scaricano un file Markdown (`efuture-games-<voce>-descrizione.md` / `-tecnico.md`):
+
+| Voce | Descrizione | Tecnico |
+|---|---|---|
+| Intera piattaforma | tutte le specifiche di `docs/specifiche/` (indice, app, classifica, admin, giochi, database) + FAQ | tutti i file di `docs/tecnico/` |
+| App Efuture Games | `app-giocatori.md` + FAQ | `docs/tecnico/app.md` |
+| Ogni gioco | `gioco-<id>.md` + `giochi-comune.md` | `docs/tecnico/gioco-<id>.md` |
+
+I file vengono letti dal sito pubblicato al momento del clic (array `DOCS`, funzione `buildDoc`): quando si uniscono più file, il documento ha un titolo, la data di esportazione e i file separati da `---`. Se un file manca compare "Non riesco a preparare il documento: file non trovato: …".
 
 ### Skills
 

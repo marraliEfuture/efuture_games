@@ -65,7 +65,8 @@ CODICI DI SBLOCCO (uno per gioco)
    Si entra con la chiave admin (non è nel sito: è salvata cifrata nel
    database). Dal pannello:
    Il menu si apre con il pulsante "Menu" in alto a sinistra: Utenti,
-   Collegamenti (QR, Link), Formazione (Video utili, Tutorial, Skills),
+   Collegamenti (QR, Link), Formazione (Video utili, Tutorial, Skills,
+   FAQ, Documentazione),
    Admin (Log, Backup, Chiave, Reset), Logout.
    - Utenti: elenco con simbolo del tipo, nome, email, punti per gioco;
      CSV. "Modifica" apre un popup per cambiare il tipo (Giocatore, Admin
@@ -74,6 +75,9 @@ CODICI DI SBLOCCO (uno per gioco)
      Ogni modifica chiede conferma spiegando le conseguenze. Una volta
      sola esegui supabase-tipi-utenti.sql (e rieseguilo se l'avevi gia'
      eseguito prima della v36) e supabase-privacy-utenti.sql.
+   - FAQ: domande frequenti sull'uso dell'app, scaricabili in Markdown.
+   - Documentazione: scarica in Markdown descrizione e documento tecnico
+     della piattaforma, dell'app e di ogni gioco.
    - Log: registrazioni, accessi, partite e operazioni admin; CSV.
    - Backup: crea e scarica una copia (JSON), ripristina una copia.
    - Reset: azzera i punti (i giocatori restano) o cancella tutto.
