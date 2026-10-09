@@ -65,7 +65,8 @@ Lo script principale è una IIFE con `"use strict"`, organizzata in sezioni segn
 | `bestTime`, `bestDebugPercent` | Record locali |
 | `runKillsTotal`, `runEnemiesTotal` | Bug eliminati / totali della partita (percentuale di pulizia) |
 | `projectiles`, `particles` | Proiettili (mouse, antivirus, colpi dell'hacker) e particelle |
-| `goalReached` | Il giocatore ha già toccato il cliente in questo livello |
+| `goalReached` | Il giocatore ha già toccato il cliente in questo livello (tiene aperta la porta) |
+| `doorOpen`, `doorT` | Apertura della porta (0–1) e ultimo istante disegnato, per `drawDoor()` |
 | `keys`, `touch` | Stato dei comandi tenuti premuti |
 | `jumpPressedEdge`, `throwPressedEdge`, `specialPressedEdge` | Pressioni "una tantum", consumate da `updatePlayer()` |
 | `el` | Riferimenti a tutti gli elementi del DOM |

@@ -71,7 +71,8 @@ Campo logico 960 × 540, terreno a y = 470. I livelli 1–9 sono generati da un 
 - bug a terra: 4 + round(1,15·i), velocità 55 + 7·i (+0…30) px/s, pattugliano 90–180 px;
 - bug volanti: dal livello 4, min(i − 2; 6), ondeggiano in verticale;
 - chiodi dal livello 2, scosse elettriche dal livello 3, seghe dal livello 4 (velocità 85 + 9·i px/s). Ogni trappola ha almeno 110 px di terreno libero prima e dopo;
-- in fondo una scala di 6 gradini con il pianerottolo e il cliente.
+- in fondo una scala di 6 gradini con il pianerottolo (150 px) e la **porta del piano superiore** (46×80 px, anta in legno con finestrella e maniglia, cartello verde "PIANO SUP."). Il **cliente sta davanti alla porta**, un po' spostato a destra. La porta si apre (anta che ruota sul cardine sinistro e luce verde dentro, con ▲) quando il giocatore arriva a meno di 120 px, e si richiude se si allontana.
+- **Clienti:** figure umane con testa, capelli, occhi, sorriso, collo, mani e scarpe; l'abito dipende dal cliente (giacca, camice, divisa, felpa, abito, grembiule). Si alternano **uomo e donna** a ogni ticket (Marco, Giulia, Paolo, Elena, Davide, Sara, Fabio, Ilaria, Team IT): le donne hanno capelli lunghi e gonna con abito o camice.
 
 **Risultato (conteggi reali del generatore):**
 
