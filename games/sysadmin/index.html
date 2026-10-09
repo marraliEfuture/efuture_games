@@ -785,7 +785,18 @@ function buildNormalLevel(idx){
   segments.push({x1:x, x2:width});
 
   const platforms = [];
-  for (let i=1;i<segments.length-1;i++){
+  if (cfg){   // livelli 1-3: una pedana su quasi ogni tratto, due sui tratti lunghi (generatore a parte, non cambia il resto)
+    const pr = mulberry32(3000 + idx*41);
+    for (let i=1;i<segments.length-1;i++){
+      const s = segments[i], sw = s.x2 - s.x1, n = sw > 470 && pr() < 0.6 ? 2 : (pr() < 0.85 ? 1 : 0);
+      for (let k=0;k<n;k++){
+        const pw = 100 + pr()*60, slot = (sw - 20) / n;
+        const px = s.x1 + 10 + k*slot + Math.max(0, slot - pw)*pr();
+        platforms.push({x:px, y:GROUND_Y - (92 + pr()*38), w:Math.min(pw, slot), h:18});
+      }
+    }
+  }
+  for (let i=1;i<segments.length-1 && !cfg;i++){
     if (rand() < 0.4 + idx*0.02){
       const s = segments[i];
       const pw = 110 + rand()*70;
@@ -900,9 +911,12 @@ function buildNormalLevel(idx){
   lastSeg.x2 = Math.max(lastSeg.x2, finalWidth);
   const width2 = Math.max(width, finalWidth);
   const goalX = landing.x + landing.w*0.40 - 22 + 12;   // il cliente sta davanti alla porta, un po' spostato a destra
+  // non solo bug: a terra anche gli alert, in volo anche le email spam (generatore a parte: il livello non cambia)
+  const sk = mulberry32(7000 + idx*13);
+  for (const e of enemies){ if (e.type === 'bug' && sk() < 0.3) e.skin = 'alert'; else if (e.type === 'flybug' && sk() < 0.5) e.skin = 'spam'; }
   const totalEnemies = enemies.length;
   return {
-    kind:'normal', theme, client, width:width2, segments, platforms, enemies, goalX,
+    kind:'normal', life:{ state:'wait' }, lifeDone:false, theme, client, width:width2, segments, platforms, enemies, goalX,
     goal:{x:goalX, y:landing.y-72, w:44, h:72},
     stairs, traps,
     totalEnemies, kills:0, killStreak:0, specialUnlocked:false, seed: idx
@@ -964,6 +978,7 @@ function resetLevelRuntime(){
       }
     }
     if (level.kind === 'boss') level.enemies = level.enemies.filter(e=>e.type==='boss');
+    if (level.kind === 'normal' && !level.lifeDone) level.life = { state:'wait' };
     if (level.traps){
       for (const tr of level.traps){
         if (tr.type==='saw'){ tr.x = (tr.patrolMin+tr.patrolMax)/2; }
@@ -1313,6 +1328,52 @@ function updateEnemiesAndCombat(dt, t){
   particles = particles.filter(p=>p.life>0);
 
   if (level.traps) updateTraps(dt, t);
+  updateLife(dt, t);
+}
+
+/* ---- una vita in più che cade dal cielo, una sola per livello ---- */
+const LIFE_W = 30, LIFE_H = 28, LIFE_MAX = LIVES_START + 2;
+function updateLife(dt, t){
+  const L = level, lf = L.life;
+  if (L.kind !== 'normal' || L.lifeDone || !lf) return;
+  if (lf.state === 'wait'){
+    if (player.x > L.width*0.3){ Object.assign(lf, { state:'fall', x:Math.min(player.x + 320, L.width - 700), y:-40, t:0 }); showToast('Una vita cade dal cielo: prendila!'); }
+    return;
+  }
+  lf.t += dt;
+  if (lf.state === 'fall'){
+    lf.y += 85*dt;
+    const ground = L.segments.some(s => lf.x + LIFE_W/2 > s.x1 && lf.x + LIFE_W/2 < s.x2);
+    if (lf.y + LIFE_H >= GROUND_Y){
+      if (ground){ lf.y = GROUND_Y - LIFE_H; lf.state = 'ground'; lf.t = 0; }
+      else if (lf.y > VH){ lf.state = 'gone'; L.lifeDone = true; }
+    }
+  } else if (lf.state === 'ground' && lf.t > 9){ lf.state = 'gone'; L.lifeDone = true; return; }
+  if ((lf.state === 'fall' || lf.state === 'ground') && aabb(player, { x:lf.x + (lf.state==='fall' ? Math.sin(lf.t*2)*20 : 0), y:lf.y, w:LIFE_W, h:LIFE_H })){
+    lf.state = 'gone'; L.lifeDone = true;
+    if (lives < LIFE_MAX){ lives += 1; showToast('Vita in più!'); } else { score += 300; showToast('Vite al massimo: +300 punti'); }
+    spawnBurst(lf.x + LIFE_W/2, lf.y + LIFE_H/2, '#ff4d6d'); updateHud();
+  }
+}
+function drawLife(t){
+  const lf = level.life;
+  if (!lf || (lf.state !== 'fall' && lf.state !== 'ground')) return;
+  if (lf.state === 'ground' && lf.t > 6 && Math.floor(t*8) % 2) return;   // lampeggia prima di sparire
+  const x = lf.x - camX + (lf.state === 'fall' ? Math.sin(lf.t*2)*20 : 0), y = lf.y;
+  if (x < -60 || x > VW + 60) return;
+  ctx.save();
+  if (lf.state === 'fall'){   // paracadute
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(x+2, y+6); ctx.lineTo(x-6, y-26); ctx.moveTo(x+LIFE_W-2, y+6); ctx.lineTo(x+LIFE_W+6, y-26); ctx.stroke();
+    ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(x+LIFE_W/2, y-26, 22, Math.PI, 0); ctx.fill();
+    ctx.fillStyle = '#ff9eb0'; ctx.beginPath(); ctx.arc(x+LIFE_W/2, y-26, 22, Math.PI, Math.PI*1.33); ctx.lineTo(x+LIFE_W/2, y-26); ctx.fill();
+  }
+  ctx.shadowColor = '#ff4d6d'; ctx.shadowBlur = 12 + Math.sin(t*6)*4;
+  ctx.fillStyle = '#ff2d55';
+  const cx = x + LIFE_W/2, cy = y + 9;
+  ctx.beginPath(); ctx.moveTo(cx, y+LIFE_H); ctx.bezierCurveTo(x-6, cy+6, x+2, y-6, cx, cy-1); ctx.bezierCurveTo(x+LIFE_W-2, y-6, x+LIFE_W+6, cy+6, cx, y+LIFE_H); ctx.fill();
+  ctx.shadowBlur = 0; ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.arc(cx-7, cy-1, 3.5, 0, 7); ctx.fill();
+  ctx.restore();
 }
 
 function trapRect(tr){
@@ -1449,8 +1510,20 @@ function efgEnd(ok, reason){
   if (EFG.done) return;
   EFG.done = true;
   state = ok ? 'complete' : 'gameover';
-  efgPost({ev:'result', ok, reason: reason||'', level:levelIndex+1, max:EFG.max, used:EFG.used, times:EFG.times.slice(), lives:EFG.livesAt.slice(), seconds: EFG.used + (ok ? 0 : EFG.lvT)});
+  efgPost({ev:'result', ok, retry: !ok, reason: reason||'', level:levelIndex+1, max:EFG.max, used:EFG.used, times:EFG.times.slice(), lives:EFG.livesAt.slice(), seconds: EFG.used + (ok ? 0 : EFG.lvT)});
 }
+// in gara: dopo una sconfitta l'app può chiedere di riprovare lo stesso livello (i livelli già superati restano)
+function efgRetry(){
+  if (!EFG.on || !EFG.done || state !== 'gameover') return;
+  EFG.done = false; EFG.lvT = 0; EFG.tickT = 0;
+  lives = LIVES_START;
+  level = (levelIndex === 9) ? buildBossLevel() : buildNormalLevel(levelIndex);
+  resetLevelRuntime();
+  showIntro();
+}
+window.addEventListener('message', e => {
+  if (e.source === window.parent && e.data && e.data.type === 'efg-cmd' && e.data.cmd === 'retry') efgRetry();
+});
 function onLevelComplete(){
   if (EFG.on && !EFG.done){
     EFG.used += EFG.lvT; EFG.times.push(EFG.lvT); EFG.livesAt.push(lives);
@@ -1769,9 +1842,10 @@ function drawWheat(baseY, h, step, par, col1, col2, t, seed){
 }
 // gli sfondi dei primi 3 livelli si disegnano su una tela piccola (1/3) e poi si ingrandiscono:
 // così risultano sfocati e restano dietro all'omino, che è nitido. Un velo li rende meno colorati.
-const BG_K = 3, BG_CV = document.createElement('canvas'); BG_CV.width = Math.ceil(VW/BG_K); BG_CV.height = Math.ceil(VH/BG_K);
+const BG_K = 4, BG_CV = document.createElement('canvas'); BG_CV.width = Math.ceil(VW/BG_K); BG_CV.height = Math.ceil(VH/BG_K);
 const BG_CTX = BG_CV.getContext('2d');
-const SCENE_VEIL = { alba:'rgba(238,232,222,0.30)', openspace:'rgba(225,222,232,0.30)', notte:'rgba(20,24,44,0.28)' };
+const SCENE_VEIL = { alba:'rgba(240,236,228,0.48)', openspace:'rgba(232,230,238,0.48)', notte:'rgba(26,30,52,0.45)' };
+const BACK_FLOOR = 50;   // i mobili stanno più in fondo: tra loro e il terreno di gioco c'è una fascia di pavimento
 function drawSceneSoft(kind, t){
   const main = ctx;
   BG_CTX.setTransform(1/BG_K, 0, 0, 1/BG_K, 0, 0);
@@ -1853,10 +1927,11 @@ function drawScene(kind, t){
       ctx.fillStyle = '#4a445a'; ctx.fillRect(wxx+WIN/2-3, 30, 6, 270);
     }
     ctx.fillStyle = '#6a6479'; ctx.fillRect(0, 300, VW, GROUND_Y-300);
+    ctx.fillStyle = '#7d788c'; ctx.fillRect(0, GROUND_Y-BACK_FLOOR, VW, BACK_FLOOR);   // pavimento verso il fondo
     const DESK = 200, doff = wrapX(camX*0.55, DESK);
     for (let dx = -doff - DESK; dx < VW + DESK; dx += DESK){
       const k = Math.round((dx + camX*0.55) / DESK);
-      const y = GROUND_Y - 58;
+      const y = GROUND_Y - BACK_FLOOR - 58;
       ctx.fillStyle = '#b89c80'; ctx.fillRect(dx+10, y, DESK-30, 10);
       ctx.fillStyle = '#8a7560'; ctx.fillRect(dx+18, y+10, 8, 48); ctx.fillRect(dx+DESK-38, y+10, 8, 48);
       if (k % 3 === 0){
@@ -1891,9 +1966,10 @@ function drawScene(kind, t){
       else { ctx.fillStyle = '#e8e2d4'; ctx.beginPath(); ctx.arc(rx+300, 140, 26, 0, 7); ctx.fill(); ctx.strokeStyle = '#333'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(rx+300, 140); ctx.lineTo(rx+300+12*Math.cos(-Math.PI/2+Math.PI/3), 140+12*Math.sin(-Math.PI/2+Math.PI/3)); ctx.moveTo(rx+300,140); ctx.lineTo(rx+300, 120); ctx.stroke(); }
     }
     // mobili in primo piano (parallasse più veloce): scrivania con portatile e lampada, libreria, divano
+    ctx.fillStyle = '#4a3c3c'; ctx.fillRect(0, GROUND_Y-BACK_FLOOR, VW, BACK_FLOOR);   // pavimento verso il fondo
     const F = 330, foff = wrapX(camX*0.6, F);
     for (let fx = -foff - F; fx < VW + F; fx += F){
-      const k = Math.round((fx + camX*0.6) / F), y = GROUND_Y;
+      const k = Math.round((fx + camX*0.6) / F), y = GROUND_Y - BACK_FLOOR;
       if (k % 3 === 0){
         ctx.fillStyle = '#6b4f3f'; ctx.fillRect(fx+20, y-70, 170, 10); ctx.fillRect(fx+30, y-60, 8, 60); ctx.fillRect(fx+172, y-60, 8, 60);
         ctx.fillStyle = '#2a2f3a'; ctx.fillRect(fx+70, y-112, 66, 42); ctx.fillStyle = '#7fd0ff'; ctx.fillRect(fx+74, y-108, 58, 34);
@@ -1959,10 +2035,12 @@ function drawGround(){
   for (const p of level.platforms){
     const x = p.x - camX;
     if (x+p.w < -20 || x > VW+20) continue;
+    ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.fillRect(x+4, p.y+p.h, p.w-8, 5);   // ombra: la pedana si stacca dallo sfondo
     ctx.fillStyle = th.groundTop;
     ctx.fillRect(x, p.y, p.w, 8);
     ctx.fillStyle = th.ground;
     ctx.fillRect(x, p.y+8, p.w, p.h-8);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(x, p.y, p.w, 2);
   }
 }
 
@@ -2549,13 +2627,37 @@ function drawBug(e, t){
   ctx.translate(0,bob);
   const spec = e.type==='virusminion' ? THEMES.bunker.bug : level.theme.bug;
   ctx.shadowColor = 'rgba(13,43,69,0.55)'; ctx.shadowBlur = 3;
+  if (e.skin === 'alert') drawAlert(e, t); else
   drawBugSpecies(spec.species, spec.color, e, t, bob);
   ctx.restore();
 }
 
+// alert: cartello di pericolo con il punto esclamativo, che cammina
+function drawAlert(e, t){
+  const w = e.w, h = e.h, blink = Math.floor(t*4 + e.wobble) % 2 === 0;
+  ctx.strokeStyle = '#3a2a00'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(w*0.35, h*0.85); ctx.lineTo(w*0.3 + Math.sin(t*12)*3, h+2); ctx.moveTo(w*0.65, h*0.85); ctx.lineTo(w*0.7 - Math.sin(t*12)*3, h+2); ctx.stroke();
+  ctx.fillStyle = blink ? '#ffcc00' : '#ffb000';
+  ctx.beginPath(); ctx.moveTo(w/2, -6); ctx.lineTo(w+2, h*0.9); ctx.lineTo(-2, h*0.9); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = '#d93a2b'; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke();
+  ctx.fillStyle = '#1d1d1d'; ctx.fillRect(w/2-2.5, h*0.2, 5, h*0.38); ctx.beginPath(); ctx.arc(w/2, h*0.72, 3, 0, 7); ctx.fill();
+}
+// email spam: busta con le ali e la scritta SPAM
+function drawSpam(e, t){
+  const w = e.w, h = e.h, wing = Math.sin(t*20)*8;
+  ctx.fillStyle = '#e8eef5';
+  ctx.beginPath(); ctx.moveTo(4,h*0.3); ctx.lineTo(-12,wing-6); ctx.lineTo(-2,h*0.6); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(w-4,h*0.3); ctx.lineTo(w+12,wing-6); ctx.lineTo(w+2,h*0.6); ctx.fill();
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = '#7a8796'; ctx.lineWidth = 2; ctx.strokeRect(0, 0, w, h);
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(w/2, h*0.55); ctx.lineTo(w,0); ctx.stroke();
+  ctx.fillStyle = '#d93a2b'; ctx.fillRect(w*0.18, h*0.58, w*0.64, h*0.36);
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 8px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('SPAM', w/2, h*0.88);
+}
 function drawFlyBug(e, t){
   const x = e.x - camX;
   if (x+e.w < -40 || x > VW+40) return;
+  if (e.skin === 'spam'){ ctx.save(); ctx.translate(x, e.y); ctx.shadowColor = 'rgba(13,43,69,0.45)'; ctx.shadowBlur = 3; drawSpam(e, t); ctx.restore(); return; }
   const color = level.theme.fly;
   ctx.save();
   ctx.translate(x, e.y);
@@ -2649,6 +2751,7 @@ function render(t){
   drawStairs(t);
   drawTraps(t);
   drawGoal(t);
+  if (level.kind === 'normal') drawLife(t);
   for (const e of level.enemies){
     if (!e.alive) continue;
     if (e.type==='bug'||e.type==='virusminion') drawBug(e,t);
@@ -2762,7 +2865,7 @@ function drawSysadminFigure(c, x, y, w, h, t, armsUp){
 ========================================================= */
 function updateHud(){
   let hearts = '';
-  for (let i=0;i<LIVES_START;i++) hearts += (i<lives? '❤':'<span class="dim">♡</span>');
+  for (let i=0;i<Math.max(LIVES_START, lives);i++) hearts += (i<lives? '❤':'<span class="dim">♡</span>');   // con la vita in più i cuori possono essere 4 o 5
   el.lives.innerHTML = hearts;
   el.score.textContent = score;
   el.timerWrap.textContent = '⏱ ' + fmtTime(runTimer);
@@ -2831,6 +2934,7 @@ el.btnRestartAll.addEventListener('click', ()=>{
   hideAllOverlays(); el.ovTitle.hidden=false; state='title'; refreshTitleContinue();
 });
 el.btnRetryLevel.addEventListener('click', ()=>{
+  if (EFG.on){ efgRetry(); return; }
   lives = LIVES_START;
   resetLevelRuntime();
   beginPlaying();

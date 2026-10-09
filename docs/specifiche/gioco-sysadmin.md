@@ -51,7 +51,7 @@ Regole comuni e protocollo: [giochi-comune.md](giochi-comune.md#modalità-libera
 | | Modalità libera | Modalità gara (`?hub=1`) |
 |---|---|---|
 | Livelli | 10 (Marco … Team IT, poi l'hacker) | 3: Marco (Alba: da casa al cliente), Giulia (In ufficio al tramonto), Paolo (Notte in smart working). Niente boss |
-| Vite | 3 a inizio partita, si portano da un livello all'altro; **Continua** e **Riprova ticket** le riportano a 3 | 3 a ogni livello. "Riparti dal ticket" (pausa) non ridà le vite |
+| Vite | 3 a inizio partita, si portano da un livello all'altro; **Continua** e **Riprova ticket** le riportano a 3. La vita dal cielo ne aggiunge una (massimo 5) | 3 a ogni livello, più la vita dal cielo. "Riparti dal ticket" (pausa) non ridà le vite |
 | Progressi | `sysadminRunnerProgress` (`bestUnlocked`): pulsante **Continua** | Nessun Continua |
 | Fine | Vittoria dopo il boss | `result` alla fine del livello 3 (senza schermata del gioco) |
 
@@ -60,6 +60,7 @@ Regole comuni e protocollo: [giochi-comune.md](giochi-comune.md#modalità-libera
 - `tick`: ogni 0,25 s nello stato di gioco. Il tempo si ferma su pausa, scheda del livello, "Cliente non convinto" e livello completato.
 - Livello superato (anche con **Chiudi il ticket**, cioè con bug rimasti): salva tempo e vite; al livello 3 manda `result` con `ok: true`.
 - Vite finite: `result` con `reason: 'lives'`, poi la schermata GAME OVER.
+- **Riprova il livello:** dopo una sconfitta (vite finite o tempo scaduto) `result` ha anche `retry: true`. L'app mostra il punteggio (già salvato) e il pulsante **Riprova livello N**: manda al gioco `{type:'efg-cmd', cmd:'retry'}` e il gioco (`efgRetry()`) riparte dalla scheda dello stesso livello, con 3 vite e il minuto da capo; i livelli già superati restano. Anche **Riprova ticket** del GAME OVER, in gara, fa la stessa cosa. Alla fine il gioco manda un nuovo `result`: in classifica conta il migliore.
 - 60 s nel livello: `result` con `reason: 'time'`; il gioco si ferma senza schermata.
 
 ## Livelli
@@ -74,7 +75,13 @@ Campo logico 960 × 540, terreno a y = 470. I livelli 1–9 sono generati da un 
 | 2 | **In ufficio al tramonto**: l'omino è **in ufficio**: vetrate sul tramonto con lo skyline, file di scrivanie con pc e stampanti da cui volano via i fogli | Quasi fine giornata | lunghezza 7000, 16 bug, 4 volanti, 3 chiodi, 2 scosse, 2 seghe, burroni 24%, bug 72 px/s |
 | 3 | **Notte in smart working**: l'omino è **a casa sua, di notte, in smart working**: stanza con finestre sulla città di notte (stelle, luna), orologio e quadri, scrivania con il portatile acceso e la lampada, libreria e divano; luce rossa d'emergenza che lampeggia. Bug **cattivi con il cappuccio** e occhi rossi (anche quelli volanti) | Emergenza | lunghezza 7800, 20 bug, 5 volanti, 4 chiodi, 4 scosse (accese più a lungo), 3 seghe più veloci (140 px/s), burroni 30%, bug 88 px/s |
 
-**Sfondi sfocati:** i tre sfondi si disegnano su una tela grande un terzo e poi si ingrandiscono, quindi risultano morbidi e sfocati; sopra c'è un velo chiaro (scuro di notte) che smorza i colori. Così restano dietro all'omino, ai bug e alle trappole, che sono nitidi.
+**Sfondi lontani e sfocati:** i tre sfondi si disegnano su una tela grande un quarto e poi si ingrandiscono, quindi risultano morbidi e sfocati; sopra c'è un velo chiaro (scuro di notte, circa 45%) che smorza i colori. Scrivanie e mobili stanno più in fondo: tra loro e il terreno di gioco c'è una fascia di pavimento di 50 px. Così l'omino, i nemici, le pedane e le trappole, che sono nitidi, non si confondono con lo sfondo.
+
+**Pedane (livelli 1–3):** una su quasi ogni tratto di terreno (85%), due sui tratti lunghi oltre 470 px (60%), larghe 100–160 px e alte 92–130 px sul terreno. Hanno un'ombra sotto e un filo chiaro sopra per staccarsi dallo sfondo. Le genera un generatore a parte (seme `3000 + i × 41`), così il resto del livello non cambia.
+
+**Non solo bug:** in tutti i livelli circa il 30% dei nemici a terra sono **alert** (cartello giallo di pericolo con il punto esclamativo, che cammina) e circa la metà di quelli in volo sono **email spam** (busta con le ali e la scritta SPAM). Si comportano come i bug: si eliminano saltandoci sopra o con il mouse e contano come bug eliminati.
+
+**Vita dal cielo:** in ogni livello normale cade **una vita in più**, una sola volta. Quando l'omino supera il 30% del livello compare il messaggio "Una vita cade dal cielo: prendila!" e un cuore con il paracadute scende piano, ondeggiando, circa 320 px davanti a lui. Se la prende guadagna una vita (fino a 5; se ha già il massimo, +300 punti). Se tocca terra resta lì per 9 secondi (lampeggia negli ultimi 3) e poi sparisce; se cade in un burrone si perde. Una volta presa o persa non torna, nemmeno se il livello riparte.
 
 Nei primi 3 livelli i tratti di terreno sono più ampi (320–600 px) e i bug pattugliano 60–140 px. I numeri sono obiettivi: se un bug o una trappola non trova posto non viene messo (vedi la tabella sotto).
 
@@ -94,9 +101,9 @@ Nei primi 3 livelli i tratti di terreno sono più ampi (320–600 px) e i bug pa
 
 | Liv. | Cliente – stanza | Lunghezza (px) | Burroni | Piattaforme | Bug a terra | Bug volanti | Chiodi | Scosse | Seghe |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | Marco – Alba: da casa al cliente | 6384 | 1 | 2 | 15 | 2 | 2 | 1 | 0 |
-| 2 | Giulia – In ufficio al tramonto | 7184 | 5 | 3 | 15 | 4 | 3 | 2 | 2 |
-| 3 | Paolo – Notte in smart working | 8095 | 8 | 4 | 17 | 5 | 4 | 4 | 2 |
+| 1 | Marco – Alba: da casa al cliente | 6384 | 1 | 13 | 15 | 2 | 2 | 1 | 0 |
+| 2 | Giulia – In ufficio al tramonto | 7184 | 5 | 19 | 16 | 4 | 3 | 2 | 2 |
+| 3 | Paolo – Notte in smart working | 8095 | 8 | 16 | 13 | 5 | 4 | 4 | 3 |
 | 4 | Elena – Sala Rete | 5225 | 2 | 6 | 7 | 1 | 2 | 2 | 1 |
 | 5 | Davide – Data Center Cloud | 5810 | 4 | 7 | 8 | 2 | 3 | 2 | 1 |
 | 6 | Sara – Sala Controllo | 6318 | 6 | 9 | 9 | 3 | 3 | 3 | 1 |

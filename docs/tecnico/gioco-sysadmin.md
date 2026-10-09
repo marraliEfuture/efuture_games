@@ -158,7 +158,10 @@ Flusso tipico: `title` → (`btnStart`) `startLevel(0)` → `intro` → (`btnGo`
 | `fitCanvas()` | Adatta il canvas allo spazio di `#stage` mantenendo 960:540 (densità fino a 2×) |
 | `sizeVictoryCanvas()` | Dimensiona il canvas della vittoria (campo logico 480 × 224) |
 | `render(t)` | Disegna tutto, in ordine: sfondo, terreno, scala, trappole, cliente, nemici, proiettili, particelle, giocatore, vignettatura |
-| `drawSceneSoft(kind, t)` | Disegna lo sfondo con `drawScene` sulla tela piccola `BG_CV` (1/`BG_K` = 1/3 di 960×540, scambiando temporaneamente `ctx`, che per questo è `let`), lo ingrandisce sul canvas (sfocatura) e ci passa sopra il velo `SCENE_VEIL[kind]` che smorza i colori |
+| `updateLife(dt, t)`, `drawLife(t)` | Vita dal cielo (una per livello normale): `level.life.state` va da `wait` a `fall` (oltre il 30% del livello), `ground` (9 s) e `gone`; `level.lifeDone` impedisce che torni quando il livello riparte. Massimo `LIFE_MAX` = 5 vite |
+| `drawAlert(e, t)`, `drawSpam(e, t)` | Nemici con `e.skin` `'alert'` (a terra) o `'spam'` (in volo): scelti in `buildNormalLevel` con il generatore `mulberry32(7000 + idx × 13)`, si comportano come bug e bug volanti |
+| `efgRetry()` | In gara, dopo una sconfitta: riceve dall'app `{type:'efg-cmd', cmd:'retry'}` (o il clic su Riprova ticket), ricostruisce lo stesso livello e riparte con 3 vite e `EFG.lvT = 0`; `EFG.times` dei livelli superati resta |
+| `drawSceneSoft(kind, t)` | Disegna lo sfondo con `drawScene` sulla tela piccola `BG_CV` (1/`BG_K` = 1/4 di 960×540, scambiando temporaneamente `ctx`, che per questo è `let`), lo ingrandisce sul canvas (sfocatura) e ci passa sopra il velo `SCENE_VEIL[kind]` che smorza i colori |
 | `drawScene(kind, t)` | Sfondi dei primi 3 livelli (`theme.scene`): `alba` (campo di grano con `drawWheat`, sole che sorge, `drawHouse` all'inizio e `drawClientOffice` dietro la scala; usa `img/alba.jpg` se c'è), `openspace` (ufficio: vetrate sul tramonto, scrivanie, stampanti con fogli che volano), `notte` (casa in smart working: finestre sulla città, orologio, scrivania con portatile e lampada, libreria, divano, luce d'emergenza) |
 | `drawBackground(t)` | Se il tema ha `scene` chiama `drawScene`; altrimenti cielo a gradiente, puntini, effetto del tema, filigrana del logo, oggetti di sfondo in parallasse |
 | `drawThemeFX(fx, t)` | Effetto animato della stanza (scansione, braci, radar, pioggia di codice…) |
@@ -212,7 +215,7 @@ I livelli 1–9 **non sono scritti a mano**: li genera `buildNormalLevel(idx)` c
 
 | Parametro | Formula nel codice |
 |---|---|
-| Livelli 1–3 | Parametri fissi in `LV3[idx]`: `width`, `bugs`, `fly`, `spikes`, `zappers`, `saws`, `gap` (probabilità di burrone), `bugSpeed`, `sawSpeed`, `zapOn` (durata della scossa). Tratti 320–600 px, pattuglia dei bug 60–140 px, fino a 300 tentativi per trappola |
+| Livelli 1–3 | Parametri fissi in `LV3[idx]`: `width`, `bugs`, `fly`, `spikes`, `zappers`, `saws`, `gap` (probabilità di burrone), `bugSpeed`, `sawSpeed`, `zapOn` (durata della scossa). Tratti 320–600 px, pattuglia dei bug 60–140 px, fino a 300 tentativi per trappola. Pedane dal generatore `mulberry32(3000 + idx × 41)`: 85% per tratto, 2 sui tratti oltre 470 px (60%) |
 | Ordine | Prima le trappole (`placeTrap`), poi i bug a terra (zona della trappola + 50 px vietata), poi i bug volanti (non sopra le trappole, margine 60 px) |
 | Lunghezza base | `3400 + idx × 520` px, poi allungata per far stare la scala |
 | Tratto iniziale sicuro | 340 px |
@@ -233,9 +236,9 @@ Conteggi ottenuti eseguendo il generatore del codice attuale (le trappole sono q
 
 | Liv. | Cliente – stanza | Lunghezza (px) | Burroni | Piattaforme | Bug a terra | Bug volanti | Chiodi | Scosse | Seghe |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | Marco – Alba: da casa al cliente | 6384 | 1 | 2 | 15 | 2 | 2 | 1 | 0 |
-| 2 | Giulia – In ufficio al tramonto | 7184 | 5 | 3 | 15 | 4 | 3 | 2 | 2 |
-| 3 | Paolo – Notte in smart working | 8095 | 8 | 4 | 17 | 5 | 4 | 4 | 2 |
+| 1 | Marco – Alba: da casa al cliente | 6384 | 1 | 13 | 15 | 2 | 2 | 1 | 0 |
+| 2 | Giulia – In ufficio al tramonto | 7184 | 5 | 19 | 16 | 4 | 3 | 2 | 2 |
+| 3 | Paolo – Notte in smart working | 8095 | 8 | 16 | 13 | 5 | 4 | 4 | 3 |
 | 4 | Elena – Sala Rete | 5225 | 2 | 6 | 7 | 1 | 2 | 2 | 1 |
 | 5 | Davide – Data Center Cloud | 5810 | 4 | 7 | 8 | 2 | 3 | 2 | 1 |
 | 6 | Sara – Sala Controllo | 6318 | 6 | 9 | 9 | 3 | 3 | 3 | 1 |

@@ -101,7 +101,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v47' : 'Modalità demo: account e classifica restano su questo telefono. · v47';
+  mn.textContent = remote ? 'Classifica online · v48' : 'Modalità demo: account e classifica restano su questo telefono. · v48';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -207,6 +207,7 @@ function closePlayer(){
 $('btnBack').addEventListener('click', closePlayer);
 $('rsHome').addEventListener('click', closePlayer);
 $('rsAgain').addEventListener('click', ()=>{ const g = playing; if (g) play(g); });
+$('rsRetry').addEventListener('click', ()=>{ $('mResult').hidden = true; try { $('frame').contentWindow.postMessage({ type:'efg-cmd', cmd:'retry' }, '*'); } catch(e){} });
 
 window.addEventListener('message', async e=>{
   const d = e.data;
@@ -219,13 +220,15 @@ window.addEventListener('message', async e=>{
     clk.classList.toggle('warn', left <= 10);
     return;
   }
-  if (d.ev === 'result') showResult(playing, !!d.ok, d.reason, Number(d.seconds)||0, Number(d.level)||1, Number(d.used)||0, Array.isArray(d.times) ? d.times.map(Number) : null, Array.isArray(d.lives) ? d.lives.map(Number) : null);
+  if (d.ev === 'result') showResult(playing, !!d.ok, d.reason, Number(d.seconds)||0, Number(d.level)||1, Number(d.used)||0, Array.isArray(d.times) ? d.times.map(Number) : null, Array.isArray(d.lives) ? d.lives.map(Number) : null, !!d.retry);
 });
 
 // ogni livello superato vale: numero del livello x secondi che avanzano sul suo minuto x vite rimaste
 // es. livello 1 finito a 35 s con 2 vite → 1 x 25 x 2 = 50; livello 2 con 20 s e 3 vite → 2 x 20 x 3 = 120.
 // Un livello non finito vale 0; alla fine si sommano i livelli superati.
-async function showResult(g, ok, reason, seconds, level, used, times, lives){
+async function showResult(g, ok, reason, seconds, level, used, times, lives, retry){
+  // il gioco consente di riprovare il livello perso (i livelli già superati restano): il punteggio intanto è già salvato
+  $('rsRetry').hidden = ok || !retry; $('rsRetry').textContent = 'Riprova livello ' + level;
   if (!times){ const n = ok ? LEVELS : Math.max(0, level - 1); times = Array.from({length:n}, ()=> n ? used / n : 0); }
   times = times.slice(0, LEVELS);
   const levels = times.length;
