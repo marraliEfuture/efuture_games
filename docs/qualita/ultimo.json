@@ -288,8 +288,8 @@
     },
     {
      "nome": "Immagini pesanti (oltre 300 KB)",
-     "esito": "avviso",
-     "dettaglio": "anteprima/05-coretech.png 397.9 KB; anteprima/06-timenet.png 328.1 KB"
+     "esito": "ok",
+     "dettaglio": "nessuna"
     },
     {
      "nome": "Download della cache offline al primo avvio",
@@ -300,49 +300,49 @@
     {
      "nome": "Caricamento nel browser: index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 136 ms (DOM pronto in 113 ms) su telefono simulato, file locali, database escluso",
-     "valore": 136
+     "dettaglio": "caricata in 123 ms (DOM pronto in 96 ms) su telefono simulato, file locali, database escluso",
+     "valore": 123
     },
     {
      "nome": "Caricamento nel browser: classifica.html",
      "esito": "ok",
-     "dettaglio": "caricata in 158 ms (DOM pronto in 140 ms) su telefono simulato, file locali, database escluso",
-     "valore": 158
+     "dettaglio": "caricata in 105 ms (DOM pronto in 83 ms) su telefono simulato, file locali, database escluso",
+     "valore": 105
     },
     {
      "nome": "Caricamento nel browser: admin.html",
      "esito": "ok",
-     "dettaglio": "caricata in 130 ms (DOM pronto in 127 ms) su telefono simulato, file locali, database escluso",
-     "valore": 130
+     "dettaglio": "caricata in 113 ms (DOM pronto in 104 ms) su telefono simulato, file locali, database escluso",
+     "valore": 113
     },
     {
      "nome": "Caricamento nel browser: games/sysadmin/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 139 ms (DOM pronto in 135 ms) su telefono simulato, file locali, database escluso",
-     "valore": 139
+     "dettaglio": "caricata in 111 ms (DOM pronto in 107 ms) su telefono simulato, file locali, database escluso",
+     "valore": 111
     },
     {
      "nome": "Caricamento nel browser: games/coretech/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 139 ms (DOM pronto in 134 ms) su telefono simulato, file locali, database escluso",
-     "valore": 139
+     "dettaglio": "caricata in 105 ms (DOM pronto in 101 ms) su telefono simulato, file locali, database escluso",
+     "valore": 105
     },
     {
      "nome": "Caricamento nel browser: games/timenet/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 117 ms (DOM pronto in 113 ms) su telefono simulato, file locali, database escluso",
-     "valore": 117
+     "dettaglio": "caricata in 109 ms (DOM pronto in 101 ms) su telefono simulato, file locali, database escluso",
+     "valore": 109
     },
     {
      "nome": "Caricamento nel browser: games/inncloud/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 132 ms (DOM pronto in 127 ms) su telefono simulato, file locali, database escluso",
-     "valore": 132
+     "dettaglio": "caricata in 118 ms (DOM pronto in 112 ms) su telefono simulato, file locali, database escluso",
+     "valore": 118
     }
    ],
    "esiti": {
-    "ok": 16,
-    "avviso": 1,
+    "ok": 17,
+    "avviso": 0,
     "errore": 0
    }
   },
@@ -352,20 +352,14 @@
     {
      "nome": "Spazio totale del sito",
      "esito": "ok",
-     "dettaglio": "13.4 MB (limite consigliato GitHub Pages: 1 GB)",
-     "valore": 13720.3
+     "dettaglio": "11.62 MB (limite consigliato GitHub Pages: 1 GB)",
+     "valore": 11897.3
     },
     {
      "nome": "Cartella video",
      "esito": "ok",
      "dettaglio": "8175.2 KB",
      "valore": 8175.2
-    },
-    {
-     "nome": "Cartella anteprima",
-     "esito": "ok",
-     "dettaglio": "1823.0 KB",
-     "valore": 1823.0
     },
     {
      "nome": "Cartella tutorial",
@@ -429,15 +423,14 @@
     }
    ],
    "esiti": {
-    "ok": 13,
+    "ok": 12,
     "avviso": 0,
     "errore": 0
    },
-   "totale_kb": 13720.3,
+   "totale_kb": 11897.3,
    "cartelle_kb": {
     ".claude": 89.8,
     "(file principali)": 256.4,
-    "anteprima": 1823.0,
     "docs": 261.1,
     "fonts": 120.3,
     "games": 875.8,
@@ -548,6 +541,6 @@
    "livello": "Buono"
   }
  },
- "data": "2026-10-09T13:21:40+00:00",
- "commit": "5ade4c6"
+ "data": "2026-10-09T13:21:55+00:00",
+ "commit": "46ef5ba"
 }
