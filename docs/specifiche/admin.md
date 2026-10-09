@@ -20,7 +20,7 @@ Indirizzo: `https://marraliefuture.github.io/efuture_games/admin.html`. Script c
 - **Entra** chiama `efg_admin_login(p_key)`.
 - Se la chiave è giusta:
   - compare la dashboard;
-  - in alto a destra compaiono **Classifica ↗** e **Esci**;
+  - in alto a destra compaiono **Gioca ↗** (apre l'app dei giocatori in una nuova scheda), **Classifica ↗** e **Esci**;
   - la chiave si salva in `sessionStorage` (`efgAdminKey`). Vale solo per quella scheda del browser e si perde chiudendola.
 - Ricaricando la pagina si rientra da soli con la chiave salvata.
 - **Errori**, restituiti dal server come `{errore: …}`:

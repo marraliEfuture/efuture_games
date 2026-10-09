@@ -42,6 +42,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 06/10 | Claude Code `session_0174QLAunrqj9gZvMmRgiFii` | Skill `qr`, `commit`, `links`, `skills`, `preview`; schede admin QR, Link, Skills, Video utili, Tutorial; video TheFork e Forza 4; istruzioni a comparsa (v19). |
 | 07/10 | Claude Code `session_014RiPo4gT2e1UtaJRgiE7ap` | Classifica: generale a destra, righe animate, pulsante Admin; versioni v20 e v21; PR #10 e #11 su main. |
 | 07/10 | Claude Code `session_01E5nckLsAM9uFBEZoNu3pXB` | Spiegato perché le skill di progetto si vedono solo in Claude Code; creata la skill `/efuture-games` con questa memoria (v22). |
+| 07/10 – 09/10 | Claude Code `session_015LsFVpYFCmd5CgErkamknr` | Skill caricabili sull'account (zip); CoreTech senza schermata a ogni livello, joystick a destra in orizzontale, bug che rinascono dal liv. 2; Timenet senza schermata e pallone grande che sfonda; risultato con solo punti/livelli/tempo; posizione in classifica nella home; SysAdmin (omino, piattaforme, bug, antivirus una volta); home: giochi che chiedono l'accesso, Classifica solo dopo l'accesso; titolo classifica arcade; pulsante Gioca nell'admin (v23-v34, PR #19-#22). |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 
