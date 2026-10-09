@@ -17,7 +17,7 @@ Platform a scorrimento orizzontale. Il giocatore è il sysadmin di guardia (la t
 | `games/gameboy.css`, `games/gameboy.js` | Scocca "Game Boy" in verticale (`data-game="sysadmin"`) |
 | `img/logo-testa.png` | Logo Efuture usato come testa del giocatore |
 | `img/efuture-white.png` | Logo bianco, ricolorato in blu e usato come filigrana nel cielo |
-| `fonts/`, `icons/` | Font locali (Press Start 2P, IBM Plex Mono 400/500/600) e icone |
+| `fonts/`, `icons/` | Font locali (Press Start 2P, IBM Plex Mono 400/500/600) e icone. L'icona (anche `img/g-sysadmin.png` nella home) mostra l'omino del gioco con la testa "e" di Efuture su sfondo azzurro dell'ufficio, con un bug rosso a destra e il bordo giallo; è disegnata con la stessa funzione del gioco (`drawHumanLogoFigure`) |
 
 ## Storia
 
