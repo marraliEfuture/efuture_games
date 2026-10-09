@@ -2,7 +2,7 @@
 // Apre admin.html in Chromium, entra con una chiave qualsiasi e salva una schermata
 // per ogni sezione del menu (PC), il menu aperto, il popup Modifica e la sezione Utenti su telefono.
 // Uso: node anteprima_admin.mjs <cartella di uscita> [sezione ...]
-// Sezioni: players log backup reset key links videos tutorials skills qr
+// Sezioni: players quality log backup reset key links videos tutorials skills qr
 // Il repository è EFG_REPO, altrimenti quello che contiene la skill, altrimenti la cartella corrente.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,7 +19,7 @@ const REPO = process.env.EFG_REPO || (() => {
   return process.cwd();
 })();
 const OUT = path.resolve(process.argv[2] || 'anteprima-admin');
-const ALL = ['players', 'log', 'backup', 'reset', 'key', 'links', 'videos', 'tutorials', 'skills', 'qr'];
+const ALL = ['players', 'quality', 'log', 'backup', 'reset', 'key', 'links', 'videos', 'tutorials', 'skills', 'qr'];
 const WANT = process.argv.slice(3).length ? process.argv.slice(3) : ALL;
 fs.mkdirSync(OUT, { recursive: true });
 

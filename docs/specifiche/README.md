@@ -8,6 +8,8 @@ Questa cartella contiene le specifiche funzionali e tecniche di ogni parte. **Pe
 
 I **documenti tecnici** (struttura del codice, funzioni, database, come modificare) sono in [`docs/tecnico/`](../tecnico/): `piattaforma.md`, `app.md` e `gioco-<id>.md`. Si scaricano anche dall'admin (Formazione › Documentazione). Ogni modifica che cambia la struttura del codice aggiorna anche il documento tecnico.
 
+I **risultati dei controlli** (codice, database, prestazioni, spazio, vulnerabilità) sono in [`docs/qualita/`](../qualita/): `ultimo.json` e `storico.json`, scritti da `qualita.py` a ogni commit e mostrati nell'admin (Admin › Qualità).
+
 ## Regola di manutenzione
 
 - **Ogni modifica a un'app aggiorna anche la sua specifica, nello stesso commit.**

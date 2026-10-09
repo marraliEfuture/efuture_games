@@ -171,6 +171,18 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 .vcard .vb .bar{gap:6px} .vcard .btn{padding:6px 10px;font-size:12px}
 /* Skills */
 .skills{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.qcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:12px}
+.qcard{text-align:left;background:#fff;border:1px solid var(--line);border-top:4px solid var(--ok);border-radius:6px;padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:6px;font:inherit;color:var(--text)}
+.qcard:hover{box-shadow:0 6px 18px rgba(20,29,40,.08)} .qcard.on{outline:2px solid var(--sky)}
+.qcard.warn{border-top-color:#e0a000} .qcard.bad{border-top-color:var(--danger)}
+.qcard h4{margin:0;font-family:var(--title);font-size:15px;color:var(--ink)}
+.qcard .big{font-family:var(--title);font-weight:800;font-size:24px;color:var(--ink);line-height:1.1}
+.qcard .sub{font-size:12px;color:var(--muted)}
+.qcard svg{width:100%;height:46px;display:block}
+.qcard .go{font-size:12px;color:var(--navy);font-weight:600;margin-top:auto}
+.qchart{width:100%;max-width:760px;height:auto;display:block;margin-top:8px}
+.es{white-space:nowrap;font-weight:600} .es.ok{color:var(--ok)} .es.avviso{color:#b07800} .es.errore{color:var(--danger)}
+.grav{display:inline-block;font-size:11px;font-weight:700;border-radius:3px;padding:1px 6px;color:#fff} .grav.alta{background:var(--danger)} .grav.media{background:#e07a00} .grav.bassa{background:#c9a400}
 .faq{display:flex;flex-direction:column;gap:14px;margin-top:12px}
 .faq h4{margin:6px 0 0;font-family:var(--title);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .faq details{border:1px solid var(--line);border-radius:4px;background:#fff}
@@ -257,6 +269,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <button class="tab sub" data-tab="faq" type="button">FAQ</button>
         <button class="tab sub" data-tab="docs" type="button">Documentazione</button>
         <div class="grp">Admin</div>
+        <button class="tab sub" data-tab="quality" type="button">Qualità</button>
         <button class="tab sub" data-tab="log" type="button">Log</button>
         <button class="tab sub" data-tab="backup" type="button">Backup</button>
         <button class="tab sub" data-tab="key" type="button">Chiave</button>
@@ -287,7 +300,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
           <button class="btn ghost" id="lReload" type="button">Aggiorna</button>
           <button class="btn navy" id="lCsv" type="button">Scarica CSV</button>
         </div>
-        <div class="msg" id="lMsg" aria-live="polite"></div>
+        <div class="msg" id="logMsg" aria-live="polite"></div>
         <div class="tablewrap" style="margin-top:10px"><table id="lTable"></table></div>
       </section>
 
@@ -352,6 +365,16 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
           <div class="dnav"><button class="arrow" id="dPrev" type="button" aria-label="Slide precedente">←</button><div class="dots" id="dDots"></div><button class="arrow next" id="dNext" type="button" aria-label="Slide successiva">→</button></div>
         </div>
         <div class="msg" id="tuMsg" aria-live="polite" style="margin-top:8px"></div>
+      </section>
+
+      <section data-pane="quality" hidden>
+        <div class="bar"><p class="dim grow" style="margin:0" id="qInfo">Carico i controlli…</p><button class="btn ghost" id="qReload" type="button">Aggiorna</button></div>
+        <div class="qcards" id="qCards"></div>
+        <div id="qDetail" hidden>
+          <h3 id="qdTitle" style="margin:6px 0 0;font-family:var(--title)"></h3>
+          <div id="qdChart"></div>
+          <div class="tablewrap" style="margin-top:10px"><table id="qdTable"></table></div>
+        </div>
       </section>
 
       <section data-pane="faq" hidden>
@@ -520,6 +543,7 @@ document.querySelectorAll('.tab[data-tab]').forEach(t => t.onclick = () => {
   if (t.dataset.tab === 'videos') renderVideos();
   if (t.dataset.tab === 'skills') renderSkills();
   if (t.dataset.tab === 'faq') renderFaq();
+  if (t.dataset.tab === 'quality') loadQuality();
   if (t.dataset.tab === 'docs') renderDocs();
   if (t.dataset.tab === 'tutorials') renderTutorials();
 });
@@ -655,7 +679,7 @@ const describe = l => {
 };
 async function loadLogs(){
   try { logs = await call('efg_admin_logs', { p_limit: parseInt($('lLimit').value, 10), p_kind: $('lKind').value || null }) || []; }
-  catch(err){ return onErr(err, $('lMsg')); }
+  catch(err){ return onErr(err, $('logMsg')); }
   fillTable($('lTable'), ['Quando', 'Evento', 'Email', 'Gioco', 'Dettagli'],
     logs.map(l => { const t = document.createElement('span'); t.className = 'tag' + (/errata/.test(l.kind) ? ' err' : l.kind.startsWith('admin') ? ' admin' : ''); t.textContent = l.kind;
       return [fmtDate(l.at), t, l.email || '', l.game ? (GAMES[l.game] || l.game) : '', describe(l)]; }),
@@ -805,6 +829,76 @@ $('qPrint').onclick = () => window.print();
 
 /* ---------- skills ---------- */
 // stesso elenco di .claude/skills/ (la skill /efuture-games-skills lo legge dai file)
+/* ---------- Qualità: test su codice, database, prestazioni, spazio e vulnerabilità ----------
+   I dati li scrive lo script .claude/skills/efuture-games-commit/scripts/qualita.py
+   in docs/qualita/ultimo.json (dettagli) e docs/qualita/storico.json (un riepilogo per data). */
+let QUAL = null, QHIST = [], qSel = null;
+const ES = { ok:'✅ ok', avviso:'⚠️ avviso', errore:'❌ errore' };
+const fmtDay = d => d.slice(8,10) + '/' + d.slice(5,7);
+async function loadQuality(){
+  $('qInfo').textContent = 'Carico i controlli…';
+  try {
+    const [a, b] = await Promise.all(['docs/qualita/ultimo.json', 'docs/qualita/storico.json'].map(f => fetch(f + '?t=' + Date.now(), { cache:'no-store' }).then(r => { if (!r.ok) throw new Error('manca ' + f); return r.json(); })));
+    QUAL = a; QHIST = b;
+  } catch(err){ $('qInfo').textContent = 'Controlli non disponibili (' + err.message + '): si creano con lo script qualita.py, che la skill efuture-games-commit esegue a ogni salvataggio.'; return; }
+  $('qInfo').textContent = 'Ultimo controllo: ' + fmtDate(QUAL.data) + ' · versione ' + QUAL.versione + ' · commit ' + QUAL.commit + '. Tocca un riquadro per vedere i dettagli.';
+  renderQCards(); if (qSel) showQDetail(qSel);
+}
+$('qReload').onclick = loadQuality;
+// mini grafico a linea (spazio) o a barre impilate (vulnerabilità)
+function spark(vals, opt){
+  const W = opt.w || 200, H = opt.h || 46, n = vals.length, pad = opt.pad || 4;
+  if (!n) return '';
+  if (opt.bars){
+    const max = Math.max(1, ...vals.map(v => v.alta + v.media + v.bassa)), bw = (W - pad*2) / n;
+    let g = '';
+    const lab = opt.axis ? vals.map((v, i) => '<text x="' + (pad + i*bw + bw/2).toFixed(1) + '" y="' + (H - 2) + '" font-size="12" text-anchor="middle" fill="#6b7a8a">' + opt.labels[i] + '</text><text x="' + (pad + i*bw + bw/2).toFixed(1) + '" y="' + (H - pad - (H - pad*2) * (v.alta + v.media + v.bassa) / max - 4).toFixed(1) + '" font-size="12" font-weight="700" text-anchor="middle" fill="#1d2b3a">' + (v.alta + v.media + v.bassa) + '</text>').join('') : '';
+    vals.forEach((v, i) => { let y = H - pad; for (const [k, c] of [['alta','#d93636'], ['media','#e07a00'], ['bassa','#c9a400']]){ const h = (H - pad*2) * v[k] / max; if (h){ y -= h; g += '<rect x="' + (pad + i*bw + bw*0.15).toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + (bw*0.7).toFixed(1) + '" height="' + h.toFixed(1) + '" fill="' + c + '"><title>' + (opt.labels ? opt.labels[i] + ' · ' : '') + k + ': ' + v[k] + '</title></rect>'; } } });
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + (opt.aria || '') + '">' + g + lab + '</svg>';
+  }
+  const max = Math.max(...vals), min = Math.min(0, ...vals), sx = n > 1 ? (W - pad*2) / (n - 1) : 0, sy = v => H - pad - (H - pad*2) * (v - min) / ((max - min) || 1);
+  const pts = vals.map((v, i) => (pad + i*sx).toFixed(1) + ',' + sy(v).toFixed(1)).join(' ');
+  const dots = vals.map((v, i) => '<circle cx="' + (pad + i*sx).toFixed(1) + '" cy="' + sy(v).toFixed(1) + '" r="' + (opt.r || 2.5) + '" fill="#0b6db3"><title>' + (opt.labels ? opt.labels[i] + ': ' : '') + v + (opt.unit || '') + '</title></circle>').join('');
+  const lab = opt.axis ? vals.map((v, i) => '<text x="' + (pad + i*sx).toFixed(1) + '" y="' + (H - 2) + '" font-size="12" text-anchor="middle" fill="#6b7a8a">' + opt.labels[i] + '</text><text x="' + (pad + i*sx).toFixed(1) + '" y="' + (sy(v) - 8).toFixed(1) + '" font-size="12" font-weight="700" text-anchor="middle" fill="#1d2b3a">' + v + '</text>').join('') : '';
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + (opt.aria || '') + '"><polyline points="' + pts + '" fill="none" stroke="#0b6db3" stroke-width="2"/>' + dots + lab + '</svg>';
+}
+function renderQCards(){
+  const box = $('qCards'); box.innerHTML = '';
+  const days = QHIST.map(h => fmtDay(h.data));
+  for (const [id, a] of Object.entries(QUAL.aree)){
+    const e = a.esiti, b = document.createElement('button'); b.type = 'button'; b.className = 'qcard' + (e.errore ? ' bad' : e.avviso ? ' warn' : '') + (qSel === id ? ' on' : '');
+    let big, sub, extra = '';
+    if (id === 'spazio'){ big = (a.totale_kb / 1024).toFixed(1) + ' MB'; sub = 'occupati dal sito · trend per data'; extra = spark(QHIST.map(h => Math.round(h.spazio_kb / 102.4) / 10), { labels: days, unit:' MB', aria:'Trend dello spazio' }); }
+    else if (id === 'vulnerabilita'){ const g = a.gravita; big = (g.alta + g.media + g.bassa) + ' segnalate'; sub = 'alta ' + g.alta + ' · media ' + g.media + ' · bassa ' + g.bassa + ' · trend per data'; extra = spark(QHIST.map(h => h.vulnerabilita), { bars:true, labels: days, aria:'Trend delle vulnerabilità' }); }
+    else { const n = a.test.length; big = (n - e.avviso - e.errore) + '/' + n + ' ok'; sub = (e.errore ? e.errore + ' errori · ' : '') + (e.avviso ? e.avviso + ' avvisi · ' : '') + n + ' test eseguiti'; }
+    b.innerHTML = '<h4></h4><div class="big"></div><div class="sub"></div>' + extra + '<span class="go">Vedi elenco ›</span>';
+    b.querySelector('h4').textContent = a.titolo; b.querySelector('.big').textContent = big; b.querySelector('.sub').textContent = sub;
+    b.onclick = () => showQDetail(id);
+    box.appendChild(b);
+  }
+}
+function showQDetail(id){
+  qSel = id; renderQCards();
+  document.querySelectorAll('[data-extra]').forEach(w => w.remove());
+  const a = QUAL.aree[id]; $('qDetail').hidden = false; $('qdTitle').textContent = a.titolo + ' – elenco dei controlli';
+  const days = QHIST.map(h => fmtDay(h.data)); let chart = '';
+  if (id === 'spazio') chart = '<p class="dim" style="margin:6px 0 0">Spazio totale per data (MB)</p>' + spark(QHIST.map(h => Math.round(h.spazio_kb / 102.4) / 10), { w:760, h:190, pad:28, r:4, axis:true, labels: days, unit:' MB', aria:'Trend dello spazio' }).replace('<svg ', '<svg class="qchart" ');
+  if (id === 'vulnerabilita') chart = '<p class="dim" style="margin:6px 0 0">Vulnerabilità per data: <span class="grav alta">alta</span> <span class="grav media">media</span> <span class="grav bassa">bassa</span></p>' + spark(QHIST.map(h => h.vulnerabilita), { w:760, h:190, pad:28, bars:true, axis:true, labels: days, aria:'Trend delle vulnerabilità' }).replace('<svg ', '<svg class="qchart" ');
+  $('qdChart').innerHTML = chart;
+  const es = t => { const s = document.createElement('span'); s.className = 'es ' + t.esito; s.textContent = ES[t.esito] || t.esito; return s; };
+  const gv = t => { if (!t.gravita) return ''; const s = document.createElement('span'); s.className = 'grav ' + t.gravita; s.textContent = t.gravita; return s; };
+  const order = { errore:0, avviso:1, ok:2 }, tests = a.test.slice().sort((x, y) => order[x.esito] - order[y.esito]);
+  if (id === 'vulnerabilita') fillTable($('qdTable'), ['Esito', 'Gravità', 'Controllo', 'Dettaglio'], tests.map(t => [es(t), gv(t), t.nome, t.dettaglio]), [null, null, null, 'small']);
+  else if (id === 'spazio') fillTable($('qdTable'), ['Data', 'Versione', 'Spazio totale', 'Variazione'], QHIST.slice().reverse().map((h, i, arr) => [fmtDate(h.data + 'T12:00:00Z').split(',')[0], h.versione, (h.spazio_kb / 1024).toFixed(2) + ' MB', arr[i+1] ? ((h.spazio_kb - arr[i+1].spazio_kb) >= 0 ? '+' : '') + Math.round(h.spazio_kb - arr[i+1].spazio_kb) + ' KB' : '—']), [null, null, 'num', 'num']);
+  else fillTable($('qdTable'), ['Esito', 'Controllo', 'Dettaglio'], tests.map(t => [es(t), t.nome, t.dettaglio]), [null, null, 'small']);
+  if (id === 'spazio'){ // anche le cartelle, sotto lo storico
+    const t2 = document.createElement('table'); const wrap = document.createElement('div'); wrap.className = 'tablewrap'; wrap.style.marginTop = '10px'; wrap.appendChild(t2);
+    fillTable(t2, ['Cartella', 'Spazio'], tests.map(t => [t.nome, t.dettaglio]), [null, 'num']);
+    wrap.dataset.extra = '1'; $('qdTable').parentNode.after(wrap);
+  }
+  $('qDetail').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
 /* ---------- FAQ sull'uso dell'app ---------- */
 const FAQ = [
   ['Iniziare', [

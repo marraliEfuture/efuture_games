@@ -53,7 +53,7 @@ Si apre con il pulsante **☰ Menu** a sinistra nell'intestazione (visibile dopo
 - **Utenti**;
 - **Collegamenti:** QR, Link;
 - **Formazione:** Video utili, Tutorial, Skills, FAQ, Documentazione;
-- **Admin:** Log, Backup, Chiave, Reset (Reset in rosso);
+- **Admin:** Qualità, Log, Backup, Chiave, Reset (Reset in rosso);
 - **Logout:** dimentica la chiave e torna al login.
 
 All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
@@ -87,6 +87,23 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
   - **Elimina utente:** chiama `efg_admin_delete_player(p_key, p_email)`, chiude il popup, ricarica la tabella e aggiunge "· eliminato *nome*". L'utente potrà registrarsi di nuovo con la stessa email, ripartendo da zero.
 - **Ogni modifica chiede conferma** in una seconda finestra con la domanda ("Cambiare il tipo di…?", "Disabilitare…?", "Riabilitare…?", "Eliminare…?"), le conseguenze spiegate e i pulsanti **Annulla** e **Sì, …** (rosso per disabilitare ed eliminare). Con Annulla non cambia niente.
 - Tipo e disabilitazione servono `supabase-tipi-utenti.sql`: senza, il popup dice di eseguirlo.
+
+### Qualità
+
+Mostra i risultati dei controlli automatici sul progetto. I dati vengono da `docs/qualita/ultimo.json` (ultimo controllo) e `docs/qualita/storico.json` (un punto per data), scritti dallo script `.claude/skills/efuture-games-commit/scripts/qualita.py`, che la skill di commit esegue prima di ogni salvataggio. La pagina non chiama il database.
+
+- In alto: data, versione e commit dell'ultimo controllo, pulsante **Aggiorna**.
+- **5 box**, ognuno con numeri e mini grafico per data; il bordo è giallo se ci sono avvisi, rosso se ci sono errori o vulnerabilità alte:
+  | Box | Cosa controlla |
+  |---|---|
+  | Codice | Sintassi dei .js, script nelle pagine, id duplicati, collegamenti locali, file della cache, versione coerente |
+  | Database | File SQL: RLS, `search_path`, controllo della chiave nelle funzioni admin, permessi, chiavi cifrate, classifica senza disabilitati |
+  | Prestazioni | Peso delle pagine e dei file, immagini, cache offline, tempo di caricamento nel browser |
+  | Spazio occupato | Totale del sito e per cartella, con trend per data |
+  | Vulnerabilità | Segreti o codici in chiaro, link esterni, HTTPS, CDN, `innerHTML`, sblocco, blocco dei tentativi; gravità alta/media/bassa, con trend per data |
+- **Cliccando un box** si apre sotto l'elenco dei dettagli: grafico grande per data (date e valori), tabella dei controlli (prima errori e avvisi) con esito, dettaglio e, per le vulnerabilità, la gravità; poi lo storico per data. Per lo spazio c'è anche la tabella delle cartelle.
+- Se i file non ci sono la sezione lo dice e spiega come crearli.
+- Lo storico si ricostruisce dai commit passati con `qualita.py --storico`.
 
 ### Log
 

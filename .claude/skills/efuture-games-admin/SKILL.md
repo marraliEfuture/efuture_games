@@ -1,6 +1,6 @@
 ---
 name: efuture-games-admin
-description: Mette Claude in "modalità admin" per Efuture Games. Da quel momento ogni richiesta dell'utente riguarda il pannello di amministrazione (admin.html) — utenti, log, backup, chiave, reset, QR, link, video, tutorial, skill, menu laterale — finché non dice altro. Usala quando l'utente scrive /efuture-games-admin o dice che vuole lavorare, modificare o fare domande sulla pagina admin di Efuture Games.
+description: Mette Claude in "modalità admin" per Efuture Games. Da quel momento ogni richiesta dell'utente riguarda il pannello di amministrazione (admin.html) — utenti, qualità, log, backup, chiave, reset, QR, link, video, tutorial, skill, menu laterale — finché non dice altro. Usala quando l'utente scrive /efuture-games-admin o dice che vuole lavorare, modificare o fare domande sulla pagina admin di Efuture Games.
 ---
 
 # Efuture Games – modalità admin
@@ -37,6 +37,7 @@ Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
 - **Utenti:** tipo come simbolo (🎮 giocatore, 🛡️🎮 admin e giocatore, 🛡️ solo admin), etichetta "disabilitato". Il pulsante **Modifica** apre il popup `#pEdit` (Tipo, Disabilita/Riabilita, Elimina). Ogni modifica passa da `ask(titolo, conseguenze, pulsante, pericolosa)`, che apre la conferma `#pAsk`: usala per ogni nuova azione che cambia dati.
 - **Chiamate al database:** `call('efg_admin_…', {…})`. La funzione aggiunge da sola `p_key`; se la risposta ha `errore` lancia un'eccezione.
 - **Tabelle:** `fillTable(tabella, intestazioni, righe, classi)`. Una cella può essere testo o un elemento (pulsante, menu a tendina).
+- **Qualità:** legge `docs/qualita/ultimo.json` e `storico.json`, scritti da `efuture-games-commit/scripts/qualita.py`. Per un controllo nuovo modifica lo script, non la pagina.
 - **CSV:** `toCsv` e `download`. Separatore `;` con BOM, così si aprono bene in Excel.
 
 ## 3. Regole per le modifiche

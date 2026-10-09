@@ -35,6 +35,12 @@ Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
 
    Se un controllo fallisce, correggi o riferisci all'utente. Non fare commit con controlli falliti.
 
+   Poi aggiorna i controlli di qualità mostrati nell'admin (Admin › Qualità):
+   ```
+   python3 <skill>/scripts/qualita.py
+   ```
+   Scrive `docs/qualita/ultimo.json` e `storico.json`: includili nel commit. Se trova errori o vulnerabilità alte, dillo all'utente prima del commit.
+
 3. **Se è cambiato `supabase.sql`**, ricorda all'utente che va rieseguito nel SQL Editor di Supabase: il push non aggiorna il database.
 
 4. **Commit.** Fai `git add` dei file pertinenti. Il messaggio va in italiano, nello stile dei commit esistenti (`git log --oneline -10`): una riga "Area: cosa cambia per chi usa l'app", poi un corpo breve se serve. Se le modifiche riguardano cose diverse, fai più commit separati.

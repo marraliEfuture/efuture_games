@@ -1,0 +1,510 @@
+{
+ "versione": "v37",
+ "aree": {
+  "codice": {
+   "titolo": "Codice",
+   "test": [
+    {
+     "nome": "Sintassi JavaScript: backend.js",
+     "esito": "ok",
+     "dettaglio": "nessun errore"
+    },
+    {
+     "nome": "Sintassi JavaScript: config.js",
+     "esito": "ok",
+     "dettaglio": "nessun errore"
+    },
+    {
+     "nome": "Sintassi JavaScript: games/coretech/game.js",
+     "esito": "ok",
+     "dettaglio": "nessun errore"
+    },
+    {
+     "nome": "Sintassi JavaScript: games/gameboy.js",
+     "esito": "ok",
+     "dettaglio": "nessun errore"
+    },
+    {
+     "nome": "Sintassi JavaScript: games/inncloud/game.js",
+     "esito": "ok",
+     "dettaglio": "nessun errore"
+    },
+    {
+     "nome": "Sintassi JavaScript: games/timenet/game.js",
+     "esito": "ok",
+     "dettaglio": "nessun errore"
+    },
+    {
+     "nome": "Sintassi JavaScript: hub.js",
+     "esito": "ok",
+     "dettaglio": "nessun errore"
+    },
+    {
+     "nome": "Sintassi JavaScript: sw.js",
+     "esito": "ok",
+     "dettaglio": "nessun errore"
+    },
+    {
+     "nome": "Script nella pagina: admin.html",
+     "esito": "ok",
+     "dettaglio": "1 script senza errori"
+    },
+    {
+     "nome": "Id duplicati: admin.html",
+     "esito": "ok",
+     "dettaglio": "nessuno"
+    },
+    {
+     "nome": "Collegamenti locali esistenti: admin.html",
+     "esito": "ok",
+     "dettaglio": "tutti presenti"
+    },
+    {
+     "nome": "Script nella pagina: classifica.html",
+     "esito": "ok",
+     "dettaglio": "1 script senza errori"
+    },
+    {
+     "nome": "Id duplicati: classifica.html",
+     "esito": "ok",
+     "dettaglio": "nessuno"
+    },
+    {
+     "nome": "Collegamenti locali esistenti: classifica.html",
+     "esito": "ok",
+     "dettaglio": "tutti presenti"
+    },
+    {
+     "nome": "Script nella pagina: games/coretech/index.html",
+     "esito": "ok",
+     "dettaglio": "2 script senza errori"
+    },
+    {
+     "nome": "Id duplicati: games/coretech/index.html",
+     "esito": "ok",
+     "dettaglio": "nessuno"
+    },
+    {
+     "nome": "Collegamenti locali esistenti: games/coretech/index.html",
+     "esito": "ok",
+     "dettaglio": "tutti presenti"
+    },
+    {
+     "nome": "Script nella pagina: games/inncloud/index.html",
+     "esito": "ok",
+     "dettaglio": "2 script senza errori"
+    },
+    {
+     "nome": "Id duplicati: games/inncloud/index.html",
+     "esito": "ok",
+     "dettaglio": "nessuno"
+    },
+    {
+     "nome": "Collegamenti locali esistenti: games/inncloud/index.html",
+     "esito": "ok",
+     "dettaglio": "tutti presenti"
+    },
+    {
+     "nome": "Script nella pagina: games/sysadmin/index.html",
+     "esito": "ok",
+     "dettaglio": "2 script senza errori"
+    },
+    {
+     "nome": "Id duplicati: games/sysadmin/index.html",
+     "esito": "ok",
+     "dettaglio": "nessuno"
+    },
+    {
+     "nome": "Collegamenti locali esistenti: games/sysadmin/index.html",
+     "esito": "ok",
+     "dettaglio": "tutti presenti"
+    },
+    {
+     "nome": "Script nella pagina: games/timenet/index.html",
+     "esito": "ok",
+     "dettaglio": "2 script senza errori"
+    },
+    {
+     "nome": "Id duplicati: games/timenet/index.html",
+     "esito": "ok",
+     "dettaglio": "nessuno"
+    },
+    {
+     "nome": "Collegamenti locali esistenti: games/timenet/index.html",
+     "esito": "ok",
+     "dettaglio": "tutti presenti"
+    },
+    {
+     "nome": "Script nella pagina: index.html",
+     "esito": "ok",
+     "dettaglio": "1 script senza errori"
+    },
+    {
+     "nome": "Id duplicati: index.html",
+     "esito": "ok",
+     "dettaglio": "nessuno"
+    },
+    {
+     "nome": "Collegamenti locali esistenti: index.html",
+     "esito": "ok",
+     "dettaglio": "tutti presenti"
+    },
+    {
+     "nome": "Script nella pagina: qr/stampa.html",
+     "esito": "ok",
+     "dettaglio": "0 script senza errori"
+    },
+    {
+     "nome": "Id duplicati: qr/stampa.html",
+     "esito": "ok",
+     "dettaglio": "nessuno"
+    },
+    {
+     "nome": "Collegamenti locali esistenti: qr/stampa.html",
+     "esito": "ok",
+     "dettaglio": "tutti presenti"
+    },
+    {
+     "nome": "File della cache offline (sw.js)",
+     "esito": "ok",
+     "dettaglio": "84 file, tutti presenti"
+    },
+    {
+     "nome": "Versione uguale in tutti i file",
+     "esito": "ok",
+     "dettaglio": "v37 ovunque"
+    }
+   ],
+   "esiti": {
+    "ok": 34,
+    "avviso": 0,
+    "errore": 0
+   }
+  },
+  "db": {
+   "titolo": "Database",
+   "test": [
+    {
+     "nome": "File SQL letti",
+     "esito": "ok",
+     "dettaglio": "supabase.sql, supabase-classifica-gruppi.sql, supabase-countdown.sql, supabase-privacy-utenti.sql, supabase-tipi-utenti.sql (nell'ordine di esecuzione)"
+    },
+    {
+     "nome": "RLS attiva su tutte le tabelle",
+     "esito": "ok",
+     "dettaglio": "6 tabelle protette"
+    },
+    {
+     "nome": "search_path fissato nelle funzioni security definer",
+     "esito": "ok",
+     "dettaglio": "25 funzioni controllate"
+    },
+    {
+     "nome": "Funzioni admin che controllano la chiave",
+     "esito": "ok",
+     "dettaglio": "tutte le funzioni efg_admin_* chiamano efg_admin_auth"
+    },
+    {
+     "nome": "Permessi revocati a 'public' per ogni funzione",
+     "esito": "ok",
+     "dettaglio": "tutte le funzioni hanno un revoke"
+    },
+    {
+     "nome": "Nessun accesso diretto alle tabelle da 'anon'",
+     "esito": "ok",
+     "dettaglio": "il sito usa solo funzioni efg_*"
+    },
+    {
+     "nome": "Chiavi admin solo cifrate (bcrypt)",
+     "esito": "ok",
+     "dettaglio": "crypt(…, gen_salt('bf')) per chiave principale e personali"
+    },
+    {
+     "nome": "Classifica filtrata esclude i disabilitati",
+     "esito": "ok",
+     "dettaglio": "definizione finale in supabase-tipi-utenti.sql"
+    },
+    {
+     "nome": "Funzioni del database",
+     "esito": "ok",
+     "dettaglio": "25 funzioni efg_*: efg_admin_auth, efg_admin_backup, efg_admin_backup_get, efg_admin_backups, efg_admin_delete_player, efg_admin_gate, efg_admin_init, efg_admin_login, efg_admin_logs, efg_admin_me, efg_admin_players, efg_admin_reset, efg_admin_restore, efg_admin_set_disabilitato, efg_admin_set_key, efg_admin_set_tipo, efg_admin_set_user_key, efg_board, efg_board_group, efg_gate_open, efg_gate_state, efg_login, efg_register, efg_snapshot, efg_submit"
+    }
+   ],
+   "esiti": {
+    "ok": 9,
+    "avviso": 0,
+    "errore": 0
+   }
+  },
+  "prestazioni": {
+   "titolo": "Prestazioni",
+   "test": [
+    {
+     "nome": "Peso della pagina: index.html",
+     "esito": "ok",
+     "dettaglio": "495.7 KB con 13 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 495.7
+    },
+    {
+     "nome": "Peso della pagina: classifica.html",
+     "esito": "ok",
+     "dettaglio": "279.6 KB con 13 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 279.6
+    },
+    {
+     "nome": "Peso della pagina: admin.html",
+     "esito": "ok",
+     "dettaglio": "335.5 KB con 10 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 335.5
+    },
+    {
+     "nome": "Peso della pagina: games/coretech/index.html",
+     "esito": "ok",
+     "dettaglio": "160.1 KB con 9 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 160.1
+    },
+    {
+     "nome": "Peso della pagina: games/inncloud/index.html",
+     "esito": "ok",
+     "dettaglio": "132.8 KB con 9 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 132.8
+    },
+    {
+     "nome": "Peso della pagina: games/sysadmin/index.html",
+     "esito": "ok",
+     "dettaglio": "178.9 KB con 8 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 178.9
+    },
+    {
+     "nome": "Peso della pagina: games/timenet/index.html",
+     "esito": "ok",
+     "dettaglio": "176.8 KB con 9 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 176.8
+    },
+    {
+     "nome": "File grandi (oltre 500 KB, video esclusi)",
+     "esito": "ok",
+     "dettaglio": "nessuno"
+    },
+    {
+     "nome": "Immagini pesanti (oltre 300 KB)",
+     "esito": "ok",
+     "dettaglio": "nessuna"
+    },
+    {
+     "nome": "Download della cache offline al primo avvio",
+     "esito": "ok",
+     "dettaglio": "1452.5 KB scaricati da sw.js per giocare offline",
+     "valore": 1452.5
+    },
+    {
+     "nome": "Caricamento nel browser: index.html",
+     "esito": "ok",
+     "dettaglio": "caricata in 90 ms (DOM pronto in 81 ms) su telefono simulato, file locali, database escluso",
+     "valore": 90
+    },
+    {
+     "nome": "Caricamento nel browser: classifica.html",
+     "esito": "ok",
+     "dettaglio": "caricata in 112 ms (DOM pronto in 96 ms) su telefono simulato, file locali, database escluso",
+     "valore": 112
+    },
+    {
+     "nome": "Caricamento nel browser: admin.html",
+     "esito": "ok",
+     "dettaglio": "caricata in 81 ms (DOM pronto in 78 ms) su telefono simulato, file locali, database escluso",
+     "valore": 81
+    },
+    {
+     "nome": "Caricamento nel browser: games/sysadmin/index.html",
+     "esito": "ok",
+     "dettaglio": "caricata in 95 ms (DOM pronto in 86 ms) su telefono simulato, file locali, database escluso",
+     "valore": 95
+    },
+    {
+     "nome": "Caricamento nel browser: games/coretech/index.html",
+     "esito": "ok",
+     "dettaglio": "caricata in 73 ms (DOM pronto in 67 ms) su telefono simulato, file locali, database escluso",
+     "valore": 73
+    },
+    {
+     "nome": "Caricamento nel browser: games/timenet/index.html",
+     "esito": "ok",
+     "dettaglio": "caricata in 91 ms (DOM pronto in 77 ms) su telefono simulato, file locali, database escluso",
+     "valore": 91
+    },
+    {
+     "nome": "Caricamento nel browser: games/inncloud/index.html",
+     "esito": "ok",
+     "dettaglio": "caricata in 70 ms (DOM pronto in 67 ms) su telefono simulato, file locali, database escluso",
+     "valore": 70
+    }
+   ],
+   "esiti": {
+    "ok": 17,
+    "avviso": 0,
+    "errore": 0
+   }
+  },
+  "spazio": {
+   "titolo": "Spazio occupato",
+   "test": [
+    {
+     "nome": "Spazio totale del sito",
+     "esito": "ok",
+     "dettaglio": "11.44 MB (limite consigliato GitHub Pages: 1 GB)",
+     "valore": 11717.1
+    },
+    {
+     "nome": "Cartella video",
+     "esito": "ok",
+     "dettaglio": "8175.2 KB",
+     "valore": 8175.2
+    },
+    {
+     "nome": "Cartella tutorial",
+     "esito": "ok",
+     "dettaglio": "1334.2 KB",
+     "valore": 1334.2
+    },
+    {
+     "nome": "Cartella games",
+     "esito": "ok",
+     "dettaglio": "747.1 KB",
+     "valore": 747.1
+    },
+    {
+     "nome": "Cartella vendor",
+     "esito": "ok",
+     "dettaglio": "426.8 KB",
+     "valore": 426.8
+    },
+    {
+     "nome": "Cartella docs",
+     "esito": "ok",
+     "dettaglio": "254.1 KB",
+     "valore": 254.1
+    },
+    {
+     "nome": "Cartella (file principali)",
+     "esito": "ok",
+     "dettaglio": "238.7 KB",
+     "valore": 238.7
+    },
+    {
+     "nome": "Cartella qr",
+     "esito": "ok",
+     "dettaglio": "160.0 KB",
+     "valore": 160.0
+    },
+    {
+     "nome": "Cartella fonts",
+     "esito": "ok",
+     "dettaglio": "120.3 KB",
+     "valore": 120.3
+    },
+    {
+     "nome": "Cartella icons",
+     "esito": "ok",
+     "dettaglio": "105.6 KB",
+     "valore": 105.6
+    },
+    {
+     "nome": "Cartella .claude",
+     "esito": "ok",
+     "dettaglio": "86.3 KB",
+     "valore": 86.3
+    },
+    {
+     "nome": "Cartella img",
+     "esito": "ok",
+     "dettaglio": "68.8 KB",
+     "valore": 68.8
+    }
+   ],
+   "esiti": {
+    "ok": 12,
+    "avviso": 0,
+    "errore": 0
+   },
+   "totale_kb": 11717.1,
+   "cartelle_kb": {
+    ".claude": 86.3,
+    "(file principali)": 238.7,
+    "docs": 254.1,
+    "fonts": 120.3,
+    "games": 747.1,
+    "icons": 105.6,
+    "img": 68.8,
+    "qr": 160.0,
+    "tutorial": 1334.2,
+    "vendor": 426.8,
+    "video": 8175.2
+   }
+  },
+  "vulnerabilita": {
+   "titolo": "Vulnerabilità",
+   "test": [
+    {
+     "nome": "Chiavi segrete nel codice (service_role, chiavi private, token)",
+     "esito": "ok",
+     "dettaglio": "nessuna"
+    },
+    {
+     "nome": "Codici di sblocco leggibili dal sito pubblico",
+     "esito": "avviso",
+     "dettaglio": "compaiono in: LEGGIMI.txt. Chi apre questi file dal sito li legge senza passare dallo stand.",
+     "gravita": "media"
+    },
+    {
+     "nome": "Link esterni senza rel=noopener",
+     "esito": "ok",
+     "dettaglio": "tutti protetti"
+    },
+    {
+     "nome": "Risorse caricate senza HTTPS",
+     "esito": "ok",
+     "dettaglio": "nessuna"
+    },
+    {
+     "nome": "Script da siti esterni (CDN)",
+     "esito": "ok",
+     "dettaglio": "tutte le librerie sono locali in vendor/"
+    },
+    {
+     "nome": "innerHTML con testo composto (rischio XSS da verificare)",
+     "esito": "ok",
+     "dettaglio": "nessuno"
+    },
+    {
+     "nome": "Funzioni del database senza search_path",
+     "esito": "ok",
+     "dettaglio": "nessuna"
+    },
+    {
+     "nome": "Sblocco dei giochi verificato sul telefono",
+     "esito": "avviso",
+     "dettaglio": "i codici sono confrontati con un hash nell'app: con 10.000 combinazioni per gioco si possono ricavare. Va bene per l'evento, non per premi di valore.",
+     "gravita": "bassa"
+    },
+    {
+     "nome": "Blocco dei tentativi sulla chiave admin",
+     "esito": "ok",
+     "dettaglio": "8 tentativi sbagliati in 10 minuti bloccano l'accesso (conteggio globale)"
+    }
+   ],
+   "esiti": {
+    "ok": 7,
+    "avviso": 2,
+    "errore": 0
+   },
+   "gravita": {
+    "alta": 0,
+    "media": 1,
+    "bassa": 1
+   }
+  }
+ },
+ "data": "2026-10-09T08:23:28+00:00",
+ "commit": "85a4a8b"
+}
