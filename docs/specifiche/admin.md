@@ -44,16 +44,16 @@ Valori presi da `efg_admin_login`:
 
 Si aggiornano dopo Elimina, Backup, Ripristino e Reset.
 
-## Menu laterale
+## Menu a comparsa
 
-A sinistra del contenuto (sopra, sul telefono):
+Si apre con il pulsante **☰ Menu** a sinistra nell'intestazione (visibile dopo l'accesso) e scorre da sinistra sopra la pagina. Si chiude con ✕, toccando lo sfondo, con Esc o scegliendo una voce. Il nome della sezione aperta compare come titolo sopra il contenuto. Voci:
 - **Utenti**;
 - **Collegamenti:** QR, Link;
 - **Formazione:** Video utili, Tutorial, Skills;
 - **Admin:** Log, Backup, Chiave, Reset (Reset in rosso);
 - **Logout:** dimentica la chiave e torna al login.
 
-All'ingresso è aperta Utenti. In stampa il menu non compare.
+All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
 
 ### Utenti
 
@@ -63,22 +63,22 @@ All'ingresso è aperta Utenti. In stampa il menu non compare.
   | Colonna | Contenuto |
   |---|---|
   | `#` | Posizione |
-  | Nome | |
+  | Tipo | Simbolo: 🎮 Giocatore, 🛡️🎮 Admin e giocatore, 🛡️ Solo admin (il nome del tipo compare passandoci sopra). Gli utenti senza tipo valgono come Giocatore |
+  | Nome | Con l'etichetta rossa **disabilitato** se l'utente è disabilitato (tutta la riga in grigio) |
   | Email | |
-  | Tipo | Menu a tendina: **Giocatore** (predefinito), **Admin e giocatore**, **Solo admin**. Cambiandolo chiama `efg_admin_set_tipo(p_key, p_email, p_tipo)` (valori `giocatore`, `admin_giocatore`, `admin`) e scrive "admin: tipo utente" nel log. Serve `supabase-tipi-utenti.sql`: senza, il menu torna indietro e chiede di eseguirlo. |
   | Registrato | Data e ora |
   | Giochi | Giochi con almeno 1 livello, su 4 |
   | Livelli | Livelli totali, su 12 |
   | Punti | Punti totali |
   | Dettaglio per gioco | Per esempio `SysAdmin 2/3 · 150 — Timenet 1/3 · 40` |
-  | (ultima) | Pulsante **Elimina** |
+  | (ultima) | Pulsante **Modifica** |
 
-- **Elimina:**
-  1. chiede conferma ("…vengono cancellati dal database e spariscono dalla classifica. Il log resta. Non si può annullare.");
-  2. chiama `efg_admin_delete_player(p_key, p_email)`;
-  3. ricarica la tabella e aggiunge "· eliminato *nome*".
-
-  L'utente potrà registrarsi di nuovo con la stessa email.
+- **Modifica** apre un popup con nome ed email e tre gruppi di comandi:
+  - **Tipo:** Giocatore, Admin e giocatore, Solo admin (quello attuale è evidenziato). Chiama `efg_admin_set_tipo(p_key, p_email, p_tipo)` (valori `giocatore`, `admin_giocatore`, `admin`); nel log "admin: tipo utente". Per ora il tipo serve solo a riconoscere gli utenti: non cambia permessi né classifica.
+  - **Accesso:** 🚫 **Disabilita** / ✅ **Riabilita**. Chiama `efg_admin_set_disabilitato(p_key, p_email, p_on)`; nel log "admin: utente disabilitato/riabilitato". Un utente disabilitato non può accedere all'app ("Il tuo account è stato disabilitato: chiedi agli organizzatori."), i nuovi punteggi non vengono salvati e non compare nelle classifiche. I punteggi restano nel database: riabilitandolo torna in classifica.
+  - **Elimina utente:** chiama `efg_admin_delete_player(p_key, p_email)`, chiude il popup, ricarica la tabella e aggiunge "· eliminato *nome*". L'utente potrà registrarsi di nuovo con la stessa email, ripartendo da zero.
+- **Ogni modifica chiede conferma** in una seconda finestra con la domanda ("Cambiare il tipo di…?", "Disabilitare…?", "Riabilitare…?", "Eliminare…?"), le conseguenze spiegate e i pulsanti **Annulla** e **Sì, …** (rosso per disabilitare ed eliminare). Con Annulla non cambia niente.
+- Tipo e disabilitazione servono `supabase-tipi-utenti.sql`: senza, il popup dice di eseguirlo.
 
 ### Log
 
@@ -210,7 +210,7 @@ Tutti i CSV usano il separatore `;`, il BOM UTF-8 e righe CRLF, così si aprono 
 **Utenti** (`efuture-games-utenti-<AAAAMMGG-HHMM>.csv`). Righe nell'ordine del server, cioè per data di registrazione:
 
 ```
-Nome;Email;Tipo;Registrato;Giochi usati;Livelli totali;Punti totali;SysAdmin livelli;SysAdmin punti;CoreTech livelli;CoreTech punti;Timenet livelli;Timenet punti;Inncloud livelli;Inncloud punti
+Nome;Email;Tipo;Disabilitato;Registrato;Giochi usati;Livelli totali;Punti totali;SysAdmin livelli;SysAdmin punti;CoreTech livelli;CoreTech punti;Timenet livelli;Timenet punti;Inncloud livelli;Inncloud punti
 ```
 
 Se un giocatore non ha giocato a un gioco, le celle di quel gioco restano vuote.

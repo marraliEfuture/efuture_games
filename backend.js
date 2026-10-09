@@ -111,6 +111,7 @@ window.EFG_GATE_PHASE = (g, nowMs) => {
 function friendly(err){
   const m = String(err && err.message || err);
   if (/gara chiusa/i.test(m)) return 'La gara è chiusa: i punteggi non vengono più registrati.';
+  if (/account disabilitato/i.test(m)) return 'Il tuo account è stato disabilitato: chiedi agli organizzatori.';
   if (/fetch|network/i.test(m)) return 'Nessuna connessione con il server: controlla la rete e riprova.';
   if (/not found/i.test(m)) return 'Nessun giocatore registrato con questa email: usa Registrati.';
   if (/already registered|duplicate/i.test(m)) return 'Questa email è già registrata: usa Accedi.';

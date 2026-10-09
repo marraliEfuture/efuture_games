@@ -64,15 +64,16 @@ CODICI DI SBLOCCO (uno per gioco)
    https://marraliefuture.github.io/efuture_games/admin.html
    Si entra con la chiave admin (non è nel sito: è salvata cifrata nel
    database). Dal pannello:
-   Il menu e' a sinistra: Utenti, Collegamenti (QR, Link), Formazione
-   (Video utili, Tutorial, Skills), Admin (Log, Backup, Chiave, Reset),
-   Logout.
-   - Utenti: elenco con nome, email, tipo, punti per gioco; CSV. Il tipo
-     (Giocatore, Admin e giocatore, Solo admin) si cambia dal menu a
-     tendina: una volta sola esegui supabase-tipi-utenti.sql nel SQL
-     Editor. Il pulsante "Elimina" cancella un utente e i suoi punteggi
-     (sparisce dalla classifica); il log resta. Una volta sola esegui
-     anche supabase-privacy-utenti.sql.
+   Il menu si apre con il pulsante "Menu" in alto a sinistra: Utenti,
+   Collegamenti (QR, Link), Formazione (Video utili, Tutorial, Skills),
+   Admin (Log, Backup, Chiave, Reset), Logout.
+   - Utenti: elenco con simbolo del tipo, nome, email, punti per gioco;
+     CSV. "Modifica" apre un popup per cambiare il tipo (Giocatore, Admin
+     e giocatore, Solo admin), disabilitare/riabilitare l'utente (non
+     accede, non salva punti, sparisce dalla classifica) o eliminarlo.
+     Ogni modifica chiede conferma spiegando le conseguenze. Una volta
+     sola esegui supabase-tipi-utenti.sql (e rieseguilo se l'avevi gia'
+     eseguito prima della v36) e supabase-privacy-utenti.sql.
    - Log: registrazioni, accessi, partite e operazioni admin; CSV.
    - Backup: crea e scarica una copia (JSON), ripristina una copia.
    - Reset: azzera i punti (i giocatori restano) o cancella tutto.
