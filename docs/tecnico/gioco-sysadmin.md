@@ -158,7 +158,8 @@ Flusso tipico: `title` → (`btnStart`) `startLevel(0)` → `intro` → (`btnGo`
 | `fitCanvas()` | Adatta il canvas allo spazio di `#stage` mantenendo 960:540 (densità fino a 2×) |
 | `sizeVictoryCanvas()` | Dimensiona il canvas della vittoria (campo logico 480 × 224) |
 | `render(t)` | Disegna tutto, in ordine: sfondo, terreno, scala, trappole, cliente, nemici, proiettili, particelle, giocatore, vignettatura |
-| `drawBackground(t)` | Cielo a gradiente, puntini, effetto del tema, filigrana del logo, oggetti di sfondo in parallasse |
+| `drawScene(kind, t)` | Sfondi dei primi 3 livelli (`theme.scene`): `alba` (campo di grano con `drawWheat`, sole che sorge; usa `img/alba.jpg` se c'è), `openspace` (vetrate sul tramonto, scrivanie, stampanti con fogli che volano), `notte` (stelle, luna, palazzi, luce d'emergenza) |
+| `drawBackground(t)` | Se il tema ha `scene` chiama `drawScene`; altrimenti cielo a gradiente, puntini, effetto del tema, filigrana del logo, oggetti di sfondo in parallasse |
 | `drawThemeFX(fx, t)` | Effetto animato della stanza (scansione, braci, radar, pioggia di codice…) |
 | `propIcon(kind, x, y, s, t)` | Oggetti di sfondo (monitor, rack, router, database…) |
 | `drawBgLogo()` | Logo Efuture in trasparenza |
@@ -200,7 +201,7 @@ Il gioco non ha suoni: non c'è codice audio.
 
 I dati sono nello script, sezione CONSTANTS:
 
-- `THEMES`: 10 temi (`office`, `server`, `firewall`, `network`, `cloud`, `control`, `code`, `database`, `critical`, `bunker`). Ognuno ha `name`, `sky` (2 colori), `ground`, `groundTop`, `props` (oggetti di sfondo), `fx` (effetto), `bug` (`species` e `color`) e `fly` (colore dei bug volanti).
+- `THEMES`: 13 temi. I primi 3 livelli usano `alba`, `openspace` e `notte`, che hanno anche `scene` (sfondo disegnato da `drawScene`); la notte ha i bug `hoodBug` (cappuccio e occhi rossi). Gli altri: (`office`, `server`, `firewall`, `network`, `cloud`, `control`, `code`, `database`, `critical`, `bunker`). Ognuno ha `name`, `sky` (2 colori), `ground`, `groundTop`, `props` (oggetti di sfondo), `fx` (effetto), `bug` (`species` e `color`) e `fly` (colore dei bug volanti).
 - `CLIENTS`: 10 clienti in ordine di livello, con `name`, `theme`, `msg` (scheda), `thanks` (ringraziamento) e aspetto (`shape`, `color`, `skin`, `accessory`). Il decimo (`???`, tema `bunker`) è il boss.
 - `CAPO`: aspetto del Capo nella scena di vittoria.
 
@@ -210,6 +211,8 @@ I livelli 1–9 **non sono scritti a mano**: li genera `buildNormalLevel(idx)` c
 
 | Parametro | Formula nel codice |
 |---|---|
+| Livelli 1–3 | Parametri fissi in `LV3[idx]`: `width`, `bugs`, `fly`, `spikes`, `zappers`, `saws`, `gap` (probabilità di burrone), `bugSpeed`, `sawSpeed`, `zapOn` (durata della scossa). Tratti 320–600 px, pattuglia dei bug 60–140 px, fino a 300 tentativi per trappola |
+| Ordine | Prima le trappole (`placeTrap`), poi i bug a terra (zona della trappola + 50 px vietata), poi i bug volanti (non sopra le trappole, margine 60 px) |
 | Lunghezza base | `3400 + idx × 520` px, poi allungata per far stare la scala |
 | Tratto iniziale sicuro | 340 px |
 | Tratti di terreno | 220–440 px |
@@ -229,18 +232,18 @@ Conteggi ottenuti eseguendo il generatore del codice attuale (le trappole sono q
 
 | Liv. | Cliente – stanza | Lunghezza (px) | Burroni | Piattaforme | Bug a terra | Bug volanti | Chiodi | Scosse | Seghe |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | Marco – Ufficio | 3544 | 1 | 2 | 6 | 0 | 0 | 0 | 0 |
-| 2 | Giulia – Sala Server | 4178 | 4 | 3 | 7 | 0 | 1 | 0 | 0 |
-| 3 | Paolo – Zona Firewall | 4595 | 4 | 7 | 9 | 0 | 2 | 1 | 0 |
-| 4 | Elena – Sala Rete | 5185 | 2 | 6 | 10 | 1 | 2 | 2 | 1 |
-| 5 | Davide – Data Center Cloud | 5770 | 4 | 7 | 12 | 2 | 3 | 2 | 1 |
-| 6 | Sara – Sala Controllo | 6278 | 6 | 9 | 13 | 3 | 3 | 3 | 2 |
-| 7 | Fabio – Sala Sviluppo | 6703 | 10 | 10 | 14 | 4 | 4 | 4 | 1 |
-| 8 | Ilaria – Sala Database | 7342 | 12 | 9 | 16 | 5 | 4 | 4 | 0 |
-| 9 | Team IT – Difesa Critica | 7704 | 8 | 11 | 17 | 6 | 5 | 5 | 1 |
+| 1 | Marco – Alba nel campo | 6384 | 1 | 2 | 15 | 2 | 2 | 1 | 0 |
+| 2 | Giulia – Open space al tramonto | 7184 | 5 | 3 | 15 | 4 | 3 | 2 | 2 |
+| 3 | Paolo – Notte di emergenza | 8095 | 8 | 4 | 17 | 5 | 4 | 4 | 2 |
+| 4 | Elena – Sala Rete | 5225 | 2 | 6 | 7 | 1 | 2 | 2 | 1 |
+| 5 | Davide – Data Center Cloud | 5810 | 4 | 7 | 8 | 2 | 3 | 2 | 1 |
+| 6 | Sara – Sala Controllo | 6318 | 6 | 9 | 9 | 3 | 3 | 3 | 1 |
+| 7 | Fabio – Sala Sviluppo | 6743 | 10 | 10 | 9 | 4 | 4 | 4 | 0 |
+| 8 | Ilaria – Sala Database | 7382 | 12 | 9 | 6 | 5 | 4 | 4 | 2 |
+| 9 | Team IT – Difesa Critica | 7744 | 8 | 11 | 12 | 6 | 5 | 5 | 0 |
 | 10 | Bunker dell'Hacker | 1500 | 0 | 3 | boss | – | – | 1 | 1 |
 
-> Questi numeri **non coincidono** con la tabella della specifica funzionale per i bug a terra e per alcune seghe: la specifica usa la formula `4 + round(1,15·i)`, il codice `6 + round(idx × 1.4)`. Vale il codice.
+> I primi 3 livelli usano i parametri di `LV3`; dal 4 valgono le formule sopra. I bug a terra possono essere meno dell'obiettivo: si piazzano dopo le trappole e solo dove restano ad almeno 50 px da ognuna.
 
 ### Livello 10 (`buildBossLevel`)
 

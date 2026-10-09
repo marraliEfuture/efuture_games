@@ -14,7 +14,7 @@ Sparatutto nello stile di Space Invaders. Il giocatore guida la nuvola di innclo
 | `games/inncloud/game.js` | Logica del gioco |
 | `games/gameboy.css`, `games/gameboy.js` | Scocca "Game Boy" in verticale (`data-game="strip"`) |
 | `img/inncloud-logo.png` | Logo: schermata titolo, animazione iniziale, filigrana nel cielo |
-| `fonts/`, `icons/` | Font locali e icone. `img/efuture-white.png` è presente ma non usato |
+| `fonts/`, `icons/` | Font locali e icone. L'icona (anche `img/g-inncloud.png` nella home), su fondo scuro con bordo rosso: invasore verde in alto, sotto a sinistra la "i" bianca con il puntino rosso di inncloud e a destra, ben staccata, la nuvola bianca. `img/efuture-white.png` è presente ma non usato |
 
 ## Storia
 
