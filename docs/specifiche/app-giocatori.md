@@ -127,7 +127,7 @@ Finestra `mAuth` con due schede: **Registrati** e **Accedi**.
 **Avvio:**
 - Se la gara è in attesa di apertura o chiusa, il gioco non parte. Toast: "I giochi non sono ancora aperti." oppure "La gara è chiusa.".
 - Altrimenti si apre il **player** a tutto schermo con una barra in alto:
-  - `← Giochi`;
+  - `← Torna ai giochi` (pulsante blu Efuture `--ef-navy` con scritta bianca);
   - nome del gioco;
   - orologio del livello;
   - logo.
