@@ -17,7 +17,6 @@ Dall'alto in basso:
 
 1. **Barra scura:** "CARE Conference 2026 · Efuture Games" e la pillola "Classifica live".
 2. **Intestazione bianca:**
-   - logo Efuture;
    - titolo "Classifica Efuture Games" ("Classifica" in azzurro) con "CARE Conference Edition";
    - a destra:
      - stato con un pallino: verde pulsante se la classifica è raggiungibile, rosso se no;
@@ -29,7 +28,7 @@ Dall'alto in basso:
    - **Classifica generale**, in un riquadro blu notte a destra dei giochi. Sottotitolo "Somma dei record nei 4 giochi · livelli, poi punti". Etichetta arancio "Solo utenti Efuture" o "Solo ospiti" se filtrata. Riga: posizione, nome, `G/4 giochi · L/12 liv`, punti.
    - **QR grande** (`qr/qr-app.svg`, il link di installazione dell'app) con "Gioca anche tu · Inquadra il QR con la fotocamera". La dimensione si adatta allo schermo: `min(40vw, 100vh − 440px)`, più grande a schermo intero.
 6. **Nota demo**, solo in modalità demo.
-7. **Piè di pagina:** "Sblocca i giochi agli stand" e le regole "3 livelli per gioco, 1 minuto ciascuno · punti = livello × secondi avanzati × vite".
+7. **Piè di pagina:** "Sblocca i giochi agli stand", le regole "3 livelli per gioco, 1 minuto ciascuno · punti = livello × secondi avanzati × vite" e, a destra, il logo Efuture bianco.
 
 Podio: 1° arancio, 2° azzurro, 3° pesca. Lista vuota: "Ancora nessun punteggio. Sarai il primo?".
 

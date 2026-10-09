@@ -88,7 +88,8 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 .btn.link{flex:0 0 auto;background:none;border:none;box-shadow:none;color:var(--dim);font-family:var(--mono);font-size:11px;padding:8px;text-decoration:underline}
 /* riga di 3 pulsanti in fondo: Classifica · Installa app · Istruzioni */
 .dock-row.tools{gap:8px}
-.dock-row.tools .btn{flex:1 1 0;min-width:0;padding:11px 6px;font-size:8.5px;line-height:1.4}
+.dock-row.tools .btn{flex:1 1 0;min-width:0;padding:11px 6px;font-size:8.5px;line-height:1.4;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.dock-row.tools .ico{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}   /* coppa, download, libro */
 #dockIn{align-items:center;gap:4px}
 .mode{font-size:9.5px;color:var(--dim);text-align:center;max-width:420px;line-height:1.5}
 
@@ -177,9 +178,9 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
     <div class="dock-row" id="dockIn" hidden><span class="who" id="who"></span><button class="btn link" id="btnLogout">Esci</button></div>
     <!-- i pulsanti di sempre, in fondo alla home -->
     <div class="dock-row tools">
-      <button class="btn alt" id="btnBoard" type="button" hidden>Classifica</button>
-      <button class="btn alt" id="btnInstall" type="button" hidden>Installa app</button>
-      <button class="btn alt" id="btnHelp" type="button" aria-haspopup="dialog">Istruzioni</button>
+      <button class="btn alt" id="btnBoard" type="button" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z M7 6H4v1a3 3 0 0 0 3 3 M17 6h3v1a3 3 0 0 1-3 3"/></svg>Classifica</button>
+      <button class="btn alt" id="btnInstall" type="button" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Installa app</button>
+      <button class="btn alt" id="btnHelp" type="button" aria-haspopup="dialog"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6c-2-1.5-5-2-8-2v14c3 0 6 .5 8 2 2-1.5 5-2 8-2V4c-3 0-6 .5-8 2zM12 6v14"/></svg>Istruzioni</button>
     </div>
     <div class="mode" id="modeNote" hidden>Modalità demo: account e classifica restano su questo telefono.</div>
   </div>
@@ -303,11 +304,11 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=34"></script>
+<script src="config.js?v=35"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=34"></script>
+<script src="backend.js?v=35"></script>
 <script src="vendor/jsQR.js"></script>
-<script src="hub.js?v=34"></script>
+<script src="hub.js?v=35"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });
