@@ -68,11 +68,11 @@ const BRICK = {
   o:{hp:1, pts:200, color:SUN},
 };
 const POWERS = {
-  C:{label:'CONNESSI',    note:'3 palloni', color:TN_LIGHT},
-  S:{label:'SICURI',      note:'rete', color:TN_DARK},
-  V:{label:'SODDISFATTI', note:'delfino grande', color:'#3fbf8f'},
-  T:{label:'TEMPO',       note:'pallone grande e lento', color:'#b48cff'},
-  L:{label:'+1 PALLONE',  note:'vita extra', color:'#ff5d56'},
+  C:{label:'CONNESSI',    note:'3 palloni', bonus:'3 Palline', color:TN_LIGHT},
+  S:{label:'SICURI',      note:'rete', bonus:'Rete', color:TN_DARK},
+  V:{label:'SODDISFATTI', note:'delfino grande', bonus:'Delfino Grande', color:'#3fbf8f'},
+  T:{label:'TEMPO',       note:'pallone grande', bonus:'Palla Grande', color:'#b48cff'},
+  L:{label:'+1 PALLONE',  note:'vita extra', bonus:'Vita Extra', color:'#ff5d56'},
 };
 
 /* ================= DOM ================= */
@@ -121,6 +121,7 @@ let state = 'title', prevState = null;
 let lvIndex = 0, L = LEVELS[0];
 let bricks = [], breakable = 0;
 let balls = [], caps = [], parts = [], toasts = [];
+let bonusMsg = null; const BONUS_T = 1.8;   // scritta grande del bonus appena preso
 let score = 0, levelStartScore = 0, lives = 3, levelBroken = 0, levelTime = 0;
 let dolphin = { x:W/2, w:98, face:1, nod:0, hop:0 };
 let bigTimer = 0, slowTimer = 0, net = false, speedMul = 1;
@@ -160,7 +161,7 @@ function loadLevel(i){
   cells = bricks.filter(b=>b.hp !== Infinity).map(b=>({ x:b.x, y:b.y, w:b.w, h:b.h, open:0 }));
   buildReveal(); endRevealAt = null;
   levelBroken = 0; levelTime = 0;
-  bigTimer = 0; slowTimer = 0; net = false; caps = []; parts = []; toasts = [];
+  bigTimer = 0; slowTimer = 0; net = false; caps = []; parts = []; toasts = []; bonusMsg = null;
   resetBall();
 }
 function resetBall(){
@@ -170,7 +171,7 @@ function resetBall(){
   caps = [];
 }
 function rad(b){ return BALL_R * (b.s || 1); }   // current radius of a ball (grows with TEMPO)
-function ballSpeed(){ return L.speed * speedMul * (slowTimer>0 ? 0.68 : 1); }
+function ballSpeed(){ return L.speed * speedMul; }   // la palla grande (TEMPO) va veloce come quella normale
 function launch(){
   for (const b of balls){
     if (!b.stuck) continue;
@@ -235,6 +236,7 @@ function updateParts(dt){
   for (const p of parts){ p.x += p.vx*dt; p.y += p.vy*dt; p.vy += (p.g||500)*dt; p.t -= dt; }
   parts = parts.filter(p=>p.t>0);
   for (const t of toasts) t.t -= dt;
+  if (bonusMsg && (bonusMsg.t -= dt) <= 0) bonusMsg = null;
   toasts = toasts.filter(t=>t.t>0);
 }
 
@@ -320,7 +322,8 @@ function dropCapsule(x, y){
 }
 
 function applyPower(k){
-  sfx.power(); toast(POWERS[k].label + ' · ' + POWERS[k].note, POWERS[k].color);
+  sfx.power(); bonusMsg = { text:('Bonus ' + POWERS[k].bonus + '!').toUpperCase(),   // maiuscolo: niente legature (fi) nel font pixel
+    color:POWERS[k].color, t:BONUS_T };
   score += 100;
   if (k === 'C'){
     const add = [];
@@ -382,7 +385,7 @@ function levelCleared(){
   setTimeout(()=>{
     if (state !== 'clear' || lvIndex !== doneIdx) return;
     if (lvIndex === LEVELS.length-1){ win(); return; }
-    $('clearTitle').textContent = 'Ore ' + L.clock + ' completate!';
+    $('clearTitle').textContent = 'Livello ' + (lvIndex+1) + ' completato!';
     $('clearScore').textContent = score; $('clearBugs').textContent = levelBroken; $('clearTime').textContent = fmt(levelTime);
     showOnly(ov.clear);
   }, L.revealAtEnd ? 1900 : 900);
@@ -751,6 +754,21 @@ function render(){
     ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 4; ctx.strokeText(t.text, W/2, y);
     ctx.fillStyle = t.color; ctx.fillText(t.text, W/2, y); });
   ctx.globalAlpha = 1;
+  // bonus preso: scritta grande al centro, entra con un piccolo rimbalzo e sfuma alla fine
+  if (bonusMsg){
+    const b = bonusMsg, age = BONUS_T - b.t;
+    const pop = age < 0.25 ? 0.6 + 0.4*Math.sin(age/0.25*Math.PI/2) * 1.12 : 1;
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, b.t*2.5);
+    ctx.font = "16px 'Press Start 2P', monospace";
+    const fit = Math.min(1, (W - 24) / ctx.measureText(b.text).width);
+    ctx.translate(W/2, H*0.52); ctx.scale(pop*fit, pop*fit);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#0d2b45'; ctx.lineWidth = 7; ctx.strokeText(b.text, 0, 0);
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.strokeText(b.text, 0, 0);
+    ctx.fillStyle = b.color; ctx.fillText(b.text, 0, 0);
+    ctx.restore();
+  }
 }
 
 function updateHud(){

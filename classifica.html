@@ -195,7 +195,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   <div class="live">
     <span class="dot" id="dot" aria-hidden="true"></span>
     <span id="status" aria-live="polite">Carico…</span>
-    <button class="btn" id="btnFull" type="button" title="Apre la classifica a schermo intero sul secondo monitor (se c'è)">Schermo intero</button>
+    <button class="btn" id="btnFull" type="button" title="Apre la classifica sul secondo monitor (ledwall o proiettore); questa finestra resta qui">📺 Proietta</button>
     <button class="btn ghost" id="btnGate" type="button">⏱ Countdown</button>
     <a class="btn ghost" id="btnAdmin" href="admin.html" title="Area amministratori">Admin</a>
   </div>
@@ -258,9 +258,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=39"></script>
+<script src="config.js?v=40"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=39"></script>
+<script src="backend.js?v=40"></script>
 <script>
 (function(){
 "use strict";
@@ -404,9 +404,10 @@ async function refresh(){
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
 window.addEventListener('storage', () => { if (!B.remote) refresh(); });   // demo: aggiorna quando l'app scrive
-/* Schermo intero sul secondo monitor (Window Management API, Chrome/Edge).
-   Se c'è un altro schermo oltre a quello della finestra, la classifica va a schermo intero lì;
-   altrimenti, o se il browser non lo permette, va a schermo intero dove si trova. */
+/* 📺 Proietta: apre la classifica in una finestra sul secondo monitor (ledwall o proiettore);
+   questa finestra resta dov'è. Con Chrome/Edge (Window Management API) la finestra va
+   direttamente sull'altro schermo; lì un clic la mette a schermo intero (?proietta=1). */
+const PROJ = Q.get('proietta') === '1';   // finestra già sul secondo monitor
 let screens = null;                       // dettagli degli schermi, dopo il permesso
 async function loadScreens(ask){
   if (!('getScreenDetails' in window)) return null;
@@ -428,46 +429,40 @@ function fsMsg(t){
   let m = document.getElementById('fsMsg');
   if (!m){ m = document.createElement('div'); m.id = 'fsMsg'; m.className = 'fsmsg'; m.setAttribute('role', 'status'); document.body.appendChild(m); }
   m.textContent = t; m.hidden = false;
-  clearTimeout(fsMsg.t); fsMsg.t = setTimeout(() => { m.hidden = true; }, 8000);
+  clearTimeout(fsMsg.t); fsMsg.t = setTimeout(() => { m.hidden = true; }, 9000);
 }
-const PROJ = Q.get('proietta') === '1';   // aperta dall'admin già sul secondo monitor
-// lascia l'admin sul primo monitor: finestra "compagna" sullo schermo dove era la classifica
-function adminCompanion(here){
-  if (PROJ || !here) return;
-  const f = 'popup,left=' + here.availLeft + ',top=' + here.availTop + ',width=' + here.availWidth + ',height=' + here.availHeight;
-  try { window.open('admin.html', 'efgAdmin', f); } catch (e) {}
-}
-async function goFull(){
-  const el = document.documentElement;
-  if (PROJ){ el.requestFullscreen().catch(() => {}); return; }   // resta sullo schermo dove l'ha messa l'admin
+async function proietta(){
   const first = !screens && 'getScreenDetails' in window;
-  if (first) await loadScreens(true);       // la prima volta il browser chiede il permesso
-  const other = otherScreen();
-  try {
-    const here = screens && screens.currentScreen;
-    await el.requestFullscreen(other ? { screen: other } : undefined);
-    if (other) adminCompanion(here);
-    if (!other && screens && screens.screens.length < 2) fsMsg('Non trovo un secondo monitor: schermo intero su questo schermo.');
-  } catch (e) {
-    // dopo la richiesta di permesso il clic può non valere più: si riprova con un secondo clic
-    if (first && other) fsMsg('Permesso concesso: premi di nuovo "Schermo intero" per aprirla sul secondo monitor.');
-    else el.requestFullscreen().catch(() => fsMsg('Premi di nuovo "Schermo intero".'));
-  }
-  if (!('getScreenDetails' in window)) fsMsg('Questo browser non sa scegliere il monitor: trascina la finestra sul secondo schermo e premi di nuovo "Schermo intero" (meglio usare Chrome o Edge).');
+  if (first) await loadScreens(true);       // la prima volta il browser chiede il permesso "Gestione finestre"
+  const scr = otherScreen();
+  const f = scr ? 'popup,left=' + scr.availLeft + ',top=' + scr.availTop + ',width=' + scr.availWidth + ',height=' + scr.availHeight
+                : 'popup,width=1280,height=760';
+  const u = new URL(location.href); u.searchParams.set('proietta', '1');
+  const w = window.open(u.pathname + u.search, 'efgLedwall', f);
+  if (!w){ fsMsg(first ? 'Permesso concesso: premi di nuovo "Proietta".' : 'Il browser ha bloccato la finestra: consenti i popup per questo sito e riprova.'); return; }
+  if (scr) fsMsg('Classifica aperta sul secondo monitor: cliccaci sopra una volta per lo schermo intero.');
+  else if (!('getScreenDetails' in window)) fsMsg('Questo browser non sa scegliere il monitor: trascina la finestra della classifica sul secondo schermo e cliccaci sopra (meglio Chrome o Edge).');
+  else fsMsg('Non trovo un secondo monitor (o il permesso è negato): trascina la finestra della classifica sull\'altro schermo e cliccaci sopra.');
 }
-$('btnFull').onclick = () => {
-  if (document.fullscreenElement) document.exitFullscreen && document.exitFullscreen();
-  else if (document.documentElement.requestFullscreen) goFull();
-};
-loadScreens(false);                       // se il permesso c'era già, gli schermi sono pronti subito
-if (PROJ && document.documentElement.requestFullscreen){
-  const b = document.createElement('button');
-  b.type = 'button'; b.className = 'projgo'; b.id = 'projGo';
-  b.innerHTML = '<b>Clicca qui per lo schermo intero</b><span>La classifica resta su questo monitor. Per uscire: Esc</span>';
-  b.onclick = () => document.documentElement.requestFullscreen().catch(() => {});
-  document.body.appendChild(b);
+if (PROJ){
+  // finestra proiettata: il pulsante mette o toglie lo schermo intero su questo monitor
+  $('btnFull').textContent = 'Schermo intero';
+  $('btnFull').onclick = () => {
+    if (document.fullscreenElement) document.exitFullscreen && document.exitFullscreen();
+    else document.documentElement.requestFullscreen().catch(() => {});
+  };
+  if (document.documentElement.requestFullscreen){
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'projgo'; b.id = 'projGo';
+    b.innerHTML = '<b>Clicca qui per lo schermo intero</b><span>La classifica resta su questo monitor. Per uscire: Esc</span>';
+    b.onclick = () => document.documentElement.requestFullscreen().catch(() => {});
+    document.body.appendChild(b);
+  } else $('btnFull').hidden = true;
+} else {
+  $('btnFull').onclick = proietta;
+  loadScreens(false);                     // se il permesso c'era già, gli schermi sono pronti subito
 }
-if (!document.documentElement.requestFullscreen) $('btnFull').hidden = true;
+
 /* ---------- countdown di apertura / chiusura ----------
    Lo vedono tutti (anche a schermo intero); lo avvia e lo ferma solo un amministratore
    collegato da admin.html (stesso browser). In demo il pulsante è sempre disponibile. */

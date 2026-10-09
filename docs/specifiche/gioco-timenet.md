@@ -27,10 +27,10 @@ Breakout (rompi-mattoncini) con il delfino di Timenet. Il delfino nuota sul pelo
 | Schermata | Contenuto | Pulsanti |
 |---|---|---|
 | **Titolo** (`ov-title`) | Logo Timenet su badge bianco, BREAKOUT, "Muovi il delfino e rompi i mattoncini col pallone.", "Record: N" se esiste. Sotto, sul campo, il delfino che ondeggia | **Inizia**, **Continua · Liv. N** (solo modalità libera, se c'è un livello raggiunto), **Istruzioni** |
-| **Istruzioni** (`howBox`) | Tre righe con disegnino: mattoncini ("alcuni reggono più colpi"), pallone ("Non far cadere il pallone in acqua"), capsule ("C 3 palloni · S rete · ✓ delfino grande · T pallone grande e lento"). "5 livelli, dalle 08:00 alle 18:00." Tasti: Trascina o frecce · spazio lancia · P pausa | – |
+| **Istruzioni** (`howBox`) | Tre righe con disegnino: mattoncini ("alcuni reggono più colpi"), pallone ("Non far cadere il pallone in acqua"), capsule ("C 3 palloni · S rete · ✓ delfino grande · T pallone grande"). "5 livelli, dalle 08:00 alle 18:00." Tasti: Trascina o frecce · spazio lancia · P pausa | – |
 | **Animazione iniziale** | Dopo **Inizia** (e **Gioca ancora**): il delfino salta fuori dall'acqua, lancia il pallone, il logo va in frantumi, compare BREAKOUT. Dura 4,2 s; "TOCCA PER SALTARE": un tocco o un tasto la salta | – |
 | **Scheda del livello** (`ov-level`) | Etichetta "08:00 · Livello 1/5" (gara: "/3"), nome e frase del livello | **Via!** |
-| **Livello completato** (`ov-clear`) | Dopo 0,9 s (1,9 s nei livelli col logo finale): "Ora completata", "Ore 08:00 completate!", punti, mattoncini rotti, tempo | **Prossimo livello** |
+| **Livello completato** (`ov-clear`) | Dopo 0,9 s (1,9 s nei livelli col logo finale): "Livello N completato!", punti, mattoncini rotti, tempo | **Prossimo livello** |
 | **Pausa** (`ov-pause`) | PAUSA | **Riprendi**, **Menu** |
 | **Game over** (`ov-over`) | "Pallone in acqua", GAME OVER, "Palloni finiti. Riprova!", punti, livello N/5 (gara N/3) | **Riprova livello**, **Menu** |
 | **Vittoria** (`ov-win`) | "Missione compiuta", GIORNATA CHIUSA, "Tutti i mattoncini rotti. Connessi, sicuri, soddisfatti.", punteggio finale, record, "Nuovo record!" o "Record da battere: N" | **Gioca ancora** |
@@ -99,12 +99,12 @@ Il codice prevede anche mattoncini da 3 colpi (`h`) e di acciaio indistruttibili
 | `C` | CONNESSI | 27% | Ogni pallone in volo (max 3) si divide in 3 |
 | `S` | SICURI | 24% | Rete sul fondo: salva un pallone una volta ("Salvato!") |
 | `✓` | SODDISFATTI | 24% | Delfino largo 1,4 volte per 15 s |
-| `T` | TEMPO | 20% | Per 10 s il pallone è più lento (×0,68) e più grande (raggio ×1,7), con un alone viola. Messaggio "TEMPO · pallone grande e lento" |
+| `T` | TEMPO | 20% | Per 10 s il pallone è più grande (raggio ×1,7), con un alone viola, e va **alla stessa velocità** del pallone normale. Sfonda i mattoncini al primo colpo |
 | `+` | +1 PALLONE | 5% | Un pallone (vita) in più |
 
 **Pallone grande (capsula `T`):** il raggio cresce e torna normale in modo graduale (circa 0,4 s). Il raggio attuale vale per tutte le collisioni: pareti, mattoncini (colpi più larghi), delfino (più facile da prendere) e rete. Il pallone cresce solo dove c'è spazio libero, quindi non resta mai incastrato in pareti o mattoncini; i palloni nati da `C` mantengono la dimensione del pallone da cui nascono. Il pallone nuovo sul delfino ha la dimensione normale.
 
-**Pallone perso:** quando tutti i palloni in gioco cadono in acqua (spruzzo), si perde una vita; delfino grande, pallone grande e lento e capsule in caduta si annullano, la rete resta.
+**Pallone perso:** quando tutti i palloni in gioco cadono in acqua (spruzzo), si perde una vita; delfino grande, pallone grande e capsule in caduta si annullano, la rete resta.
 
 **Punteggio interno** (HUD, non va in classifica): mattoncino rotto 50/100/200, colpo su un mattoncino che resiste 10, capsula presa 100. Record in `timenetBreakBest`.
 
@@ -154,3 +154,5 @@ Effetti sintetizzati con Web Audio (nessun file audio): mattoncino rotto (nota c
 
 ---
 Ultimo aggiornamento: 08/10/2026 (v28)
+
+**Scritta del bonus:** quando il delfino prende una capsula compare al centro del campo una scritta grande (Press Start 2P 16 px, ridotta se non entra), con il colore della capsula e un piccolo rimbalzo; dura 1,8 s e sfuma. Testi: "BONUS 3 PALLINE!" (C), "BONUS RETE!" (S), "BONUS DELFINO GRANDE!" (✓), "BONUS PALLA GRANDE!" (T), "BONUS VITA EXTRA!" (+1), in maiuscolo. Un nuovo bonus sostituisce la scritta precedente.

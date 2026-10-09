@@ -20,7 +20,7 @@ Dall'alto in basso:
    - titolo "Classifica Efuture Games" ("Classifica" in azzurro) con "CARE Conference Edition";
    - a destra:
      - stato con un pallino: verde pulsante se la classifica è raggiungibile, rosso se no;
-     - pulsanti **Schermo intero**, **⏱ Countdown** e **Admin** (link ad `admin.html`).
+     - pulsanti **📺 Proietta**, **⏱ Countdown** e **Admin** (link ad `admin.html`).
 3. **Barra del countdown**, se attivo: grande, blu notte.
 4. **Pulsanti di visualizzazione:** Classifica, Top, Giocatori, QR.
 5. **Area principale:**
@@ -121,16 +121,14 @@ La finestra "Countdown della gara" contiene:
 - l'ora è quella del server, con lo scarto calcolato da `now`;
 - lo stato si rilegge ogni **10 s** e si ridisegna ogni secondo.
 
-## Schermo intero
+## Proietta (secondo monitor) e schermo intero
 
-- **Schermo intero** usa la Fullscreen API ed è nascosto se il browser non la supporta. Premuto di nuovo, esce.
-- **Secondo monitor** (per il ledwall o il proiettore all'evento): con Chrome o Edge la classifica va a schermo intero sull'altro schermo collegato, non su quello della finestra. Usa la Window Management API (`getScreenDetails`, `requestFullscreen({ screen })`):
-  - la prima volta il browser chiede il permesso "Gestione finestre"; se dopo il permesso il clic non vale più, compare il messaggio "premi di nuovo";
+- Il pulsante **📺 Proietta** (al posto del vecchio "Schermo intero") apre la classifica in una **nuova finestra sul secondo monitor** (ledwall o proiettore), con gli stessi filtri (`?…&proietta=1`, nome finestra `efgLedwall`). La finestra da cui si preme resta dov'è: se è aperta dall'admin, il primo monitor resta sull'admin e non si chiedono di nuovo le credenziali.
+- Con Chrome o Edge usa la Window Management API (`getScreenDetails`) per posizionare la finestra (`window.open` con `popup,left,top,width,height`) sull'altro schermo, preferendo uno non principale:
+  - la prima volta il browser chiede il permesso "Gestione finestre"; se la finestra viene bloccata, il messaggio dice "premi di nuovo";
   - se il permesso c'è già, gli schermi si leggono all'apertura della pagina;
-  - con più schermi sceglie il primo diverso da quello corrente, preferendo uno non principale;
-  - senza secondo monitor, senza permesso o con un browser che non supporta l'API va a schermo intero dove si trova e mostra un breve messaggio in basso (per esempio: trascina la finestra sul secondo schermo);
-  - quando va sull'altro monitor riapre l'**admin** in una finestra sullo schermo di partenza (`window.open('admin.html', 'efgAdmin', …)`), così il primo monitor resta sull'admin (può chiedere di nuovo la chiave).
-- **Aperta dall'admin** con **📺 Proietta** (`?proietta=1`): la finestra è già sul secondo monitor. Un velo scuro dice "Clicca qui per lo schermo intero": il clic la mette a schermo intero **su quel monitor**, e anche il pulsante Schermo intero non la sposta più. Uscendo dallo schermo intero il velo ricompare.
+  - senza secondo monitor, senza permesso o con altri browser la finestra si apre normale (1280×760) e un messaggio in basso dice di trascinarla sull'altro schermo.
+- **Finestra proiettata** (`?proietta=1`): un velo scuro dice "Clicca qui per lo schermo intero"; il clic la mette a schermo intero **su quel monitor**. Il pulsante lì si chiama **Schermo intero** e mette o toglie lo schermo intero senza spostare la finestra. Uscendo dallo schermo intero il velo ricompare.
 - A schermo intero si nascondono Countdown, Admin e i pulsanti di visualizzazione. La barra del countdown resta visibile e il QR diventa più grande.
 
 ## Modalità demo
