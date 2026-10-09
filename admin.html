@@ -225,6 +225,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
   .qrcard svg{width:56mm;max-width:none;margin:2mm 0}
   .qrcard h3{font-size:15pt} .qrcard .code{font-size:20pt}
 }
+.fsmsg{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:90;max-width:min(560px,calc(100vw - 32px));background:#1f2a37;color:#fff;font-size:14px;line-height:1.4;padding:10px 16px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.25);text-align:center}
 </style>
 </head>
 <body>
@@ -236,6 +237,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
     <span class="dim" id="who" style="font-size:13px"></span>
     <a class="btn ghost" href="index.html" target="_blank" rel="noopener" style="text-decoration:none">Gioca ↗</a>
     <a class="btn ghost" href="classifica.html" target="_blank" rel="noopener" style="text-decoration:none">Classifica ↗</a>
+    <button class="btn navy" id="btnProj" type="button" title="Apre la classifica sul secondo monitor (ledwall o proiettore); l'admin resta qui">📺 Proietta</button>
   </div>
 </header>
 
@@ -502,6 +504,41 @@ async function enter(){
 }
 // chi è collegato (serve supabase-tipi-utenti.sql; senza, si presume la chiave principale)
 let ME = { principale: true };
+/* Proietta: apre la classifica in una finestra sul secondo monitor; l'admin resta su questo.
+   Con Chrome/Edge (Window Management API) la finestra va direttamente sull'altro schermo. */
+let projScreens = null;
+async function projLoad(ask){
+  if (!('getScreenDetails' in window)) return null;
+  try {
+    if (!ask){ const st = await navigator.permissions.query({ name: 'window-management' }); if (st.state !== 'granted') return null; }
+    projScreens = await window.getScreenDetails();
+  } catch (e) { projScreens = null; }
+  return projScreens;
+}
+function projMsg(t){
+  let m = $('projMsg');
+  if (!m){ m = document.createElement('div'); m.id = 'projMsg'; m.className = 'fsmsg'; m.setAttribute('role', 'status'); document.body.appendChild(m); }
+  m.textContent = t; m.hidden = false;
+  clearTimeout(projMsg.t); projMsg.t = setTimeout(() => { m.hidden = true; }, 9000);
+}
+$('btnProj').onclick = async () => {
+  const first = !projScreens && 'getScreenDetails' in window;
+  if (first) await projLoad(true);           // la prima volta il browser chiede il permesso "Gestione finestre"
+  let scr = null;
+  if (projScreens && projScreens.screens.length > 1){
+    const o = projScreens.screens.filter(s => s !== projScreens.currentScreen);
+    scr = o.find(s => !s.isPrimary) || o[0] || null;
+  }
+  const f = scr ? 'popup,left=' + scr.availLeft + ',top=' + scr.availTop + ',width=' + scr.availWidth + ',height=' + scr.availHeight
+                : 'popup,width=1280,height=760';
+  const w = window.open('classifica.html?proietta=1', 'efgLedwall', f);
+  if (!w){ projMsg(first ? 'Permesso concesso: premi di nuovo "Proietta".' : 'Il browser ha bloccato la finestra: consenti i popup per questo sito e riprova.'); return; }
+  if (scr) projMsg('Classifica aperta sul secondo monitor: cliccaci sopra una volta per lo schermo intero. L\'admin resta qui.');
+  else if (!('getScreenDetails' in window)) projMsg('Questo browser non sa scegliere il monitor: trascina la finestra della classifica sul secondo schermo e cliccaci sopra (meglio Chrome o Edge).');
+  else projMsg('Non trovo un secondo monitor (o il permesso è negato): trascina la finestra della classifica sull\'altro schermo e cliccaci sopra.');
+};
+projLoad(false);
+
 async function whoAmI(){
   try { ME = await call('efg_admin_me') || { principale: true }; } catch(e){ ME = { principale: !KEY.includes('\n') }; }
   $('who').textContent = ME.principale ? '🔑 Chiave principale' : '🛡️ ' + (ME.nome || ME.email || '');

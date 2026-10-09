@@ -42,6 +42,9 @@ CODICI DI SBLOCCO (uno per gioco)
      il permesso "Gestione finestre": consenti (se serve, premi di nuovo il
      pulsante). Con un solo schermo o altri browser va a schermo intero dove
      si trova la finestra. Per uscire: Esc o di nuovo il pulsante.
+     MODO CONSIGLIATO ALL'EVENTO: dal pannello admin premi "📺 Proietta":
+     la classifica si apre sul secondo monitor e l'admin resta sul primo.
+     Sul ledwall clicca una volta su "Clicca qui per lo schermo intero".
    - Mostra le classifiche dei giochi, la classifica generale e un QR
      grande per aprire l'app.
    - Pulsanti sotto il titolo (le scelte restano salvate sullo schermo):
