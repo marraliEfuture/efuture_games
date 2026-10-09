@@ -1,14 +1,14 @@
 EFUTURE GAMES – CARE CONFERENCE EDITION
 =======================================
 Un'unica web app con i 4 giochi: SysAdmin Runner (Efuture), CoreTech Pac,
-Timenet Breakout, Inncloud Invaders. I giochi si sbloccano con un codice
+Timenet Breakout, inncloud Invaders. I giochi si sbloccano con un codice
 (QR allo stand), i punteggi vanno in una classifica comune.
 
 CODICI DI SBLOCCO (uno per gioco)
   SysAdmin Runner ...... RUN-4827   (stand Efuture)
   CoreTech Pac ......... PAC-3915   (stand CoreTech)
   Timenet Breakout ..... BRK-6042   (stand Timenet)
-  Inncloud Invaders .... INV-7358   (stand Inncloud)
+  inncloud Invaders .... INV-7358   (stand inncloud)
   I QR pronti da stampare sono in qr/ (apri qr/stampa.html e stampa).
   Nel codice dell'app i codici non compaiono in chiaro.
 

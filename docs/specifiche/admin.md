@@ -256,7 +256,7 @@ Tutti i CSV usano il separatore `;`, il BOM UTF-8 e righe CRLF, così si aprono 
 **Utenti** (`efuture-games-utenti-<AAAAMMGG-HHMM>.csv`). Righe nell'ordine del server, cioè per data di registrazione:
 
 ```
-Nome;Email;Tipo;Disabilitato;Registrato;Giochi usati;Livelli totali;Punti totali;SysAdmin livelli;SysAdmin punti;CoreTech livelli;CoreTech punti;Timenet livelli;Timenet punti;Inncloud livelli;Inncloud punti
+Nome;Email;Tipo;Disabilitato;Registrato;Giochi usati;Livelli totali;Punti totali;SysAdmin livelli;SysAdmin punti;CoreTech livelli;CoreTech punti;Timenet livelli;Timenet punti;inncloud livelli;inncloud punti
 ```
 
 Se un giocatore non ha giocato a un gioco, le celle di quel gioco restano vuote.

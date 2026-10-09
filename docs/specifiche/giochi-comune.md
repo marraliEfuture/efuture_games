@@ -14,7 +14,7 @@ Qui si descrive una volta sola ciò che è comune. Le specifiche dei singoli gio
 | SysAdmin Runner | [gioco-sysadmin.md](gioco-sysadmin.md) |
 | CoreTech Pac | [gioco-coretech.md](gioco-coretech.md) |
 | Timenet Breakout | [gioco-timenet.md](gioco-timenet.md) |
-| Inncloud Invaders | [gioco-inncloud.md](gioco-inncloud.md) |
+| inncloud Invaders | [gioco-inncloud.md](gioco-inncloud.md) |
 
 ## File e cartelle
 
@@ -22,7 +22,7 @@ Qui si descrive una volta sola ciò che è comune. Le specifiche dei singoli gio
 |---|---|
 | `games/gameboy.css`, `games/gameboy.js` | Scocca "Game Boy" in verticale, condivisa dai 4 giochi |
 | `games/<id>/index.html` | Pagina del gioco: HUD, canvas, overlay (schermate), comandi touch, stile |
-| `games/<id>/game.js` | Logica del gioco (CoreTech, Timenet, Inncloud). SysAdmin ha tutto dentro `index.html` |
+| `games/<id>/game.js` | Logica del gioco (CoreTech, Timenet, inncloud). SysAdmin ha tutto dentro `index.html` |
 | `games/<id>/fonts/` | Press Start 2P e IBM Plex Mono in `woff2`, con le licenze |
 | `games/<id>/icons/` | `favicon.png`, `apple-touch-icon.png`, `icon-192/512.png`, `icon-maskable-512.png` |
 | `games/<id>/img/` | Logo del marchio e altre immagini del gioco; `efuture-white.png` in tutti |
@@ -77,7 +77,7 @@ Il protocollo completo è in [app-giocatori.md](app-giocatori.md#protocollo-post
 - **Vite finite:** `result` con `ok: false`, `reason: 'lives'`. Sotto il risultato dell'app resta la schermata GAME OVER del gioco.
 - `seconds` = tempo usato nei livelli superati + tempo del livello in corso se la partita è persa. L'app lo legge ma non lo usa.
 - Dopo `result` il gioco può ancora essere usato (per esempio "Riprova"), ma non manda più nulla finché non riparte dal livello 1.
-- **Codice non usato:** Timenet, Inncloud e CoreTech definiscono in `index.html` anche `window.efgReport` (messaggio `efg-score`). Nessuno lo chiama e l'app non lo ascolta.
+- **Codice non usato:** Timenet, inncloud e CoreTech definiscono in `index.html` anche `window.efgReport` (messaggio `efg-score`). Nessuno lo chiama e l'app non lo ascolta.
 
 ## Scocca "Game Boy" (verticale)
 
@@ -91,7 +91,7 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
   - HUD del gioco su una fascia chiara, come il display;
   - schermo del gioco (`#stage`), con l'angolo in basso a destra arrotondato.
 - Sotto lo schermo: scritta **EFUTURE GAMES** in corsivo blu `#004675`.
-- **Fascia comandi:** al posto della croce c'è il joystick (SysAdmin, CoreTech) o la fascia di trascinamento (Timenet, Inncloud); al posto di A e B ci sono i tasti del gioco; in basso i due tastini inclinati **ISTRUZIONI** e **AVVIA/PAUSA**.
+- **Fascia comandi:** al posto della croce c'è il joystick (SysAdmin, CoreTech) o la fascia di trascinamento (Timenet, inncloud); al posto di A e B ci sono i tasti del gioco; in basso i due tastini inclinati **ISTRUZIONI** e **AVVIA/PAUSA**.
 - **Griglia dell'altoparlante:** 6 fessure inclinate in basso a destra (non nei giochi con la fascia).
 - Telefoni bassi (altezza ≤ 700 px): cornice e scritta più sottili. Telefoni grandi (≥ 390 × 780 px): joystick e tasti più grandi in SysAdmin e CoreTech.
 
@@ -101,7 +101,7 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
 
 | Attributo | Significato |
 |---|---|
-| `data-game` | Variante della scocca: `sysadmin`, `joy` (CoreTech) o `strip` (Timenet, Inncloud) |
+| `data-game` | Variante della scocca: `sysadmin`, `joy` (CoreTech) o `strip` (Timenet, inncloud) |
 | `data-a`, `data-b` | Id dei pulsanti da spostare nei tasti A (arancio, in alto) e B (blu, in basso) |
 | `data-select` | Id del pulsante premuto da ISTRUZIONI |
 | `data-pause` | Id del pulsante pausa |
@@ -121,7 +121,7 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
 
 - In verticale i pulsanti indicati da `data-a` e `data-b` vengono spostati nella coppia A/B. Tornano al loro posto (segnato da un commento nel DOM) in orizzontale. Al cambio di orientamento lo script ridisegna il gioco.
 - Nella coppia A/B il pulsante scatta al rilascio del dito, senza doppioni con il click.
-- Sotto i tasti compare una didascalia: `PAUSA` per `#pauseBtn`, `MUSICA` per `#soundBtn`. Il tasto SPARA di Inncloud (`#fireBtn`) ha la scritta dentro e non ha didascalia; il suo aspetto (rosso, 76 px) e il fuoco tenendo premuto sono gestiti dalla pagina del gioco, non da `gameboy.css`/`gameboy.js`.
+- Sotto i tasti compare una didascalia: `PAUSA` per `#pauseBtn`, `MUSICA` per `#soundBtn`. Il tasto SPARA di inncloud (`#fireBtn`) ha la scritta dentro e non ha didascalia; il suo aspetto (rosso, 76 px) e il fuoco tenendo premuto sono gestiti dalla pagina del gioco, non da `gameboy.css`/`gameboy.js`.
 - SysAdmin non usa `data-a`/`data-b`: i suoi tasti SALTA, MOUSE e ANTIVIRUS sono disposti dal CSS come A, B e un terzo tasto.
 
 ### Mappa per gioco
@@ -131,12 +131,12 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
 | SysAdmin Runner | `sysadmin` | Joystick (destra/sinistra, su = salto) | SALTA | MOUSE (+ ANTIVIRUS piccolo sopra) | `btnHow` | Pulsante arancio della schermata, oppure pausa |
 | CoreTech Pac | `joy` | Joystick a 4 direzioni | PAUSA | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
 | Timenet Breakout | `strip` | Fascia di trascinamento | PAUSA | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
-| Inncloud Invaders | `strip` | Fascia di trascinamento | SPARA (rosso, più grande) | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
+| inncloud Invaders | `strip` | Fascia di trascinamento | SPARA (rosso, più grande) | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
 
 Dettagli per gioco:
 - **SysAdmin:** lo schermo è 16:9 e il pulsante pausa dell'HUD è nascosto (la pausa si fa con il tastino). Le schermate (overlay) coprono tutta la console tranne la fila dei tastini, che resta usabile.
 - **CoreTech:** lo schermo ha le proporzioni del labirinto più alto (19:21,6); lo spazio in più va ai comandi.
-- **Timenet e Inncloud:** la fascia di trascinamento diventa una pista scura arrotondata alta 62 px, a sinistra di A/B.
+- **Timenet e inncloud:** la fascia di trascinamento diventa una pista scura arrotondata alta 62 px, a sinistra di A/B.
 
 ## Limiti comuni
 

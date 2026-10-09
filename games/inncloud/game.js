@@ -436,7 +436,8 @@ function showLevelCard(i){
   $('lvTag').textContent = 'Livello ' + (i+1) + '/' + (EFG.on ? EFG.max : 5);
   $('lvName').textContent = L.name;
   $('lvText').textContent = L.text;
-  showOnly(ov.level); updateHud();
+  updateHud();
+  $('btnGo').onclick();   // niente spiegazione prima del livello: si gioca subito
 }
 function startGame(from){ score = 0; lives = 3; showLevelCard(from||0); }
 $('btnStart').onclick = ()=>{ score = 0; lives = 3; playIntro(); };
@@ -552,7 +553,7 @@ function drawCloudShape(c, x, y, w, color){
   c.moveTo(x - w*0.42 + h*0.25, y); c.rect(x - w*0.42 + h*0.25, y, w*0.84 - h*0.5, h*0.5);
   c.fill('nonzero');
 }
-// the Inncloud wordmark as a light "sky billboard": faint at first, clearer as the attackers fall
+// the inncloud wordmark as a light "sky billboard": faint at first, clearer as the attackers fall
 let skyLogo = null;
 function buildSkyLogo(){
   const img = $('logoImg'); if (!img || !img.naturalWidth) return null;
@@ -605,7 +606,7 @@ function drawSprite(S, fr, x, y, override){
   }
 }
 function drawShip(x, y, a, dotK){
-  // the Inncloud cloud, with the red dot of the "i" as its cannon; dotK 0..1 = how much of the dot has grown back
+  // the inncloud cloud, with the red dot of the "i" as its cannon; dotK 0..1 = how much of the dot has grown back
   if (dotK === undefined) dotK = 1;
   ctx.save(); ctx.translate(x, y);
   ctx.fillStyle = 'rgba(13,43,69,0.22)'; ctx.beginPath(); ctx.ellipse(0, 14, 22, 3, 0, 0, Math.PI*2); ctx.fill();
@@ -680,7 +681,7 @@ function updateHud(){
   $('score').textContent = score;
   const lv = $('lives'); const n = Math.max(0, lives);
   if (lv.childElementCount !== n){ lv.innerHTML = ''; for (let i=0;i<n;i++){ const d=document.createElement('span'); d.className='life'; lv.appendChild(d); } }
-  $('levelName').innerHTML = (state==='title' || state==='intro') ? 'Inncloud Invaders' : `<b>Liv. ${lvIndex+1}/${EFG.on ? EFG.max : 5}</b> · ${L.name}`;
+  $('levelName').innerHTML = (state==='title' || state==='intro') ? 'inncloud Invaders' : `<b>Liv. ${lvIndex+1}/${EFG.on ? EFG.max : 5}</b> · ${L.name}`;
 }
 function drawLegend(){
   const draw = (id, fn)=>{ const c = $(id).getContext('2d'); c.setTransform(1,0,0,1,0,0); c.clearRect(0,0,44,44); fn(c); };

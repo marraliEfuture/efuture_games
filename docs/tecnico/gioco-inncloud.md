@@ -1,6 +1,6 @@
-# Inncloud Invaders – documentazione tecnica
+# inncloud Invaders – documentazione tecnica
 
-Questo documento spiega **come è fatto il codice** di Inncloud Invaders. Le regole del gioco, le schermate e i testi sono nella specifica funzionale [gioco-inncloud.md](../specifiche/gioco-inncloud.md); le parti comuni ai 4 giochi (modalità gara, scocca "Game Boy") sono in [giochi-comune.md](../specifiche/giochi-comune.md).
+Questo documento spiega **come è fatto il codice** di inncloud Invaders. Le regole del gioco, le schermate e i testi sono nella specifica funzionale [gioco-inncloud.md](../specifiche/gioco-inncloud.md); le parti comuni ai 4 giochi (modalità gara, scocca "Game Boy") sono in [giochi-comune.md](../specifiche/giochi-comune.md).
 
 ## File e risorse
 
@@ -80,7 +80,7 @@ Ordine degli script in fondo a `index.html`:
 |---|---|---|
 | `'title'` | Avvio e `toMenu()` | Solo particelle. `render()` disegna cielo e nuvola |
 | `'intro'` | Dopo Inizia / Gioca ancora (`playIntro()`) | `updateIntro()` |
-| `'levelcard'` | `showLevelCard()`: mostra `#ov-level` | Solo particelle |
+| `'levelcard'` | `showLevelCard()`: carica il livello e passa subito a `'play'` con `btnGo.onclick()` (la scheda `#ov-level` non si mostra) | Solo particelle |
 | `'play'` | Dopo **Via!** (`btnGo`) | Tutto: tempo, gara, nuvola, formazione, boss, drone, colpi |
 | `'paused'` | `togglePause()` da `'play'` | Niente: il loop salta `update()` |
 | `'clear'` | `levelCleared()` | Solo particelle |

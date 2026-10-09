@@ -10,7 +10,7 @@ const GAMES = [
     hash:'8b9458de8fd04f3d7303d6317f3731330b0966acae29322d30b911291191fd9a' },
   { id:'timenet',  name:'Timenet Breakout',  sponsor:'Timenet',  icon:'img/g-timenet.png',  path:'games/timenet/index.html',
     hash:'29daa7b03dd7231bbec63c61643ed7a24c31dd0ae2123fb2c9b28d3e11a8ed9c' },
-  { id:'inncloud', name:'Inncloud Invaders', sponsor:'Inncloud', icon:'img/g-inncloud.png', path:'games/inncloud/index.html',
+  { id:'inncloud', name:'inncloud Invaders', sponsor:'inncloud', icon:'img/g-inncloud.png', path:'games/inncloud/index.html',
     hash:'28efc8bdf7a8836e85fec8d0de3baf9c00aa3e7e1eb48afd909776897c40ebb3' },
 ];
 const byId = Object.fromEntries(GAMES.map(g=>[g.id, g]));
@@ -101,7 +101,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v40' : 'Modalità demo: account e classifica restano su questo telefono. · v40';
+  mn.textContent = remote ? 'Classifica online · v41' : 'Modalità demo: account e classifica restano su questo telefono. · v41';
 }
 
 /* ================= UNLOCK: camera + code ================= */

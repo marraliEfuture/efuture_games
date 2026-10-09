@@ -9,7 +9,7 @@ out = Path(sys.argv[1] if len(sys.argv) > 1 else "skill-zip")
 nomi = sys.argv[2:]
 out.mkdir(parents=True, exist_ok=True)
 errori = 0
-for d in sorted(ROOT.glob("efuture-games-*")):
+for d in sorted(ROOT.glob("efuture-games*")):   # anche la skill principale efuture-games
     if nomi and d.name not in nomi:
         continue
     testo = (d / "SKILL.md").read_text(encoding="utf-8")

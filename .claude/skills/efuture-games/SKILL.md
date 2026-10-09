@@ -15,7 +15,7 @@ Rispondi all'utente in italiano, in modo semplice.
    ```
    Contiene stato e versione dell'app (ramo corrente e online), mappa dei file, skill, link e artifact, sessioni di Claude Code ricavate dai commit, ultimi commit e `memoria.md`.
 2. Completa con le fonti esterne, se gli strumenti ci sono. Se uno manca o non risponde, saltalo senza bloccarti:
-   - **Artifact di Claude:** `Artifact` con `action: "list"`. Tieni quelli del gioco (titoli con "Efuture", "SysAdmin", "CoreTech", "Timenet", "Inncloud") e segnala quelli che mancano in `links.json`.
+   - **Artifact di Claude:** `Artifact` con `action: "list"`. Tieni quelli del gioco (titoli con "Efuture", "SysAdmin", "CoreTech", "Timenet", "inncloud") e segnala quelli che mancano in `links.json`.
    - **Sessioni di Claude Code:** `list_sessions` (server claude-code-remote) con `mine: true`. Tieni quelle con titolo o repository efuture_games, anche quelle senza commit.
    - **Pull request:** `list_pull_requests` su `marraliEfuture/efuture_games` (aperte e ultime chiuse).
 3. Non leggere i file del sito per intero adesso: aprili quando servono per il lavoro richiesto.

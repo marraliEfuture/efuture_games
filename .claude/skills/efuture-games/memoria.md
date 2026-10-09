@@ -7,7 +7,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 ## Il progetto
 
 - **Cos'è:** Efuture Games – CARE Conference Edition. Web app (PWA installabile) con 4 giochi da sbloccare con un QR allo stand dei 4 marchi, registrazione senza password e classifica comune.
-- **I giochi:** SysAdmin Runner (Efuture), CoreTech Pac, Timenet Breakout, Inncloud Invaders.
+- **I giochi:** SysAdmin Runner (Efuture), CoreTech Pac, Timenet Breakout, inncloud Invaders.
 - **Dove gira:** GitHub Pages dal ramo `main` → https://marraliefuture.github.io/efuture_games/ · dati su Supabase (regione Frankfurt).
 - **Referente:** marrali@efuture.it (Efuture). Scrive in italiano e preferisce spiegazioni semplici, senza gergo tecnico.
 
@@ -65,7 +65,7 @@ Raccolte alla presentazione del 07/10. Si fanno uno step alla volta: l'utente pr
 
 Correzioni dell'08/10 (v28):
 - Timenet: muro di mattoncini più in alto (y 64→28); la capsula T rende il pallone anche grande (×1,7) con alone viola, così sembra un vantaggio.
-- Inncloud: schieramento nemici più in alto (prima fila y 84→34); niente più sparo automatico: pulsante SPARA (tasto A nel look Game Boy, a destra in orizzontale), tieni premuto = raffica; tastiera Spazio/↑/Z.
+- inncloud: schieramento nemici più in alto (prima fila y 84→34); niente più sparo automatico: pulsante SPARA (tasto A nel look Game Boy, a destra in orizzontale), tieni premuto = raffica; tastiera Spazio/↑/Z.
 
 Correzione dell'08/10 (v29): CoreTech livelli 1–3 semplificati (labirinti simmetrici, corridoi lunghi, niente vicoli), C più lenta di un altro ~15% (bug in proporzione, floppy +1 s), svolta assistita entro 0,35 casella dall'incrocio, joystick con zona morta 30% e isteresi sulle diagonali.
 
@@ -73,7 +73,7 @@ Risposte dell'utente (07/10):
 - L'utente eliminato si cancella davvero dal database e sparisce dalla classifica; il registro eventi resta.
 - Cellulare: via da tutto, anche dal database.
 - Colori più chiari sia nei 4 giochi sia nell'app Efuture Games.
-- Joystick solo in SysAdmin e CoreTech (Timenet e Inncloud restano come sono).
+- Joystick solo in SysAdmin e CoreTech (Timenet e inncloud restano come sono).
 - Ogni step si pubblica su main appena pronto, per provarlo sul telefono.
 
 ## In sospeso / da ricordare

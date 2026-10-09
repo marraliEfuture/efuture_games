@@ -25,7 +25,7 @@ Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
    - **github, claude, chatgpt:** `url` così com'è;
    - **ultime sessioni Claude Code:** prendi i link `Claude-Session:` distinti dagli ultimi commit (`git log -30 --format=%B | grep Claude-Session | awk '!s[$0]++'`, i più recenti prima) e mostra al massimo i 3 più recenti.
 3. Se il tool `Artifact` è disponibile, fai `action: "list"` e controlla gli artifact di Claude:
-   - aggiungi quelli del gioco che mancano in `links.json`: titoli "Efuture Games", "SysAdmin", "CoreTech", "Timenet", "Inncloud";
+   - aggiungi quelli del gioco che mancano in `links.json`: titoli "Efuture Games", "SysAdmin", "CoreTech", "Timenet", "inncloud";
    - segnala quelli in `links.json` che non esistono più.
    Non modificare `links.json` senza chiedere.
 4. Mostra un'unica risposta con una sezione per gruppo, nell'ordine: **Sito** (App, Installazione, Classifica, Admin), **GitHub**, **Claude**, **ChatGPT**. Ogni link è cliccabile e ha una nota breve.

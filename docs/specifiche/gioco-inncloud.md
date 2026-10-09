@@ -1,8 +1,8 @@
-# Gioco Inncloud Invaders
+# Gioco inncloud Invaders
 
 ## In breve
 
-Sparatutto nello stile di Space Invaders. Il giocatore guida la nuvola di Inncloud lungo il fondo dello schermo; il suo cannone è il pallino rosso della "i" del logo e **spara solo quando il giocatore lo comanda** (tasto **SPARA**, Spazio). Dalla v28 non c'è più il fuoco automatico. Dall'alto scende una formazione di bug, virus e hacker che spara codici verdi. Ci si ripara dietro 4 nuvolette-firewall. All'ultimo livello c'è il boss Ransomware.
+Sparatutto nello stile di Space Invaders. Il giocatore guida la nuvola di inncloud lungo il fondo dello schermo; il suo cannone è il pallino rosso della "i" del logo e **spara solo quando il giocatore lo comanda** (tasto **SPARA**, Spazio). Dalla v28 non c'è più il fuoco automatico. Dall'alto scende una formazione di bug, virus e hacker che spara codici verdi. Ci si ripara dietro 4 nuvolette-firewall. All'ultimo livello c'è il boss Ransomware.
 
 - Modalità libera: 5 livelli, nessun limite di tempo.
 - Modalità gara (`?hub=1`): i primi 3 livelli, 1 minuto e 3 vite ciascuno.
@@ -19,16 +19,16 @@ Sparatutto nello stile di Space Invaders. Il giocatore guida la nuvola di Innclo
 ## Storia
 
 - Gli attacchi al cloud diventano sempre più seri: Login sospetto, Phishing, Malware, Botnet e infine il Ransomware, un lucchetto con il teschio e la scritta "PAY $".
-- Il logo Inncloud è una filigrana blu nel cielo: più attaccanti si abbattono, più diventa nitido.
+- Il logo inncloud è una filigrana blu nel cielo: più attaccanti si abbattono, più diventa nitido.
 
 ## Schermate
 
 | Schermata | Contenuto | Pulsanti |
 |---|---|---|
-| **Titolo** (`ov-title`) | Logo Inncloud su badge bianco, INVADERS, "Guida la nuvola di Inncloud e ferma gli hacker.", "Record: N" se esiste. Sul campo, la nuvola | **Inizia**, **Continua · Liv. N** (solo modalità libera, se c'è un livello raggiunto), **Istruzioni** |
+| **Titolo** (`ov-title`) | Logo inncloud su badge bianco, INVADERS, "Guida la nuvola di inncloud e ferma gli hacker.", "Record: N" se esiste. Sul campo, la nuvola | **Inizia**, **Continua · Liv. N** (solo modalità libera, se c'è un livello raggiunto), **Istruzioni** |
 | **Istruzioni** (`howBox`) | Tre righe con disegnino: "Premi SPARA per colpire, trascina per muoverti.", "Abbatti tutti, schiva i codici verdi.", "Riparati dietro le nuvolette." "5 livelli, boss finale." Tasti: Trascina o frecce · Spazio spara · P pausa | – |
 | **Animazione iniziale** | Dopo **Inizia** (e **Gioca ancora**): un hacker scende sul logo, il pallino rosso della "i" parte e lo abbatte, il logo scivola giù e diventa la nuvola, compare INVADERS. Dura 4,3 s; "TOCCA PER SALTARE": un tocco o un tasto la salta | – |
-| **Scheda del livello** (`ov-level`) | "Livello 1/5" (gara: "/3"), nome e frase del livello | **Via!** |
+| **Scheda del livello** (`ov-level`) | **Non compare più:** il livello parte subito, senza nome né frase di spiegazione (la scheda resta nella pagina ma non viene mostrata) | – |
 | **Livello superato** (`ov-clear`) | Dopo 1,1 s: "Attacco respinto", "Livello N superato!", punti, attaccanti abbattuti, tempo | **Prossimo livello** |
 | **Pausa** (`ov-pause`) | PAUSA | **Riprendi**, **Menu** |
 | **Game over** (`ov-over`) | "Cloud violato", GAME OVER, "Difese bucate.", punti, livello N/5 (gara N/3) | **Riprova livello**, **Menu** |
@@ -50,7 +50,7 @@ Regole comuni e protocollo: [giochi-comune.md](giochi-comune.md#modalità-libera
 | Fine | Vittoria dopo il boss | `result` alla fine del livello 3 |
 
 **Messaggi all'app:**
-- `start`: alla scheda del livello 1, cioè dopo l'animazione iniziale.
+- `start`: all'avvio del livello 1, cioè dopo l'animazione iniziale.
 - `tick`: ogni 0,25 s nello stato di gioco, più uno al momento in cui il livello è superato.
 - Livello superato: salva tempo e vite; al livello 3 manda `result` con `ok: true`.
 - Vite finite (anche quando la formazione arriva in fondo): `result` con `reason: 'lives'`, poi GAME OVER.
@@ -60,7 +60,7 @@ Regole comuni e protocollo: [giochi-comune.md](giochi-comune.md#modalità-libera
 
 Campo logico 360 × 600. La nuvola sta a y = 548; le 4 nuvolette-firewall a y = 468.
 
-| Liv. | Nome | Frase | File (dall'alto) | Attaccanti | Velocità formazione | Fuoco nemico | Velocità codici |
+| Liv. | Nome | Frase (non più mostrata) | File (dall'alto) | Attaccanti | Velocità formazione | Fuoco nemico | Velocità codici |
 |---|---|---|---|---|---|---|---|
 | 1 | Login sospetto | "Tre file lente: prendi la mira." | K V B | 3 × 8 = 24 | 16 | 0,55 | 170 |
 | 2 | Phishing | "Virus via email: più file, più veloci." | K V V B | 4 × 8 = 32 | 20 | 0,85 | 185 |
@@ -121,7 +121,7 @@ Campo logico 360 × 600. La nuvola sta a y = 548; le 4 nuvolette-firewall a y = 
 | Musica | – | Pulsante `♪` (in verticale: tasto B) |
 
 - **Fascia di trascinamento** ("Trascina per muoverti · SPARA per colpire"; in verticale solo "Trascina per muoverti", perché la pista è stretta): funziona come un touchpad, spostamento del dito × 1,3.
-- **Tasto SPARA** (`fireBtn`): rotondo, rosso Inncloud con la scritta bianca, almeno 76 px (88 px in orizzontale). Risponde al dito appena appoggiato (non al rilascio) e non fa mai partire il trascinamento della nuvola.
+- **Tasto SPARA** (`fireBtn`): rotondo, rosso inncloud con la scritta bianca, almeno 76 px (88 px in orizzontale). Risponde al dito appena appoggiato (non al rilascio) e non fa mai partire il trascinamento della nuvola.
 - **Sul campo:** la nuvola va dove si tocca e segue il dito.
 - **Mouse:** la nuvola segue il puntatore anche senza cliccare.
 - Multi-touch: un dito muove la nuvola (fascia o campo) e intanto un altro può tenere premuto SPARA. Per il movimento si segue un solo dito alla volta.
@@ -140,7 +140,7 @@ Campo logico 360 × 600. La nuvola sta a y = 548; le 4 nuvolette-firewall a y = 
 |---|---|---|
 | `--ic-red` | `#c00000` | Rosso del pallino della "i": colpi, pulsanti, tasto SPARA, titoli |
 | `--ic-red-hi` | `#ff3b3b` | Riflesso dei colpi, barra del boss |
-| `--ic-ink` | `#272727` | Grigio della scritta Inncloud |
+| `--ic-ink` | `#272727` | Grigio della scritta inncloud |
 | `--navy` | `#004675` | Punti, valori, filigrana del logo |
 | `--hack` | `#13843f` | Verde degli attaccanti nei testi (sul campo `#13a04a`) |
 | `--danger` | `#d93a33` | Game over |

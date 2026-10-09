@@ -29,7 +29,7 @@ Elenco `GAMES` in `hub.js`:
 | `sysadmin` | SysAdmin Runner | Efuture | `img/g-sysadmin.png` | `games/sysadmin/index.html` |
 | `coretech` | CoreTech Pac | CoreTech | `img/g-coretech.png` | `games/coretech/index.html` |
 | `timenet` | Timenet Breakout | Timenet | `img/g-timenet.png` | `games/timenet/index.html` |
-| `inncloud` | Inncloud Invaders | Inncloud | `img/g-inncloud.png` | `games/inncloud/index.html` |
+| `inncloud` | inncloud Invaders | inncloud | `img/g-inncloud.png` | `games/inncloud/index.html` |
 
 Ogni voce contiene anche `hash`, l'impronta del codice di sblocco (vedi [Sblocco](#sblocco)). Gli stessi id si usano nel database (`efg_scores.game`), nella classifica e nell'admin.
 
@@ -127,7 +127,7 @@ Finestra `mAuth` con due schede: **Registrati** e **Accedi**.
 **Avvio:**
 - Se la gara è in attesa di apertura o chiusa, il gioco non parte. Toast: "I giochi non sono ancora aperti." oppure "La gara è chiusa.".
 - Altrimenti si apre il **player** a tutto schermo con una barra in alto:
-  - `← Giochi`;
+  - `← Torna ai giochi` (pulsante blu Efuture `--ef-navy` con scritta bianca);
   - nome del gioco;
   - orologio del livello;
   - logo.

@@ -28,7 +28,7 @@ GAMES = [  # stesso ordine di hub.js
     ("sysadmin", "SysAdmin Runner", "Efuture"),
     ("coretech", "CoreTech Pac", "CoreTech"),
     ("timenet", "Timenet Breakout", "Timenet"),
-    ("inncloud", "Inncloud Invaders", "Inncloud"),
+    ("inncloud", "inncloud Invaders", "inncloud"),
 ]
 NAVY, ORANGE, WHITE, MUTED = "#041a2c", "#f28c1e", "#f2f6fa", "#8fb0c8"
 W, H = 776, 1076
