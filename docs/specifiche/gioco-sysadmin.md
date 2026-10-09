@@ -22,7 +22,7 @@ Platform a scorrimento orizzontale. Il giocatore è il sysadmin di guardia (la t
 ## Storia
 
 - Ogni livello è il **ticket di un cliente**, in una stanza a tema. Il cliente aspetta in cima a una scala alla fine del livello.
-- I clienti: Marco (Ufficio), Giulia (Sala Server), Paolo (Zona Firewall), Elena (Sala Rete), Davide (Data Center Cloud), Sara (Sala Controllo), Fabio (Sala Sviluppo), Ilaria (Sala Database), Team IT (Difesa Critica).
+- I clienti: Marco (Alba nel campo), Giulia (Open space al tramonto), Paolo (Notte di emergenza), Elena (Sala Rete), Davide (Data Center Cloud), Sara (Sala Controllo), Fabio (Sala Sviluppo), Ilaria (Sala Database), Team IT (Difesa Critica).
 - Livello 10: **l'hacker** nel Bunker dell'Hacker. Sconfitto lui, il Capo promuove il giocatore a "Senior Sysadmin".
 
 ## Schermate
@@ -33,7 +33,7 @@ Le schermate sono overlay sopra il canvas, con una card bianca al centro.
 |---|---|---|
 | **Titolo** (`ov-title`) | Riga piccola "Livello 1 di 10 · missione IT" (in gara: "3 livelli · 1 minuto · 3 vite"), titolo EFUTURE BROS, "Sei il sistemista di Efuture: elimina i bug del cliente. Ne sarà soddisfatto!" In modalità libera anche "Record attuale" (tempo) e "Miglior pulizia" (%), se esistono | **Inizia**, **Continua · Liv. N** (solo modalità libera, se c'è un livello raggiunto), **Istruzioni** |
 | **Istruzioni** (`howBox`, dentro il titolo) | Salta sui bug o lanciagli il mouse · Schiva chiodi, scosse e seghe · 3 bug di fila: sblocchi l'antivirus · Sali la scala e raggiungi il cliente. Sotto: ← → muovi · ↑ salta · X mouse · V antivirus | – |
-| **Scheda del livello** (`ov-intro`) | Etichetta "Cliente N/9" (gara: "Livello N/3"; boss: "Livello finale", viola), "Ticket di *Nome*" (boss: "*Nome* — *Stanza*"), messaggio del cliente (per esempio "La stampante non va e ci sono bug ovunque!") | **Risolvi!** (boss: **Affrontalo**) |
+| **Scheda del livello** (`ov-intro`) | Etichetta "Cliente N/9" (gara: "Livello N/3"; boss: "Livello finale", viola), "Ticket di *Nome*" (boss: "*Nome* — *Stanza*"), messaggio del cliente (per esempio "È l'alba: gioca d'anticipo e ferma i bug prima che arrivino in ufficio!") | **Risolvi!** (boss: **Affrontalo**) |
 | **Cliente non convinto** (`ov-complaint`) | Si apre se si arriva al cliente con bug ancora vivi: "*Nome* non è convinto", "Ci sono ancora N bug in giro. Torni a stanarli?" | **Torna a debuggare** (riporta il giocatore prima della scala), **Chiudi il ticket** |
 | **Livello completato** (`ov-complete`) | "Problema risolto", "*Nome* ringrazia!" con il ringraziamento del cliente; se rimasti bug: "*Nome* ringrazia, ma..." e "Ma qualche bug è rimasto in giro." Punteggio | **Prossimo ticket** |
 | **Pausa** (`ov-pause`) | PAUSA | **Riprendi**, **Riparti dal ticket**, **Menu** |
@@ -50,7 +50,7 @@ Regole comuni e protocollo: [giochi-comune.md](giochi-comune.md#modalità-libera
 
 | | Modalità libera | Modalità gara (`?hub=1`) |
 |---|---|---|
-| Livelli | 10 (Marco … Team IT, poi l'hacker) | 3: Marco (Ufficio), Giulia (Sala Server), Paolo (Zona Firewall). Niente boss |
+| Livelli | 10 (Marco … Team IT, poi l'hacker) | 3: Marco (Alba nel campo), Giulia (Open space al tramonto), Paolo (Notte di emergenza). Niente boss |
 | Vite | 3 a inizio partita, si portano da un livello all'altro; **Continua** e **Riprova ticket** le riportano a 3 | 3 a ogni livello. "Riparti dal ticket" (pausa) non ridà le vite |
 | Progressi | `sysadminRunnerProgress` (`bestUnlocked`): pulsante **Continua** | Nessun Continua |
 | Fine | Vittoria dopo il boss | `result` alla fine del livello 3 (senza schermata del gioco) |
@@ -66,11 +66,23 @@ Regole comuni e protocollo: [giochi-comune.md](giochi-comune.md#modalità-libera
 
 Campo logico 960 × 540, terreno a y = 470. I livelli 1–9 sono generati da un generatore pseudo-casuale con seme fisso per livello (`1000 + indice × 37`): ogni livello è **sempre uguale**.
 
-**Regole di generazione (indice i = 0…8):**
+**I primi 3 livelli** (quelli della gara) raccontano una giornata di lavoro e sono più lunghi, con più bug (circa 35–45 secondi sul minuto a disposizione):
+
+| Liv. | Sfondo | Cosa rappresenta | Parametri (`LV3` nel codice) |
+|---|---|---|---|
+| 1 | **Alba nel campo**: campo di grano su più piani che ondeggia, sole che sorge con raggi e alone, colline e nuvole rosate. Se esiste `games/sysadmin/img/alba.jpg` (l'immagine dell'evento) il cielo è quella foto, che scorre piano | Proattività: si parte presto | lunghezza 6200, 15 bug a terra, 2 volanti, 2 chiodi, 1 scossa, nessuna sega, burroni 16%, bug 60 px/s |
+| 2 | **Open space al tramonto**: vetrate sul tramonto con lo skyline, file di scrivanie con pc e stampanti da cui volano via i fogli | Quasi fine giornata | lunghezza 7000, 16 bug, 4 volanti, 3 chiodi, 2 scosse, 2 seghe, burroni 24%, bug 72 px/s |
+| 3 | **Notte di emergenza**: cielo stellato con la luna, palazzi bui con poche finestre accese, luce rossa d'emergenza che lampeggia. Bug **cattivi con il cappuccio** e occhi rossi (anche quelli volanti) | Emergenza | lunghezza 7800, 20 bug, 5 volanti, 4 chiodi, 4 scosse (accese più a lungo), 3 seghe più veloci (140 px/s), burroni 30%, bug 88 px/s |
+
+Nei primi 3 livelli i tratti di terreno sono più ampi (320–600 px) e i bug pattugliano 60–140 px. I numeri sono obiettivi: se un bug o una trappola non trova posto non viene messo (vedi la tabella sotto).
+
+**Bug e trappole non si sovrappongono mai:** prima si piazzano le trappole, poi i bug a terra, che restano ad almeno 50 px da ogni trappola (per una sega: da tutto il suo percorso). I bug volanti non volano sopra le trappole (60 px di margine).
+
+**Regole di generazione dei livelli 4–9 (indice i = 3…8):**
 - lunghezza base 3400 + 520·i px, più la scala finale;
 - tratti di terreno da 220–440 px; probabilità di burrone dopo un tratto min(0,16 + 0,05·i; 0,58), largo 90–145 px (+ fino a 35);
 - piattaforme sospese (110–180 px) con probabilità 0,4 + 0,02·i per tratto;
-- bug a terra: 4 + round(1,15·i), velocità 55 + 7·i (+0…30) px/s, pattugliano 90–180 px;
+- bug a terra: 6 + round(1,4·i) (meno se non trovano posto lontano dalle trappole), velocità 55 + 7·i (+0…30) px/s, pattugliano 90–180 px;
 - bug volanti: dal livello 4, min(i − 2; 6), ondeggiano in verticale;
 - chiodi dal livello 2, scosse elettriche dal livello 3, seghe dal livello 4 (velocità 85 + 9·i px/s). Ogni trappola ha almeno 110 px di terreno libero prima e dopo;
 - in fondo una scala di 6 gradini con il pianerottolo (150 px) e la **porta del piano superiore** (46×80 px, anta in legno con finestrella e maniglia, cartello verde "PIANO SUP."). Il **cliente sta davanti alla porta**, un po' spostato a destra. La porta si apre (anta che ruota sul cardine sinistro e luce verde dentro, con ▲) quando il giocatore arriva a meno di 120 px, e si richiude se si allontana.
@@ -80,15 +92,15 @@ Campo logico 960 × 540, terreno a y = 470. I livelli 1–9 sono generati da un 
 
 | Liv. | Cliente – stanza | Lunghezza (px) | Burroni | Piattaforme | Bug a terra | Bug volanti | Chiodi | Scosse | Seghe |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | Marco – Ufficio | 3544 | 1 | 2 | 4 | 0 | 0 | 0 | 0 |
-| 2 | Giulia – Sala Server | 4178 | 4 | 3 | 5 | 0 | 1 | 0 | 0 |
-| 3 | Paolo – Zona Firewall | 4595 | 4 | 7 | 6 | 0 | 2 | 1 | 0 |
-| 4 | Elena – Sala Rete | 5185 | 2 | 6 | 7 | 1 | 2 | 2 | 1 |
-| 5 | Davide – Data Center Cloud | 5770 | 4 | 7 | 9 | 2 | 3 | 2 | 2 |
-| 6 | Sara – Sala Controllo | 6278 | 6 | 9 | 10 | 3 | 3 | 3 | 1 |
-| 7 | Fabio – Sala Sviluppo | 6703 | 10 | 10 | 11 | 4 | 4 | 4 | 0 |
-| 8 | Ilaria – Sala Database | 7342 | 12 | 9 | 12 | 5 | 4 | 4 | 0 |
-| 9 | Team IT – Difesa Critica | 7704 | 8 | 11 | 13 | 6 | 5 | 5 | 1 |
+| 1 | Marco – Alba nel campo | 6384 | 1 | 2 | 15 | 2 | 2 | 1 | 0 |
+| 2 | Giulia – Open space al tramonto | 7184 | 5 | 3 | 15 | 4 | 3 | 2 | 2 |
+| 3 | Paolo – Notte di emergenza | 8095 | 8 | 4 | 17 | 5 | 4 | 4 | 2 |
+| 4 | Elena – Sala Rete | 5225 | 2 | 6 | 7 | 1 | 2 | 2 | 1 |
+| 5 | Davide – Data Center Cloud | 5810 | 4 | 7 | 8 | 2 | 3 | 2 | 1 |
+| 6 | Sara – Sala Controllo | 6318 | 6 | 9 | 9 | 3 | 3 | 3 | 1 |
+| 7 | Fabio – Sala Sviluppo | 6743 | 10 | 10 | 9 | 4 | 4 | 4 | 0 |
+| 8 | Ilaria – Sala Database | 7382 | 12 | 9 | 6 | 5 | 4 | 4 | 2 |
+| 9 | Team IT – Difesa Critica | 7744 | 8 | 11 | 12 | 6 | 5 | 5 | 0 |
 | 10 | Bunker dell'Hacker | 1500 | 0 | 3 | boss | – | – | 1 | 1 |
 
 In gara si giocano solo le prime 3 righe.
@@ -99,7 +111,7 @@ In gara si giocano solo le prime 3 righe.
 
 L'antivirus è sbloccato dall'inizio.
 
-**Temi:** ogni stanza ha cielo, terreno, oggetti sullo sfondo (monitor, rack, router, nuvole, database…), un effetto animato (scansione, braci, radar, pioggia di codice, allarme rosso, matrice…) e una specie di bug con il suo colore.
+**Temi:** i primi 3 livelli hanno uno sfondo disegnato a parte (alba, open space, notte: vedi sopra). Le altre stanze hanno cielo, terreno, oggetti sullo sfondo (monitor, rack, router, nuvole, database…), un effetto animato (scansione, braci, radar, pioggia di codice, allarme rosso, matrice…) e una specie di bug con il suo colore.
 
 ## Meccaniche
 

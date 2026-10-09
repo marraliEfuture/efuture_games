@@ -608,6 +608,10 @@ const COYOTE_TIME = 0.09;
 const JUMP_BUFFER = 0.12;
 
 const THEMES = {
+  // i primi 3 livelli (quelli della gara): alba, tramonto in open space, notte. scene = sfondo disegnato a parte
+  alba:     { name:"Alba nel campo",   sky:["#2e3f73","#f6b26b"], ground:"#8a6a3f", groundTop:"#c99a4b", props:[], fx:"none", scene:"alba",      bug:{species:"roundBug",  color:"#ff5d56"}, fly:"#d9584a" },
+  openspace:{ name:"Open space al tramonto", sky:["#4a3a6b","#f08a4b"], ground:"#7b8794", groundTop:"#4d5866", props:[], fx:"none", scene:"openspace", bug:{species:"glitchBug", color:"#12a9cf"}, fly:"#1597b8" },
+  notte:    { name:"Notte di emergenza", sky:["#070b1a","#1a2240"], ground:"#2c3450", groundTop:"#6a78a8", props:[], fx:"none", scene:"notte",     bug:{species:"hoodBug",   color:"#7a4fc0"}, fly:"#8a55d0" },
   office:   { name:"Ufficio",          sky:["#e3effa","#cfe1f1"], ground:"#9fb6cc", groundTop:"#5d7f9f", props:["monitor","printer","cable","monitor"], fx:"none",     bug:{species:"roundBug",  color:"#ff5d56"}, fly:"#d9584a" },
   server:   { name:"Sala Server",      sky:["#e2eef6","#cadded"], ground:"#97adc2", groundTop:"#56738f", props:["rack","cable","rack"],    fx:"scan",     bug:{species:"glitchBug", color:"#12a9cf"}, fly:"#1597b8" },
   firewall: { name:"Zona Firewall",    sky:["#fbece4","#f3d9cc"], ground:"#c9a596", groundTop:"#9a6656", props:["brick","flame","shield"],   fx:"embers",   bug:{species:"spikyBug",  color:"#f07a12"}, fly:"#e8603a" },
@@ -621,9 +625,9 @@ const THEMES = {
 };
 
 const CLIENTS = [
-  { name:"Marco", g:"m", hair:"#3b2a1e",   theme:"office",   msg:"La stampante non va e ci sono bug ovunque!", thanks:"Marco torna a stampare, grazie!", shape:"suit",     color:"#3a6ea5", skin:"#e8b98a", accessory:"none" },
-  { name:"Giulia", g:"f", hair:"#2a1a12",  theme:"server",   msg:"Il server è bloccato, bug tra i rack!", thanks:"Server di nuovo in piedi, grazie!", shape:"labcoat",  color:"#eef2f5", skin:"#8a5a3c", accessory:"glasses" },
-  { name:"Paolo", g:"m", hair:"#6b4a2a",   theme:"firewall", msg:"Firewall bucato: entrano i bug!", thanks:"Firewall sigillato!", shape:"uniform",  color:"#c65b3c", skin:"#e0a878", accessory:"cap" },
+  { name:"Marco", g:"m", hair:"#3b2a1e",   theme:"alba",     msg:"È l'alba: gioca d'anticipo e ferma i bug prima che arrivino in ufficio!", thanks:"Giornata partita senza intoppi, grazie!", shape:"suit",     color:"#3a6ea5", skin:"#e8b98a", accessory:"none" },
+  { name:"Giulia", g:"f", hair:"#2a1a12",  theme:"openspace", msg:"Quasi fine giornata: stampanti impazzite, fogli che volano e bug tra le scrivanie!", thanks:"Open space in ordine, si torna a casa!", shape:"labcoat",  color:"#eef2f5", skin:"#8a5a3c", accessory:"glasses" },
+  { name:"Paolo", g:"m", hair:"#6b4a2a",   theme:"notte",    msg:"Emergenza notturna: bug incappucciati nei sistemi. Attento alle trappole!", thanks:"Emergenza rientrata, grazie!", shape:"uniform",  color:"#c65b3c", skin:"#e0a878", accessory:"cap" },
   { name:"Elena", g:"f", hair:"#a0522d",   theme:"network",  msg:"Niente rete: cavi infestati dai bug!", thanks:"Rete ripristinata!", shape:"hoodie2",  color:"#3ba893", skin:"#f0c9a0", accessory:"headset" },
   { name:"Davide", g:"m", hair:"#1e1a18",  theme:"cloud",    msg:"Bug volanti nel cloud!", thanks:"Cloud ripulito!", shape:"poncho",   color:"#5b9bd9", skin:"#c9925f", accessory:"none" },
   { name:"Sara", g:"f", hair:"#d9b26a",    theme:"control",  msg:"Monitor in tilt, bug ovunque!", thanks:"Schermi tornati verdi!", shape:"dress",    color:"#9a6fd9", skin:"#e8b98a", accessory:"glasses" },
@@ -748,20 +752,27 @@ let specialPressedEdge = false;
 /* =========================================================
    LEVEL BUILDING
 ========================================================= */
+// primi 3 livelli: più lunghi e con più bug (circa 35-45 secondi su 60); la notte ha le trappole più pericolose
+const LV3 = [
+  { width:6200, bugs:15, fly:2, spikes:2, zappers:1, saws:0, gap:0.16, bugSpeed:60, sawSpeed:90,  zapOn:0.7 },
+  { width:7000, bugs:16, fly:4, spikes:3, zappers:2, saws:2, gap:0.24, bugSpeed:72, sawSpeed:110, zapOn:0.8 },
+  { width:7800, bugs:20, fly:5, spikes:4, zappers:4, saws:3, gap:0.30, bugSpeed:88, sawSpeed:140, zapOn:1.0 },
+];
 function buildNormalLevel(idx){
   const rand = mulberry32(1000 + idx*37);
   const client = CLIENTS[idx];
   const theme = THEMES[client.theme];
-  const width = 3400 + idx*520;
+  const cfg = LV3[idx] || null;
+  const width = cfg ? cfg.width : 3400 + idx*520;
 
   const segments = [];
   let x = 0;
   const safeStart = 340;
   segments.push({x1:0, x2:safeStart});
   x = safeStart;
-  const gapChance = Math.min(0.16 + idx*0.05, 0.58);
+  const gapChance = cfg ? cfg.gap : Math.min(0.16 + idx*0.05, 0.58);
   while (x < width - 420){
-    const segLen = 220 + rand()*220;
+    const segLen = cfg ? 320 + rand()*280 : 220 + rand()*220;   // nei livelli lunghi tratti più ampi: c'è posto per bug e trappole separati
     const segX1 = x;
     const segX2 = Math.min(segX1 + segLen, width - 420);
     segments.push({x1:segX1, x2:segX2});
@@ -784,42 +795,6 @@ function buildNormalLevel(idx){
     }
   }
 
-  const enemies = [];
-  const numBugs = 6 + Math.round(idx*1.4);
-  const bugZones = [];   // percorsi già occupati: i bug non si sovrappongono
-  let placed = 0, tries = 0;
-  while (placed < numBugs && tries < 600){
-    tries++;
-    const segI = 1 + Math.floor(rand()*(segments.length-2));
-    const s = segments[segI];
-    const segW = s.x2 - s.x1;
-    if (segW < 90) continue;
-    const patrolW = Math.min(segW - 20, 90 + rand()*90);
-    const patrolMin = s.x1 + 10 + rand()*Math.max(1,(segW-patrolW-20));
-    const patrolMax = patrolMin + patrolW;
-    const z1 = patrolMin - 30, z2 = patrolMax + 38 + 30;
-    if (bugZones.some(([a,b]) => z2 > a && z1 < b)) continue;
-    bugZones.push([z1, z2]);
-    const speed = (55 + idx*7 + rand()*30) * (rand()<0.5?1:-1);
-    enemies.push({
-      type:'bug', x:(patrolMin+patrolMax)/2, y:GROUND_Y, w:38, h:30,
-      vx:speed, patrolMin, patrolMax, alive:true, hurtCd:0, wobble:rand()*10
-    });
-    placed++;
-  }
-
-  const numFly = idx >= 3 ? Math.min(idx-2, 6) : 0;
-  for (let i=0;i<numFly;i++){
-    const fx = 500 + rand()*(width-1100);
-    enemies.push({
-      type:'flybug', x:fx, y:GROUND_Y-140, w:34, h:26, alive:true,
-      baseY: GROUND_Y - (110 + rand()*130),
-      amp: 40 + rand()*35, freq: 1.1 + rand()*0.9, phase: rand()*10,
-      vx:(28+rand()*24)*(rand()<0.5?1:-1), patrolMin:Math.max(0,fx-160), patrolMax:Math.min(width-40,fx+160),
-      hurtCd:0
-    });
-  }
-
   // environmental traps: spikes (jump over), zappers (timed electric arc), saws (patrolling blade)
   // every trap reserves its hazard span PLUS a safety pad, and never overlaps another
   // trap's reserved span, so there is always clear, reachable ground before and after it.
@@ -829,7 +804,7 @@ function buildNormalLevel(idx){
   const fitsReserved = (x1,x2) => reserved.every(([a,b]) => x2<=a || x1>=b);
 
   function placeTrap(minSegW, hazardW, build){
-    for (let tries2=0; tries2<50; tries2++){
+    for (let tries2=0; tries2<(cfg ? 300 : 50); tries2++){
       const segI = 1+Math.floor(rand()*(segments.length-2));
       const s = segments[segI];
       const segW = s.x2-s.x1;
@@ -845,28 +820,69 @@ function buildNormalLevel(idx){
     return false;
   }
 
-  const numSpikes = idx>=1 ? 1+Math.floor(idx*0.55) : 0;
+  const numSpikes = cfg ? cfg.spikes : idx>=1 ? 1+Math.floor(idx*0.55) : 0;
   for (let n=0;n<numSpikes;n++){
     const tw = 52+rand()*22;
     placeTrap(tw+PAD*2, tw, (tx)=>{
       traps.push({type:'spikes', x:tx, y:GROUND_Y-20, w:tw, h:20});
     });
   }
-  const numZappers = idx>=2 ? 1+Math.floor((idx-1)*0.6) : 0;
+  const numZappers = cfg ? cfg.zappers : idx>=2 ? 1+Math.floor((idx-1)*0.6) : 0;
   for (let n=0;n<numZappers;n++){
     placeTrap(14+PAD*2, 14, (tx)=>{
-      traps.push({type:'zapper', x:tx, w:14, topY:GROUND_Y-134, period:1.9+rand()*1.0, onDur:0.7+rand()*0.35, phase:rand()*10});
+      traps.push({type:'zapper', x:tx, w:14, topY:GROUND_Y-134, period:1.9+rand()*1.0, onDur:(cfg ? cfg.zapOn : 0.7)+rand()*0.35, phase:rand()*10});
     });
   }
-  const numSaws = idx>=3 ? 1+Math.floor((idx-2)*0.55) : 0;
+  const numSaws = cfg ? cfg.saws : idx>=3 ? 1+Math.floor((idx-2)*0.55) : 0;
   for (let n=0;n<numSaws;n++){
     const sw = 36;
     const patrolW = 90+rand()*70;
     placeTrap(patrolW+sw+PAD*2, patrolW+sw, (tx, s)=>{
       const patrolMin = tx;
       const patrolMax = tx+patrolW;
-      const speed = (85+idx*9)*(rand()<0.5?1:-1);
+      const speed = (cfg ? cfg.sawSpeed : 85+idx*9)*(rand()<0.5?1:-1);
       traps.push({type:'saw', x:(patrolMin+patrolMax)/2, y:GROUND_Y-sw, w:sw, h:sw, vx:speed, patrolMin, patrolMax, spin:0});
+    });
+  }
+
+  // bug a terra dopo le trappole: mai sopra una trappola né sopra un altro bug
+  const enemies = [];
+  const numBugs = cfg ? cfg.bugs : 6 + Math.round(idx*1.4);
+  // percorsi già occupati: la trappola con 50 px liberi per lato, poi gli altri bug
+  const bugZones = traps.map(tr => tr.type==='saw' ? [tr.patrolMin-50, tr.patrolMax+tr.w+50] : [tr.x-50, tr.x+tr.w+50]);
+  let placed = 0, tries = 0;
+  while (placed < numBugs && tries < 3000){
+    tries++;
+    const segI = 1 + Math.floor(rand()*(segments.length-2));
+    const s = segments[segI];
+    const segW = s.x2 - s.x1;
+    if (segW < 90) continue;
+    const patrolW = Math.min(segW - 20, cfg ? 60 + rand()*80 : 90 + rand()*90);
+    const patrolMin = s.x1 + 10 + rand()*Math.max(1,(segW-patrolW-20));
+    const patrolMax = patrolMin + patrolW;
+    const z1 = patrolMin - 30, z2 = patrolMax + 38 + 30;
+    if (bugZones.some(([a,b]) => z2 > a && z1 < b)) continue;
+    bugZones.push([z1, z2]);
+    const speed = ((cfg ? cfg.bugSpeed : 55 + idx*7) + rand()*30) * (rand()<0.5?1:-1);
+    enemies.push({
+      type:'bug', x:(patrolMin+patrolMax)/2, y:GROUND_Y, w:38, h:30,
+      vx:speed, patrolMin, patrolMax, alive:true, hurtCd:0, wobble:rand()*10
+    });
+    placed++;
+  }
+
+  const numFly = cfg ? cfg.fly : idx >= 3 ? Math.min(idx-2, 6) : 0;
+  const hazards = traps.map(tr => tr.type==='saw' ? [tr.patrolMin, tr.patrolMax+tr.w] : [tr.x, tr.x+tr.w]);
+  for (let i=0, tries3=0; i<numFly && tries3<200; tries3++){
+    const fx = 500 + rand()*(width-1100);
+    if (hazards.some(([a,b]) => fx+160+34 > a-60 && fx-160 < b+60)) continue;   // non vola sopra una trappola
+    i++;
+    enemies.push({
+      type:'flybug', x:fx, y:GROUND_Y-140, w:34, h:26, alive:true,
+      baseY: GROUND_Y - (110 + rand()*130),
+      amp: 40 + rand()*35, freq: 1.1 + rand()*0.9, phase: rand()*10,
+      vx:(28+rand()*24)*(rand()<0.5?1:-1), patrolMin:Math.max(0,fx-160), patrolMax:Math.min(width-40,fx+160),
+      hurtCd:0
     });
   }
 
@@ -1701,6 +1717,7 @@ function drawThemeFX(fx, t){
 
 function drawBackground(t){
   const th = level.theme;
+  if (th.scene){ drawScene(th.scene, t); return; }
   const g = ctx.createLinearGradient(0,0,0,VH);
   g.addColorStop(0, th.sky[0]); g.addColorStop(1, th.sky[1]);
   ctx.fillStyle = g;
@@ -1727,6 +1744,134 @@ function drawBackground(t){
     propIcon(kind, px, py, 46 + (rand()*14), t + i);
   }
   ctx.restore();
+}
+
+/* ---- sfondi dei primi 3 livelli: alba, tramonto in open space, notte ----
+   Alba: se c'è img/alba.jpg (l'immagine dell'evento) si usa quella, altrimenti il campo di grano disegnato. */
+const ALBA_IMG = new Image(); let albaImgOk = false;
+ALBA_IMG.onload = ()=>{ albaImgOk = ALBA_IMG.naturalWidth > 0; };
+ALBA_IMG.src = 'img/alba.jpg';
+function wrapX(x, span){ return ((x % span) + span) % span; }
+function drawWheat(baseY, h, step, par, col1, col2, t, seed){
+  // fila di spighe che ondeggiano, con parallasse
+  const off = camX*par, span = VW + step*2;
+  ctx.lineCap = 'round';
+  for (let i=0; i*step < span; i++){
+    const gx = i*step - wrapX(off, step) - step;
+    const k = Math.floor((off + gx) / step) + seed;
+    const hh = h*(0.75 + 0.25*((k*9301+49297)%233)/233);
+    const sway = Math.sin(t*1.6 + k*0.7)*4;
+    ctx.strokeStyle = (k%2) ? col1 : col2; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(gx, baseY); ctx.quadraticCurveTo(gx+sway*0.5, baseY-hh*0.6, gx+sway, baseY-hh); ctx.stroke();
+    ctx.fillStyle = (k%2) ? col1 : col2;
+    ctx.beginPath(); ctx.ellipse(gx+sway, baseY-hh-5, 3, 8, sway*0.04, 0, 7); ctx.fill();
+  }
+}
+function drawScene(kind, t){
+  if (kind === 'alba'){
+    if (albaImgOk){
+      // immagine dell'evento: copre il cielo, scorre piano
+      const k = Math.max(VW*1.25/ALBA_IMG.naturalWidth, VH/ALBA_IMG.naturalHeight), w = ALBA_IMG.naturalWidth*k, h = ALBA_IMG.naturalHeight*k;
+      const x = -((camX*0.05) % Math.max(1, w - VW));
+      ctx.drawImage(ALBA_IMG, x, VH - h, w, h);
+      ctx.fillStyle = 'rgba(255,190,120,0.10)'; ctx.fillRect(0,0,VW,VH);
+      return;
+    }
+    const g = ctx.createLinearGradient(0,0,0,GROUND_Y);
+    g.addColorStop(0,'#2e3f73'); g.addColorStop(0.45,'#c97a8a'); g.addColorStop(0.75,'#f6b26b'); g.addColorStop(1,'#ffd99a');
+    ctx.fillStyle = g; ctx.fillRect(0,0,VW,VH);
+    // sole che sorge all'orizzonte, con alone
+    const sx = VW*0.62 - camX*0.02, sy = GROUND_Y - 120;
+    const glow = ctx.createRadialGradient(sx, sy, 10, sx, sy, 300);
+    glow.addColorStop(0,'rgba(255,240,190,0.95)'); glow.addColorStop(0.15,'rgba(255,214,140,0.7)'); glow.addColorStop(1,'rgba(255,190,120,0)');
+    ctx.fillStyle = glow; ctx.fillRect(0,0,VW,VH);
+    ctx.fillStyle = '#fff3cf'; ctx.beginPath(); ctx.arc(sx, sy, 46, 0, 7); ctx.fill();
+    // raggi
+    ctx.save(); ctx.globalAlpha = 0.10; ctx.fillStyle = '#fff6d8';
+    for (let i=0;i<9;i++){ const a = -Math.PI + i*Math.PI/8 + Math.sin(t*0.2)*0.03; ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(sx+Math.cos(a-0.05)*900, sy+Math.sin(a-0.05)*900); ctx.lineTo(sx+Math.cos(a+0.05)*900, sy+Math.sin(a+0.05)*900); ctx.fill(); }
+    ctx.restore();
+    // nuvole rosate
+    ctx.fillStyle = 'rgba(255,214,214,0.45)';
+    for (let i=0;i<4;i++){ const cx = wrapX(i*300 - camX*0.06 + t*6, VW+400) - 200; ctx.beginPath(); ctx.ellipse(cx, 70+i*28, 110, 16, 0, 0, 7); ctx.fill(); }
+    // colline lontane e campo di grano su più piani
+    ctx.fillStyle = '#9c6b5a';
+    ctx.beginPath(); ctx.moveTo(0, GROUND_Y-150);
+    for (let x=0; x<=VW; x+=20) ctx.lineTo(x, GROUND_Y-150 - 18*Math.sin((x + camX*0.1)*0.008));
+    ctx.lineTo(VW, GROUND_Y); ctx.lineTo(0, GROUND_Y); ctx.fill();
+    const f = ctx.createLinearGradient(0, GROUND_Y-140, 0, GROUND_Y);
+    f.addColorStop(0,'#d9a441'); f.addColorStop(1,'#b97f2a');
+    ctx.fillStyle = f; ctx.fillRect(0, GROUND_Y-120, VW, 120);
+    drawWheat(GROUND_Y-95, 22, 9, 0.2, '#e8b955', '#cf9a3c', t, 3);
+    drawWheat(GROUND_Y-55, 32, 12, 0.35, '#f0c463', '#d6a043', t, 7);
+    drawWheat(GROUND_Y+2, 46, 15, 0.6, '#f6cf6e', '#dcaa4b', t, 11);
+    drawBgLogo();
+    return;
+  }
+  if (kind === 'openspace'){
+    // parete con grandi vetrate sul tramonto
+    ctx.fillStyle = '#3b3550'; ctx.fillRect(0,0,VW,VH);
+    const WIN = 230, off = wrapX(camX*0.25, WIN);
+    for (let wx = -off; wx < VW; wx += WIN){
+      const g = ctx.createLinearGradient(0, 30, 0, 300);
+      g.addColorStop(0,'#5b3f7a'); g.addColorStop(0.55,'#f07d5a'); g.addColorStop(1,'#ffc06b');
+      ctx.fillStyle = g; ctx.fillRect(wx+14, 30, WIN-28, 270);
+      // sole basso e skyline
+      ctx.fillStyle = 'rgba(255,220,150,0.9)'; ctx.beginPath(); ctx.arc(wx+WIN*0.5, 262, 26, Math.PI, 0); ctx.fill();
+      ctx.fillStyle = '#2b2440';
+      for (let b=0;b<6;b++){ const bh = 30 + ((b*37 + Math.floor((wx+camX*0.25)/WIN)*13) % 70); ctx.fillRect(wx+14+b*(WIN-28)/6, 300-bh, (WIN-28)/6-3, bh); }
+      ctx.fillStyle = '#2a2438'; ctx.fillRect(wx+WIN/2-3, 30, 6, 270);
+    }
+    ctx.fillStyle = '#4a4360'; ctx.fillRect(0, 300, VW, GROUND_Y-300);
+    ctx.fillStyle = 'rgba(255,170,110,0.10)'; ctx.fillRect(0,0,VW,VH);
+    // file di scrivanie con pc e stampanti (parallasse), da cui escono fogli
+    const DESK = 200, doff = wrapX(camX*0.55, DESK);
+    for (let dx = -doff - DESK; dx < VW + DESK; dx += DESK){
+      const k = Math.round((dx + camX*0.55) / DESK);
+      const y = GROUND_Y - 58;
+      ctx.fillStyle = '#c8a27a'; ctx.fillRect(dx+10, y, DESK-30, 10);
+      ctx.fillStyle = '#8a6d50'; ctx.fillRect(dx+18, y+10, 8, 48); ctx.fillRect(dx+DESK-38, y+10, 8, 48);
+      if (k % 3 === 0){ // stampante
+        ctx.save(); ctx.globalAlpha = 0.95; propIcon('printer', dx+50, y-38, 40, t+k); ctx.restore();
+        for (let n=0;n<3;n++){ // fogli che volano via
+          const ph = (t*0.45 + n/3 + k*0.13) % 1;
+          const fx = dx+72 + ph*140*(n%2?1:-0.6), fy = y-24 - ph*190 + Math.sin(t*3+n)*8;
+          ctx.save(); ctx.translate(fx, fy); ctx.rotate(Math.sin(t*2.4 + n + k)*0.9); ctx.globalAlpha = 1 - ph*0.7;
+          ctx.fillStyle = '#ffffff'; ctx.fillRect(-9,-12,18,24);
+          ctx.fillStyle = '#9aa7b6'; for (let r=0;r<4;r++) ctx.fillRect(-6,-8+r*5,12,1.5);
+          ctx.restore();
+        }
+      } else {
+        ctx.save(); ctx.globalAlpha = 0.95; propIcon('monitor', dx+48, y-40, 36, t+k); propIcon('monitor', dx+110, y-40, 36, t+k+1); ctx.restore();
+      }
+    }
+    drawBgLogo();
+    return;
+  }
+  if (kind === 'notte'){
+    const g = ctx.createLinearGradient(0,0,0,GROUND_Y);
+    g.addColorStop(0,'#05081a'); g.addColorStop(1,'#1a2246');
+    ctx.fillStyle = g; ctx.fillRect(0,0,VW,VH);
+    const sr = mulberry32(77);   // stelle sparse, sempre nello stesso posto
+    for (let i=0;i<70;i++){ const x = wrapX(sr()*VW*1.3 - camX*0.03, VW), y = sr()*280; ctx.fillStyle = 'rgba(255,255,255,'+(0.3+0.4*Math.abs(Math.sin(t*1.5+i)))+')'; ctx.beginPath(); ctx.arc(x, y, 1.2 + (i%3)*0.4, 0, 7); ctx.fill(); }
+    // luna
+    ctx.fillStyle = '#f3f0d8'; ctx.beginPath(); ctx.arc(VW*0.8 - camX*0.01, 80, 30, 0, 7); ctx.fill();
+    ctx.fillStyle = '#05081a'; ctx.beginPath(); ctx.arc(VW*0.8 - camX*0.01 + 12, 72, 27, 0, 7); ctx.fill();
+    // palazzi e uffici bui con poche finestre accese
+    const B = 120, off = wrapX(camX*0.3, B);
+    for (let bx = -off - B; bx < VW + B; bx += B){
+      const k = Math.round((bx + camX*0.3) / B), bh = 160 + ((k*53) % 140 + 140) % 140;
+      ctx.fillStyle = '#0e1430'; ctx.fillRect(bx, GROUND_Y-bh, B-10, bh);
+      for (let r=0; r<bh/26-1; r++) for (let c=0;c<4;c++){
+        const on = ((k*7 + r*3 + c*5) % 11) === 0;
+        ctx.fillStyle = on ? 'rgba(255,214,120,0.85)' : 'rgba(80,100,160,0.18)';
+        ctx.fillRect(bx+10+c*26, GROUND_Y-bh+12+r*26, 14, 12);
+      }
+    }
+    // luce d'emergenza che lampeggia
+    const a = 0.06 + 0.07*Math.max(0, Math.sin(t*3));
+    ctx.fillStyle = 'rgba(255,40,60,'+a+')'; ctx.fillRect(0,0,VW,VH);
+    return;
+  }
 }
 
 /* ---- logo Efuture in trasparenza nel cielo (parallasse lenta) ----
@@ -2220,6 +2365,20 @@ function drawBugSpecies(species, color, e, t, bob){
   const w=e.w, h=e.h;
   const dark = shadeColor(color, -0.4);
   switch(species){
+    case 'hoodBug': {   // bug cattivo della notte: cappuccio scuro e occhi rossi
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.ellipse(w/2, h*0.62, w*0.48, h*0.4, 0, 0, 7); ctx.fill();
+      ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.lineCap = 'round';
+      for (const sx of [-1,1]) for (const dy of [0.5,0.78]){ ctx.beginPath(); ctx.moveTo(w/2+sx*w*0.4, h*dy); ctx.lineTo(w/2+sx*w*0.62, h*dy+5+Math.sin(t*10+dy*9)*2); ctx.stroke(); }
+      ctx.fillStyle = '#1c1430';   // cappuccio a punta, con bordo chiaro per vederlo nel buio
+      ctx.beginPath(); ctx.moveTo(w*0.08, h*0.62); ctx.quadraticCurveTo(w*0.1, h*0.05, w*0.5, -h*0.12); ctx.quadraticCurveTo(w*0.9, h*0.05, w*0.92, h*0.62); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#c9a8ff'; ctx.lineWidth = 1.6; ctx.stroke();
+      ctx.fillStyle = '#05030a'; ctx.beginPath(); ctx.ellipse(w/2, h*0.42, w*0.3, h*0.2, 0, 0, 7); ctx.fill();
+      ctx.fillStyle = (Math.floor(t*4)%5===0) ? '#ff9a9a' : '#ff2a3a';
+      ctx.shadowColor = '#ff2a3a'; ctx.shadowBlur = 6;
+      ctx.beginPath(); ctx.ellipse(w*0.38, h*0.42, 3.4, 2.2, 0.3, 0, 7); ctx.ellipse(w*0.62, h*0.42, 3.4, 2.2, -0.3, 0, 7); ctx.fill();
+      ctx.shadowBlur = 0;
+      break; }
     case 'glitchBug': {
       ctx.fillStyle = color;
       ctx.fillRect(0,h*0.15,w,h*0.7);
@@ -2364,7 +2523,10 @@ function drawFlyBug(e, t){
   ctx.beginPath(); ctx.moveTo(e.w,0); ctx.lineTo(e.w+14,wing-8); ctx.lineTo(e.w+4,10); ctx.fill();
   ctx.fillStyle = shadeColor(color,-0.35);
   ctx.beginPath(); ctx.ellipse(e.w/2, e.h/2, e.w/2, e.h/2, 0, 0, 7); ctx.fill();
-  drawBugEyes(ctx, e.w, e.h*0.8);
+  if (level.theme.bug.species === 'hoodBug'){   // di notte: cappuccio e occhi rossi anche per quelli volanti
+    ctx.fillStyle = '#14101f'; ctx.beginPath(); ctx.moveTo(0, e.h*0.55); ctx.quadraticCurveTo(e.w*0.1, -e.h*0.2, e.w/2, -e.h*0.35); ctx.quadraticCurveTo(e.w*0.9, -e.h*0.2, e.w, e.h*0.55); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ff2a3a'; ctx.beginPath(); ctx.arc(e.w*0.36, e.h*0.32, 2.6, 0, 7); ctx.arc(e.w*0.64, e.h*0.32, 2.6, 0, 7); ctx.fill();
+  } else drawBugEyes(ctx, e.w, e.h*0.8);
   ctx.restore();
 }
 
