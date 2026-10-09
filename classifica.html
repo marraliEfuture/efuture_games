@@ -121,11 +121,11 @@ main.only-total .boards,main.only-games .boards{grid-template-columns:minmax(0,1
    Regola pratica: lato del QR ≈ distanza ÷ 10–15 (da 20 m serve un QR di circa 1,3–2 m sul ledwall) */
 .qrbig{align-self:start;position:sticky;top:12px;display:flex;flex-direction:column;align-items:center;gap:4px;background:#fff;border:1px solid var(--line);border-radius:6px;padding:4px 4px clamp(10px,1vw,16px);box-shadow:0 10px 30px rgba(20,29,40,.07)}
 .qrbig img{display:block;width:var(--qr);height:var(--qr);image-rendering:pixelated}
-.qrbig{--qr:min(40vw, calc(100vh - 440px))}
+.qrbig{--qr:min(20vw, calc((100vh - 440px) / 2))}   /* metà della misura di prima */
 .qrcap{text-align:center;font-family:var(--title)}
 .qrcap b{display:block;font-weight:700;font-size:clamp(18px,2vw,40px);letter-spacing:-.5px;color:var(--ink)}
 .qrcap span{font-family:var(--body);font-weight:300;font-size:clamp(12px,1vw,20px);color:var(--muted)}
-:fullscreen .qrbig{--qr:min(44vw, calc(100vh - 290px))}
+:fullscreen .qrbig{--qr:min(22vw, calc((100vh - 290px) / 2))}
 /* classifica generale: sezione blu notte come sul sito */
 .panel.total{background:var(--navy);border-color:var(--navy);box-shadow:0 16px 40px rgba(0,34,56,.25)}
 .total .ph h2{color:#fff;font-size:clamp(18px,1.7vw,30px);letter-spacing:-1px}
@@ -258,9 +258,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=44"></script>
+<script src="config.js?v=45"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=44"></script>
+<script src="backend.js?v=45"></script>
 <script>
 (function(){
 "use strict";
