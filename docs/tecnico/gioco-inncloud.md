@@ -80,7 +80,7 @@ Ordine degli script in fondo a `index.html`:
 |---|---|---|
 | `'title'` | Avvio e `toMenu()` | Solo particelle. `render()` disegna cielo e nuvola |
 | `'intro'` | Dopo Inizia / Gioca ancora (`playIntro()`) | `updateIntro()` |
-| `'levelcard'` | `showLevelCard()`: mostra `#ov-level` | Solo particelle |
+| `'levelcard'` | `showLevelCard()`: carica il livello e passa subito a `'play'` con `btnGo.onclick()` (la scheda `#ov-level` non si mostra) | Solo particelle |
 | `'play'` | Dopo **Via!** (`btnGo`) | Tutto: tempo, gara, nuvola, formazione, boss, drone, colpi |
 | `'paused'` | `togglePause()` da `'play'` | Niente: il loop salta `update()` |
 | `'clear'` | `levelCleared()` | Solo particelle |

@@ -28,7 +28,7 @@ Sparatutto nello stile di Space Invaders. Il giocatore guida la nuvola di innclo
 | **Titolo** (`ov-title`) | Logo inncloud su badge bianco, INVADERS, "Guida la nuvola di inncloud e ferma gli hacker.", "Record: N" se esiste. Sul campo, la nuvola | **Inizia**, **Continua · Liv. N** (solo modalità libera, se c'è un livello raggiunto), **Istruzioni** |
 | **Istruzioni** (`howBox`) | Tre righe con disegnino: "Premi SPARA per colpire, trascina per muoverti.", "Abbatti tutti, schiva i codici verdi.", "Riparati dietro le nuvolette." "5 livelli, boss finale." Tasti: Trascina o frecce · Spazio spara · P pausa | – |
 | **Animazione iniziale** | Dopo **Inizia** (e **Gioca ancora**): un hacker scende sul logo, il pallino rosso della "i" parte e lo abbatte, il logo scivola giù e diventa la nuvola, compare INVADERS. Dura 4,3 s; "TOCCA PER SALTARE": un tocco o un tasto la salta | – |
-| **Scheda del livello** (`ov-level`) | "Livello 1/5" (gara: "/3"), nome e frase del livello | **Via!** |
+| **Scheda del livello** (`ov-level`) | **Non compare più:** il livello parte subito, senza nome né frase di spiegazione (la scheda resta nella pagina ma non viene mostrata) | – |
 | **Livello superato** (`ov-clear`) | Dopo 1,1 s: "Attacco respinto", "Livello N superato!", punti, attaccanti abbattuti, tempo | **Prossimo livello** |
 | **Pausa** (`ov-pause`) | PAUSA | **Riprendi**, **Menu** |
 | **Game over** (`ov-over`) | "Cloud violato", GAME OVER, "Difese bucate.", punti, livello N/5 (gara N/3) | **Riprova livello**, **Menu** |
@@ -50,7 +50,7 @@ Regole comuni e protocollo: [giochi-comune.md](giochi-comune.md#modalità-libera
 | Fine | Vittoria dopo il boss | `result` alla fine del livello 3 |
 
 **Messaggi all'app:**
-- `start`: alla scheda del livello 1, cioè dopo l'animazione iniziale.
+- `start`: all'avvio del livello 1, cioè dopo l'animazione iniziale.
 - `tick`: ogni 0,25 s nello stato di gioco, più uno al momento in cui il livello è superato.
 - Livello superato: salva tempo e vite; al livello 3 manda `result` con `ok: true`.
 - Vite finite (anche quando la formazione arriva in fondo): `result` con `reason: 'lives'`, poi GAME OVER.
@@ -60,7 +60,7 @@ Regole comuni e protocollo: [giochi-comune.md](giochi-comune.md#modalità-libera
 
 Campo logico 360 × 600. La nuvola sta a y = 548; le 4 nuvolette-firewall a y = 468.
 
-| Liv. | Nome | Frase | File (dall'alto) | Attaccanti | Velocità formazione | Fuoco nemico | Velocità codici |
+| Liv. | Nome | Frase (non più mostrata) | File (dall'alto) | Attaccanti | Velocità formazione | Fuoco nemico | Velocità codici |
 |---|---|---|---|---|---|---|---|
 | 1 | Login sospetto | "Tre file lente: prendi la mira." | K V B | 3 × 8 = 24 | 16 | 0,55 | 170 |
 | 2 | Phishing | "Virus via email: più file, più veloci." | K V V B | 4 × 8 = 32 | 20 | 0,85 | 185 |

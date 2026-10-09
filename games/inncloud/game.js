@@ -436,7 +436,8 @@ function showLevelCard(i){
   $('lvTag').textContent = 'Livello ' + (i+1) + '/' + (EFG.on ? EFG.max : 5);
   $('lvName').textContent = L.name;
   $('lvText').textContent = L.text;
-  showOnly(ov.level); updateHud();
+  updateHud();
+  $('btnGo').onclick();   // niente spiegazione prima del livello: si gioca subito
 }
 function startGame(from){ score = 0; lives = 3; showLevelCard(from||0); }
 $('btnStart').onclick = ()=>{ score = 0; lives = 3; playIntro(); };

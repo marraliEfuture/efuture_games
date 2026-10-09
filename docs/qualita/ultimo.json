@@ -266,8 +266,8 @@
     {
      "nome": "Peso della pagina: games/inncloud/index.html",
      "esito": "ok",
-     "dettaglio": "132.8 KB con 9 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
-     "valore": 132.8
+     "dettaglio": "132.9 KB con 9 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 132.9
     },
     {
      "nome": "Peso della pagina: games/sysadmin/index.html",
@@ -300,43 +300,43 @@
     {
      "nome": "Caricamento nel browser: index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 154 ms (DOM pronto in 144 ms) su telefono simulato, file locali, database escluso",
-     "valore": 154
+     "dettaglio": "caricata in 102 ms (DOM pronto in 96 ms) su telefono simulato, file locali, database escluso",
+     "valore": 102
     },
     {
      "nome": "Caricamento nel browser: classifica.html",
      "esito": "ok",
-     "dettaglio": "caricata in 115 ms (DOM pronto in 101 ms) su telefono simulato, file locali, database escluso",
-     "valore": 115
+     "dettaglio": "caricata in 94 ms (DOM pronto in 87 ms) su telefono simulato, file locali, database escluso",
+     "valore": 94
     },
     {
      "nome": "Caricamento nel browser: admin.html",
      "esito": "ok",
-     "dettaglio": "caricata in 90 ms (DOM pronto in 87 ms) su telefono simulato, file locali, database escluso",
-     "valore": 90
+     "dettaglio": "caricata in 80 ms (DOM pronto in 76 ms) su telefono simulato, file locali, database escluso",
+     "valore": 80
     },
     {
      "nome": "Caricamento nel browser: games/sysadmin/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 79 ms (DOM pronto in 62 ms) su telefono simulato, file locali, database escluso",
-     "valore": 79
+     "dettaglio": "caricata in 116 ms (DOM pronto in 104 ms) su telefono simulato, file locali, database escluso",
+     "valore": 116
     },
     {
      "nome": "Caricamento nel browser: games/coretech/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 93 ms (DOM pronto in 88 ms) su telefono simulato, file locali, database escluso",
-     "valore": 93
+     "dettaglio": "caricata in 77 ms (DOM pronto in 74 ms) su telefono simulato, file locali, database escluso",
+     "valore": 77
     },
     {
      "nome": "Caricamento nel browser: games/timenet/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 92 ms (DOM pronto in 90 ms) su telefono simulato, file locali, database escluso",
-     "valore": 92
+     "dettaglio": "caricata in 96 ms (DOM pronto in 92 ms) su telefono simulato, file locali, database escluso",
+     "valore": 96
     },
     {
      "nome": "Caricamento nel browser: games/inncloud/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 67 ms (DOM pronto in 62 ms) su telefono simulato, file locali, database escluso",
+     "dettaglio": "caricata in 67 ms (DOM pronto in 63 ms) su telefono simulato, file locali, database escluso",
      "valore": 67
     }
    ],
@@ -353,7 +353,7 @@
      "nome": "Spazio totale del sito",
      "esito": "ok",
      "dettaglio": "11.46 MB (limite consigliato GitHub Pages: 1 GB)",
-     "valore": 11732.6
+     "valore": 11732.9
     },
     {
      "nome": "Cartella video",
@@ -370,8 +370,8 @@
     {
      "nome": "Cartella games",
      "esito": "ok",
-     "dettaglio": "752.1 KB",
-     "valore": 752.1
+     "dettaglio": "752.2 KB",
+     "valore": 752.2
     },
     {
      "nome": "Cartella vendor",
@@ -382,8 +382,8 @@
     {
      "nome": "Cartella docs",
      "esito": "ok",
-     "dettaglio": "257.7 KB",
-     "valore": 257.7
+     "dettaglio": "257.8 KB",
+     "valore": 257.8
     },
     {
      "nome": "Cartella (file principali)",
@@ -427,13 +427,13 @@
     "avviso": 0,
     "errore": 0
    },
-   "totale_kb": 11732.6,
+   "totale_kb": 11732.9,
    "cartelle_kb": {
     ".claude": 86.6,
     "(file principali)": 245.8,
-    "docs": 257.7,
+    "docs": 257.8,
     "fonts": 120.3,
-    "games": 752.1,
+    "games": 752.2,
     "icons": 105.6,
     "img": 68.8,
     "qr": 159.6,
@@ -505,6 +505,6 @@
    }
   }
  },
- "data": "2026-10-09T09:53:39+00:00",
- "commit": "8762894"
+ "data": "2026-10-09T09:55:15+00:00",
+ "commit": "262bb92"
 }
