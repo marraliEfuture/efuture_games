@@ -31,7 +31,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .topbar{background:var(--ink);color:#fff;font-size:12px;text-align:center;padding:calc(7px + env(safe-area-inset-top,0px)) 16px 7px}
 .topbar b{font-weight:600}
 header{background:#fff;display:flex;align-items:center;gap:24px;padding:14px clamp(16px,3vw,40px);flex-wrap:wrap;box-shadow:0 2px 14px rgba(20,29,40,.06)}
-.brand{height:36px;width:auto;display:block}
+.afoot{margin-top:auto;display:flex;justify-content:flex-end;padding:14px clamp(16px,3vw,40px) calc(14px + env(safe-area-inset-bottom,0px));background:#fff;border-top:1px solid var(--line,#e3e8ef)}   /* logo Efuture in basso a destra */
+.afoot img{height:30px;width:auto;display:block}
 .special{border-left:3px solid var(--sky);padding-left:16px}
 h1{font-family:var(--title);font-weight:700;font-size:clamp(20px,2vw,30px);letter-spacing:-1px;margin:0;color:var(--ink)}
 h2{font-family:var(--title);font-weight:700;font-size:18px;letter-spacing:-.5px;margin:0;color:var(--ink)}
@@ -168,7 +169,6 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 <body>
 <div class="topbar"><b>Efuture Games</b> · pannello di amministrazione</div>
 <header>
-  <img class="brand" src="img/efuture-logo.png" alt="efuture">
   <div class="special"><h1><mark>Admin</mark> Efuture Games</h1><div class="label"><b>CARE Conference</b> Edition · classifica, backup e registro</div></div>
   <div class="hright" id="hRight" hidden>
     <a class="btn ghost" href="index.html" target="_blank" rel="noopener" style="text-decoration:none">Gioca ↗</a>
@@ -322,7 +322,9 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
   <p class="dim" id="noRemote" hidden>Il database online non è configurato in <code>config.js</code>: il pannello admin funziona solo con Supabase.</p>
 </main>
 
-<script src="config.js?v=34"></script>
+<footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
+
+<script src="config.js?v=35"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script>

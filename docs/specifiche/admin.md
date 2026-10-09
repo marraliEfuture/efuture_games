@@ -17,6 +17,7 @@ Indirizzo: `https://marraliefuture.github.io/efuture_games/admin.html`. Script c
 ## Accesso
 
 - Modulo "Accesso amministratore", con il campo **Chiave admin**.
+- Il logo Efuture non è nell'intestazione ma nel piè di pagina bianco, in basso a destra (nascosto in stampa).
 - **Entra** chiama `efg_admin_login(p_key)`.
 - Se la chiave è giusta:
   - compare la dashboard;
