@@ -481,7 +481,6 @@ function update(dt){
   // eat the coin under the player even when passing between centres quickly
   if (player.moving) player.mouth += dt*14;
 
-  bugs = bugs.filter(b => b.mode !== 'eaten');
   for (const b of bugs){
     if (b.mode === 'house'){
       b.release -= dt;

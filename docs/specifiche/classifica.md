@@ -128,7 +128,9 @@ La finestra "Countdown della gara" contiene:
   - la prima volta il browser chiede il permesso "Gestione finestre"; se dopo il permesso il clic non vale più, compare il messaggio "premi di nuovo";
   - se il permesso c'è già, gli schermi si leggono all'apertura della pagina;
   - con più schermi sceglie il primo diverso da quello corrente, preferendo uno non principale;
-  - senza secondo monitor, senza permesso o con un browser che non supporta l'API va a schermo intero dove si trova e mostra un breve messaggio in basso (per esempio: trascina la finestra sul secondo schermo).
+  - senza secondo monitor, senza permesso o con un browser che non supporta l'API va a schermo intero dove si trova e mostra un breve messaggio in basso (per esempio: trascina la finestra sul secondo schermo);
+  - quando va sull'altro monitor riapre l'**admin** in una finestra sullo schermo di partenza (`window.open('admin.html', 'efgAdmin', …)`), così il primo monitor resta sull'admin (può chiedere di nuovo la chiave).
+- **Aperta dall'admin** con **📺 Proietta** (`?proietta=1`): la finestra è già sul secondo monitor. Un velo scuro dice "Clicca qui per lo schermo intero": il clic la mette a schermo intero **su quel monitor**, e anche il pulsante Schermo intero non la sposta più. Uscendo dallo schermo intero il velo ricompare.
 - A schermo intero si nascondono Countdown, Admin e i pulsanti di visualizzazione. La barra del countdown resta visibile e il QR diventa più grande.
 
 ## Modalità demo
