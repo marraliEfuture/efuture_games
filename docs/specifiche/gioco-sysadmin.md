@@ -22,7 +22,7 @@ Platform a scorrimento orizzontale. Il giocatore è il sysadmin di guardia (la t
 ## Storia
 
 - Ogni livello è il **ticket di un cliente**, in una stanza a tema. Il cliente aspetta in cima a una scala alla fine del livello.
-- I clienti: Marco (Alba nel campo), Giulia (Open space al tramonto), Paolo (Notte di emergenza), Elena (Sala Rete), Davide (Data Center Cloud), Sara (Sala Controllo), Fabio (Sala Sviluppo), Ilaria (Sala Database), Team IT (Difesa Critica).
+- I clienti: Marco (Alba: da casa al cliente), Giulia (In ufficio al tramonto), Paolo (Notte in smart working), Elena (Sala Rete), Davide (Data Center Cloud), Sara (Sala Controllo), Fabio (Sala Sviluppo), Ilaria (Sala Database), Team IT (Difesa Critica).
 - Livello 10: **l'hacker** nel Bunker dell'Hacker. Sconfitto lui, il Capo promuove il giocatore a "Senior Sysadmin".
 
 ## Schermate
@@ -50,7 +50,7 @@ Regole comuni e protocollo: [giochi-comune.md](giochi-comune.md#modalità-libera
 
 | | Modalità libera | Modalità gara (`?hub=1`) |
 |---|---|---|
-| Livelli | 10 (Marco … Team IT, poi l'hacker) | 3: Marco (Alba nel campo), Giulia (Open space al tramonto), Paolo (Notte di emergenza). Niente boss |
+| Livelli | 10 (Marco … Team IT, poi l'hacker) | 3: Marco (Alba: da casa al cliente), Giulia (In ufficio al tramonto), Paolo (Notte in smart working). Niente boss |
 | Vite | 3 a inizio partita, si portano da un livello all'altro; **Continua** e **Riprova ticket** le riportano a 3 | 3 a ogni livello. "Riparti dal ticket" (pausa) non ridà le vite |
 | Progressi | `sysadminRunnerProgress` (`bestUnlocked`): pulsante **Continua** | Nessun Continua |
 | Fine | Vittoria dopo il boss | `result` alla fine del livello 3 (senza schermata del gioco) |
@@ -70,9 +70,11 @@ Campo logico 960 × 540, terreno a y = 470. I livelli 1–9 sono generati da un 
 
 | Liv. | Sfondo | Cosa rappresenta | Parametri (`LV3` nel codice) |
 |---|---|---|---|
-| 1 | **Alba nel campo**: campo di grano su più piani che ondeggia, sole che sorge con raggi e alone, colline e nuvole rosate. Se esiste `games/sysadmin/img/alba.jpg` (l'immagine dell'evento) il cielo è quella foto, che scorre piano | Proattività: si parte presto | lunghezza 6200, 15 bug a terra, 2 volanti, 2 chiodi, 1 scossa, nessuna sega, burroni 16%, bug 60 px/s |
-| 2 | **Open space al tramonto**: vetrate sul tramonto con lo skyline, file di scrivanie con pc e stampanti da cui volano via i fogli | Quasi fine giornata | lunghezza 7000, 16 bug, 4 volanti, 3 chiodi, 2 scosse, 2 seghe, burroni 24%, bug 72 px/s |
-| 3 | **Notte di emergenza**: cielo stellato con la luna, palazzi bui con poche finestre accese, luce rossa d'emergenza che lampeggia. Bug **cattivi con il cappuccio** e occhi rossi (anche quelli volanti) | Emergenza | lunghezza 7800, 20 bug, 5 volanti, 4 chiodi, 4 scosse (accese più a lungo), 3 seghe più veloci (140 px/s), burroni 30%, bug 88 px/s |
+| 1 | **Alba: da casa al cliente**: l'omino **parte da casa sua** (casetta con la porta aperta e il camino che fuma, scritta CASA) e attraversa un campo di grano all'alba (sole che sorge, colline, nuvole rosate); in fondo, dietro la scala, c'è **l'ufficio del cliente** (palazzo con l'insegna CLIENTE). Se esiste `games/sysadmin/img/alba.jpg` (l'immagine dell'evento) il cielo e il campo sono quella foto | Proattività: si parte presto | lunghezza 6200, 15 bug a terra, 2 volanti, 2 chiodi, 1 scossa, nessuna sega, burroni 16%, bug 60 px/s |
+| 2 | **In ufficio al tramonto**: l'omino è **in ufficio**: vetrate sul tramonto con lo skyline, file di scrivanie con pc e stampanti da cui volano via i fogli | Quasi fine giornata | lunghezza 7000, 16 bug, 4 volanti, 3 chiodi, 2 scosse, 2 seghe, burroni 24%, bug 72 px/s |
+| 3 | **Notte in smart working**: l'omino è **a casa sua, di notte, in smart working**: stanza con finestre sulla città di notte (stelle, luna), orologio e quadri, scrivania con il portatile acceso e la lampada, libreria e divano; luce rossa d'emergenza che lampeggia. Bug **cattivi con il cappuccio** e occhi rossi (anche quelli volanti) | Emergenza | lunghezza 7800, 20 bug, 5 volanti, 4 chiodi, 4 scosse (accese più a lungo), 3 seghe più veloci (140 px/s), burroni 30%, bug 88 px/s |
+
+**Sfondi sfocati:** i tre sfondi si disegnano su una tela grande un terzo e poi si ingrandiscono, quindi risultano morbidi e sfocati; sopra c'è un velo chiaro (scuro di notte) che smorza i colori. Così restano dietro all'omino, ai bug e alle trappole, che sono nitidi.
 
 Nei primi 3 livelli i tratti di terreno sono più ampi (320–600 px) e i bug pattugliano 60–140 px. I numeri sono obiettivi: se un bug o una trappola non trova posto non viene messo (vedi la tabella sotto).
 
@@ -92,9 +94,9 @@ Nei primi 3 livelli i tratti di terreno sono più ampi (320–600 px) e i bug pa
 
 | Liv. | Cliente – stanza | Lunghezza (px) | Burroni | Piattaforme | Bug a terra | Bug volanti | Chiodi | Scosse | Seghe |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | Marco – Alba nel campo | 6384 | 1 | 2 | 15 | 2 | 2 | 1 | 0 |
-| 2 | Giulia – Open space al tramonto | 7184 | 5 | 3 | 15 | 4 | 3 | 2 | 2 |
-| 3 | Paolo – Notte di emergenza | 8095 | 8 | 4 | 17 | 5 | 4 | 4 | 2 |
+| 1 | Marco – Alba: da casa al cliente | 6384 | 1 | 2 | 15 | 2 | 2 | 1 | 0 |
+| 2 | Giulia – In ufficio al tramonto | 7184 | 5 | 3 | 15 | 4 | 3 | 2 | 2 |
+| 3 | Paolo – Notte in smart working | 8095 | 8 | 4 | 17 | 5 | 4 | 4 | 2 |
 | 4 | Elena – Sala Rete | 5225 | 2 | 6 | 7 | 1 | 2 | 2 | 1 |
 | 5 | Davide – Data Center Cloud | 5810 | 4 | 7 | 8 | 2 | 3 | 2 | 1 |
 | 6 | Sara – Sala Controllo | 6318 | 6 | 9 | 9 | 3 | 3 | 3 | 1 |

@@ -158,7 +158,8 @@ Flusso tipico: `title` → (`btnStart`) `startLevel(0)` → `intro` → (`btnGo`
 | `fitCanvas()` | Adatta il canvas allo spazio di `#stage` mantenendo 960:540 (densità fino a 2×) |
 | `sizeVictoryCanvas()` | Dimensiona il canvas della vittoria (campo logico 480 × 224) |
 | `render(t)` | Disegna tutto, in ordine: sfondo, terreno, scala, trappole, cliente, nemici, proiettili, particelle, giocatore, vignettatura |
-| `drawScene(kind, t)` | Sfondi dei primi 3 livelli (`theme.scene`): `alba` (campo di grano con `drawWheat`, sole che sorge; usa `img/alba.jpg` se c'è), `openspace` (vetrate sul tramonto, scrivanie, stampanti con fogli che volano), `notte` (stelle, luna, palazzi, luce d'emergenza) |
+| `drawSceneSoft(kind, t)` | Disegna lo sfondo con `drawScene` sulla tela piccola `BG_CV` (1/`BG_K` = 1/3 di 960×540, scambiando temporaneamente `ctx`, che per questo è `let`), lo ingrandisce sul canvas (sfocatura) e ci passa sopra il velo `SCENE_VEIL[kind]` che smorza i colori |
+| `drawScene(kind, t)` | Sfondi dei primi 3 livelli (`theme.scene`): `alba` (campo di grano con `drawWheat`, sole che sorge, `drawHouse` all'inizio e `drawClientOffice` dietro la scala; usa `img/alba.jpg` se c'è), `openspace` (ufficio: vetrate sul tramonto, scrivanie, stampanti con fogli che volano), `notte` (casa in smart working: finestre sulla città, orologio, scrivania con portatile e lampada, libreria, divano, luce d'emergenza) |
 | `drawBackground(t)` | Se il tema ha `scene` chiama `drawScene`; altrimenti cielo a gradiente, puntini, effetto del tema, filigrana del logo, oggetti di sfondo in parallasse |
 | `drawThemeFX(fx, t)` | Effetto animato della stanza (scansione, braci, radar, pioggia di codice…) |
 | `propIcon(kind, x, y, s, t)` | Oggetti di sfondo (monitor, rack, router, database…) |
@@ -232,9 +233,9 @@ Conteggi ottenuti eseguendo il generatore del codice attuale (le trappole sono q
 
 | Liv. | Cliente – stanza | Lunghezza (px) | Burroni | Piattaforme | Bug a terra | Bug volanti | Chiodi | Scosse | Seghe |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | Marco – Alba nel campo | 6384 | 1 | 2 | 15 | 2 | 2 | 1 | 0 |
-| 2 | Giulia – Open space al tramonto | 7184 | 5 | 3 | 15 | 4 | 3 | 2 | 2 |
-| 3 | Paolo – Notte di emergenza | 8095 | 8 | 4 | 17 | 5 | 4 | 4 | 2 |
+| 1 | Marco – Alba: da casa al cliente | 6384 | 1 | 2 | 15 | 2 | 2 | 1 | 0 |
+| 2 | Giulia – In ufficio al tramonto | 7184 | 5 | 3 | 15 | 4 | 3 | 2 | 2 |
+| 3 | Paolo – Notte in smart working | 8095 | 8 | 4 | 17 | 5 | 4 | 4 | 2 |
 | 4 | Elena – Sala Rete | 5225 | 2 | 6 | 7 | 1 | 2 | 2 | 1 |
 | 5 | Davide – Data Center Cloud | 5810 | 4 | 7 | 8 | 2 | 3 | 2 | 1 |
 | 6 | Sara – Sala Controllo | 6318 | 6 | 9 | 9 | 3 | 3 | 3 | 1 |

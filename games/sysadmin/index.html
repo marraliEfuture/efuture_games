@@ -609,9 +609,9 @@ const JUMP_BUFFER = 0.12;
 
 const THEMES = {
   // i primi 3 livelli (quelli della gara): alba, tramonto in open space, notte. scene = sfondo disegnato a parte
-  alba:     { name:"Alba nel campo",   sky:["#2e3f73","#f6b26b"], ground:"#8a6a3f", groundTop:"#c99a4b", props:[], fx:"none", scene:"alba",      bug:{species:"roundBug",  color:"#ff5d56"}, fly:"#d9584a" },
-  openspace:{ name:"Open space al tramonto", sky:["#4a3a6b","#f08a4b"], ground:"#7b8794", groundTop:"#4d5866", props:[], fx:"none", scene:"openspace", bug:{species:"glitchBug", color:"#12a9cf"}, fly:"#1597b8" },
-  notte:    { name:"Notte di emergenza", sky:["#070b1a","#1a2240"], ground:"#2c3450", groundTop:"#6a78a8", props:[], fx:"none", scene:"notte",     bug:{species:"hoodBug",   color:"#7a4fc0"}, fly:"#8a55d0" },
+  alba:     { name:"Alba: da casa al cliente",   sky:["#2e3f73","#f6b26b"], ground:"#8a6a3f", groundTop:"#c99a4b", props:[], fx:"none", scene:"alba",      bug:{species:"roundBug",  color:"#ff5d56"}, fly:"#d9584a" },
+  openspace:{ name:"In ufficio al tramonto", sky:["#4a3a6b","#f08a4b"], ground:"#7b8794", groundTop:"#4d5866", props:[], fx:"none", scene:"openspace", bug:{species:"glitchBug", color:"#12a9cf"}, fly:"#1597b8" },
+  notte:    { name:"Notte in smart working", sky:["#070b1a","#1a2240"], ground:"#3a2c2a", groundTop:"#7a5c48", props:[], fx:"none", scene:"notte",     bug:{species:"hoodBug",   color:"#7a4fc0"}, fly:"#8a55d0" },
   office:   { name:"Ufficio",          sky:["#e3effa","#cfe1f1"], ground:"#9fb6cc", groundTop:"#5d7f9f", props:["monitor","printer","cable","monitor"], fx:"none",     bug:{species:"roundBug",  color:"#ff5d56"}, fly:"#d9584a" },
   server:   { name:"Sala Server",      sky:["#e2eef6","#cadded"], ground:"#97adc2", groundTop:"#56738f", props:["rack","cable","rack"],    fx:"scan",     bug:{species:"glitchBug", color:"#12a9cf"}, fly:"#1597b8" },
   firewall: { name:"Zona Firewall",    sky:["#fbece4","#f3d9cc"], ground:"#c9a596", groundTop:"#9a6656", props:["brick","flame","shield"],   fx:"embers",   bug:{species:"spikyBug",  color:"#f07a12"}, fly:"#e8603a" },
@@ -625,9 +625,9 @@ const THEMES = {
 };
 
 const CLIENTS = [
-  { name:"Marco", g:"m", hair:"#3b2a1e",   theme:"alba",     msg:"È l'alba: gioca d'anticipo e ferma i bug prima che arrivino in ufficio!", thanks:"Giornata partita senza intoppi, grazie!", shape:"suit",     color:"#3a6ea5", skin:"#e8b98a", accessory:"none" },
-  { name:"Giulia", g:"f", hair:"#2a1a12",  theme:"openspace", msg:"Quasi fine giornata: stampanti impazzite, fogli che volano e bug tra le scrivanie!", thanks:"Open space in ordine, si torna a casa!", shape:"labcoat",  color:"#eef2f5", skin:"#8a5a3c", accessory:"glasses" },
-  { name:"Paolo", g:"m", hair:"#6b4a2a",   theme:"notte",    msg:"Emergenza notturna: bug incappucciati nei sistemi. Attento alle trappole!", thanks:"Emergenza rientrata, grazie!", shape:"uniform",  color:"#c65b3c", skin:"#e0a878", accessory:"cap" },
+  { name:"Marco", g:"m", hair:"#3b2a1e",   theme:"alba",     msg:"È l'alba: esci di casa e raggiungimi in ufficio, ferma i bug prima che arrivino!", thanks:"Sei arrivato prima dei bug, grazie!", shape:"suit",     color:"#3a6ea5", skin:"#e8b98a", accessory:"none" },
+  { name:"Giulia", g:"f", hair:"#2a1a12",  theme:"openspace", msg:"Quasi fine giornata in ufficio: stampanti impazzite, fogli che volano e bug tra le scrivanie!", thanks:"Open space in ordine, si torna a casa!", shape:"labcoat",  color:"#eef2f5", skin:"#8a5a3c", accessory:"glasses" },
+  { name:"Paolo", g:"m", hair:"#6b4a2a",   theme:"notte",    msg:"Emergenza di notte! Collegati da casa in smart working: bug incappucciati nei sistemi, attento alle trappole!", thanks:"Emergenza risolta da casa, grazie!", shape:"uniform",  color:"#c65b3c", skin:"#e0a878", accessory:"cap" },
   { name:"Elena", g:"f", hair:"#a0522d",   theme:"network",  msg:"Niente rete: cavi infestati dai bug!", thanks:"Rete ripristinata!", shape:"hoodie2",  color:"#3ba893", skin:"#f0c9a0", accessory:"headset" },
   { name:"Davide", g:"m", hair:"#1e1a18",  theme:"cloud",    msg:"Bug volanti nel cloud!", thanks:"Cloud ripulito!", shape:"poncho",   color:"#5b9bd9", skin:"#c9925f", accessory:"none" },
   { name:"Sara", g:"f", hair:"#d9b26a",    theme:"control",  msg:"Monitor in tilt, bug ovunque!", thanks:"Schermi tornati verdi!", shape:"dress",    color:"#9a6fd9", skin:"#e8b98a", accessory:"glasses" },
@@ -643,7 +643,7 @@ const CAPO = { name:"Il Capo", g:"m", hair:"#8a8f98", shape:"suitTie", color:"#e
    DOM
 ========================================================= */
 const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
+let ctx = canvas.getContext('2d');   // let: gli sfondi dei primi livelli si disegnano su una tela piccola (drawSceneSoft)
 const stage = document.getElementById('stage');
 const victoryCanvas = document.getElementById('victoryCanvas');
 const vctx = victoryCanvas.getContext('2d');
@@ -1717,7 +1717,7 @@ function drawThemeFX(fx, t){
 
 function drawBackground(t){
   const th = level.theme;
-  if (th.scene){ drawScene(th.scene, t); return; }
+  if (th.scene){ drawSceneSoft(th.scene, t); return; }
   const g = ctx.createLinearGradient(0,0,0,VH);
   g.addColorStop(0, th.sky[0]); g.addColorStop(1, th.sky[1]);
   ctx.fillStyle = g;
@@ -1767,6 +1767,45 @@ function drawWheat(baseY, h, step, par, col1, col2, t, seed){
     ctx.beginPath(); ctx.ellipse(gx+sway, baseY-hh-5, 3, 8, sway*0.04, 0, 7); ctx.fill();
   }
 }
+// gli sfondi dei primi 3 livelli si disegnano su una tela piccola (1/3) e poi si ingrandiscono:
+// così risultano sfocati e restano dietro all'omino, che è nitido. Un velo li rende meno colorati.
+const BG_K = 3, BG_CV = document.createElement('canvas'); BG_CV.width = Math.ceil(VW/BG_K); BG_CV.height = Math.ceil(VH/BG_K);
+const BG_CTX = BG_CV.getContext('2d');
+const SCENE_VEIL = { alba:'rgba(238,232,222,0.30)', openspace:'rgba(225,222,232,0.30)', notte:'rgba(20,24,44,0.28)' };
+function drawSceneSoft(kind, t){
+  const main = ctx;
+  BG_CTX.setTransform(1/BG_K, 0, 0, 1/BG_K, 0, 0);
+  ctx = BG_CTX;
+  try { drawScene(kind, t); } finally { ctx = main; }
+  ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(BG_CV, 0, 0, VW, VH);
+  ctx.fillStyle = SCENE_VEIL[kind] || 'rgba(255,255,255,0.25)'; ctx.fillRect(0, 0, VW, VH);
+  ctx.restore();
+}
+// oggetti fissi nel mondo (scorrono con il terreno): x nel livello -> x sullo schermo
+const wx = x => x - camX;
+function drawHouse(x, t){   // la casa dell'omino, da cui parte all'alba
+  const g = GROUND_Y, w = 250, h = 150;
+  if (x > VW + 40 || x + w < -40) return;
+  ctx.fillStyle = '#e9dcc6'; ctx.fillRect(x, g - h, w, h);
+  ctx.fillStyle = '#b5523b'; ctx.beginPath(); ctx.moveTo(x - 18, g - h); ctx.lineTo(x + w/2, g - h - 90); ctx.lineTo(x + w + 18, g - h); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#8c3f2e'; ctx.fillRect(x + w*0.7, g - h - 70, 22, 40);   // camino
+  ctx.fillStyle = 'rgba(230,230,230,0.5)'; for (let i=0;i<3;i++){ ctx.beginPath(); ctx.arc(x + w*0.7 + 11 + Math.sin(t+i)*6, g - h - 82 - i*18 - (t*12 % 18), 9 + i*3, 0, 7); ctx.fill(); }
+  ctx.fillStyle = '#6b4a33'; ctx.fillRect(x + 30, g - 92, 46, 92);           // porta aperta
+  ctx.fillStyle = '#ffd98a'; ctx.fillRect(x + 36, g - 86, 34, 86);
+  ctx.fillStyle = '#ffe6a8'; ctx.fillRect(x + 110, g - 110, 46, 40); ctx.fillRect(x + 176, g - 110, 46, 40);
+  ctx.strokeStyle = '#6b4a33'; ctx.lineWidth = 4; ctx.strokeRect(x + 110, g - 110, 46, 40); ctx.strokeRect(x + 176, g - 110, 46, 40);
+  ctx.fillStyle = '#6b4a33'; ctx.font = 'bold 22px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('CASA', x + w/2 + 40, g - 124);
+}
+function drawClientOffice(x){   // l'ufficio del cliente, dove arriva alla fine
+  const g = GROUND_Y, w = 360, h = 330;
+  if (x > VW + 40 || x + w < -40) return;
+  ctx.fillStyle = '#cfd6de'; ctx.fillRect(x, g - h, w, h);
+  ctx.fillStyle = '#9fb0c2'; ctx.fillRect(x - 10, g - h - 16, w + 20, 18);
+  for (let r=0;r<6;r++) for (let c=0;c<5;c++){ ctx.fillStyle = ((r+c)%3) ? '#8fb4d6' : '#ffe2a0'; ctx.fillRect(x + 20 + c*68, g - h + 24 + r*44, 48, 28); }
+  ctx.fillStyle = '#004675'; ctx.fillRect(x + 90, g - h - 64, 180, 40);
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 24px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('CLIENTE', x + 180, g - h - 35);
+}
 function drawScene(kind, t){
   if (kind === 'alba'){
     if (albaImgOk){
@@ -1774,101 +1813,105 @@ function drawScene(kind, t){
       const k = Math.max(VW*1.25/ALBA_IMG.naturalWidth, VH/ALBA_IMG.naturalHeight), w = ALBA_IMG.naturalWidth*k, h = ALBA_IMG.naturalHeight*k;
       const x = -((camX*0.05) % Math.max(1, w - VW));
       ctx.drawImage(ALBA_IMG, x, VH - h, w, h);
-      ctx.fillStyle = 'rgba(255,190,120,0.10)'; ctx.fillRect(0,0,VW,VH);
-      return;
+    } else {
+      const g = ctx.createLinearGradient(0,0,0,GROUND_Y);
+      g.addColorStop(0,'#5b6a93'); g.addColorStop(0.5,'#d6a3a3'); g.addColorStop(0.8,'#f1c48f'); g.addColorStop(1,'#f7dcae');
+      ctx.fillStyle = g; ctx.fillRect(0,0,VW,VH);
+      const sx = VW*0.62 - camX*0.02, sy = GROUND_Y - 120;
+      const glow = ctx.createRadialGradient(sx, sy, 10, sx, sy, 300);
+      glow.addColorStop(0,'rgba(255,240,200,0.9)'); glow.addColorStop(0.2,'rgba(255,220,160,0.5)'); glow.addColorStop(1,'rgba(255,200,140,0)');
+      ctx.fillStyle = glow; ctx.fillRect(0,0,VW,VH);
+      ctx.fillStyle = '#fff3d6'; ctx.beginPath(); ctx.arc(sx, sy, 46, 0, 7); ctx.fill();
+      ctx.fillStyle = 'rgba(255,225,225,0.45)';
+      for (let i=0;i<4;i++){ const cx = wrapX(i*300 - camX*0.06 + t*6, VW+400) - 200; ctx.beginPath(); ctx.ellipse(cx, 70+i*28, 110, 18, 0, 0, 7); ctx.fill(); }
+      ctx.fillStyle = '#b08a7c';
+      ctx.beginPath(); ctx.moveTo(0, GROUND_Y-150);
+      for (let x=0; x<=VW; x+=20) ctx.lineTo(x, GROUND_Y-150 - 18*Math.sin((x + camX*0.1)*0.008));
+      ctx.lineTo(VW, GROUND_Y); ctx.lineTo(0, GROUND_Y); ctx.fill();
+      const f = ctx.createLinearGradient(0, GROUND_Y-140, 0, GROUND_Y);
+      f.addColorStop(0,'#d8b26a'); f.addColorStop(1,'#c29a55');
+      ctx.fillStyle = f; ctx.fillRect(0, GROUND_Y-120, VW, 120);
+      drawWheat(GROUND_Y-90, 26, 10, 0.25, '#e6c27a', '#d3ad66', t, 3);
+      drawWheat(GROUND_Y+2, 44, 15, 0.5, '#ebc983', '#d8b36f', t, 11);
     }
-    const g = ctx.createLinearGradient(0,0,0,GROUND_Y);
-    g.addColorStop(0,'#2e3f73'); g.addColorStop(0.45,'#c97a8a'); g.addColorStop(0.75,'#f6b26b'); g.addColorStop(1,'#ffd99a');
-    ctx.fillStyle = g; ctx.fillRect(0,0,VW,VH);
-    // sole che sorge all'orizzonte, con alone
-    const sx = VW*0.62 - camX*0.02, sy = GROUND_Y - 120;
-    const glow = ctx.createRadialGradient(sx, sy, 10, sx, sy, 300);
-    glow.addColorStop(0,'rgba(255,240,190,0.95)'); glow.addColorStop(0.15,'rgba(255,214,140,0.7)'); glow.addColorStop(1,'rgba(255,190,120,0)');
-    ctx.fillStyle = glow; ctx.fillRect(0,0,VW,VH);
-    ctx.fillStyle = '#fff3cf'; ctx.beginPath(); ctx.arc(sx, sy, 46, 0, 7); ctx.fill();
-    // raggi
-    ctx.save(); ctx.globalAlpha = 0.10; ctx.fillStyle = '#fff6d8';
-    for (let i=0;i<9;i++){ const a = -Math.PI + i*Math.PI/8 + Math.sin(t*0.2)*0.03; ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(sx+Math.cos(a-0.05)*900, sy+Math.sin(a-0.05)*900); ctx.lineTo(sx+Math.cos(a+0.05)*900, sy+Math.sin(a+0.05)*900); ctx.fill(); }
-    ctx.restore();
-    // nuvole rosate
-    ctx.fillStyle = 'rgba(255,214,214,0.45)';
-    for (let i=0;i<4;i++){ const cx = wrapX(i*300 - camX*0.06 + t*6, VW+400) - 200; ctx.beginPath(); ctx.ellipse(cx, 70+i*28, 110, 16, 0, 0, 7); ctx.fill(); }
-    // colline lontane e campo di grano su più piani
-    ctx.fillStyle = '#9c6b5a';
-    ctx.beginPath(); ctx.moveTo(0, GROUND_Y-150);
-    for (let x=0; x<=VW; x+=20) ctx.lineTo(x, GROUND_Y-150 - 18*Math.sin((x + camX*0.1)*0.008));
-    ctx.lineTo(VW, GROUND_Y); ctx.lineTo(0, GROUND_Y); ctx.fill();
-    const f = ctx.createLinearGradient(0, GROUND_Y-140, 0, GROUND_Y);
-    f.addColorStop(0,'#d9a441'); f.addColorStop(1,'#b97f2a');
-    ctx.fillStyle = f; ctx.fillRect(0, GROUND_Y-120, VW, 120);
-    drawWheat(GROUND_Y-95, 22, 9, 0.2, '#e8b955', '#cf9a3c', t, 3);
-    drawWheat(GROUND_Y-55, 32, 12, 0.35, '#f0c463', '#d6a043', t, 7);
-    drawWheat(GROUND_Y+2, 46, 15, 0.6, '#f6cf6e', '#dcaa4b', t, 11);
-    drawBgLogo();
+    // si parte da casa e si arriva dal cliente
+    drawHouse(wx(-20), t);
+    if (level.stairs) drawClientOffice(wx(level.stairs[0].x - 80));
     return;
   }
   if (kind === 'openspace'){
     // parete con grandi vetrate sul tramonto
-    ctx.fillStyle = '#3b3550'; ctx.fillRect(0,0,VW,VH);
+    ctx.fillStyle = '#5d5770'; ctx.fillRect(0,0,VW,VH);
     const WIN = 230, off = wrapX(camX*0.25, WIN);
-    for (let wx = -off; wx < VW; wx += WIN){
+    for (let wxx = -off; wxx < VW; wxx += WIN){
       const g = ctx.createLinearGradient(0, 30, 0, 300);
-      g.addColorStop(0,'#5b3f7a'); g.addColorStop(0.55,'#f07d5a'); g.addColorStop(1,'#ffc06b');
-      ctx.fillStyle = g; ctx.fillRect(wx+14, 30, WIN-28, 270);
-      // sole basso e skyline
-      ctx.fillStyle = 'rgba(255,220,150,0.9)'; ctx.beginPath(); ctx.arc(wx+WIN*0.5, 262, 26, Math.PI, 0); ctx.fill();
-      ctx.fillStyle = '#2b2440';
-      for (let b=0;b<6;b++){ const bh = 30 + ((b*37 + Math.floor((wx+camX*0.25)/WIN)*13) % 70); ctx.fillRect(wx+14+b*(WIN-28)/6, 300-bh, (WIN-28)/6-3, bh); }
-      ctx.fillStyle = '#2a2438'; ctx.fillRect(wx+WIN/2-3, 30, 6, 270);
+      g.addColorStop(0,'#7d6a95'); g.addColorStop(0.55,'#e19a80'); g.addColorStop(1,'#f0c48c');
+      ctx.fillStyle = g; ctx.fillRect(wxx+14, 30, WIN-28, 270);
+      ctx.fillStyle = 'rgba(255,225,170,0.9)'; ctx.beginPath(); ctx.arc(wxx+WIN*0.5, 262, 26, Math.PI, 0); ctx.fill();
+      ctx.fillStyle = '#4d465e';
+      for (let b=0;b<6;b++){ const bh = 30 + ((b*37 + Math.floor((wxx+camX*0.25)/WIN)*13) % 70); ctx.fillRect(wxx+14+b*(WIN-28)/6, 300-bh, (WIN-28)/6-3, bh); }
+      ctx.fillStyle = '#4a445a'; ctx.fillRect(wxx+WIN/2-3, 30, 6, 270);
     }
-    ctx.fillStyle = '#4a4360'; ctx.fillRect(0, 300, VW, GROUND_Y-300);
-    ctx.fillStyle = 'rgba(255,170,110,0.10)'; ctx.fillRect(0,0,VW,VH);
-    // file di scrivanie con pc e stampanti (parallasse), da cui escono fogli
+    ctx.fillStyle = '#6a6479'; ctx.fillRect(0, 300, VW, GROUND_Y-300);
     const DESK = 200, doff = wrapX(camX*0.55, DESK);
     for (let dx = -doff - DESK; dx < VW + DESK; dx += DESK){
       const k = Math.round((dx + camX*0.55) / DESK);
       const y = GROUND_Y - 58;
-      ctx.fillStyle = '#c8a27a'; ctx.fillRect(dx+10, y, DESK-30, 10);
-      ctx.fillStyle = '#8a6d50'; ctx.fillRect(dx+18, y+10, 8, 48); ctx.fillRect(dx+DESK-38, y+10, 8, 48);
-      if (k % 3 === 0){ // stampante
-        ctx.save(); ctx.globalAlpha = 0.95; propIcon('printer', dx+50, y-38, 40, t+k); ctx.restore();
-        for (let n=0;n<3;n++){ // fogli che volano via
+      ctx.fillStyle = '#b89c80'; ctx.fillRect(dx+10, y, DESK-30, 10);
+      ctx.fillStyle = '#8a7560'; ctx.fillRect(dx+18, y+10, 8, 48); ctx.fillRect(dx+DESK-38, y+10, 8, 48);
+      if (k % 3 === 0){
+        propIcon('printer', dx+50, y-38, 40, t+k);
+        for (let n=0;n<3;n++){
           const ph = (t*0.45 + n/3 + k*0.13) % 1;
           const fx = dx+72 + ph*140*(n%2?1:-0.6), fy = y-24 - ph*190 + Math.sin(t*3+n)*8;
           ctx.save(); ctx.translate(fx, fy); ctx.rotate(Math.sin(t*2.4 + n + k)*0.9); ctx.globalAlpha = 1 - ph*0.7;
-          ctx.fillStyle = '#ffffff'; ctx.fillRect(-9,-12,18,24);
-          ctx.fillStyle = '#9aa7b6'; for (let r=0;r<4;r++) ctx.fillRect(-6,-8+r*5,12,1.5);
+          ctx.fillStyle = '#ffffff'; ctx.fillRect(-10,-13,20,26);
           ctx.restore();
         }
-      } else {
-        ctx.save(); ctx.globalAlpha = 0.95; propIcon('monitor', dx+48, y-40, 36, t+k); propIcon('monitor', dx+110, y-40, 36, t+k+1); ctx.restore();
-      }
+      } else { propIcon('monitor', dx+48, y-40, 36, t+k); propIcon('monitor', dx+110, y-40, 36, t+k+1); }
     }
-    drawBgLogo();
     return;
   }
   if (kind === 'notte'){
-    const g = ctx.createLinearGradient(0,0,0,GROUND_Y);
-    g.addColorStop(0,'#05081a'); g.addColorStop(1,'#1a2246');
-    ctx.fillStyle = g; ctx.fillRect(0,0,VW,VH);
-    const sr = mulberry32(77);   // stelle sparse, sempre nello stesso posto
-    for (let i=0;i<70;i++){ const x = wrapX(sr()*VW*1.3 - camX*0.03, VW), y = sr()*280; ctx.fillStyle = 'rgba(255,255,255,'+(0.3+0.4*Math.abs(Math.sin(t*1.5+i)))+')'; ctx.beginPath(); ctx.arc(x, y, 1.2 + (i%3)*0.4, 0, 7); ctx.fill(); }
-    // luna
-    ctx.fillStyle = '#f3f0d8'; ctx.beginPath(); ctx.arc(VW*0.8 - camX*0.01, 80, 30, 0, 7); ctx.fill();
-    ctx.fillStyle = '#05081a'; ctx.beginPath(); ctx.arc(VW*0.8 - camX*0.01 + 12, 72, 27, 0, 7); ctx.fill();
-    // palazzi e uffici bui con poche finestre accese
-    const B = 120, off = wrapX(camX*0.3, B);
-    for (let bx = -off - B; bx < VW + B; bx += B){
-      const k = Math.round((bx + camX*0.3) / B), bh = 160 + ((k*53) % 140 + 140) % 140;
-      ctx.fillStyle = '#0e1430'; ctx.fillRect(bx, GROUND_Y-bh, B-10, bh);
-      for (let r=0; r<bh/26-1; r++) for (let c=0;c<4;c++){
-        const on = ((k*7 + r*3 + c*5) % 11) === 0;
-        ctx.fillStyle = on ? 'rgba(255,214,120,0.85)' : 'rgba(80,100,160,0.18)';
-        ctx.fillRect(bx+10+c*26, GROUND_Y-bh+12+r*26, 14, 12);
+    // a casa, di notte, in smart working: stanza con finestre sulla città, scrivania con il portatile, lampada
+    ctx.fillStyle = '#2e2b45'; ctx.fillRect(0,0,VW,VH);
+    const ROOM = 420, off = wrapX(camX*0.3, ROOM);
+    for (let rx = -off - ROOM; rx < VW + ROOM; rx += ROOM){
+      const k = Math.round((rx + camX*0.3) / ROOM);
+      // finestra sulla notte
+      const g = ctx.createLinearGradient(0, 60, 0, 280); g.addColorStop(0,'#0b1030'); g.addColorStop(1,'#26305a');
+      ctx.fillStyle = g; ctx.fillRect(rx+40, 60, 170, 220);
+      for (let s=0;s<10;s++){ ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.fillRect(rx+50+((s*53+k*31)%150), 70+((s*37)%90), 2, 2); }
+      if (k % 2 === 0){ ctx.fillStyle = '#f3f0d8'; ctx.beginPath(); ctx.arc(rx+170, 100, 18, 0, 7); ctx.fill(); ctx.fillStyle = '#0b1030'; ctx.beginPath(); ctx.arc(rx+178, 95, 16, 0, 7); ctx.fill(); }
+      ctx.fillStyle = '#141a38'; for (let b=0;b<5;b++){ const bh = 40 + ((b*29 + k*17) % 60); ctx.fillRect(rx+40+b*34, 280-bh, 30, bh); ctx.fillStyle = 'rgba(255,214,120,0.7)'; ctx.fillRect(rx+48+b*34, 280-bh+10, 6, 6); ctx.fillStyle = '#141a38'; }
+      ctx.strokeStyle = '#d9cfc0'; ctx.lineWidth = 8; ctx.strokeRect(rx+40, 60, 170, 220);
+      ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(rx+125, 60); ctx.lineTo(rx+125, 280); ctx.stroke();
+      // quadro e orologio (le 2 di notte)
+      if (k % 2){ ctx.fillStyle = '#4b5a7a'; ctx.fillRect(rx+260, 110, 90, 64); ctx.strokeStyle = '#c9b48a'; ctx.lineWidth = 5; ctx.strokeRect(rx+260, 110, 90, 64); }
+      else { ctx.fillStyle = '#e8e2d4'; ctx.beginPath(); ctx.arc(rx+300, 140, 26, 0, 7); ctx.fill(); ctx.strokeStyle = '#333'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(rx+300, 140); ctx.lineTo(rx+300+12*Math.cos(-Math.PI/2+Math.PI/3), 140+12*Math.sin(-Math.PI/2+Math.PI/3)); ctx.moveTo(rx+300,140); ctx.lineTo(rx+300, 120); ctx.stroke(); }
+    }
+    // mobili in primo piano (parallasse più veloce): scrivania con portatile e lampada, libreria, divano
+    const F = 330, foff = wrapX(camX*0.6, F);
+    for (let fx = -foff - F; fx < VW + F; fx += F){
+      const k = Math.round((fx + camX*0.6) / F), y = GROUND_Y;
+      if (k % 3 === 0){
+        ctx.fillStyle = '#6b4f3f'; ctx.fillRect(fx+20, y-70, 170, 10); ctx.fillRect(fx+30, y-60, 8, 60); ctx.fillRect(fx+172, y-60, 8, 60);
+        ctx.fillStyle = '#2a2f3a'; ctx.fillRect(fx+70, y-112, 66, 42); ctx.fillStyle = '#7fd0ff'; ctx.fillRect(fx+74, y-108, 58, 34);
+        ctx.fillStyle = '#3a3f4a'; ctx.fillRect(fx+60, y-72, 86, 4);
+        const lg = ctx.createRadialGradient(fx+170, y-120, 4, fx+170, y-120, 120); lg.addColorStop(0,'rgba(255,214,140,0.55)'); lg.addColorStop(1,'rgba(255,214,140,0)');
+        ctx.fillStyle = lg; ctx.fillRect(fx+50, y-240, 240, 240);
+        ctx.strokeStyle = '#333'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(fx+165, y-70); ctx.lineTo(fx+160, y-115); ctx.lineTo(fx+175, y-130); ctx.stroke();
+        ctx.fillStyle = '#e0b860'; ctx.beginPath(); ctx.moveTo(fx+165, y-140); ctx.lineTo(fx+190, y-125); ctx.lineTo(fx+170, y-118); ctx.closePath(); ctx.fill();
+      } else if (k % 3 === 1){
+        ctx.fillStyle = '#5a4436'; ctx.fillRect(fx+30, y-190, 110, 190);
+        for (let r=0;r<4;r++){ ctx.fillStyle = '#3e2f26'; ctx.fillRect(fx+36, y-180+r*45, 98, 6); for (let b=0;b<6;b++){ ctx.fillStyle = ['#8a5a5a','#5a7a8a','#8a8a5a','#6a5a8a'][(b+r+k)%4]; ctx.fillRect(fx+40+b*15, y-172+r*45, 11, 30); } }
+      } else {
+        ctx.fillStyle = '#4c5a78'; ctx.fillRect(fx+20, y-60, 200, 40); ctx.fillRect(fx+20, y-95, 200, 40); ctx.fillRect(fx+10, y-75, 24, 55); ctx.fillRect(fx+206, y-75, 24, 55);
+        ctx.fillStyle = '#c96b6b'; ctx.fillRect(fx+60, y-88, 34, 26);
       }
     }
-    // luce d'emergenza che lampeggia
-    const a = 0.06 + 0.07*Math.max(0, Math.sin(t*3));
+    // luce rossa d'emergenza
+    const a = 0.05 + 0.06*Math.max(0, Math.sin(t*3));
     ctx.fillStyle = 'rgba(255,40,60,'+a+')'; ctx.fillRect(0,0,VW,VH);
     return;
   }
