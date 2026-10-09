@@ -278,7 +278,7 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 <!-- install the app -->
 <div class="modal" id="mInstall" hidden role="dialog" aria-modal="true" aria-labelledby="iTitle" style="z-index:38">
   <div class="sheet">
-    <div class="head"><img src="icons/icon-192.png" alt="" style="border-radius:12px"><div><h2 id="iTitle">Installa l'app</h2><p>Efuture Games sul tuo telefono, come un'app vera</p></div><button class="close" data-close aria-label="Chiudi">✕</button></div>
+    <div class="head"><img src="icons/icon-192.png" alt="" style="border-radius:12px"><div><h2 id="iTitle">Installa l'app</h2><p>Installa sul tuo dispositivo</p></div><button class="close" data-close aria-label="Chiudi">✕</button></div>
     <p>Così la apri dall'icona nella schermata Home, a schermo intero, e i giochi sbloccati restano sempre a portata di mano.</p>
     <div id="iAuto"><button class="btn" type="button" id="btnDoInstall" style="max-width:none;width:100%">Installa Efuture Games</button></div>
     <div id="iIos" class="option" hidden>
@@ -304,11 +304,11 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=38"></script>
+<script src="config.js?v=39"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=38"></script>
+<script src="backend.js?v=39"></script>
 <script src="vendor/jsQR.js"></script>
-<script src="hub.js?v=38"></script>
+<script src="hub.js?v=39"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });
