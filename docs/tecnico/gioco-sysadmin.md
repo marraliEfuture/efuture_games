@@ -236,9 +236,9 @@ Conteggi ottenuti eseguendo il generatore del codice attuale (le trappole sono q
 
 | Liv. | Cliente – stanza | Lunghezza (px) | Burroni | Piattaforme | Bug a terra | Bug volanti | Chiodi | Scosse | Seghe |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | Marco – Alba: da casa al cliente | 6384 | 1 | 13 | 15 | 2 | 2 | 1 | 0 |
-| 2 | Giulia – In ufficio al tramonto | 7184 | 5 | 19 | 16 | 4 | 3 | 2 | 2 |
-| 3 | Paolo – Notte in smart working | 8095 | 8 | 16 | 13 | 5 | 4 | 4 | 3 |
+| 1 | Marco – Alba: da casa al cliente | 6184 | 1 | 13 | 12 | 2 | 2 | 1 | 0 |
+| 2 | Giulia – In ufficio al tramonto | 7184 | 5 | 11 | 16 | 3 | 3 | 2 | 1 |
+| 3 | Paolo – Notte in smart working | 8584 | 8 | 10 | 18 | 5 | 4 | 4 | 3 |
 | 4 | Elena – Sala Rete | 5225 | 2 | 6 | 7 | 1 | 2 | 2 | 1 |
 | 5 | Davide – Data Center Cloud | 5810 | 4 | 7 | 8 | 2 | 3 | 2 | 1 |
 | 6 | Sara – Sala Controllo | 6318 | 6 | 9 | 9 | 3 | 3 | 3 | 1 |

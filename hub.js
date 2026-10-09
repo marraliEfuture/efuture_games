@@ -101,7 +101,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v48' : 'Modalità demo: account e classifica restano su questo telefono. · v48';
+  mn.textContent = remote ? 'Classifica online · v49' : 'Modalità demo: account e classifica restano su questo telefono. · v49';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -201,6 +201,7 @@ function play(g){
   document.body.style.overflow = 'hidden';
 }
 function closePlayer(){
+  playerFull(false);
   $('player').hidden = true; $('mResult').hidden = true; $('frame').src = 'about:blank'; playing = null;
   document.body.style.overflow = ''; renderGrid(); loadRanks();
 }
@@ -209,6 +210,18 @@ $('rsHome').addEventListener('click', closePlayer);
 $('rsAgain').addEventListener('click', ()=>{ const g = playing; if (g) play(g); });
 $('rsRetry').addEventListener('click', ()=>{ $('mResult').hidden = true; try { $('frame').contentWindow.postMessage({ type:'efg-cmd', cmd:'retry' }, '*'); } catch(e){} });
 
+// i giochi in orizzontale chiedono lo schermo intero: va al riquadro del gioco (barra con il tempo compresa)
+function playerFull(on){
+  const p = $('player'), fs = document.fullscreenElement || document.webkitFullscreenElement;
+  try {
+    if (on && !fs && !p.hidden){ const r = p.requestFullscreen || p.webkitRequestFullscreen; if (r){ const pr = r.call(p, { navigationUI:'hide' }); if (pr && pr.catch) pr.catch(()=>{}); } }
+    else if (!on && fs){ const x = document.exitFullscreen || document.webkitExitFullscreen; if (x){ const px = x.call(document); if (px && px.catch) px.catch(()=>{}); } }
+  } catch(err){}
+}
+window.addEventListener('message', e=>{
+  const d = e.data;
+  if (d && d.type === 'efg-fs' && playing && e.source === $('frame').contentWindow) playerFull(!!d.on);
+});
 window.addEventListener('message', async e=>{
   const d = e.data;
   if (!d || d.type !== 'efg' || !playing || e.source !== $('frame').contentWindow) return;

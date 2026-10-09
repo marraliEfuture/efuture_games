@@ -753,10 +753,11 @@ let specialPressedEdge = false;
    LEVEL BUILDING
 ========================================================= */
 // primi 3 livelli: più lunghi e con più bug (circa 35-45 secondi su 60); la notte ha le trappole più pericolose
+// in ordine di difficoltà: ogni livello ha più nemici, più trappole, più burroni, nemici più veloci e meno pedane del precedente
 const LV3 = [
-  { width:6200, bugs:15, fly:2, spikes:2, zappers:1, saws:0, gap:0.16, bugSpeed:60, sawSpeed:90,  zapOn:0.7 },
-  { width:7000, bugs:16, fly:4, spikes:3, zappers:2, saws:2, gap:0.24, bugSpeed:72, sawSpeed:110, zapOn:0.8 },
-  { width:7800, bugs:20, fly:5, spikes:4, zappers:4, saws:3, gap:0.30, bugSpeed:88, sawSpeed:140, zapOn:1.0 },
+  { width:6000, bugs:12, fly:2, spikes:2, zappers:1, saws:0, gap:0.14, bugSpeed:55, sawSpeed:90,  zapOn:0.6, plat:1.0 },
+  { width:7000, bugs:16, fly:3, spikes:3, zappers:2, saws:1, gap:0.22, bugSpeed:72, sawSpeed:115, zapOn:0.8, plat:0.5 },
+  { width:8400, bugs:21, fly:5, spikes:4, zappers:4, saws:3, gap:0.30, bugSpeed:90, sawSpeed:140, zapOn:1.0, plat:0.75 },
 ];
 function buildNormalLevel(idx){
   const rand = mulberry32(1000 + idx*37);
@@ -788,7 +789,7 @@ function buildNormalLevel(idx){
   if (cfg){   // livelli 1-3: una pedana su quasi ogni tratto, due sui tratti lunghi (generatore a parte, non cambia il resto)
     const pr = mulberry32(3000 + idx*41);
     for (let i=1;i<segments.length-1;i++){
-      const s = segments[i], sw = s.x2 - s.x1, n = sw > 470 && pr() < 0.6 ? 2 : (pr() < 0.85 ? 1 : 0);
+      const s = segments[i], sw = s.x2 - s.x1, n = sw > 470 && pr() < cfg.plat*0.7 ? 2 : (pr() < cfg.plat ? 1 : 0);
       for (let k=0;k<n;k++){
         const pw = 100 + pr()*60, slot = (sw - 20) / n;
         const px = s.x1 + 10 + k*slot + Math.max(0, slot - pw)*pr();
@@ -1869,7 +1870,6 @@ function drawHouse(x, t){   // la casa dell'omino, da cui parte all'alba
   ctx.fillStyle = '#ffd98a'; ctx.fillRect(x + 36, g - 86, 34, 86);
   ctx.fillStyle = '#ffe6a8'; ctx.fillRect(x + 110, g - 110, 46, 40); ctx.fillRect(x + 176, g - 110, 46, 40);
   ctx.strokeStyle = '#6b4a33'; ctx.lineWidth = 4; ctx.strokeRect(x + 110, g - 110, 46, 40); ctx.strokeRect(x + 176, g - 110, 46, 40);
-  ctx.fillStyle = '#6b4a33'; ctx.font = 'bold 22px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('CASA', x + w/2 + 40, g - 124);
 }
 function drawClientOffice(x){   // l'ufficio del cliente, dove arriva alla fine
   const g = GROUND_Y, w = 360, h = 330;
@@ -1877,8 +1877,7 @@ function drawClientOffice(x){   // l'ufficio del cliente, dove arriva alla fine
   ctx.fillStyle = '#cfd6de'; ctx.fillRect(x, g - h, w, h);
   ctx.fillStyle = '#9fb0c2'; ctx.fillRect(x - 10, g - h - 16, w + 20, 18);
   for (let r=0;r<6;r++) for (let c=0;c<5;c++){ ctx.fillStyle = ((r+c)%3) ? '#8fb4d6' : '#ffe2a0'; ctx.fillRect(x + 20 + c*68, g - h + 24 + r*44, 48, 28); }
-  ctx.fillStyle = '#004675'; ctx.fillRect(x + 90, g - h - 64, 180, 40);
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 24px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('CLIENTE', x + 180, g - h - 35);
+  ctx.fillStyle = '#004675'; ctx.fillRect(x + 90, g - h - 64, 180, 40);   // insegna senza scritta
 }
 function drawScene(kind, t){
   if (kind === 'alba'){

@@ -71,13 +71,15 @@ Campo logico 960 × 540, terreno a y = 470. I livelli 1–9 sono generati da un 
 
 | Liv. | Sfondo | Cosa rappresenta | Parametri (`LV3` nel codice) |
 |---|---|---|---|
-| 1 | **Alba: da casa al cliente**: l'omino **parte da casa sua** (casetta con la porta aperta e il camino che fuma, scritta CASA) e attraversa un campo di grano all'alba (sole che sorge, colline, nuvole rosate); in fondo, dietro la scala, c'è **l'ufficio del cliente** (palazzo con l'insegna CLIENTE). Se esiste `games/sysadmin/img/alba.jpg` (l'immagine dell'evento) il cielo e il campo sono quella foto | Proattività: si parte presto | lunghezza 6200, 15 bug a terra, 2 volanti, 2 chiodi, 1 scossa, nessuna sega, burroni 16%, bug 60 px/s |
-| 2 | **In ufficio al tramonto**: l'omino è **in ufficio**: vetrate sul tramonto con lo skyline, file di scrivanie con pc e stampanti da cui volano via i fogli | Quasi fine giornata | lunghezza 7000, 16 bug, 4 volanti, 3 chiodi, 2 scosse, 2 seghe, burroni 24%, bug 72 px/s |
-| 3 | **Notte in smart working**: l'omino è **a casa sua, di notte, in smart working**: stanza con finestre sulla città di notte (stelle, luna), orologio e quadri, scrivania con il portatile acceso e la lampada, libreria e divano; luce rossa d'emergenza che lampeggia. Bug **cattivi con il cappuccio** e occhi rossi (anche quelli volanti) | Emergenza | lunghezza 7800, 20 bug, 5 volanti, 4 chiodi, 4 scosse (accese più a lungo), 3 seghe più veloci (140 px/s), burroni 30%, bug 88 px/s |
+| 1 | **Alba: da casa al cliente**: l'omino **parte da casa sua** (casetta con la porta aperta e il camino che fuma, senza scritte) e attraversa un campo di grano all'alba (sole che sorge, colline, nuvole rosate); in fondo, dietro la scala, c'è **l'ufficio del cliente** (palazzo con un'insegna blu, senza scritte). Se esiste `games/sysadmin/img/alba.jpg` (l'immagine dell'evento) il cielo e il campo sono quella foto | Proattività: si parte presto | lunghezza 6000, 12 nemici a terra, 2 volanti, 2 chiodi, 1 scossa, nessuna sega, burroni 14%, nemici 55 px/s, pedane 100% |
+| 2 | **In ufficio al tramonto**: l'omino è **in ufficio**: vetrate sul tramonto con lo skyline, file di scrivanie con pc e stampanti da cui volano via i fogli | Quasi fine giornata | lunghezza 7000, 16 nemici a terra, 3 volanti, 3 chiodi, 2 scosse, 1 sega, burroni 22%, nemici 72 px/s, pedane 50% |
+| 3 | **Notte in smart working**: l'omino è **a casa sua, di notte, in smart working**: stanza con finestre sulla città di notte (stelle, luna), orologio e quadri, scrivania con il portatile acceso e la lampada, libreria e divano; luce rossa d'emergenza che lampeggia. Bug **cattivi con il cappuccio** e occhi rossi (anche quelli volanti) | Emergenza | lunghezza 8400, 21 nemici a terra, 5 volanti, 4 chiodi, 4 scosse (accese più a lungo), 3 seghe più veloci (140 px/s), burroni 30%, nemici 90 px/s, pedane 75% |
 
 **Sfondi lontani e sfocati:** i tre sfondi si disegnano su una tela grande un quarto e poi si ingrandiscono, quindi risultano morbidi e sfocati; sopra c'è un velo chiaro (scuro di notte, circa 45%) che smorza i colori. Scrivanie e mobili stanno più in fondo: tra loro e il terreno di gioco c'è una fascia di pavimento di 50 px. Così l'omino, i nemici, le pedane e le trappole, che sono nitidi, non si confondono con lo sfondo.
 
-**Pedane (livelli 1–3):** una su quasi ogni tratto di terreno (85%), due sui tratti lunghi oltre 470 px (60%), larghe 100–160 px e alte 92–130 px sul terreno. Hanno un'ombra sotto e un filo chiaro sopra per staccarsi dallo sfondo. Le genera un generatore a parte (seme `3000 + i × 41`), così il resto del livello non cambia.
+**In ordine di difficoltà:** dal livello 1 al 3 crescono nemici, nemici volanti, trappole, burroni e velocità dei nemici, e le pedane calano (risultato reale: 13, 11 e 10 pedane; nemici a terra 12, 16 e 18; trappole 3, 6 e 11; burroni 1, 5 e 8).
+
+**Pedane (livelli 1–3):** su ogni tratto di terreno con la probabilità `plat` del livello (100%, 50%, 75%), due sui tratti lunghi oltre 470 px (probabilità `plat` × 0,7), larghe 100–160 px e alte 92–130 px sul terreno. Hanno un'ombra sotto e un filo chiaro sopra per staccarsi dallo sfondo. Le genera un generatore a parte (seme `3000 + i × 41`), così il resto del livello non cambia.
 
 **Non solo bug:** in tutti i livelli circa il 30% dei nemici a terra sono **alert** (cartello giallo di pericolo con il punto esclamativo, che cammina) e circa la metà di quelli in volo sono **email spam** (busta con le ali e la scritta SPAM). Si comportano come i bug: si eliminano saltandoci sopra o con il mouse e contano come bug eliminati.
 
@@ -101,9 +103,9 @@ Nei primi 3 livelli i tratti di terreno sono più ampi (320–600 px) e i bug pa
 
 | Liv. | Cliente – stanza | Lunghezza (px) | Burroni | Piattaforme | Bug a terra | Bug volanti | Chiodi | Scosse | Seghe |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | Marco – Alba: da casa al cliente | 6384 | 1 | 13 | 15 | 2 | 2 | 1 | 0 |
-| 2 | Giulia – In ufficio al tramonto | 7184 | 5 | 19 | 16 | 4 | 3 | 2 | 2 |
-| 3 | Paolo – Notte in smart working | 8095 | 8 | 16 | 13 | 5 | 4 | 4 | 3 |
+| 1 | Marco – Alba: da casa al cliente | 6184 | 1 | 13 | 12 | 2 | 2 | 1 | 0 |
+| 2 | Giulia – In ufficio al tramonto | 7184 | 5 | 11 | 16 | 3 | 3 | 2 | 1 |
+| 3 | Paolo – Notte in smart working | 8584 | 8 | 10 | 18 | 5 | 4 | 4 | 3 |
 | 4 | Elena – Sala Rete | 5225 | 2 | 6 | 7 | 1 | 2 | 2 | 1 |
 | 5 | Davide – Data Center Cloud | 5810 | 4 | 7 | 8 | 2 | 3 | 2 | 1 |
 | 6 | Sara – Sala Controllo | 6318 | 6 | 9 | 9 | 3 | 3 | 3 | 1 |

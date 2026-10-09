@@ -81,7 +81,9 @@ Il protocollo completo è in [app-giocatori.md](app-giocatori.md#protocollo-post
 
 ## Scocca "Game Boy" (verticale)
 
-Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`). In orizzontale ogni gioco usa il suo layout, descritto nella sua specifica. Lo script non cambia la logica dei giochi: aggiunge parti decorative e due tastini che premono pulsanti già esistenti.
+Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`). In orizzontale ogni gioco usa il suo layout, descritto nella sua specifica.
+
+**Schermo intero in orizzontale (tutti e 4 i giochi):** girando il telefono in orizzontale il gioco va a schermo intero; girandolo in verticale ne esce. Il browser concede lo schermo intero solo dopo un tocco: lo script prova alla rotazione e poi a ogni tocco sul gioco finché non ci riesce. Dentro l'app (iframe) il gioco chiede all'app con `postMessage({type:'efg-fs', on})` e l'app mette a schermo intero il riquadro del gioco (`#player`, con la barra del tempo); aperto da solo, il gioco mette a schermo intero la pagina. Su iPhone Safari non permette lo schermo intero delle pagine: lì il gioco resta com'è (con l'app installata sulla schermata Home le barre del browser comunque non ci sono). Lo script non cambia la logica dei giochi: aggiunge parti decorative e due tastini che premono pulsanti già esistenti.
 
 ### Aspetto
 

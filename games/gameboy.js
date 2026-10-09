@@ -115,6 +115,23 @@
   function relayout(){ place(); refresh(); requestAnimationFrame(function(){ window.dispatchEvent(new Event('resize')); }); }
   place();
   if (mq.addEventListener) mq.addEventListener('change', relayout); else if (mq.addListener) mq.addListener(relayout);
+  /* in orizzontale il gioco va a schermo intero. Il browser lo concede solo dopo un tocco:
+     si prova subito alla rotazione e, se non basta, al primo tocco sul gioco.
+     Dentro l'app (iframe) lo chiede all'app, che mette a schermo intero il riquadro del gioco
+     (con la barra del tempo); da solo mette a schermo intero la pagina. In verticale si esce. */
+  var land = window.matchMedia('(orientation:landscape)'), inApp = window.parent !== window;
+  function fsEl(){ return doc.fullscreenElement || doc.webkitFullscreenElement; }
+  function goFull(on){
+    if (inApp){ try { window.parent.postMessage({ type:'efg-fs', on: on }, '*'); } catch(e){} return; }
+    var d = doc.documentElement;
+    try {
+      if (on && !fsEl()){ var r = (d.requestFullscreen || d.webkitRequestFullscreen); if (r){ var pr = r.call(d, { navigationUI:'hide' }); if (pr && pr.catch) pr.catch(function(){}); } }
+      else if (!on && fsEl()){ var x = (doc.exitFullscreen || doc.webkitExitFullscreen); if (x){ var px = x.call(doc); if (px && px.catch) px.catch(function(){}); } }
+    } catch(e){}
+  }
+  function onTurn(){ goFull(land.matches); }
+  if (land.addEventListener) land.addEventListener('change', onTurn); else if (land.addListener) land.addListener(onTurn);
+  doc.addEventListener('pointerdown', function(){ if (land.matches && (inApp || !fsEl())) goFull(true); }, true);
   /* i caratteri arrivano dopo: ricalcola le misure del gioco a pagina caricata */
   window.addEventListener('load', function(){ window.dispatchEvent(new Event('resize')); });
   if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function(){ window.dispatchEvent(new Event('resize')); });
