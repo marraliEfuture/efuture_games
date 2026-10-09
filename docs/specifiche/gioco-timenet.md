@@ -30,7 +30,7 @@ Breakout (rompi-mattoncini) con il delfino di Timenet. Il delfino nuota sul pelo
 | **Istruzioni** (`howBox`) | Tre righe con disegnino: mattoncini ("alcuni reggono più colpi"), pallone ("Non far cadere il pallone in acqua"), capsule ("C 3 palloni · S rete · ✓ delfino grande · T pallone grande e lento"). "5 livelli, dalle 08:00 alle 18:00." Tasti: Trascina o frecce · spazio lancia · P pausa | – |
 | **Animazione iniziale** | Dopo **Inizia** (e **Gioca ancora**): il delfino salta fuori dall'acqua, lancia il pallone, il logo va in frantumi, compare BREAKOUT. Dura 4,2 s; "TOCCA PER SALTARE": un tocco o un tasto la salta | – |
 | **Scheda del livello** (`ov-level`) | Etichetta "08:00 · Livello 1/5" (gara: "/3"), nome e frase del livello | **Via!** |
-| **Livello completato** (`ov-clear`) | Dopo 0,9 s (1,9 s nei livelli col logo finale): "Ora completata", "Ore 08:00 completate!", punti, mattoncini rotti, tempo | **Prossimo livello** |
+| **Livello completato** (`ov-clear`) | Dopo 0,9 s (1,9 s nei livelli col logo finale): "Livello N completato!", punti, mattoncini rotti, tempo | **Prossimo livello** |
 | **Pausa** (`ov-pause`) | PAUSA | **Riprendi**, **Menu** |
 | **Game over** (`ov-over`) | "Pallone in acqua", GAME OVER, "Palloni finiti. Riprova!", punti, livello N/5 (gara N/3) | **Riprova livello**, **Menu** |
 | **Vittoria** (`ov-win`) | "Missione compiuta", GIORNATA CHIUSA, "Tutti i mattoncini rotti. Connessi, sicuri, soddisfatti.", punteggio finale, record, "Nuovo record!" o "Record da battere: N" | **Gioca ancora** |

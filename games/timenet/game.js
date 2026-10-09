@@ -382,7 +382,7 @@ function levelCleared(){
   setTimeout(()=>{
     if (state !== 'clear' || lvIndex !== doneIdx) return;
     if (lvIndex === LEVELS.length-1){ win(); return; }
-    $('clearTitle').textContent = 'Ore ' + L.clock + ' completate!';
+    $('clearTitle').textContent = 'Livello ' + (lvIndex+1) + ' completato!';
     $('clearScore').textContent = score; $('clearBugs').textContent = levelBroken; $('clearTime').textContent = fmt(levelTime);
     showOnly(ov.clear);
   }, L.revealAtEnd ? 1900 : 900);

@@ -247,7 +247,7 @@
  },
  {
   "data": "2026-10-09",
-  "commit": "a29f7bb",
+  "commit": "caa24fd",
   "versione": "v40",
   "esiti": {
    "codice": {
@@ -276,7 +276,7 @@
     "errore": 0
    }
   },
-  "spazio_kb": 11731.5,
+  "spazio_kb": 11731.4,
   "cartelle_kb": {
    ".claude": 86.6,
    "(file principali)": 245.7,
