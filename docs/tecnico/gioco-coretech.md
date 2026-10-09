@@ -58,7 +58,7 @@ Ordine degli script in fondo a `<body>`: `gameboy.js` → `efgReport` inline →
 | `TUNNEL_ROW`, `TUNNEL_LEN` | Riga dell'uscita laterale e lunghezza del tratto dove i bug rallentano |
 | `player` | La C: `x`, `y` in caselle, `gx`/`gy` (scostamento del disegno dopo una svolta assistita), `dir`, `face`, `moving`, `mouth`, `turnAt` |
 | `bugs` | Bug in gioco: `id`, `name`, `color`, `home`, `x`, `y`, `dir`, `mode`, `release`, `reverse`, `wob` |
-| `goneBugs` | Id dei bug mangiati che non devono rinascere |
+| `goneBugs` | Id dei bug mangiati che non devono rinascere (solo livello 1; dal livello 2 il bug mangiato resta in `bugs` in modo `eaten`, torna a `HOUSE_IN` e riesce in modo `exit`) |
 | `globalMode`, `modeIdx`, `modeTimer` | Alternanza dispersione / inseguimento |
 | `frightTimer`, `eatCombo` | Durata residua della patch e bug mangiati di fila |
 | `readyTimer`, `dyingTimer` | Timer di PRONTI! e dell'animazione della vita persa |

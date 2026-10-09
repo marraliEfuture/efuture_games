@@ -107,8 +107,8 @@ Il primo bug parte già fuori dalla casetta; gli altri escono ai tempi indicati.
 **Floppy (patch):** vale 50 punti e per la durata del livello tutti i bug diventano blu e lenti, anche quelli ancora nella casetta (escono subito). Nell'ultimo 1,6 s lampeggiano. Durante la patch l'alternanza dispersione/inseguimento si ferma.
 
 **Collisioni** (distanza meno di circa due terzi di casella):
-- bug spaventato: viene mangiato. Vale 200, 400, 800, 1600 punti per i bug mangiati di fila con la stessa patch. **Il bug mangiato non torna più per tutto il livello**, neanche dopo una vita persa;
-- bug normale: si perde una vita. Animazione di 1,5 s, poi tutti tornano alla partenza (i bug mangiati restano fuori), PRONTI! e si riparte. Le monetine già mangiate restano mangiate.
+- bug spaventato: viene mangiato. Vale 200, 400, 800, 1600 punti per i bug mangiati di fila con la stessa patch. **Al livello 1 il bug mangiato non torna più per tutto il livello**, neanche dopo una vita persa. **Dal livello 2 rinasce:** diventa solo occhi, torna di corsa alla casetta al centro e ne riesce subito come bug normale;
+- bug normale: si perde una vita. Animazione di 1,5 s, poi tutti tornano alla partenza (al livello 1 i bug mangiati restano fuori), PRONTI! e si riparte. Le monetine già mangiate restano mangiate.
 
 **Fine del livello:** quando non restano monetine né floppy.
 
