@@ -62,8 +62,9 @@ CODICI DI SBLOCCO (uno per gioco)
 
 2c) PANNELLO ADMIN
    https://marraliefuture.github.io/efuture_games/admin.html
-   Si entra con la chiave admin (non è nel sito: è salvata cifrata nel
-   database). Dal pannello:
+   Si entra con la propria email e la chiave admin personale, oppure
+   con la sola chiave principale (email vuota). Le chiavi non sono nel
+   sito: nel database sono salvate solo cifrate. Dal pannello:
    Il menu si apre con il pulsante "Menu" in alto a sinistra: Utenti,
    Collegamenti (QR, Link), Formazione (Video utili, Tutorial, Skills,
    FAQ, Documentazione),
@@ -82,7 +83,9 @@ CODICI DI SBLOCCO (uno per gioco)
    - Backup: crea e scarica una copia (JSON), ripristina una copia.
    - Reset: azzera i punti (i giocatori restano) o cancella tutto.
      Prima di ogni reset viene fatto un backup automatico.
-   - Chiave: cambia la chiave admin.
+   - Chiave: cambia la chiave con cui sei entrato (la tua personale o
+     la principale). Le chiavi personali degli altri admin si impostano,
+     generano o tolgono da Utenti > Modifica (solo per i tipi admin).
    - QR: "Genera i QR" mostra a video i 5 QR (app + sblocco dei 4
      giochi); "Stampa" li mette tutti su un foglio A4 in bianco e nero.
    - Link: tutti i link (app, installazione, classifica, admin, GitHub,

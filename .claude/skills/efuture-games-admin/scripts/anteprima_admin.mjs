@@ -29,7 +29,7 @@ const now = Date.now(), iso = m => new Date(now - m*60000).toISOString();
 const players = [
   {name:'Anna', email:'anna@esempio.it', created_at:iso(300), tipo:'giocatore', giochi:3, livelli:7, punti:820, dettaglio:{sysadmin:{livelli:3,punti:400}, coretech:{livelli:2,punti:300}, timenet:{livelli:2,punti:120}}},
   {name:'Bruno', email:'bruno@esempio.it', created_at:iso(200), tipo:'giocatore', disabilitato:true, giochi:1, livelli:2, punti:150, dettaglio:{inncloud:{livelli:2,punti:150}}},
-  {name:'Marta', email:'marta@efuture.it', created_at:iso(100), tipo:'admin_giocatore', giochi:2, livelli:4, punti:410, dettaglio:{coretech:{livelli:3,punti:310}, timenet:{livelli:1,punti:100}}},
+  {name:'Marta', email:'marta@efuture.it', created_at:iso(100), tipo:'admin_giocatore', chiave:true, giochi:2, livelli:4, punti:410, dettaglio:{coretech:{livelli:3,punti:310}, timenet:{livelli:1,punti:100}}},
   {name:'Luca', email:'luca@efuture.it', created_at:iso(50), tipo:'admin', giochi:0, livelli:0, punti:0, dettaglio:null}];
 const logs = [
   {id:3, at:iso(5), kind:'partita', email:'anna@esempio.it', game:'coretech', detail:{livelli:2, punti:300, record:true}},
@@ -41,7 +41,9 @@ window.supabase = { createClient: () => ({ rpc: async (fn, a) => {
   switch (fn){
     case 'efg_admin_login': return {data:{giocatori:players.length, punteggi:6, eventi:logs.length, backup:backups.length, ultimo_backup:backups[0].creato}};
     case 'efg_admin_players': return {data:players};
-    case 'efg_admin_set_tipo': { const p = players.find(x => x.email === a.p_email); if (p) p.tipo = a.p_tipo; return {data:{ok:true, nome:p && p.name, tipo:a.p_tipo}}; }
+    case 'efg_admin_set_tipo': { const p = players.find(x => x.email === a.p_email); if (p){ p.tipo = a.p_tipo; if (a.p_tipo === 'giocatore') p.chiave = false; } return {data:{ok:true, nome:p && p.name, tipo:a.p_tipo}}; }
+    case 'efg_admin_me': { const k = (a.p_key || '').split('\\n'); if (k.length < 2) return {data:{principale:true}}; const p = players.find(x => x.email === k[0]); return {data:{principale:false, email:k[0], nome:p ? p.name : k[0], tipo:p ? p.tipo : 'admin'}}; }
+    case 'efg_admin_set_user_key': { const p = players.find(x => x.email === a.p_email); if (p) p.chiave = !!a.p_new; return {data:{ok:true, nome:p && p.name, chiave:!!a.p_new}}; }
     case 'efg_admin_set_disabilitato': { const p = players.find(x => x.email === a.p_email); if (p) p.disabilitato = !!a.p_on; return {data:{ok:true, nome:p && p.name}}; }
     case 'efg_admin_delete_player': { const i = players.findIndex(x => x.email === a.p_email); const n = i >= 0 ? players[i].name : ''; if (i >= 0) players.splice(i, 1); return {data:{ok:true, nome:n, punteggi:0}}; }
     case 'efg_admin_logs': return {data:logs};

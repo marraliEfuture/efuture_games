@@ -16,7 +16,10 @@ Indirizzo: `https://marraliefuture.github.io/efuture_games/admin.html`. Script c
 
 ## Accesso
 
-- Modulo "Accesso amministratore", con il campo **Chiave admin**.
+- Modulo "Accesso amministratore", con i campi **Email** e **Chiave admin**:
+  - **chiave personale:** email dell'utente admin + la sua chiave. Il pannello manda al server `email` + a capo + `chiave` in `p_key`;
+  - **chiave principale:** email vuota + la chiave principale (quella impostata con `efg_admin_init`), di riserva per il primo accesso e le emergenze.
+- Dopo l'ingresso `efg_admin_me` dice chi è collegato: in alto a destra compare "🛡️ *nome*" oppure "🔑 Chiave principale".
 - Il logo Efuture non è nell'intestazione ma nel piè di pagina bianco, in basso a destra (nascosto in stampa).
 - **Entra** chiama `efg_admin_login(p_key)`.
 - Se la chiave è giusta:
@@ -25,7 +28,7 @@ Indirizzo: `https://marraliefuture.github.io/efuture_games/admin.html`. Script c
   - la chiave si salva in `sessionStorage` (`efgAdminKey`). Vale solo per quella scheda del browser e si perde chiudendola.
 - Ricaricando la pagina si rientra da soli con la chiave salvata.
 - **Errori**, restituiti dal server come `{errore: …}`:
-  - "chiave admin errata";
+  - "chiave admin errata" (chiave principale) o "email o chiave admin errata" (chiave personale: email sconosciuta, utente non admin, disabilitato, senza chiave o chiave sbagliata);
   - "chiave admin non ancora impostata";
   - "troppi tentativi sbagliati: riprova tra 10 minuti".
 - **Blocco:** dopo **8 chiavi sbagliate in 10 minuti**, contate in tutto il sistema e non per persona, ogni funzione admin rifiuta l'accesso per 10 minuti. Vale anche per il Countdown della classifica.
@@ -74,7 +77,12 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
   | (ultima) | Pulsante **Modifica** |
 
 - **Modifica** apre un popup con nome ed email e tre gruppi di comandi:
-  - **Tipo:** Giocatore, Admin e giocatore, Solo admin (quello attuale è evidenziato). Chiama `efg_admin_set_tipo(p_key, p_email, p_tipo)` (valori `giocatore`, `admin_giocatore`, `admin`); nel log "admin: tipo utente". Per ora il tipo serve solo a riconoscere gli utenti: non cambia permessi né classifica.
+  - **Tipo:** Giocatore, Admin e giocatore, Solo admin (quello attuale è evidenziato). Chiama `efg_admin_set_tipo(p_key, p_email, p_tipo)` (valori `giocatore`, `admin_giocatore`, `admin`); nel log "admin: tipo utente". Effetti: i tipi admin possono entrare nel pannello con email e chiave personale e fare tutto; tornando Giocatore la chiave personale viene cancellata. Nell'app per ora tutti i tipi giocano e compaiono in classifica. La domanda di conferma spiega questi effetti per il tipo scelto.
+  - **Chiave admin personale** (solo per i tipi admin): stato "🔑 Impostata…" / "Non impostata…" e i pulsanti:
+    - **🔑 Imposta / Modifica:** due campi (almeno 10 caratteri, uguali);
+    - **🎲 Genera:** chiave casuale di 16 caratteri (`XXXX-XXXX-XXXX-XXXX`, generata nel browser con `crypto.getRandomValues`), mostrata **una sola volta** con il pulsante **Copia**;
+    - **Togli:** l'utente non entra più nel pannello.
+    Tutti chiamano `efg_admin_set_user_key(p_key, p_email, p_new)` (`p_new` vuoto = togli). La chiave viene salvata solo cifrata (bcrypt): non si può rileggere. Nella tabella un 🔑 accanto al tipo indica la chiave impostata.
   - **Accesso:** 🚫 **Disabilita** / ✅ **Riabilita**. Chiama `efg_admin_set_disabilitato(p_key, p_email, p_on)`; nel log "admin: utente disabilitato/riabilitato". Un utente disabilitato non può accedere all'app ("Il tuo account è stato disabilitato: chiedi agli organizzatori."), i nuovi punteggi non vengono salvati e non compare nelle classifiche. I punteggi restano nel database: riabilitandolo torna in classifica.
   - **Elimina utente:** chiama `efg_admin_delete_player(p_key, p_email)`, chiude il popup, ricarica la tabella e aggiunge "· eliminato *nome*". L'utente potrà registrarsi di nuovo con la stessa email, ripartendo da zero.
 - **Ogni modifica chiede conferma** in una seconda finestra con la domanda ("Cambiare il tipo di…?", "Disabilitare…?", "Riabilitare…?", "Eliminare…?"), le conseguenze spiegate e i pulsanti **Annulla** e **Sì, …** (rosso per disabilitare ed eliminare). Con Annulla non cambia niente.
@@ -205,8 +213,9 @@ Tutorial presenti:
 
 ### Chiave
 
-- Campi: **Nuova chiave** (almeno 10 caratteri) e **Ripeti la nuova chiave**, che devono coincidere.
-- Il pulsante chiama `efg_admin_set_key(p_key, p_new)`.
+- Cambia **la chiave con cui si è entrati**: titolo "Cambia la tua chiave personale" o "Cambia la chiave principale", con una spiegazione.
+- Campi: **Nuova chiave** (almeno 10 caratteri) e **Ripeti la nuova chiave**, che devono coincidere. Prima di salvare chiede conferma con le conseguenze.
+- Il pulsante chiama `efg_admin_set_key(p_key, p_new)`: con chiave personale cambia quella dell'utente, altrimenti la principale.
 - La sessione continua con la nuova chiave.
 
 ### Reset

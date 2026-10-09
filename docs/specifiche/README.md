@@ -87,7 +87,7 @@ I file SQL **non si applicano con il push**: vanno incollati ed eseguiti a mano 
 | `supabase-classifica-gruppi.sql` | `efg_board_group`: filtro Giocatori Ospiti / Efuture della classifica | Una volta, e di nuovo quando il file cambia. Se manca, la classifica lo segnala |
 | `supabase-countdown.sql` | Tabella `efg_gate` e countdown di apertura e chiusura. Ridefinisce `efg_submit` per rifiutare i punteggi a gara chiusa | Una volta, e dopo ogni riesecuzione di `supabase.sql` |
 | `supabase-privacy-utenti.sql` | Toglie il cellulare dai giocatori e dai backup salvati. Aggiorna la registrazione e aggiunge "Elimina giocatore" | Una volta, sui database creati prima della v23. Su un database nuovo non serve: `supabase.sql` contiene già tutto |
-| `supabase-tipi-utenti.sql` | Tipo di utente e utenti disabilitati nella sezione Utenti dell'admin | Dalla v35 su qualsiasi database; da rieseguire dalla v36 |
+| `supabase-tipi-utenti.sql` | Utenti nell'admin: tipo, disabilitazione, chiavi admin personali (accesso con email + chiave) | Dalla v35, dopo `supabase-countdown.sql`; da rieseguire dalla v37 |
 
 La chiave admin si imposta o si recupera solo dallo SQL Editor con `select efg_admin_init('NUOVA-CHIAVE-LUNGA');`. Il dettaglio è in [database.md](database.md).
 
