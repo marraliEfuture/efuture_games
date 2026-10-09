@@ -176,6 +176,8 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   .join img{width:clamp(64px,4.6vw,90px)}
 }
 @media (prefers-reduced-motion:reduce){.dot{animation:none}li{transition:none}}
+.fsmsg{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:50;max-width:min(560px,calc(100vw - 32px));background:#1f2a37;color:#fff;font-size:14px;line-height:1.4;padding:10px 16px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.25);text-align:center}
+:fullscreen .fsmsg{display:none}
 </style>
 </head>
 <body>
@@ -188,7 +190,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   <div class="live">
     <span class="dot" id="dot" aria-hidden="true"></span>
     <span id="status" aria-live="polite">Carico…</span>
-    <button class="btn" id="btnFull" type="button">Schermo intero</button>
+    <button class="btn" id="btnFull" type="button" title="Apre la classifica a schermo intero sul secondo monitor (se c'è)">Schermo intero</button>
     <button class="btn ghost" id="btnGate" type="button">⏱ Countdown</button>
     <a class="btn ghost" id="btnAdmin" href="admin.html" title="Area amministratori">Admin</a>
   </div>
@@ -251,9 +253,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=37"></script>
+<script src="config.js?v=38"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=37"></script>
+<script src="backend.js?v=38"></script>
 <script>
 (function(){
 "use strict";
@@ -397,11 +399,52 @@ async function refresh(){
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
 window.addEventListener('storage', () => { if (!B.remote) refresh(); });   // demo: aggiorna quando l'app scrive
+/* Schermo intero sul secondo monitor (Window Management API, Chrome/Edge).
+   Se c'è un altro schermo oltre a quello della finestra, la classifica va a schermo intero lì;
+   altrimenti, o se il browser non lo permette, va a schermo intero dove si trova. */
+let screens = null;                       // dettagli degli schermi, dopo il permesso
+async function loadScreens(ask){
+  if (!('getScreenDetails' in window)) return null;
+  try {
+    if (!ask){
+      const st = await navigator.permissions.query({ name: 'window-management' });
+      if (st.state !== 'granted') return null;
+    }
+    screens = await window.getScreenDetails();
+  } catch (e) { screens = null; }
+  return screens;
+}
+function otherScreen(){
+  if (!screens || screens.screens.length < 2) return null;
+  const others = screens.screens.filter(s => s !== screens.currentScreen);
+  return others.find(s => !s.isPrimary) || others[0] || null;
+}
+function fsMsg(t){
+  let m = document.getElementById('fsMsg');
+  if (!m){ m = document.createElement('div'); m.id = 'fsMsg'; m.className = 'fsmsg'; m.setAttribute('role', 'status'); document.body.appendChild(m); }
+  m.textContent = t; m.hidden = false;
+  clearTimeout(fsMsg.t); fsMsg.t = setTimeout(() => { m.hidden = true; }, 8000);
+}
+async function goFull(){
+  const el = document.documentElement;
+  const first = !screens && 'getScreenDetails' in window;
+  if (first) await loadScreens(true);       // la prima volta il browser chiede il permesso
+  const other = otherScreen();
+  try {
+    await el.requestFullscreen(other ? { screen: other } : undefined);
+    if (!other && screens && screens.screens.length < 2) fsMsg('Non trovo un secondo monitor: schermo intero su questo schermo.');
+  } catch (e) {
+    // dopo la richiesta di permesso il clic può non valere più: si riprova con un secondo clic
+    if (first && other) fsMsg('Permesso concesso: premi di nuovo "Schermo intero" per aprirla sul secondo monitor.');
+    else el.requestFullscreen().catch(() => fsMsg('Premi di nuovo "Schermo intero".'));
+  }
+  if (!('getScreenDetails' in window)) fsMsg('Questo browser non sa scegliere il monitor: trascina la finestra sul secondo schermo e premi di nuovo "Schermo intero" (meglio usare Chrome o Edge).');
+}
 $('btnFull').onclick = () => {
-  const d = document;
-  if (d.fullscreenElement) d.exitFullscreen && d.exitFullscreen();
-  else if (d.documentElement.requestFullscreen) d.documentElement.requestFullscreen().catch(() => {});
+  if (document.fullscreenElement) document.exitFullscreen && document.exitFullscreen();
+  else if (document.documentElement.requestFullscreen) goFull();
 };
+loadScreens(false);                       // se il permesso c'era già, gli schermi sono pronti subito
 if (!document.documentElement.requestFullscreen) $('btnFull').hidden = true;
 /* ---------- countdown di apertura / chiusura ----------
    Lo vedono tutti (anche a schermo intero); lo avvia e lo ferma solo un amministratore
