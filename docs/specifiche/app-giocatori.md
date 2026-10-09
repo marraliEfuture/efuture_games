@@ -215,7 +215,7 @@ Si apre con il pulsante **Classifica** (finestra `mBoard`).
   - la pagina non è dentro un iframe;
   - si arriva da un QR (`?sblocca` o `?installa`), oppure si usa Samsung Internet, oppure l'installazione non è avvenuta negli ultimi 3 giorni (`efgInstalled`).
 - **Pulsante Installa app:** visibile se l'installazione è possibile e c'è la richiesta del browser, oppure il telefono è iPhone/iPad o Android.
-- **Finestra `mInstall`:** titolo "Installa l'app", sottotitolo "Installa sul tuo dispositivo". Contenuto in base al dispositivo:
+- **Finestra `mInstall`:** titolo "Installa l'app", sottotitolo "Installa sul tuo dispositivo", testo "Installando quest'app sul tuo dispositivo, avrai i giochi sempre a disposizione." Contenuto in base al dispositivo:
 
 | Dispositivo | Cosa compare |
 |---|---|
