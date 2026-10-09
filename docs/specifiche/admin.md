@@ -188,7 +188,13 @@ Card con comando, descrizione ed esempio di richiesta per ogni skill di Claude C
 - `/efuture-games-commit`;
 - `/efuture-games-preview`;
 - `/efuture-games-admin`;
+- `/efuture-games-efuture-bros`;
+- `/efuture-games-coretech-pac`;
+- `/efuture-games-timenet-breakout`;
+- `/efuture-games-inncloud-invaders`;
 - `/efuture-games-skills`.
+
+Le skill `/efuture-games-admin` e le 4 skill dei giochi mettono Claude in una "modalità": da quel momento ogni richiesta riguarda il pannello admin o quel gioco, finché l'utente non dice "basta …" o richiama un'altra skill.
 
 In alto a destra di ogni card c'è il pulsante **copia** (solo icona, tooltip "Copia il comando /…"). Copia il comando negli appunti; per un attimo l'icona diventa una spunta verde e il tooltip "Copiato!".
 
