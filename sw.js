@@ -1,6 +1,6 @@
 // Efuture Games - service worker: tiene i giochi sul telefono per giocare anche con poca rete.
 // Quando aggiorni l'app, cambia il numero di versione qui sotto.
-const CACHE = 'efuture-games-v45';
+const CACHE = 'efuture-games-v47';
 const ASSETS = [
   "./",
   "config.js",

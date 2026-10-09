@@ -25,7 +25,7 @@ Indirizzo: `https://marraliefuture.github.io/efuture_games/admin.html`. Script c
 - Se la chiave è giusta:
   - compare la dashboard;
   - in alto a destra compaiono **Gioca ↗** (apre l'app dei giocatori in una nuova scheda), **Classifica ↗** e **📺 Proietta**;
-  - **📺 Proietta** apre la classifica (`classifica.html?proietta=1`) in una finestra a parte sul **secondo monitor** (ledwall o proiettore), mentre l'admin resta sul primo. Con Chrome o Edge usa la Window Management API (`getScreenDetails`) e posiziona la finestra (`window.open` con `left/top/width/height`) sull'altro schermo; la prima volta il browser chiede il permesso "Gestione finestre" e, se la finestra viene bloccata, il messaggio dice di premere di nuovo. Fa la stessa cosa del pulsante 📺 Proietta della classifica. Sulla classifica compare "Clicca qui per lo schermo intero": un clic e va a schermo intero su quel monitor. Senza secondo monitor o con altri browser la finestra si apre normale e il messaggio dice di trascinarla sull'altro schermo;
+  - **📺 Proietta** apre la classifica (`classifica.html?proietta=1`) in una finestra a parte sul **secondo monitor** (ledwall o proiettore), mentre l'admin resta sul primo. Con Chrome o Edge usa la Window Management API (`getScreenDetails`) e posiziona la finestra (`window.open` con `left/top/width/height`) sull'altro schermo; la prima volta il browser chiede il permesso "Gestione finestre" e, se la finestra viene bloccata, il messaggio dice di premere di nuovo. Fa la stessa cosa del pulsante 📺 Proietta della classifica. Sulla classifica non serve più un secondo clic: la finestra si apre già grande quanto lo schermo (finestra senza barre, `popup,fullscreen,left,top,width,height`) e con l'aspetto da schermo intero (classe `.proj`: niente pulsanti di visualizzazione, Countdown e Admin). Se il browser lo consente (finestre `fullscreen` o schermo intero automatico, previsti da Chrome/Edge con il permesso "Gestione finestre" ma non ancora disponibili ovunque) va subito a schermo intero vero; altrimenti resta solo la barra della finestra, che sparisce con un clic in un punto qualsiasi della classifica. Senza secondo monitor o con altri browser la finestra si apre normale e il messaggio dice di trascinarla sull'altro schermo;
   - la chiave si salva in `sessionStorage` (`efgAdminKey`). Vale solo per quella scheda del browser e si perde chiudendola.
 - Ricaricando la pagina si rientra da soli con la chiave salvata.
 - **Errori**, restituiti dal server come `{errore: …}`:
@@ -67,26 +67,27 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
   | Colonna | Contenuto |
   |---|---|
   | `#` | Posizione |
-  | Tipo | Simbolo: 🎮 Giocatore, 🛡️🎮 Admin e giocatore, 🛡️ Solo admin (il nome del tipo compare passandoci sopra). Gli utenti senza tipo valgono come Giocatore |
-  | Nome | Con l'etichetta rossa **disabilitato** se l'utente è disabilitato (tutta la riga in grigio) |
+  | Tipo | Simbolo: 🎮 Giocatore, 🎮🛡️ Admin e giocatore (prima il joystick, poi lo scudo), 🛡️ Solo admin (il nome del tipo compare passandoci sopra). Gli utenti senza tipo valgono come Giocatore |
+  | Nome | Con l'etichetta rossa **bloccato** se l'utente è bloccato (tutta la riga in grigio) |
   | Email | |
   | Registrato | Data e ora |
-  | Giochi | Giochi con almeno 1 livello, su 4 |
+  | Giochi sbloccati | Giochi con almeno 1 livello superato, su 4 (lo sblocco con il QR resta solo sul telefono: il server vede un gioco solo quando arriva un punteggio) |
   | Livelli | Livelli totali, su 12 |
   | Punti | Punti totali |
-  | Dettaglio per gioco | Per esempio `SysAdmin 2/3 · 150 — Timenet 1/3 · 40` |
-  | (ultima) | Pulsante **Modifica** |
+  | Dettaglio per gioco | Per esempio `Efuture Bros 2/3 · 150 — Timenet 1/3 · 40` |
+  | (ultima) | Pulsanti **Modifica** e **🚫 Blocca** / **✅ Sblocca** (lo stesso comando del popup, con la stessa conferma; il risultato compare accanto a "N utenti registrati") |
 
 - **Modifica** apre un popup con nome ed email e tre gruppi di comandi:
   - **Tipo:** Giocatore, Admin e giocatore, Solo admin (quello attuale è evidenziato). Chiama `efg_admin_set_tipo(p_key, p_email, p_tipo)` (valori `giocatore`, `admin_giocatore`, `admin`); nel log "admin: tipo utente". Effetti: i tipi admin possono entrare nel pannello con email e chiave personale e fare tutto; tornando Giocatore la chiave personale viene cancellata. Nell'app per ora tutti i tipi giocano e compaiono in classifica. La domanda di conferma spiega questi effetti per il tipo scelto.
-  - **Chiave admin personale** (solo per i tipi admin): stato "🔑 Impostata…" / "Non impostata…" e i pulsanti:
+  - **Password** (solo per i giocatori): spiega che i giocatori non hanno una password, entrano con la sola email, quindi non c'è niente da reimpostare.
+  - **Chiave admin personale (la password del pannello)** (solo per i tipi admin): stato "🔑 Impostata…" / "Non impostata…" e i pulsanti:
     - **🔑 Imposta / Modifica:** due campi (almeno 10 caratteri, uguali);
-    - **🎲 Genera:** chiave casuale di 16 caratteri (`XXXX-XXXX-XXXX-XXXX`, generata nel browser con `crypto.getRandomValues`), mostrata **una sola volta** con il pulsante **Copia**;
+    - **🔄 Reset chiave:** nuova chiave casuale di 16 caratteri (`XXXX-XXXX-XXXX-XXXX`, generata nel browser con `crypto.getRandomValues`), mostrata **una sola volta** con il pulsante **Copia**;
     - **Togli:** l'utente non entra più nel pannello.
     Tutti chiamano `efg_admin_set_user_key(p_key, p_email, p_new)` (`p_new` vuoto = togli). La chiave viene salvata solo cifrata (bcrypt): non si può rileggere. Nella tabella un 🔑 accanto al tipo indica la chiave impostata.
-  - **Accesso:** 🚫 **Disabilita** / ✅ **Riabilita**. Chiama `efg_admin_set_disabilitato(p_key, p_email, p_on)`; nel log "admin: utente disabilitato/riabilitato". Un utente disabilitato non può accedere all'app ("Il tuo account è stato disabilitato: chiedi agli organizzatori."), i nuovi punteggi non vengono salvati e non compare nelle classifiche. I punteggi restano nel database: riabilitandolo torna in classifica.
+  - **Blocca / sblocca:** 🚫 **Blocca** / ✅ **Sblocca** (nel database: disabilitato sì/no). Chiama `efg_admin_set_disabilitato(p_key, p_email, p_on)`; nel log "admin: utente disabilitato/riabilitato". Un utente disabilitato non può accedere all'app ("Il tuo account è stato disabilitato: chiedi agli organizzatori."), i nuovi punteggi non vengono salvati e non compare nelle classifiche. I punteggi restano nel database: riabilitandolo torna in classifica.
   - **Elimina utente:** chiama `efg_admin_delete_player(p_key, p_email)`, chiude il popup, ricarica la tabella e aggiunge "· eliminato *nome*". L'utente potrà registrarsi di nuovo con la stessa email, ripartendo da zero.
-- **Ogni modifica chiede conferma** in una seconda finestra con la domanda ("Cambiare il tipo di…?", "Disabilitare…?", "Riabilitare…?", "Eliminare…?"), le conseguenze spiegate e i pulsanti **Annulla** e **Sì, …** (rosso per disabilitare ed eliminare). Con Annulla non cambia niente.
+- **Ogni modifica chiede conferma** in una seconda finestra con la domanda ("Cambiare il tipo di…?", "Bloccare…?", "Sbloccare…?", "Reset della chiave di…?", "Eliminare…?"), le conseguenze spiegate e i pulsanti **Annulla** e **Sì, …** (rosso per bloccare ed eliminare). Con Annulla non cambia niente.
 - Tipo e disabilitazione servono `supabase-tipi-utenti.sql`: senza, il popup dice di eseguirlo.
 
 ### Qualità
@@ -187,7 +188,13 @@ Card con comando, descrizione ed esempio di richiesta per ogni skill di Claude C
 - `/efuture-games-commit`;
 - `/efuture-games-preview`;
 - `/efuture-games-admin`;
+- `/efuture-games-efuture-bros`;
+- `/efuture-games-coretech-pac`;
+- `/efuture-games-timenet-breakout`;
+- `/efuture-games-inncloud-invaders`;
 - `/efuture-games-skills`.
+
+Le skill `/efuture-games-admin` e le 4 skill dei giochi mettono Claude in una "modalità": da quel momento ogni richiesta riguarda il pannello admin o quel gioco, finché l'utente non dice "basta …" o richiama un'altra skill.
 
 In alto a destra di ogni card c'è il pulsante **copia** (solo icona, tooltip "Copia il comando /…"). Copia il comando negli appunti; per un attimo l'icona diventa una spunta verde e il tooltip "Copiato!".
 
@@ -258,7 +265,7 @@ Tutti i CSV usano il separatore `;`, il BOM UTF-8 e righe CRLF, così si aprono 
 **Utenti** (`efuture-games-utenti-<AAAAMMGG-HHMM>.csv`). Righe nell'ordine del server, cioè per data di registrazione:
 
 ```
-Nome;Email;Tipo;Disabilitato;Registrato;Giochi usati;Livelli totali;Punti totali;SysAdmin livelli;SysAdmin punti;CoreTech livelli;CoreTech punti;Timenet livelli;Timenet punti;inncloud livelli;inncloud punti
+Nome;Email;Tipo;Bloccato;Registrato;Giochi sbloccati;Livelli totali;Punti totali;Efuture Bros livelli;Efuture Bros punti;CoreTech livelli;CoreTech punti;Timenet livelli;Timenet punti;inncloud livelli;inncloud punti
 ```
 
 Se un giocatore non ha giocato a un gioco, le celle di quel gioco restano vuote.

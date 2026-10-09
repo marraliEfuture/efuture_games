@@ -39,8 +39,9 @@ CODICI DI SBLOCCO (uno per gioco)
    - Si aggiorna da sola ogni 15 secondi. Pulsante "📺 Proietta" (anche
      nel pannello admin): con Chrome o Edge apre la classifica in una
      finestra sul SECONDO MONITOR (ledwall/proiettore); la finestra da cui
-     premi (per esempio l'admin) resta sul primo. Sul ledwall clicca una
-     volta su "Clicca qui per lo schermo intero". La prima volta il browser
+     premi (per esempio l'admin) resta sul primo. Sul ledwall la classifica
+     si apre gia' grande quanto lo schermo; se resta la barra della
+     finestra, un clic sulla classifica la toglie. La prima volta il browser
      chiede il permesso "Gestione finestre": consenti (se serve, premi di
      nuovo Proietta). Con un solo schermo o altri browser la finestra si
      apre normale: trascinala sull'altro schermo. Per uscire: Esc.
@@ -77,9 +78,11 @@ CODICI DI SBLOCCO (uno per gioco)
    FAQ, Documentazione),
    Admin (Qualità, Log, Backup, Chiave, Reset), Logout.
    - Utenti: elenco con simbolo del tipo, nome, email, punti per gioco;
-     CSV. "Modifica" apre un popup per cambiare il tipo (Giocatore, Admin
-     e giocatore, Solo admin), disabilitare/riabilitare l'utente (non
-     accede, non salva punti, sparisce dalla classifica) o eliminarlo.
+     CSV. Accanto a ogni utente: "Blocca"/"Sblocca" (bloccato non accede,
+     non salva punti, sparisce dalla classifica) e "Modifica", un popup
+     per cambiare il tipo (Giocatore, Admin e giocatore, Solo admin),
+     bloccare/sbloccare, fare il reset della chiave admin o eliminarlo.
+     I giocatori non hanno password: entrano con la sola email.
      Ogni modifica chiede conferma spiegando le conseguenze. Una volta
      sola esegui supabase-tipi-utenti.sql (e rieseguilo se l'avevi gia'
      eseguito prima della v36) e supabase-privacy-utenti.sql.
