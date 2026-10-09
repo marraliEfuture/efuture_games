@@ -22,7 +22,7 @@ I **risultati dei controlli** (codice, database, prestazioni, spazio, vulnerabil
 | App | File principali | Specifica |
 |---|---|---|
 | App giocatori (home, sblocco, account, gara, classifica in app, installazione) | `index.html`, `hub.js`, `backend.js`, `config.js`, `sw.js`, `manifest.webmanifest` | [app-giocatori.md](app-giocatori.md) |
-| Gioco SysAdmin Runner (Efuture) | `games/sysadmin/` | [gioco-sysadmin.md](gioco-sysadmin.md) |
+| Gioco Efuture Bros (Efuture) | `games/sysadmin/` | [gioco-sysadmin.md](gioco-sysadmin.md) |
 | Gioco CoreTech Pac | `games/coretech/` | [gioco-coretech.md](gioco-coretech.md) |
 | Gioco Timenet Breakout | `games/timenet/` | [gioco-timenet.md](gioco-timenet.md) |
 | Gioco inncloud Invaders | `games/inncloud/` | [gioco-inncloud.md](gioco-inncloud.md) |
@@ -90,6 +90,7 @@ I file SQL **non si applicano con il push**: vanno incollati ed eseguiti a mano 
 | `supabase-countdown.sql` | Tabella `efg_gate` e countdown di apertura e chiusura. Ridefinisce `efg_submit` per rifiutare i punteggi a gara chiusa | Una volta, e dopo ogni riesecuzione di `supabase.sql` |
 | `supabase-privacy-utenti.sql` | Toglie il cellulare dai giocatori e dai backup salvati. Aggiorna la registrazione e aggiunge "Elimina giocatore" | Una volta, sui database creati prima della v23. Su un database nuovo non serve: `supabase.sql` contiene già tutto |
 | `supabase-tipi-utenti.sql` | Utenti nell'admin: tipo, disabilitazione, chiavi admin personali (accesso con email + chiave) | Dalla v35, dopo `supabase-countdown.sql`; da rieseguire dalla v37 |
+| `supabase-nickname-unico.sql` | Registrazione: nickname ed email già usati vengono rifiutati ("Nickname già utilizzato", "Indirizzo email già utilizzato") | Dalla v42, dopo `supabase.sql` e dopo ogni sua riesecuzione |
 
 La chiave admin si imposta o si recupera solo dallo SQL Editor con `select efg_admin_init('NUOVA-CHIAVE-LUNGA');`. Il dettaglio è in [database.md](database.md).
 

@@ -25,6 +25,11 @@ const one = d => Array.isArray(d) ? d[0] : d;
 const Backend = remote ? {
   remote:true,
   async current(){ return store.get('efgSessionLive', null); },
+  // nickname o email già usati? null se il database non ha ancora la funzione
+  async checkSignup({ name, email }){
+    try { return one(await rpc('efg_signup_check', { p_email:normEmail(email), p_name:String(name||'').trim() })); }
+    catch(e){ if (/efg_signup_check|PGRST202|does not exist/i.test(String(e && (e.code + ' ' + e.message)))) return null; throw e; }
+  },
   async signUp({ name, email }){
     const r = one(await rpc('efg_register', { p_email:normEmail(email), p_name:name }));
     const u = { id:r.pid, email:normEmail(email), nickname:r.name };
@@ -57,9 +62,15 @@ const Backend = remote ? {
 } : {
   remote:false,
   async current(){ return store.get('efgSession3', null); },
+  async checkSignup({ name, email }){
+    const users = store.get('efgDemoUsers3', {}), n = String(name||'').trim().toLowerCase();
+    return { nome_usato: !!n && Object.values(users).some(u => String(u.name).trim().toLowerCase() === n), email_usata: !!users[normEmail(email)] };
+  },
   async signUp({ name, email }){
     const users = store.get('efgDemoUsers3', {}); const key = normEmail(email);
     if (users[key]) throw new Error('already registered');
+    const n = String(name).trim().toLowerCase();
+    if (Object.values(users).some(u => String(u.name).trim().toLowerCase() === n)) throw new Error('name taken');
     users[key] = { pid:'local-'+Date.now().toString(36), email:key, name };
     store.set('efgDemoUsers3', users);
     const u = { id:users[key].pid, email:key, nickname:name }; store.set('efgSession3', u); return { user:u };
@@ -114,7 +125,8 @@ function friendly(err){
   if (/account disabilitato/i.test(m)) return 'Il tuo account è stato disabilitato: chiedi agli organizzatori.';
   if (/fetch|network/i.test(m)) return 'Nessuna connessione con il server: controlla la rete e riprova.';
   if (/not found/i.test(m)) return 'Nessun giocatore registrato con questa email: usa Registrati.';
-  if (/already registered|duplicate/i.test(m)) return 'Questa email è già registrata: usa Accedi.';
+  if (/name taken|efg_players_name_unique/i.test(m)) return 'Nickname già utilizzato: scegline un altro.';
+  if (/already registered|duplicate/i.test(m)) return 'Indirizzo email già utilizzato: usa Accedi oppure un\'altra email.';
   if (/invalid email/i.test(m)) return 'Email non valida.';
   if (/invalid name/i.test(m)) return 'Il nome deve avere da 2 a 20 caratteri.';
   return m;

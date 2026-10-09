@@ -11,7 +11,7 @@ Qui si descrive una volta sola ciò che è comune. Le specifiche dei singoli gio
 
 | Gioco | Specifica |
 |---|---|
-| SysAdmin Runner | [gioco-sysadmin.md](gioco-sysadmin.md) |
+| Efuture Bros | [gioco-sysadmin.md](gioco-sysadmin.md) |
 | CoreTech Pac | [gioco-coretech.md](gioco-coretech.md) |
 | Timenet Breakout | [gioco-timenet.md](gioco-timenet.md) |
 | inncloud Invaders | [gioco-inncloud.md](gioco-inncloud.md) |
@@ -128,7 +128,7 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
 
 | Gioco | `data-game` | Croce | A | B | ISTRUZIONI | AVVIA / PAUSA |
 |---|---|---|---|---|---|---|
-| SysAdmin Runner | `sysadmin` | Joystick (destra/sinistra, su = salto) | SALTA | MOUSE (+ ANTIVIRUS piccolo sopra) | `btnHow` | Pulsante arancio della schermata, oppure pausa |
+| Efuture Bros | `sysadmin` | Joystick (destra/sinistra, su = salto) | SALTA | MOUSE (+ ANTIVIRUS piccolo sopra) | `btnHow` | Pulsante arancio della schermata, oppure pausa |
 | CoreTech Pac | `joy` | Joystick a 4 direzioni | PAUSA | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
 | Timenet Breakout | `strip` | Fascia di trascinamento | PAUSA | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
 | inncloud Invaders | `strip` | Fascia di trascinamento | SPARA (rosso, più grande) | MUSICA | `btnHow` | Pulsante principale, oppure pausa |

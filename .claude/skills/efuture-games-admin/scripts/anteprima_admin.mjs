@@ -35,7 +35,10 @@ const logs = [
   {id:3, at:iso(5), kind:'partita', email:'anna@esempio.it', game:'coretech', detail:{livelli:2, punti:300, record:true}},
   {id:2, at:iso(20), kind:'accesso', email:'bruno@esempio.it', detail:{esito:'ok'}},
   {id:1, at:iso(60), kind:'registrazione', email:'marta@efuture.it', detail:{nome:'Marta'}}];
-const backups = [{id:1, creato:iso(120), nota:'prima della gara', giocatori:3, punteggi:6}];
+const backups = [{id:4, creato:iso(120), nota:'prima della gara', giocatori:3, punteggi:6},
+  {id:3, creato:iso(1500), nota:'automatico prima di azzerare i punti', giocatori:3, punteggi:5},
+  {id:2, creato:iso(1560), nota:'fine giornata 1', giocatori:3, punteggi:5},
+  {id:1, creato:iso(4400), nota:'', giocatori:2, punteggi:2}];
 window.supabase = { createClient: () => ({ rpc: async (fn, a) => {
   window.__calls.push(fn);
   switch (fn){
@@ -57,6 +60,9 @@ const errs = [];
 async function open(vp){
   const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: 2 });
   await ctx.route('**/vendor/supabase.js*', rt => rt.fulfill({ contentType: 'text/javascript', body: FAKE }));
+  // da file:// fetch non funziona: i dati della Qualità si leggono dal repository
+  await ctx.route('**/docs/qualita/*.json*', rt => { const f = path.join(REPO, 'docs/qualita', path.basename(new URL(rt.request().url()).pathname));
+    return fs.existsSync(f) ? rt.fulfill({ contentType: 'application/json', body: fs.readFileSync(f, 'utf8') }) : rt.fulfill({ status: 404, body: '' }); });
   const pg = await ctx.newPage();
   pg.on('pageerror', e => errs.push(e.message));
   await pg.goto('file://' + path.join(REPO, 'admin.html'));
@@ -96,6 +102,13 @@ async function goTo(pg, s){
     const f = path.join(OUT, String(i + 1).padStart(2, '0') + '-' + s + '.png');
     await pg.screenshot({ path: f, fullPage: true });
     console.log(f);
+    if (s === 'quality') for (const [n, label] of [['sicurezza', 'Sicurezza'], ['backup', 'Backup fatti']]){   // dettagli dei box Sicurezza e Backup
+      const card = pg.locator('#qCards .qcard', { hasText: label }).first();
+      if (!await card.count()) continue;
+      await card.click(); await pg.waitForTimeout(600);
+      const g = path.join(OUT, String(i + 1).padStart(2, '0') + '-' + s + '-' + n + '.png');
+      await pg.screenshot({ path: g, fullPage: true }); console.log(g);
+    }
   }
   await ctx.close();
 }

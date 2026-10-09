@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>SysAdmin Runner</title>
+<title>Efuture Bros</title>
 <meta name="description" content="Platform game a 10 livelli: sei il sysadmin di guardia contro bug, trappole e un hacker finale.">
 <meta name="theme-color" content="#eef4fa">
 <meta name="color-scheme" content="light">
@@ -444,7 +444,7 @@ img{max-width:100%}
 <div id="app">
   <div id="hud">
     <div class="grp"><div id="lives"></div><div id="timerWrap">⏱ 00:00</div></div>
-    <div id="levelWrap">Sysadmin Runner</div>
+    <div id="levelWrap">Efuture Bros</div>
     <div class="grp">
       <div id="scoreWrap">0</div>
       <button id="pauseBtn" title="Pausa">II</button>
@@ -459,12 +459,12 @@ img{max-width:100%}
     <div class="overlay" id="ov-title">
       <div class="card">
         <div class="kicker" id="kickerLv">Livello 1 di 10 &middot; missione IT</div>
-        <h1 class="pixel">SYSADMIN RUNNER</h1>
-        <p>Sei il sysadmin di guardia: elimina i bug e raggiungi il cliente.</p>
+        <h1 class="pixel">EFUTURE BROS</h1>
+        <p>Sei il sistemista di Efuture: elimina i bug del cliente. Ne sarà soddisfatto!</p>
         <p class="dim" id="bestTimeLineTitle" style="display:none;">Record attuale: <b id="bestTimeTitle" style="color:var(--ef-yellow)"></b></p>
         <p class="dim" id="bestDebugLineTitle" style="display:none;">Miglior pulizia: <b id="bestDebugTitle" style="color:var(--ef-yellow)"></b></p>
         <div class="btnrow">
-          <button class="game-btn" id="btnStart">Risolvi il ticket del cliente</button>
+          <button class="game-btn" id="btnStart">Inizia</button>
           <button class="game-btn secondary" id="btnContinue" hidden>Continua &middot; Liv. <span id="continueLevel"></span></button>
           <button class="game-btn secondary" id="btnHow" type="button" aria-expanded="false" aria-controls="howBox">Istruzioni</button>
         </div>
@@ -488,9 +488,9 @@ img{max-width:100%}
     <div class="overlay" id="ov-intro" hidden>
       <div class="card">
         <div class="client-tag" id="introTag">Cliente</div>
-        <h2 id="introTheme" class="pixel">Ufficio</h2>
+        <h2 id="introTheme" class="pixel">Ticket di Marco</h2>
         <div class="bubble" id="introMsg"></div>
-        <div class="btnrow"><button class="game-btn" id="btnGo">Ci penso io</button></div>
+        <div class="btnrow"><button class="game-btn" id="btnGo">Risolvi!</button></div>
       </div>
     </div>
 
@@ -970,9 +970,9 @@ function showIntro(){
   const c = level.client;
   el.introTag.textContent = EFG.on ? ('Livello ' + (levelIndex+1) + '/' + EFG.max) : (levelIndex===9) ? 'Livello finale' : ('Cliente ' + (levelIndex+1) + '/9');
   el.introTag.className = 'client-tag' + (levelIndex===9?' boss':'');
-  el.introTheme.textContent = c.name + ' — ' + level.theme.name;
+  el.introTheme.textContent = (levelIndex===9) ? c.name + ' — ' + level.theme.name : 'Ticket di ' + c.name;
   el.introMsg.textContent = c.msg;
-  el.btnGo.textContent = (levelIndex===9) ? 'Affrontalo' : 'Ci penso io';
+  el.btnGo.textContent = (levelIndex===9) ? 'Affrontalo' : 'Risolvi!';
   hideAllOverlays();
   el.ovIntro.hidden = false;
   updateHud();

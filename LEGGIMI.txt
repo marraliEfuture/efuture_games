@@ -1,11 +1,11 @@
 EFUTURE GAMES – CARE CONFERENCE EDITION
 =======================================
-Un'unica web app con i 4 giochi: SysAdmin Runner (Efuture), CoreTech Pac,
+Un'unica web app con i 4 giochi: Efuture Bros (Efuture), CoreTech Pac,
 Timenet Breakout, inncloud Invaders. I giochi si sbloccano con un codice
 (QR allo stand), i punteggi vanno in una classifica comune.
 
 CODICI DI SBLOCCO (uno per gioco)
-  SysAdmin Runner ...... RUN-4827   (stand Efuture)
+  Efuture Bros ......... RUN-4827   (stand Efuture)
   CoreTech Pac ......... PAC-3915   (stand CoreTech)
   Timenet Breakout ..... BRK-6042   (stand Timenet)
   inncloud Invaders .... INV-7358   (stand inncloud)
@@ -86,8 +86,9 @@ CODICI DI SBLOCCO (uno per gioco)
    - FAQ: domande frequenti sull'uso dell'app, scaricabili in Markdown.
    - Documentazione: scarica in Markdown descrizione e documento tecnico
      della piattaforma, dell'app e di ogni gioco.
-   - Qualità: 5 box (Codice, Database, Prestazioni, Spazio occupato,
-     Vulnerabilità) con i risultati dei controlli e il trend per data;
+   - Qualità: 7 box (Codice, Database, Prestazioni, Spazio occupato,
+     Vulnerabilità, Sicurezza della piattaforma con punteggio 0-100,
+     Backup fatti) con i risultati dei controlli e il trend per data;
      cliccando un box si apre l'elenco dei dettagli. I dati si aggiornano
      a ogni salvataggio fatto con /efuture-games-commit.
    - Log: registrazioni, accessi, partite e operazioni admin; CSV.
@@ -131,6 +132,10 @@ CODICI DI SBLOCCO (uno per gioco)
      "Installa app" in fondo alla home (insieme a Classifica e Istruzioni).
    - In fondo: "Registrati / Accedi". Registrazione: nome ed email
      (il cellulare non si chiede più). Accesso: basta l'email, nessuna password.
+     Nickname ed email devono essere nuovi: se sono già usati compare
+     "Nickname già utilizzato" o "Indirizzo email già utilizzato" e non ci
+     si registra finché non si cambiano (serve supabase-nickname-unico.sql
+     nel SQL Editor, da rieseguire dopo ogni riesecuzione di supabase.sql).
    - REGOLE DI GARA (solo dentro l'app): ogni gioco ha 3 livelli, al
      massimo 1 minuto ciascuno. Ogni livello superato vale
      numero del livello x secondi che avanzano x vite rimaste, poi si

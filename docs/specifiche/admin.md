@@ -91,10 +91,10 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
 
 ### Qualità
 
-Mostra i risultati dei controlli automatici sul progetto. I dati vengono da `docs/qualita/ultimo.json` (ultimo controllo) e `docs/qualita/storico.json` (un punto per data), scritti dallo script `.claude/skills/efuture-games-commit/scripts/qualita.py`, che la skill di commit esegue prima di ogni salvataggio. La pagina non chiama il database.
+Mostra i risultati dei controlli automatici sul progetto. I dati vengono da `docs/qualita/ultimo.json` (ultimo controllo) e `docs/qualita/storico.json` (un punto per data), scritti dallo script `.claude/skills/efuture-games-commit/scripts/qualita.py`, che la skill di commit esegue prima di ogni salvataggio. Solo il box Backup fatti legge il database (`efg_admin_backups`).
 
 - In alto: data, versione e commit dell'ultimo controllo, pulsante **Aggiorna**.
-- **5 box**, ognuno con numeri e mini grafico per data; il bordo è giallo se ci sono avvisi, rosso se ci sono errori o vulnerabilità alte:
+- **7 box**, ognuno con numeri e mini grafico per data; il bordo è giallo se ci sono avvisi, rosso se ci sono errori o vulnerabilità alte:
   | Box | Cosa controlla |
   |---|---|
   | Codice | Sintassi dei .js, script nelle pagine, id duplicati, collegamenti locali, file della cache, versione coerente |
@@ -102,6 +102,8 @@ Mostra i risultati dei controlli automatici sul progetto. I dati vengono da `doc
   | Prestazioni | Peso delle pagine e dei file, immagini, cache offline, tempo di caricamento nel browser |
   | Spazio occupato | Totale del sito e per cartella, con trend per data |
   | Vulnerabilità | Segreti o codici in chiaro, link esterni, HTTPS, CDN, `innerHTML`, sblocco, blocco dei tentativi; gravità alta/media/bassa, con trend per data |
+| Sicurezza della piattaforma | Punteggio da 0 a 100 e livello (90+ Ottimo, 75+ Buono, 50+ Sufficiente, sotto A rischio), con trend per data. Si parte da 100 e si tolgono: 25 per ogni vulnerabilità alta, 10 media, 3 bassa, 15 per ogni errore e 5 per ogni avviso del box Database. Nel dettaglio: i problemi con i punti tolti, il punteggio di partenza e i controlli superati. Calcolato da `qualita.py` (`sicurezza` in `ultimo.json` e nello storico; i giorni vecchi si ricalcolano dal riepilogo) |
+| Backup fatti | Letto dal database: numero di backup, quando è stato fatto l'ultimo, quanti manuali e quanti automatici (nota che inizia con "automatico"), grafico dei backup per giorno negli ultimi 14 giorni. Bordo rosso se non c'è nessun backup, giallo se l'ultimo ha più di un giorno. Nel dettaglio: grafico grande e tabella #, Creato, Tipo, Nota, Utenti, Record. Per scaricare o ripristinare si usa la scheda Backup |
 - **Cliccando un box** si apre sotto l'elenco dei dettagli: grafico grande per data (date e valori), tabella dei controlli (prima errori e avvisi) con esito, dettaglio e, per le vulnerabilità, la gravità; poi lo storico per data. Per lo spazio c'è anche la tabella delle cartelle.
 - Se i file non ci sono la sezione lo dice e spiega come crearli.
 - Lo storico si ricostruisce dai commit passati con `qualita.py --storico`.

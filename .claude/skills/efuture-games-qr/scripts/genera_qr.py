@@ -25,7 +25,7 @@ except ImportError:
     sys.exit("Mancano le librerie: pip install segno pillow")
 
 GAMES = [  # stesso ordine di hub.js
-    ("sysadmin", "SysAdmin Runner", "Efuture"),
+    ("sysadmin", "Efuture Bros", "Efuture"),
     ("coretech", "CoreTech Pac", "CoreTech"),
     ("timenet", "Timenet Breakout", "Timenet"),
     ("inncloud", "inncloud Invaders", "inncloud"),

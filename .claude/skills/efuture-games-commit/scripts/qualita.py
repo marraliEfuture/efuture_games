@@ -5,7 +5,8 @@ Analizza il repository e scrive:
   docs/qualita/ultimo.json   ultimo controllo, con l'elenco di ogni test e i dettagli
   docs/qualita/storico.json  un riepilogo per data (trend di spazio, vulnerabilità, esiti)
 
-Aree: codice, database (file SQL), prestazioni, spazio occupato, vulnerabilità.
+Aree: codice, database (file SQL), prestazioni, spazio occupato, vulnerabilità,
+più il punteggio di sicurezza (0-100) calcolato da vulnerabilità e controlli del database.
 Il database online non viene contattato: si controllano i file supabase*.sql.
 
 Uso:
@@ -27,7 +28,7 @@ def find_repo():
 
 REPO = find_repo()
 SKIP_DIRS = {".git", "node_modules", "docs/qualita"}
-SQL_ORDER = ["supabase.sql", "supabase-classifica-gruppi.sql", "supabase-countdown.sql", "supabase-privacy-utenti.sql", "supabase-tipi-utenti.sql"]
+SQL_ORDER = ["supabase.sql", "supabase-classifica-gruppi.sql", "supabase-countdown.sql", "supabase-privacy-utenti.sql", "supabase-tipi-utenti.sql", "supabase-nickname-unico.sql"]
 
 def files(root, exts=None):
     out = []
@@ -264,8 +265,30 @@ def gravita(tests):
         if t.get("gravita"): c[t["gravita"]] += 1
     return c
 
+# punteggio di sicurezza: si parte da 100 e si toglie per ogni problema
+PENALITA = {"alta": 25, "media": 10, "bassa": 3, "db_errore": 15, "db_avviso": 5}
+def livello(score):
+    return "Ottimo" if score >= 90 else "Buono" if score >= 75 else "Sufficiente" if score >= 50 else "A rischio"
+def calcola_sicurezza(grav, db_esiti):
+    tolti = sum(PENALITA[k] * grav.get(k, 0) for k in ("alta", "media", "bassa")) \
+          + PENALITA["db_errore"] * db_esiti.get("errore", 0) + PENALITA["db_avviso"] * db_esiti.get("avviso", 0)
+    return max(0, 100 - tolti)
+def area_sicurezza(vu, db):
+    tests = []
+    for t in vu + db:
+        if t["esito"] == "ok": continue
+        pen = PENALITA[t["gravita"]] if t.get("gravita") else PENALITA["db_" + t["esito"]] if t in db else 0
+        tests.append(T(t["nome"], t["esito"], "-%d punti · %s" % (pen, t["dettaglio"]), gravita=t.get("gravita"), punti=-pen))
+    score = calcola_sicurezza(gravita(vu), esiti(db))
+    tests.append(T("Punteggio di partenza", "ok", "100 punti. Si tolgono: vulnerabilità alta %d, media %d, bassa %d; errore del database %d, avviso del database %d"
+                   % (PENALITA["alta"], PENALITA["media"], PENALITA["bassa"], PENALITA["db_errore"], PENALITA["db_avviso"])))
+    ok = sum(1 for t in vu + db if t["esito"] == "ok")
+    tests.append(T("Controlli superati", "ok", "%d su %d (vulnerabilità e database)" % (ok, len(vu + db))))
+    return tests, score
+
 def run(root, browser=True):
     cod = area_codice(root); db = area_db(root); pr = area_prestazioni(root, browser); sp, spd = area_spazio(root); vu = area_vuln(root)
+    si, score = area_sicurezza(vu, db)
     sw = root / "sw.js"; m = re.search(r"efuture-games-v(\d+)", sw.read_text(encoding="utf-8")) if sw.exists() else None
     return {
         "versione": "v" + m.group(1) if m else "?",
@@ -275,6 +298,7 @@ def run(root, browser=True):
             "prestazioni": {"titolo": "Prestazioni", "test": pr, "esiti": esiti(pr)},
             "spazio": {"titolo": "Spazio occupato", "test": sp, "esiti": esiti(sp), "totale_kb": spd["totale_kb"], "cartelle_kb": spd["cartelle_kb"]},
             "vulnerabilita": {"titolo": "Vulnerabilità", "test": vu, "esiti": esiti(vu), "gravita": gravita(vu)},
+            "sicurezza": {"titolo": "Sicurezza della piattaforma", "test": si, "esiti": esiti(si), "punteggio": score, "livello": livello(score)},
         },
     }
 
@@ -283,7 +307,7 @@ def sintesi(day, commit, rep):
     return {"data": day, "commit": commit, "versione": rep["versione"],
             "esiti": {k: v["esiti"] for k, v in a.items()},
             "spazio_kb": a["spazio"]["totale_kb"], "cartelle_kb": a["spazio"]["cartelle_kb"],
-            "vulnerabilita": a["vulnerabilita"]["gravita"]}
+            "vulnerabilita": a["vulnerabilita"]["gravita"], "sicurezza": a["sicurezza"]["punteggio"]}
 
 def git(*args, cwd=REPO):
     return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True).stdout.strip()
@@ -292,6 +316,8 @@ def main():
     out = REPO / "docs" / "qualita"; out.mkdir(parents=True, exist_ok=True)
     sf = out / "storico.json"
     storico = json.loads(sf.read_text(encoding="utf-8")) if sf.exists() else []
+    for h in storico:   # giorni salvati prima del punteggio: si ricalcola dal riepilogo
+        if "sicurezza" not in h: h["sicurezza"] = calcola_sicurezza(h["vulnerabilita"], h["esiti"]["db"])
     if "--storico" in sys.argv:
         seen = {}
         for line in git("log", "--format=%cd %H", "--date=short").splitlines():
@@ -312,7 +338,8 @@ def main():
     sf.write_text(json.dumps(storico, ensure_ascii=False, indent=1), encoding="utf-8")
     for k, v in rep["aree"].items():
         e = v["esiti"]; print("%-14s ok %d · avvisi %d · errori %d" % (v["titolo"], e["ok"], e["avviso"], e["errore"]))
-    print("spazio %s KB · vulnerabilità %s · storico %d giorni" % (rep["aree"]["spazio"]["totale_kb"], rep["aree"]["vulnerabilita"]["gravita"], len(storico)))
+    print("spazio %s KB · vulnerabilità %s · sicurezza %d/100 (%s) · storico %d giorni" % (rep["aree"]["spazio"]["totale_kb"], rep["aree"]["vulnerabilita"]["gravita"],
+          rep["aree"]["sicurezza"]["punteggio"], rep["aree"]["sicurezza"]["livello"], len(storico)))
 
 if __name__ == "__main__":
     main()
