@@ -26,14 +26,15 @@ Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
    ```
    node <skill>/scripts/anteprima_admin.mjs <scratchpad>/admin
    ```
-   Invia con SendUserFile (display `render`) `01-players.png` e `00-telefono.png`. Le altre schermate (una per sezione) mandale solo se servono.
+   Invia con SendUserFile (display `render`) `01-players.png` e `00-telefono.png` (ci sono anche `00-menu.png` e `00-modifica.png`). Le altre schermate (una per sezione) mandale solo se servono.
 3. Rispondi in 3-4 righe: sei in modalità admin, versione dell'app (`sw.js`), sezioni del menu. Chiedi cosa vuole cambiare.
 
 ## 2. Com'è fatto l'admin
 
 - **Una sola pagina:** `admin.html` contiene HTML, CSS e lo script. Usa `config.js`, `vendor/supabase.js` e `vendor/qrcode.js`.
 - **Accesso:** con la chiave admin, salvata solo cifrata nel database. Ogni funzione del server riceve `p_key` e la controlla con `efg_admin_auth`.
-- **Menu laterale** (`nav.side`): pulsanti `.tab` con `data-tab="…"`. Ogni sezione è un `<section data-pane="…">`. I gruppi sono titoli `.grp`; Logout è `#btnOut`. Per una sezione nuova servono il pulsante nel menu, la `section`, ed eventualmente il caricamento nel gestore delle schede (`if (t.dataset.tab === '…') …`).
+- **Menu a comparsa** (`nav.side#side`), aperto dal pulsante **Menu** (`#menuBtn`, hamburger) nell'intestazione e chiuso da ✕, dallo sfondo, da Esc o scegliendo una voce: pulsanti `.tab` con `data-tab="…"`. Ogni sezione è un `<section data-pane="…">` e il suo nome compare in `#paneTitle`. I gruppi sono titoli `.grp`; Logout è `#btnOut`. Per una sezione nuova servono il pulsante nel menu, la `section`, ed eventualmente il caricamento nel gestore delle schede (`if (t.dataset.tab === '…') …`).
+- **Utenti:** tipo come simbolo (🎮 giocatore, 🛡️🎮 admin e giocatore, 🛡️ solo admin), etichetta "disabilitato". Il pulsante **Modifica** apre il popup `#pEdit` (Tipo, Disabilita/Riabilita, Elimina). Ogni modifica passa da `ask(titolo, conseguenze, pulsante, pericolosa)`, che apre la conferma `#pAsk`: usala per ogni nuova azione che cambia dati.
 - **Chiamate al database:** `call('efg_admin_…', {…})`. La funzione aggiunge da sola `p_key`; se la risposta ha `errore` lancia un'eccezione.
 - **Tabelle:** `fillTable(tabella, intestazioni, righe, classi)`. Una cella può essere testo o un elemento (pulsante, menu a tendina).
 - **CSV:** `toCsv` e `download`. Separatore `;` con BOM, così si aprono bene in Excel.
