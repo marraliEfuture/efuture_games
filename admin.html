@@ -167,7 +167,11 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 .vcard .vb .bar{gap:6px} .vcard .btn{padding:6px 10px;font-size:12px}
 /* Skills */
 .skills{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-.skill{border:1px solid var(--line);border-left:3px solid var(--sky);border-radius:4px;background:#fff;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.skill{position:relative;border:1px solid var(--line);border-left:3px solid var(--sky);border-radius:4px;background:#fff;padding:12px 46px 12px 14px;display:flex;flex-direction:column;gap:6px}
+.skill .cp{position:absolute;top:8px;right:8px;width:30px;height:30px;display:grid;place-items:center;background:#fff;border:1px solid var(--line);border-radius:4px;color:var(--navy);cursor:pointer}   /* copia il comando */
+.skill .cp:hover{background:var(--row)}
+.skill .cp.ok{color:var(--ok);border-color:var(--ok)}
+.skill .cp svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .skill code{font-size:14px;font-weight:600;color:var(--navy);align-self:flex-start}
 .skill .ex{font-size:12px;color:var(--muted);font-style:italic}
 /* QR: cartellini in bianco e nero, 5 su un foglio A4 */
@@ -379,7 +383,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=36"></script>
+<script src="config.js?v=37"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script>
@@ -722,6 +726,18 @@ function renderSkills(){
     const d = document.createElement('div'); d.className = 'skill';
     d.innerHTML = '<code></code><p></p><span class="ex"></span>';
     d.querySelector('code').textContent = cmd; d.querySelector('p').textContent = what; d.querySelector('.ex').textContent = 'Esempio: ' + ex;
+    // pulsante copia in alto a destra: solo simbolo, con tooltip
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'cp';
+    const tip = 'Copia il comando ' + cmd; b.title = tip; b.setAttribute('aria-label', tip);
+    const ICO_COPY = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+    const ICO_OK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>';
+    b.innerHTML = ICO_COPY;
+    b.onclick = async () => {
+      const ok = await copyText(cmd);
+      b.innerHTML = ok ? ICO_OK : ICO_COPY; b.classList.toggle('ok', ok); b.title = ok ? 'Copiato!' : 'Copia non riuscita: seleziona il comando a mano';
+      setTimeout(() => { b.innerHTML = ICO_COPY; b.classList.remove('ok'); b.title = tip; }, 1600);
+    };
+    d.appendChild(b);
     $('skList').appendChild(d);
   }
 }

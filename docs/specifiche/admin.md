@@ -142,7 +142,10 @@ Card con comando, descrizione ed esempio di richiesta per ogni skill di Claude C
 - `/efuture-games-links`;
 - `/efuture-games-commit`;
 - `/efuture-games-preview`;
+- `/efuture-games-admin`;
 - `/efuture-games-skills`.
+
+In alto a destra di ogni card c'è il pulsante **copia** (solo icona, tooltip "Copia il comando /…"). Copia il comando negli appunti; per un attimo l'icona diventa una spunta verde e il tooltip "Copiato!".
 
 Le skill si usano in una sessione di Claude Code aperta sul repository.
 
