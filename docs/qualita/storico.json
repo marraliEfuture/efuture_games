@@ -247,7 +247,7 @@
  },
  {
   "data": "2026-10-09",
-  "commit": "da43c1c",
+  "commit": "8762894",
   "versione": "v41",
   "esiti": {
    "codice": {
@@ -276,7 +276,7 @@
     "errore": 0
    }
   },
-  "spazio_kb": 11733.1,
+  "spazio_kb": 11732.6,
   "cartelle_kb": {
    ".claude": 86.6,
    "(file principali)": 245.8,
@@ -285,7 +285,7 @@
    "games": 752.1,
    "icons": 105.6,
    "img": 68.8,
-   "qr": 160.0,
+   "qr": 159.6,
    "tutorial": 1334.2,
    "vendor": 426.8,
    "video": 8175.2

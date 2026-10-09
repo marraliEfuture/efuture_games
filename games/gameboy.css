@@ -184,7 +184,7 @@
   #pauseBtn.gb-a::after,#pauseBtn.gb-b::after{content:"PAUSA"}
   #soundBtn.gb-a::after,#soundBtn.gb-b::after{content:"MUSICA"}
 
-  /* ---------- giochi con la fascia di trascinamento (Timenet, Inncloud) ---------- */
+  /* ---------- giochi con la fascia di trascinamento (Timenet, inncloud) ---------- */
   html[data-gb=strip] #main{min-height:0}
   html[data-gb=strip] #controls{
     flex:0 0 auto;

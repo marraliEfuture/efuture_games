@@ -1,6 +1,6 @@
 ---
 name: efuture-games-qr
-description: Genera e propone i 5 QR di Efuture Games — il QR dell'app (installazione) e i 4 QR di sblocco dei giochi (SysAdmin Runner, CoreTech Pac, Timenet Breakout, Inncloud Invaders) — come cartellini pronti da stampare. Usala quando l'utente chiede i QR dell'app o dei giochi, di rigenerarli, ristamparli o aggiornarli dopo un cambio di indirizzo o di codice.
+description: Genera e propone i 5 QR di Efuture Games — il QR dell'app (installazione) e i 4 QR di sblocco dei giochi (SysAdmin Runner, CoreTech Pac, Timenet Breakout, inncloud Invaders) — come cartellini pronti da stampare. Usala quando l'utente chiede i QR dell'app o dei giochi, di rigenerarli, ristamparli o aggiornarli dopo un cambio di indirizzo o di codice.
 ---
 
 # Efuture Games – i 5 QR
@@ -15,7 +15,7 @@ Rispondi all'utente in italiano.
 | SysAdmin Runner | `PUBLIC_URL?sblocca=<codice>` | stand Efuture |
 | CoreTech Pac | `PUBLIC_URL?sblocca=<codice>` | stand CoreTech |
 | Timenet Breakout | `PUBLIC_URL?sblocca=<codice>` | stand Timenet |
-| Inncloud Invaders | `PUBLIC_URL?sblocca=<codice>` | stand Inncloud |
+| inncloud Invaders | `PUBLIC_URL?sblocca=<codice>` | stand inncloud |
 
 - `PUBLIC_URL` viene da `config.js`.
 - I codici di sblocco vengono da `LEGGIMI.txt`. Lo script li confronta con gli hash in `hub.js` e si ferma se non corrispondono. In quel caso non generare comunque i QR: dillo all'utente.

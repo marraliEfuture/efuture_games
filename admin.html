@@ -459,7 +459,7 @@ const $ = id => document.getElementById(id);
 const CFG = window.EFG_CONFIG || {};
 if (!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY && window.supabase)){ $('noRemote').hidden = false; $('fLogin').hidden = true; return; }
 const sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, { auth:{ persistSession:false } });
-const GAMES = { sysadmin:'SysAdmin', coretech:'CoreTech', timenet:'Timenet', inncloud:'Inncloud' };
+const GAMES = { sysadmin:'SysAdmin', coretech:'CoreTech', timenet:'Timenet', inncloud:'inncloud' };
 const ss = { get(){ try { return sessionStorage.getItem('efgAdminKey') || ''; } catch(e){ return ''; } }, set(v){ try { v ? sessionStorage.setItem('efgAdminKey', v) : sessionStorage.removeItem('efgAdminKey'); } catch(e){} } };
 let KEY = ss.get();
 
@@ -793,7 +793,7 @@ const QR_GAMES = [
   { id:'sysadmin', name:'SysAdmin Runner',   stand:'Efuture',  pre:'RUN' },
   { id:'coretech', name:'CoreTech Pac',      stand:'CoreTech', pre:'PAC' },
   { id:'timenet',  name:'Timenet Breakout',  stand:'Timenet',  pre:'BRK' },
-  { id:'inncloud', name:'Inncloud Invaders', stand:'Inncloud', pre:'INV' },
+  { id:'inncloud', name:'inncloud Invaders', stand:'inncloud', pre:'INV' },
 ];
 const appUrl = () => { const u = CFG.PUBLIC_URL || new URL('./', location.href).href; return u.endsWith('/') ? u : u + '/'; };
 const normCode = c => String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -991,7 +991,7 @@ const DOCS = [
   ['sysadmin', 'SysAdmin Runner', 'gioco di Efuture', [SP+'gioco-sysadmin.md', SP+'giochi-comune.md'], [TE+'gioco-sysadmin.md']],
   ['coretech', 'CoreTech Pac', 'gioco di CoreTech', [SP+'gioco-coretech.md', SP+'giochi-comune.md'], [TE+'gioco-coretech.md']],
   ['timenet', 'Timenet Breakout', 'gioco di Timenet', [SP+'gioco-timenet.md', SP+'giochi-comune.md'], [TE+'gioco-timenet.md']],
-  ['inncloud', 'Inncloud Invaders', 'gioco di Inncloud', [SP+'gioco-inncloud.md', SP+'giochi-comune.md'], [TE+'gioco-inncloud.md']],
+  ['inncloud', 'inncloud Invaders', 'gioco di inncloud', [SP+'gioco-inncloud.md', SP+'giochi-comune.md'], [TE+'gioco-inncloud.md']],
 ];
 // unisce piu' file Markdown in uno; 'FAQ' = le FAQ di questa pagina
 async function buildDoc(title, files){
@@ -1179,7 +1179,7 @@ const LINKS = () => {
       ['SysAdmin Runner Efuture (artifact)', 'https://claude.ai/artifact/Ch9xMtgjtGbAGReq5qdyQJ', ''],
       ['CoreTech Pac (artifact)', 'https://claude.ai/artifact/A9ZzBrDF2Rp2uXAArVNuHj', ''],
       ['Timenet Breakout (artifact)', 'https://claude.ai/artifact/YR5HxarMv6q8hqeqwa64Pc', ''],
-      ['Inncloud Invaders (artifact)', 'https://claude.ai/artifact/SvTmC6vb1gjUobJfQeNckc', ''],
+      ['inncloud Invaders (artifact)', 'https://claude.ai/artifact/SvTmC6vb1gjUobJfQeNckc', ''],
     ]],
     ['ChatGPT', [
       ['ChatGPT', 'https://chatgpt.com/', 'apri ChatGPT'],

@@ -1,6 +1,6 @@
-# Inncloud Invaders – documentazione tecnica
+# inncloud Invaders – documentazione tecnica
 
-Questo documento spiega **come è fatto il codice** di Inncloud Invaders. Le regole del gioco, le schermate e i testi sono nella specifica funzionale [gioco-inncloud.md](../specifiche/gioco-inncloud.md); le parti comuni ai 4 giochi (modalità gara, scocca "Game Boy") sono in [giochi-comune.md](../specifiche/giochi-comune.md).
+Questo documento spiega **come è fatto il codice** di inncloud Invaders. Le regole del gioco, le schermate e i testi sono nella specifica funzionale [gioco-inncloud.md](../specifiche/gioco-inncloud.md); le parti comuni ai 4 giochi (modalità gara, scocca "Game Boy") sono in [giochi-comune.md](../specifiche/giochi-comune.md).
 
 ## File e risorse
 

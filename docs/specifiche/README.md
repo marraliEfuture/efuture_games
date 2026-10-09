@@ -25,7 +25,7 @@ I **risultati dei controlli** (codice, database, prestazioni, spazio, vulnerabil
 | Gioco SysAdmin Runner (Efuture) | `games/sysadmin/` | [gioco-sysadmin.md](gioco-sysadmin.md) |
 | Gioco CoreTech Pac | `games/coretech/` | [gioco-coretech.md](gioco-coretech.md) |
 | Gioco Timenet Breakout | `games/timenet/` | [gioco-timenet.md](gioco-timenet.md) |
-| Gioco Inncloud Invaders | `games/inncloud/` | [gioco-inncloud.md](gioco-inncloud.md) |
+| Gioco inncloud Invaders | `games/inncloud/` | [gioco-inncloud.md](gioco-inncloud.md) |
 | Parti comuni dei giochi (modalità gara, scocca "Game Boy" in verticale) | `games/gameboy.css`, `games/gameboy.js` | [giochi-comune.md](giochi-comune.md) |
 | Classifica da proiettare (PC / ledwall) | `classifica.html` (+ `backend.js`) | [classifica.md](classifica.md) |
 | Pannello admin | `admin.html` | [admin.md](admin.md) |
