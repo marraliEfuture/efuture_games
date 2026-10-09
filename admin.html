@@ -59,24 +59,41 @@ input[type=text],input[type=password],select{width:100%;padding:10px 12px;border
 .stat{background:var(--navy);color:#fff;border-radius:6px;padding:14px 16px}
 .stat b{font-family:var(--title);font-weight:800;font-size:26px;display:block;line-height:1.1}
 .stat span{font-size:12px;font-weight:300;color:#b7c7d8}
-.adm{display:grid;grid-template-columns:200px minmax(0,1fr);gap:18px;align-items:start}   /* menu laterale + contenuto */
-.side{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:2px;position:sticky;top:12px}
+.hamb{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:3px;padding:8px 12px;font-weight:600;cursor:pointer}
+.hamb .bars{width:18px;height:2px;background:currentColor;position:relative;display:inline-block}
+.hamb .bars::before,.hamb .bars::after{content:"";position:absolute;left:0;width:18px;height:2px;background:currentColor}
+.hamb .bars::before{top:-6px} .hamb .bars::after{top:6px}
+/* menu a comparsa (hamburger) */
+.side{position:fixed;top:0;left:0;bottom:0;z-index:40;width:270px;max-width:86vw;background:var(--card);border-right:1px solid var(--line);box-shadow:8px 0 30px rgba(20,29,40,.18);padding:14px 12px calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:2px;overflow-y:auto;transform:translateX(-105%);transition:transform .22s ease;visibility:hidden}
+.side.open{transform:none;visibility:visible}
+.side .shead{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 10px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.side .shead b{font-family:var(--title);font-size:16px}
+.side .x{background:none;border:0;font-size:20px;line-height:1;cursor:pointer;color:var(--muted);padding:4px 8px}
+.sideback{position:fixed;inset:0;z-index:39;background:rgba(20,29,40,.35)}
 .side .grp{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:12px 10px 4px}
-.tab{background:none;border:0;border-left:3px solid transparent;border-radius:3px;padding:9px 10px;cursor:pointer;color:var(--ink);font-weight:600;text-align:left}
+.tab{background:none;border:0;border-left:3px solid transparent;border-radius:3px;padding:10px 10px;cursor:pointer;color:var(--ink);font-weight:600;text-align:left}
 .tab:hover{background:var(--row)}
 .tab.sub{padding-left:20px;font-weight:500;color:var(--muted)}
 .tab.on{color:var(--ink);background:var(--row);border-left-color:var(--sky)}
 .tab.danger{color:#b84a4a} .tab.danger.on{color:var(--danger);border-left-color:var(--danger)}
 .tab.logout{margin-top:10px;border-top:1px solid var(--line);border-radius:0;padding-top:12px}
-@media (max-width:760px){
-  .adm{grid-template-columns:minmax(0,1fr)}
-  .side{position:static;flex-direction:row;flex-wrap:wrap;gap:4px}
-  .side .grp{width:100%;padding:8px 4px 0}
-  .tab,.tab.sub{padding:7px 10px;border-left:0;border-bottom:3px solid transparent}
-  .tab.on{border-bottom-color:var(--sky)}
-  .tab.logout{margin:6px 0 0;border-top:0;width:100%}
-}
-.tipo{width:auto;min-width:165px;padding:5px 8px;font-size:13px}
+#paneTitle{font-family:var(--title);font-weight:700;font-size:20px;letter-spacing:-.5px;margin:0 0 4px;color:var(--ink)}
+/* utenti: simbolo del tipo, utenti disabilitati, popup Modifica e conferme */
+.ttype{font-size:18px;line-height:1;cursor:default;white-space:nowrap}
+tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
+.offtag{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;color:var(--danger);border:1px solid var(--danger);border-radius:3px;padding:0 5px;vertical-align:1px}
+.btn.edit{background:#fff;color:var(--navy);border:1px solid var(--navy);padding:4px 10px;font-size:12px}
+.pop{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(20,29,40,.45);padding:16px}
+.pop .box{background:#fff;border-radius:8px;box-shadow:0 20px 50px rgba(20,29,40,.3);width:100%;max-width:440px;padding:20px;display:flex;flex-direction:column;gap:14px;max-height:calc(100vh - 32px);overflow-y:auto}
+.pop h3{font-family:var(--title);font-weight:700;font-size:18px;margin:0;color:var(--ink)}
+.pop .who{font-size:13px;color:var(--muted);margin-top:-8px}
+.pop .grp2{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.pop .grp2>b{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pop .opts{display:flex;flex-wrap:wrap;gap:6px}
+.pop .opt{background:#fff;border:1px solid var(--line);border-radius:4px;padding:8px 10px;cursor:pointer;font-weight:600;color:var(--ink);display:inline-flex;gap:6px;align-items:center}
+.pop .opt.on{border-color:var(--sky);background:#eaf6ff;cursor:default}
+.pop .row2{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.pop p{margin:0;font-size:14px;line-height:1.55;color:var(--text)}
 .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .bar .grow{flex:1}
 .tablewrap{overflow:auto;border:1px solid var(--line);border-radius:4px;max-height:65vh}
@@ -172,6 +189,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
   .topbar,header,#stats,.side,.noprint,#noRemote{display:none!important}
   main{padding:0;max-width:none}
   #dash .adm{display:block}
+  #paneTitle{display:none}
   #dash .adm>.card{border:0;box-shadow:none;padding:0}
   .qrsheet{grid-template-columns:1fr 1fr;grid-auto-rows:92mm;gap:0}
   .qrcard{height:92mm;border-radius:0;padding:4mm;justify-content:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -183,6 +201,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 <body>
 <div class="topbar"><b>Efuture Games</b> · pannello di amministrazione</div>
 <header>
+  <button class="hamb" id="menuBtn" type="button" aria-controls="side" aria-expanded="false" hidden><span class="bars" aria-hidden="true"></span>Menu</button>
   <div class="special"><h1><mark>Admin</mark> Efuture Games</h1><div class="label"><b>CARE Conference</b> Edition · utenti, classifica, backup e log</div></div>
   <div class="hright" id="hRight" hidden>
     <a class="btn ghost" href="index.html" target="_blank" rel="noopener" style="text-decoration:none">Gioca ↗</a>
@@ -205,7 +224,9 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
     <div class="stats" id="stats"></div>
     <div class="adm">
       <!-- menu laterale -->
-      <nav class="side" aria-label="Menu admin">
+      <div class="sideback" id="sideBack" hidden></div>
+      <nav class="side" id="side" aria-label="Menu admin">
+        <div class="shead"><b>Menu</b><button class="x" id="sideX" type="button" aria-label="Chiudi il menu">✕</button></div>
         <button class="tab on" data-tab="players" type="button">Utenti</button>
         <div class="grp">Collegamenti</div>
         <button class="tab sub" data-tab="qr" type="button">QR</button>
@@ -222,6 +243,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <button class="tab logout" id="btnOut" type="button">Logout</button>
       </nav>
     <div class="card">
+      <h2 id="paneTitle">Utenti</h2>
       <section data-pane="players">
         <div class="bar"><span class="grow dim" id="pInfo"></span>
           <button class="btn ghost" id="pReload" type="button">Aggiorna</button>
@@ -334,6 +356,27 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
   <p class="dim" id="noRemote" hidden>Il database online non è configurato in <code>config.js</code>: il pannello admin funziona solo con Supabase.</p>
 </main>
 
+<!-- popup Modifica utente -->
+<div class="pop" id="pEdit" hidden role="dialog" aria-modal="true" aria-labelledby="peT">
+  <div class="box">
+    <h3 id="peT">Modifica utente</h3>
+    <div class="who" id="peWho"></div>
+    <div class="grp2"><b>Tipo</b><div class="opts" id="peTipo"></div></div>
+    <div class="grp2"><b>Accesso</b><div class="opts"><button class="btn ghost" id="peDis" type="button"></button></div></div>
+    <div class="grp2"><b>Elimina</b><div class="opts"><button class="btn danger" id="peDel" type="button">Elimina utente</button></div></div>
+    <div class="msg" id="peMsg" aria-live="polite"></div>
+    <div class="row2"><button class="btn ghost" id="peClose" type="button">Chiudi</button></div>
+  </div>
+</div>
+<!-- conferma di ogni modifica -->
+<div class="pop" id="pAsk" hidden role="alertdialog" aria-modal="true" aria-labelledby="paT" style="z-index:70">
+  <div class="box">
+    <h3 id="paT"></h3>
+    <p id="paText"></p>
+    <div class="row2"><button class="btn ghost" id="paNo" type="button">Annulla</button><button class="btn" id="paYes" type="button"></button></div>
+  </div>
+</div>
+
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
 <script src="config.js?v=36"></script>
@@ -386,7 +429,7 @@ function onErr(err, msgEl){ if (err.auth){ logout(err.message); return; } setMsg
 /* ---------- login ---------- */
 async function enter(){
   const st = await call('efg_admin_login');
-  $('fLogin').hidden = true; $('dash').hidden = false; $('hRight').hidden = false;
+  $('fLogin').hidden = true; $('dash').hidden = false; $('hRight').hidden = false; $('menuBtn').hidden = false;
   renderStats(st); loadPlayers();
 }
 function renderStats(st){
@@ -396,15 +439,23 @@ function renderStats(st){
   const d = document.createElement('div'); d.className = 'stat'; d.innerHTML = '<b style="font-size:15px;padding:6px 0"></b><span>Ultimo backup</span>'; d.querySelector('b').textContent = st.ultimo_backup ? fmtDate(st.ultimo_backup) : 'mai'; $('stats').appendChild(d);
 }
 async function refreshStats(){ try { renderStats(await call('efg_admin_login')); } catch(e){} }
-function logout(msg){ KEY = ''; ss.set(''); $('dash').hidden = true; $('hRight').hidden = true; $('fLogin').hidden = false; $('key').value = ''; setMsg($('lMsg'), msg || '', msg ? 'err' : ''); stopAuto(); }
+function logout(msg){ KEY = ''; ss.set(''); closeMenu(); $('dash').hidden = true; $('hRight').hidden = true; $('menuBtn').hidden = true; $('fLogin').hidden = false; $('key').value = ''; setMsg($('lMsg'), msg || '', msg ? 'err' : ''); stopAuto(); }
 $('fLogin').addEventListener('submit', async e => {
   e.preventDefault(); KEY = $('key').value; setMsg($('lMsg'), 'Controllo…');
   try { await enter(); ss.set(KEY); setMsg($('lMsg'), ''); } catch(err){ KEY = ''; setMsg($('lMsg'), err.message, 'err'); }
 });
 $('btnOut').onclick = () => logout();
 
+/* ---------- menu a comparsa ---------- */
+function openMenu(){ $('side').classList.add('open'); $('sideBack').hidden = false; $('menuBtn').setAttribute('aria-expanded', 'true'); }
+function closeMenu(){ $('side').classList.remove('open'); $('sideBack').hidden = true; $('menuBtn').setAttribute('aria-expanded', 'false'); }
+$('menuBtn').onclick = () => $('side').classList.contains('open') ? closeMenu() : openMenu();
+$('sideX').onclick = closeMenu; $('sideBack').onclick = closeMenu;
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
 /* ---------- tabs ---------- */
 document.querySelectorAll('.tab[data-tab]').forEach(t => t.onclick = () => {
+  closeMenu(); $('paneTitle').textContent = t.textContent.trim();
   document.querySelectorAll('.tab[data-tab]').forEach(x => x.classList.toggle('on', x === t));
   document.querySelectorAll('[data-pane]').forEach(p => p.hidden = p.dataset.pane !== t.dataset.tab);
   if (t.dataset.tab === 'players') loadPlayers();
@@ -424,44 +475,75 @@ async function loadPlayers(){
   $('pInfo').textContent = players.length + ' utenti registrati';
   const det = p => Object.keys(GAMES).map(g => { const x = p.dettaglio && p.dettaglio[g]; return x ? GAMES[g] + ' ' + x.livelli + '/3 · ' + x.punti : null; }).filter(Boolean).join(' — ');
   const sorted = players.slice().sort((a, b) => b.livelli - a.livelli || b.punti - a.punti);
-  fillTable($('pTable'), ['#', 'Nome', 'Email', 'Tipo', 'Registrato', 'Giochi', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
-    sorted.map((p, i) => [i + 1, p.name, p.email, tipoSel(p), fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), delBtn(p)]),
+  fillTable($('pTable'), ['#', 'Tipo', 'Nome', 'Email', 'Registrato', 'Giochi', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
+    sorted.map((p, i) => [i + 1, tipoIco(p), nameCell(p), p.email, fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), editBtn(p)]),
     [null, null, null, null, 'small', 'num', 'num', 'num', 'small', null]);
+  $('pTable').querySelectorAll('tbody tr').forEach((tr, i) => { if (sorted[i] && sorted[i].disabilitato) tr.classList.add('off'); });
 }
-// tipo di utente: solo giocatore, admin e giocatore, solo admin (serve supabase-tipi-utenti.sql)
+// tipo di utente (serve supabase-tipi-utenti.sql): simbolo in tabella, si cambia da Modifica
 const TIPI = { giocatore:'Giocatore', admin_giocatore:'Admin e giocatore', admin:'Solo admin' };
-function tipoSel(p){
-  const sel = document.createElement('select'); sel.className = 'tipo'; sel.setAttribute('aria-label', 'Tipo di ' + p.name);
-  for (const [v, t] of Object.entries(TIPI)){ const o = document.createElement('option'); o.value = v; o.textContent = t; sel.appendChild(o); }
-  const prima = p.tipo || 'giocatore'; sel.value = prima;
-  sel.onchange = async () => {
-    sel.disabled = true;
-    try { await call('efg_admin_set_tipo', { p_email: p.email, p_tipo: sel.value }); p.tipo = sel.value; $('pInfo').textContent = players.length + ' utenti registrati · ' + p.name + ': ' + TIPI[sel.value]; }
-    catch(err){
-      sel.value = prima;
-      if (/efg_admin_set_tipo|PGRST202|does not exist/i.test(String(err && err.message))) setMsg($('pInfo'), 'Per cambiare il tipo esegui prima supabase-tipi-utenti.sql nel SQL Editor di Supabase.', 'err');
-      else onErr(err, $('pInfo'));
-    }
-    sel.disabled = false;
-  };
-  return sel;
+const TIPO_ICO = { giocatore:'🎮', admin_giocatore:'🛡️🎮', admin:'🛡️' };
+const tipoOf = p => TIPI[p.tipo] ? p.tipo : 'giocatore';
+function tipoIco(p){ const s = document.createElement('span'); s.className = 'ttype'; const t = tipoOf(p); s.textContent = TIPO_ICO[t]; s.title = TIPI[t] + (p.disabilitato ? ' · disabilitato' : ''); s.setAttribute('aria-label', s.title); return s; }
+function nameCell(p){ const d = document.createElement('span'); d.textContent = p.name; if (p.disabilitato){ const t = document.createElement('span'); t.className = 'offtag'; t.textContent = 'disabilitato'; d.appendChild(t); } return d; }
+function editBtn(p){ const b = document.createElement('button'); b.type = 'button'; b.className = 'btn edit'; b.textContent = 'Modifica'; b.onclick = () => openEdit(p); return b; }
+
+// conferma con spiegazione delle conseguenze: risolve true solo con il pulsante di conferma
+function ask(title, text, ok, danger){
+  return new Promise(res => {
+    $('paT').textContent = title; $('paText').textContent = text; $('paYes').textContent = ok;
+    $('paYes').className = 'btn' + (danger ? ' danger' : ''); $('pAsk').hidden = false; $('paNo').focus();
+    const done = v => { $('pAsk').hidden = true; $('paYes').onclick = $('paNo').onclick = null; res(v); };
+    $('paYes').onclick = () => done(true); $('paNo').onclick = () => done(false);
+  });
 }
-// elimina un utente: sparisce dagli utenti e dalla classifica, il log resta
-function delBtn(p){
-  const b = document.createElement('button'); b.type = 'button'; b.className = 'btn del'; b.textContent = 'Elimina';
-  b.onclick = async () => {
-    if (!confirm('Eliminare ' + p.name + ' (' + p.email + ')?\n\nL\'utente e i suoi punteggi vengono cancellati dal database e spariscono dalla classifica. Il log resta. Non si può annullare.')) return;
-    b.disabled = true;
-    try { const r = await call('efg_admin_delete_player', { p_email: p.email }); await loadPlayers(); $('pInfo').textContent += ' · eliminato ' + r.nome; refreshStats(); }
-    catch(err){ b.disabled = false; onErr(err, $('pInfo')); }
-  };
-  return b;
+const needSql = err => /efg_admin_set_tipo|efg_admin_set_disabilitato|PGRST202|does not exist/i.test(String(err && err.message));
+
+// popup Modifica: Tipo, Disabilita/Riabilita, Elimina
+let editing = null;
+function openEdit(p){ editing = p; $('peMsg').textContent = ''; $('peMsg').className = 'msg'; fillEdit(); $('pEdit').hidden = false; }
+function closeEdit(){ $('pEdit').hidden = true; editing = null; }
+$('peClose').onclick = closeEdit;
+$('pEdit').addEventListener('click', e => { if (e.target === $('pEdit')) closeEdit(); });
+function fillEdit(){
+  const p = editing; $('peT').textContent = 'Modifica ' + p.name; $('peWho').textContent = p.email + (p.disabilitato ? ' · disabilitato' : '');
+  const box = $('peTipo'); box.innerHTML = '';
+  for (const [v, t] of Object.entries(TIPI)){
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'opt' + (tipoOf(p) === v ? ' on' : '');
+    b.textContent = TIPO_ICO[v] + ' ' + t; b.onclick = () => { if (tipoOf(p) !== v) setTipo(p, v); };
+    box.appendChild(b);
+  }
+  $('peDis').textContent = p.disabilitato ? '✅ Riabilita' : '🚫 Disabilita';
 }
+async function act(fn, done){
+  try { await fn(); await loadPlayers(); const p = players.find(x => x.email === editing.email); if (p){ editing = p; fillEdit(); } setMsg($('peMsg'), done, 'ok'); refreshStats(); }
+  catch(err){ if (needSql(err)) setMsg($('peMsg'), 'Prima esegui supabase-tipi-utenti.sql nel SQL Editor di Supabase.', 'err'); else if (err.auth) logout(err.message); else setMsg($('peMsg'), 'Errore: ' + err.message, 'err'); }
+}
+async function setTipo(p, v){
+  if (!await ask('Cambiare il tipo di ' + p.name + '?',
+    p.name + ' passa da "' + TIPI[tipoOf(p)] + '" a "' + TIPI[v] + '". Il tipo serve a riconoscere gli utenti in questo pannello: per ora non cambia cosa possono fare nell’app né la classifica. Il cambio viene scritto nel log.',
+    'Sì, cambia tipo')) return;
+  act(() => call('efg_admin_set_tipo', { p_email: p.email, p_tipo: v }), 'Tipo cambiato: ' + TIPI[v] + '.');
+}
+$('peDis').onclick = async () => {
+  const p = editing, on = !p.disabilitato;
+  const ok = on
+    ? await ask('Disabilitare ' + p.name + '?', p.name + ' non potrà più accedere all’app, i nuovi punteggi non verranno salvati e sparirà dalle classifiche (app e schermo). I punteggi già fatti restano salvati: se lo riabiliti torna in classifica com’era. L’operazione viene scritta nel log.', 'Sì, disabilita', true)
+    : await ask('Riabilitare ' + p.name + '?', p.name + ' potrà di nuovo accedere e giocare, e ricompare in classifica con i punteggi che aveva. L’operazione viene scritta nel log.', 'Sì, riabilita');
+  if (!ok) return;
+  act(() => call('efg_admin_set_disabilitato', { p_email: p.email, p_on: on }), on ? 'Utente disabilitato.' : 'Utente riabilitato.');
+};
+$('peDel').onclick = async () => {
+  const p = editing;
+  if (!await ask('Eliminare ' + p.name + '?', p.name + ' (' + p.email + ') e tutti i suoi punteggi vengono cancellati dal database e spariscono dalla classifica. Il log resta. Potrà registrarsi di nuovo con la stessa email, ma ripartirà da zero. Non si può annullare (si recupera solo da un backup).', 'Sì, elimina', true)) return;
+  try { const r = await call('efg_admin_delete_player', { p_email: p.email }); closeEdit(); await loadPlayers(); $('pInfo').textContent += ' · eliminato ' + r.nome; refreshStats(); }
+  catch(err){ if (err.auth) logout(err.message); else setMsg($('peMsg'), 'Errore: ' + err.message, 'err'); }
+};
 $('pReload').onclick = loadPlayers;
 $('pCsv').onclick = () => {
-  const head = ['Nome', 'Email', 'Tipo', 'Registrato', 'Giochi usati', 'Livelli totali', 'Punti totali'];
+  const head = ['Nome', 'Email', 'Tipo', 'Disabilitato', 'Registrato', 'Giochi usati', 'Livelli totali', 'Punti totali'];
   Object.values(GAMES).forEach(n => head.push(n + ' livelli', n + ' punti'));
-  const rows = players.map(p => { const r = [p.name, p.email, TIPI[p.tipo || 'giocatore'], fmtDate(p.created_at), p.giochi, p.livelli, p.punti];
+  const rows = players.map(p => { const r = [p.name, p.email, TIPI[tipoOf(p)], p.disabilitato ? 'sì' : 'no', fmtDate(p.created_at), p.giochi, p.livelli, p.punti];
     Object.keys(GAMES).forEach(g => { const x = p.dettaglio && p.dettaglio[g]; r.push(x ? x.livelli : '', x ? x.punti : ''); }); return r; });
   download('efuture-games-utenti-' + stamp() + '.csv', toCsv(head, rows), 'text/csv;charset=utf-8');
 };
