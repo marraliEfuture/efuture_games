@@ -1,0 +1,299 @@
+[
+ {
+  "data": "2026-09-30",
+  "commit": "793a0be",
+  "versione": "v10",
+  "esiti": {
+   "codice": {
+    "ok": 32,
+    "avviso": 0,
+    "errore": 1
+   },
+   "db": {
+    "ok": 8,
+    "avviso": 0,
+    "errore": 0
+   },
+   "prestazioni": {
+    "ok": 10,
+    "avviso": 0,
+    "errore": 0
+   },
+   "spazio": {
+    "ok": 8,
+    "avviso": 0,
+    "errore": 0
+   },
+   "vulnerabilita": {
+    "ok": 7,
+    "avviso": 2,
+    "errore": 0
+   }
+  },
+  "spazio_kb": 1595.3,
+  "cartelle_kb": {
+   "(file principali)": 101.7,
+   "fonts": 120.3,
+   "games": 675.2,
+   "icons": 105.6,
+   "img": 63.0,
+   "qr": 158.0,
+   "vendor": 371.4
+  },
+  "vulnerabilita": {
+   "alta": 0,
+   "media": 1,
+   "bassa": 1
+  }
+ },
+ {
+  "data": "2026-10-01",
+  "commit": "ea7df3a",
+  "versione": "v17",
+  "esiti": {
+   "codice": {
+    "ok": 33,
+    "avviso": 0,
+    "errore": 0
+   },
+   "db": {
+    "ok": 8,
+    "avviso": 0,
+    "errore": 0
+   },
+   "prestazioni": {
+    "ok": 10,
+    "avviso": 0,
+    "errore": 0
+   },
+   "spazio": {
+    "ok": 8,
+    "avviso": 0,
+    "errore": 0
+   },
+   "vulnerabilita": {
+    "ok": 7,
+    "avviso": 2,
+    "errore": 0
+   }
+  },
+  "spazio_kb": 1641.7,
+  "cartelle_kb": {
+   "(file principali)": 108.4,
+   "fonts": 120.3,
+   "games": 709.0,
+   "icons": 105.6,
+   "img": 68.8,
+   "qr": 158.1,
+   "vendor": 371.4
+  },
+  "vulnerabilita": {
+   "alta": 0,
+   "media": 1,
+   "bassa": 1
+  }
+ },
+ {
+  "data": "2026-10-06",
+  "commit": "cb0f679",
+  "versione": "v19",
+  "esiti": {
+   "codice": {
+    "ok": 33,
+    "avviso": 0,
+    "errore": 0
+   },
+   "db": {
+    "ok": 8,
+    "avviso": 0,
+    "errore": 0
+   },
+   "prestazioni": {
+    "ok": 10,
+    "avviso": 0,
+    "errore": 0
+   },
+   "spazio": {
+    "ok": 11,
+    "avviso": 0,
+    "errore": 0
+   },
+   "vulnerabilita": {
+    "ok": 7,
+    "avviso": 2,
+    "errore": 0
+   }
+  },
+  "spazio_kb": 8961.7,
+  "cartelle_kb": {
+   ".claude": 28.4,
+   "(file principali)": 140.3,
+   "fonts": 120.3,
+   "games": 712.0,
+   "icons": 105.6,
+   "img": 68.8,
+   "qr": 158.1,
+   "tutorial": 572.5,
+   "vendor": 426.8,
+   "video": 6628.9
+  },
+  "vulnerabilita": {
+   "alta": 0,
+   "media": 1,
+   "bassa": 1
+  }
+ },
+ {
+  "data": "2026-10-07",
+  "commit": "2f27b5a",
+  "versione": "v27",
+  "esiti": {
+   "codice": {
+    "ok": 33,
+    "avviso": 1,
+    "errore": 0
+   },
+   "db": {
+    "ok": 8,
+    "avviso": 0,
+    "errore": 0
+   },
+   "prestazioni": {
+    "ok": 10,
+    "avviso": 0,
+    "errore": 0
+   },
+   "spazio": {
+    "ok": 12,
+    "avviso": 0,
+    "errore": 0
+   },
+   "vulnerabilita": {
+    "ok": 7,
+    "avviso": 2,
+    "errore": 0
+   }
+  },
+  "spazio_kb": 11463.9,
+  "cartelle_kb": {
+   ".claude": 46.2,
+   "(file principali)": 180.6,
+   "docs": 110.3,
+   "fonts": 120.3,
+   "games": 735.8,
+   "icons": 105.6,
+   "img": 68.8,
+   "qr": 160.0,
+   "tutorial": 1334.2,
+   "vendor": 426.8,
+   "video": 8175.2
+  },
+  "vulnerabilita": {
+   "alta": 0,
+   "media": 1,
+   "bassa": 1
+  }
+ },
+ {
+  "data": "2026-10-08",
+  "commit": "53aaa72",
+  "versione": "v33",
+  "esiti": {
+   "codice": {
+    "ok": 33,
+    "avviso": 1,
+    "errore": 0
+   },
+   "db": {
+    "ok": 8,
+    "avviso": 0,
+    "errore": 0
+   },
+   "prestazioni": {
+    "ok": 10,
+    "avviso": 0,
+    "errore": 0
+   },
+   "spazio": {
+    "ok": 12,
+    "avviso": 0,
+    "errore": 0
+   },
+   "vulnerabilita": {
+    "ok": 7,
+    "avviso": 2,
+    "errore": 0
+   }
+  },
+  "spazio_kb": 11488.4,
+  "cartelle_kb": {
+   ".claude": 52.4,
+   "(file principali)": 183.2,
+   "docs": 114.9,
+   "fonts": 120.3,
+   "games": 747.1,
+   "icons": 105.6,
+   "img": 68.8,
+   "qr": 160.0,
+   "tutorial": 1334.2,
+   "vendor": 426.8,
+   "video": 8175.2
+  },
+  "vulnerabilita": {
+   "alta": 0,
+   "media": 1,
+   "bassa": 1
+  }
+ },
+ {
+  "data": "2026-10-09",
+  "commit": "85a4a8b",
+  "versione": "v37",
+  "esiti": {
+   "codice": {
+    "ok": 34,
+    "avviso": 0,
+    "errore": 0
+   },
+   "db": {
+    "ok": 9,
+    "avviso": 0,
+    "errore": 0
+   },
+   "prestazioni": {
+    "ok": 17,
+    "avviso": 0,
+    "errore": 0
+   },
+   "spazio": {
+    "ok": 12,
+    "avviso": 0,
+    "errore": 0
+   },
+   "vulnerabilita": {
+    "ok": 7,
+    "avviso": 2,
+    "errore": 0
+   }
+  },
+  "spazio_kb": 11717.1,
+  "cartelle_kb": {
+   ".claude": 86.3,
+   "(file principali)": 238.7,
+   "docs": 254.1,
+   "fonts": 120.3,
+   "games": 747.1,
+   "icons": 105.6,
+   "img": 68.8,
+   "qr": 160.0,
+   "tutorial": 1334.2,
+   "vendor": 426.8,
+   "video": 8175.2
+  },
+  "vulnerabilita": {
+   "alta": 0,
+   "media": 1,
+   "bassa": 1
+  }
+ }
+]

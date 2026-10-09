@@ -1,6 +1,6 @@
 ---
 name: efuture-games-admin
-description: Mette Claude in "modalità admin" per Efuture Games. Da quel momento ogni richiesta dell'utente riguarda il pannello di amministrazione (admin.html) — utenti, log, backup, chiave, reset, QR, link, video, tutorial, skill, menu laterale — finché non dice altro. Usala quando l'utente scrive /efuture-games-admin o dice che vuole lavorare, modificare o fare domande sulla pagina admin di Efuture Games.
+description: Mette Claude in "modalità admin" per Efuture Games. Da quel momento ogni richiesta dell'utente riguarda il pannello di amministrazione (admin.html) — utenti, qualità, log, backup, chiave, reset, QR, link, video, tutorial, skill, menu laterale — finché non dice altro. Usala quando l'utente scrive /efuture-games-admin o dice che vuole lavorare, modificare o fare domande sulla pagina admin di Efuture Games.
 ---
 
 # Efuture Games – modalità admin
@@ -32,11 +32,12 @@ Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
 ## 2. Com'è fatto l'admin
 
 - **Una sola pagina:** `admin.html` contiene HTML, CSS e lo script. Usa `config.js`, `vendor/supabase.js` e `vendor/qrcode.js`.
-- **Accesso:** con la chiave admin, salvata solo cifrata nel database. Ogni funzione del server riceve `p_key` e la controlla con `efg_admin_auth`.
+- **Accesso:** con email + chiave admin personale (utenti di tipo admin) oppure con la sola chiave principale. Le chiavi sono salvate solo cifrate (bcrypt) nel database. Ogni funzione del server riceve `p_key` (`email` + a capo + `chiave`, oppure la chiave principale) e la controlla con `efg_admin_auth`; `efg_admin_me` dice chi è collegato (variabile `ME`).
 - **Menu a comparsa** (`nav.side#side`), aperto dal pulsante **Menu** (`#menuBtn`, hamburger) nell'intestazione e chiuso da ✕, dallo sfondo, da Esc o scegliendo una voce: pulsanti `.tab` con `data-tab="…"`. Ogni sezione è un `<section data-pane="…">` e il suo nome compare in `#paneTitle`. I gruppi sono titoli `.grp`; Logout è `#btnOut`. Per una sezione nuova servono il pulsante nel menu, la `section`, ed eventualmente il caricamento nel gestore delle schede (`if (t.dataset.tab === '…') …`).
 - **Utenti:** tipo come simbolo (🎮 giocatore, 🛡️🎮 admin e giocatore, 🛡️ solo admin), etichetta "disabilitato". Il pulsante **Modifica** apre il popup `#pEdit` (Tipo, Disabilita/Riabilita, Elimina). Ogni modifica passa da `ask(titolo, conseguenze, pulsante, pericolosa)`, che apre la conferma `#pAsk`: usala per ogni nuova azione che cambia dati.
 - **Chiamate al database:** `call('efg_admin_…', {…})`. La funzione aggiunge da sola `p_key`; se la risposta ha `errore` lancia un'eccezione.
 - **Tabelle:** `fillTable(tabella, intestazioni, righe, classi)`. Una cella può essere testo o un elemento (pulsante, menu a tendina).
+- **Qualità:** legge `docs/qualita/ultimo.json` e `storico.json`, scritti da `efuture-games-commit/scripts/qualita.py`. Per un controllo nuovo modifica lo script, non la pagina.
 - **CSV:** `toCsv` e `download`. Separatore `;` con BOM, così si aprono bene in Excel.
 
 ## 3. Regole per le modifiche

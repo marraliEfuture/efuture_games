@@ -62,11 +62,13 @@ CODICI DI SBLOCCO (uno per gioco)
 
 2c) PANNELLO ADMIN
    https://marraliefuture.github.io/efuture_games/admin.html
-   Si entra con la chiave admin (non è nel sito: è salvata cifrata nel
-   database). Dal pannello:
+   Si entra con la propria email e la chiave admin personale, oppure
+   con la sola chiave principale (email vuota). Le chiavi non sono nel
+   sito: nel database sono salvate solo cifrate. Dal pannello:
    Il menu si apre con il pulsante "Menu" in alto a sinistra: Utenti,
-   Collegamenti (QR, Link), Formazione (Video utili, Tutorial, Skills),
-   Admin (Log, Backup, Chiave, Reset), Logout.
+   Collegamenti (QR, Link), Formazione (Video utili, Tutorial, Skills,
+   FAQ, Documentazione),
+   Admin (Qualità, Log, Backup, Chiave, Reset), Logout.
    - Utenti: elenco con simbolo del tipo, nome, email, punti per gioco;
      CSV. "Modifica" apre un popup per cambiare il tipo (Giocatore, Admin
      e giocatore, Solo admin), disabilitare/riabilitare l'utente (non
@@ -74,11 +76,20 @@ CODICI DI SBLOCCO (uno per gioco)
      Ogni modifica chiede conferma spiegando le conseguenze. Una volta
      sola esegui supabase-tipi-utenti.sql (e rieseguilo se l'avevi gia'
      eseguito prima della v36) e supabase-privacy-utenti.sql.
+   - FAQ: domande frequenti sull'uso dell'app, scaricabili in Markdown.
+   - Documentazione: scarica in Markdown descrizione e documento tecnico
+     della piattaforma, dell'app e di ogni gioco.
+   - Qualità: 5 box (Codice, Database, Prestazioni, Spazio occupato,
+     Vulnerabilità) con i risultati dei controlli e il trend per data;
+     cliccando un box si apre l'elenco dei dettagli. I dati si aggiornano
+     a ogni salvataggio fatto con /efuture-games-commit.
    - Log: registrazioni, accessi, partite e operazioni admin; CSV.
    - Backup: crea e scarica una copia (JSON), ripristina una copia.
    - Reset: azzera i punti (i giocatori restano) o cancella tutto.
      Prima di ogni reset viene fatto un backup automatico.
-   - Chiave: cambia la chiave admin.
+   - Chiave: cambia la chiave con cui sei entrato (la tua personale o
+     la principale). Le chiavi personali degli altri admin si impostano,
+     generano o tolgono da Utenti > Modifica (solo per i tipi admin).
    - QR: "Genera i QR" mostra a video i 5 QR (app + sblocco dei 4
      giochi); "Stampa" li mette tutti su un foglio A4 in bianco e nero.
    - Link: tutti i link (app, installazione, classifica, admin, GitHub,
@@ -94,8 +105,6 @@ CODICI DI SBLOCCO (uno per gioco)
      con un clic. Tutorial: "Crea e gioca a Forza 4 con Claude" e il foglio
      "Attività giornaliere" con Claude in Chrome
      (immagini in tutorial/<nome>/, testi in TUTORIALS dentro admin.html).
-   Le schede sono in gruppi: Giocatori, Registro · QR, Link, Skills ·
-     Video utili, Tutorial · Backup, Chiave, Reset.
    Se perdi la chiave: Supabase > SQL Editor >
      select efg_admin_init('NUOVA-CHIAVE-LUNGA');
    Dopo 8 chiavi sbagliate in 10 minuti il pannello si blocca 10 minuti.
