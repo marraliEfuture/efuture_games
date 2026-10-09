@@ -83,6 +83,8 @@ input[type=text],input[type=password],select{width:100%;padding:10px 12px;border
 tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 .offtag{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;color:var(--danger);border:1px solid var(--danger);border-radius:3px;padding:0 5px;vertical-align:1px}
 .btn.edit{background:#fff;color:var(--navy);border:1px solid var(--navy);padding:4px 10px;font-size:12px}
+.acts{display:flex;gap:6px;flex-wrap:nowrap}
+.btn.block{padding:4px 10px;font-size:12px;white-space:nowrap}
 .pop{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(20,29,40,.45);padding:16px}
 .pop .box{background:#fff;border-radius:8px;box-shadow:0 20px 50px rgba(20,29,40,.3);width:100%;max-width:440px;padding:20px;display:flex;flex-direction:column;gap:14px;max-height:calc(100vh - 32px);overflow-y:auto}
 .pop h3{font-family:var(--title);font-weight:700;font-size:18px;margin:0;color:var(--ink)}
@@ -422,9 +424,9 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
     <h3 id="peT">Modifica utente</h3>
     <div class="who" id="peWho"></div>
     <div class="grp2"><b>Tipo</b><div class="opts" id="peTipo"></div></div>
-    <div class="grp2" id="peKeyBox"><b>Chiave admin personale</b>
+    <div class="grp2" id="peKeyBox"><b>Chiave admin personale (la password del pannello)</b>
       <div class="small" id="peKeyState"></div>
-      <div class="opts"><button class="btn ghost" id="peKeySet" type="button">🔑 Imposta</button><button class="btn ghost" id="peKeyGen" type="button">🎲 Genera</button><button class="btn ghost" id="peKeyDel" type="button">Togli</button></div>
+      <div class="opts"><button class="btn ghost" id="peKeySet" type="button">🔑 Imposta</button><button class="btn ghost" id="peKeyGen" type="button">🔄 Reset chiave</button><button class="btn ghost" id="peKeyDel" type="button">Togli</button></div>
       <form class="keyform" id="peKeyForm" hidden autocomplete="off">
         <input type="password" id="peK1" placeholder="Nuova chiave (almeno 10 caratteri)" autocomplete="new-password">
         <input type="password" id="peK2" placeholder="Ripeti la chiave" autocomplete="new-password">
@@ -432,7 +434,8 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
       </form>
       <div class="newkey" id="peNewKey" hidden><span>Nuova chiave (si vede solo ora):</span><code id="peNewKeyVal"></code><button class="btn ghost" type="button" id="peNewKeyCopy">Copia</button></div>
     </div>
-    <div class="grp2"><b>Accesso</b><div class="opts"><button class="btn ghost" id="peDis" type="button"></button></div></div>
+    <div class="grp2" id="pePwdBox"><b>Password</b><div class="small">I giocatori non hanno una password: entrano nell'app con la sola email, quindi non c'è niente da reimpostare. Se uno non riesce a entrare, controlla che usi l'email scritta qui sopra (oppure bloccalo o eliminalo).</div></div>
+    <div class="grp2"><b>Blocca / sblocca</b><div class="opts"><button class="btn ghost" id="peDis" type="button"></button></div></div>
     <div class="grp2"><b>Elimina</b><div class="opts"><button class="btn danger" id="peDel" type="button">Elimina utente</button></div></div>
     <div class="msg" id="peMsg" aria-live="polite"></div>
     <div class="row2"><button class="btn ghost" id="peClose" type="button">Chiudi</button></div>
@@ -449,7 +452,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=45"></script>
+<script src="config.js?v=46"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script>
@@ -459,7 +462,7 @@ const $ = id => document.getElementById(id);
 const CFG = window.EFG_CONFIG || {};
 if (!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY && window.supabase)){ $('noRemote').hidden = false; $('fLogin').hidden = true; return; }
 const sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, { auth:{ persistSession:false } });
-const GAMES = { sysadmin:'SysAdmin', coretech:'CoreTech', timenet:'Timenet', inncloud:'inncloud' };
+const GAMES = { sysadmin:'Efuture Bros', coretech:'CoreTech', timenet:'Timenet', inncloud:'inncloud' };
 const ss = { get(){ try { return sessionStorage.getItem('efgAdminKey') || ''; } catch(e){ return ''; } }, set(v){ try { v ? sessionStorage.setItem('efgAdminKey', v) : sessionStorage.removeItem('efgAdminKey'); } catch(e){} } };
 let KEY = ss.get();
 
@@ -529,11 +532,12 @@ $('btnProj').onclick = async () => {
     const o = projScreens.screens.filter(s => s !== projScreens.currentScreen);
     scr = o.find(s => !s.isPrimary) || o[0] || null;
   }
-  const f = scr ? 'popup,left=' + scr.availLeft + ',top=' + scr.availTop + ',width=' + scr.availWidth + ',height=' + scr.availHeight
+  // 'fullscreen': dove il browser lo consente (Chrome/Edge con "Gestione finestre" e "Schermo intero automatico") si apre già a schermo intero
+  const f = scr ? 'popup,fullscreen,left=' + scr.availLeft + ',top=' + scr.availTop + ',width=' + scr.availWidth + ',height=' + scr.availHeight
                 : 'popup,width=1280,height=760';
   const w = window.open('classifica.html?proietta=1', 'efgLedwall', f);
   if (!w){ projMsg(first ? 'Permesso concesso: premi di nuovo "Proietta".' : 'Il browser ha bloccato la finestra: consenti i popup per questo sito e riprova.'); return; }
-  if (scr) projMsg('Classifica aperta sul secondo monitor: cliccaci sopra una volta per lo schermo intero. L\'admin resta qui.');
+  if (scr) projMsg('Classifica aperta sul secondo monitor, grande quanto lo schermo. L\'admin resta qui. Se vedi ancora la barra della finestra, clicca una volta sulla classifica.');
   else if (!('getScreenDetails' in window)) projMsg('Questo browser non sa scegliere il monitor: trascina la finestra della classifica sul secondo schermo e cliccaci sopra (meglio Chrome o Edge).');
   else projMsg('Non trovo un secondo monitor (o il permesso è negato): trascina la finestra della classifica sull\'altro schermo e cliccaci sopra.');
 };
@@ -593,18 +597,27 @@ async function loadPlayers(){
   $('pInfo').textContent = players.length + ' utenti registrati';
   const det = p => Object.keys(GAMES).map(g => { const x = p.dettaglio && p.dettaglio[g]; return x ? GAMES[g] + ' ' + x.livelli + '/3 · ' + x.punti : null; }).filter(Boolean).join(' — ');
   const sorted = players.slice().sort((a, b) => b.livelli - a.livelli || b.punti - a.punti);
-  fillTable($('pTable'), ['#', 'Tipo', 'Nome', 'Email', 'Registrato', 'Giochi', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
-    sorted.map((p, i) => [i + 1, tipoIco(p), nameCell(p), p.email, fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), editBtn(p)]),
+  fillTable($('pTable'), ['#', 'Tipo', 'Nome', 'Email', 'Registrato', 'Giochi sbloccati', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
+    sorted.map((p, i) => [i + 1, tipoIco(p), nameCell(p), p.email, fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), actions(p)]),
     [null, null, null, null, 'small', 'num', 'num', 'num', 'small', null]);
   $('pTable').querySelectorAll('tbody tr').forEach((tr, i) => { if (sorted[i] && sorted[i].disabilitato) tr.classList.add('off'); });
 }
 // tipo di utente (serve supabase-tipi-utenti.sql): simbolo in tabella, si cambia da Modifica
 const TIPI = { giocatore:'Giocatore', admin_giocatore:'Admin e giocatore', admin:'Solo admin' };
-const TIPO_ICO = { giocatore:'🎮', admin_giocatore:'🛡️🎮', admin:'🛡️' };
+const TIPO_ICO = { giocatore:'🎮', admin_giocatore:'🎮🛡️', admin:'🛡️' };   // prima il joystick, poi lo scudo
 const tipoOf = p => TIPI[p.tipo] ? p.tipo : 'giocatore';
-function tipoIco(p){ const s = document.createElement('span'); s.className = 'ttype'; const t = tipoOf(p); s.textContent = TIPO_ICO[t] + (p.chiave ? ' 🔑' : ''); s.title = TIPI[t] + (p.chiave ? ' · chiave admin personale impostata' : '') + (p.disabilitato ? ' · disabilitato' : ''); s.setAttribute('aria-label', s.title); return s; }
-function nameCell(p){ const d = document.createElement('span'); d.textContent = p.name; if (p.disabilitato){ const t = document.createElement('span'); t.className = 'offtag'; t.textContent = 'disabilitato'; d.appendChild(t); } return d; }
+function tipoIco(p){ const s = document.createElement('span'); s.className = 'ttype'; const t = tipoOf(p); s.textContent = TIPO_ICO[t] + (p.chiave ? ' 🔑' : ''); s.title = TIPI[t] + (p.chiave ? ' · chiave admin personale impostata' : '') + (p.disabilitato ? ' · bloccato' : ''); s.setAttribute('aria-label', s.title); return s; }
+function nameCell(p){ const d = document.createElement('span'); d.textContent = p.name; if (p.disabilitato){ const t = document.createElement('span'); t.className = 'offtag'; t.textContent = 'bloccato'; d.appendChild(t); } return d; }
 function editBtn(p){ const b = document.createElement('button'); b.type = 'button'; b.className = 'btn edit'; b.textContent = 'Modifica'; b.onclick = () => openEdit(p); return b; }
+// in tabella: Modifica e, subito accanto, Blocca / Sblocca
+function actions(p){
+  const box = document.createElement('div'); box.className = 'acts';
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'btn ghost block';
+  b.textContent = p.disabilitato ? '✅ Sblocca' : '🚫 Blocca';
+  b.title = p.disabilitato ? 'Può di nuovo accedere e giocare' : 'Non può più accedere né salvare punteggi';
+  b.onclick = () => toggleBlock(p, false);
+  box.append(editBtn(p), b); return box;
+}
 
 // conferma con spiegazione delle conseguenze: risolve true solo con il pulsante di conferma
 function ask(title, text, ok, danger){
@@ -624,16 +637,16 @@ function closeEdit(){ $('pEdit').hidden = true; editing = null; }
 $('peClose').onclick = closeEdit;
 $('pEdit').addEventListener('click', e => { if (e.target === $('pEdit')) closeEdit(); });
 function fillEdit(){
-  const p = editing; $('peT').textContent = 'Modifica ' + p.name; $('peWho').textContent = p.email + (p.disabilitato ? ' · disabilitato' : '');
+  const p = editing; $('peT').textContent = 'Modifica ' + p.name; $('peWho').textContent = p.email + (p.disabilitato ? ' · bloccato' : '');
   const box = $('peTipo'); box.innerHTML = '';
   for (const [v, t] of Object.entries(TIPI)){
     const b = document.createElement('button'); b.type = 'button'; b.className = 'opt' + (tipoOf(p) === v ? ' on' : '');
     b.textContent = TIPO_ICO[v] + ' ' + t; b.onclick = () => { if (tipoOf(p) !== v) setTipo(p, v); };
     box.appendChild(b);
   }
-  $('peDis').textContent = p.disabilitato ? '✅ Riabilita' : '🚫 Disabilita';
+  $('peDis').textContent = p.disabilitato ? '✅ Sblocca' : '🚫 Blocca';
   const adm = tipoOf(p) !== 'giocatore';
-  $('peKeyBox').hidden = !adm; $('peKeyForm').hidden = true; $('peNewKey').hidden = true;
+  $('peKeyBox').hidden = !adm; $('pePwdBox').hidden = adm; $('peKeyForm').hidden = true; $('peNewKey').hidden = true;
   $('peKeyState').textContent = p.chiave ? '🔑 Impostata: entra nel pannello con ' + p.email + ' e la sua chiave.' : 'Non impostata: per ora non può entrare nel pannello.';
   $('peKeySet').textContent = p.chiave ? '🔑 Modifica' : '🔑 Imposta'; $('peKeyDel').hidden = !p.chiave;
 }
@@ -673,7 +686,7 @@ $('peKeyForm').addEventListener('submit', async e => {
 });
 $('peKeyGen').onclick = async () => {
   const p = editing;
-  if (!await ask('Generare una nuova chiave per ' + p.name + '?', 'Viene creata una chiave casuale di 16 caratteri e mostrata una sola volta: copiala subito. ' + KEY_EFF(p), 'Sì, genera')) return;
+  if (!await ask('Reset della chiave di ' + p.name + '?', 'Viene creata una nuova chiave casuale di 16 caratteri e mostrata una sola volta: copiala subito. ' + KEY_EFF(p), 'Sì, reset chiave')) return;
   saveUserKey(p, genKey(), true);
 };
 $('peNewKeyCopy').onclick = async () => { const ok = await copyText($('peNewKeyVal').textContent); setMsg($('peMsg'), ok ? 'Chiave copiata negli appunti.' : 'Copia non riuscita: selezionala a mano.', ok ? 'ok' : 'err'); };
@@ -682,14 +695,19 @@ $('peKeyDel').onclick = async () => {
   if (!await ask('Togliere la chiave admin di ' + p.name + '?', p.name + ' non potrà più entrare nel pannello admin finché non gli imposti una nuova chiave. Resta di tipo "' + TIPI[tipoOf(p)] + '" e nell’app non cambia niente.', 'Sì, togli chiave', true)) return;
   act(() => call('efg_admin_set_user_key', { p_email: p.email, p_new: '' }), 'Chiave tolta.');
 };
-$('peDis').onclick = async () => {
-  const p = editing, on = !p.disabilitato;
+// blocca / sblocca: dal popup Modifica oppure direttamente dalla tabella
+async function toggleBlock(p, fromPopup){
+  const on = !p.disabilitato;
   const ok = on
-    ? await ask('Disabilitare ' + p.name + '?', p.name + ' non potrà più accedere all’app' + (tipoOf(p) !== 'giocatore' ? ' né a questo pannello' : '') + ', i nuovi punteggi non verranno salvati e sparirà dalle classifiche (app e schermo). I punteggi già fatti restano salvati: se lo riabiliti torna in classifica com’era. L’operazione viene scritta nel log.', 'Sì, disabilita', true)
-    : await ask('Riabilitare ' + p.name + '?', p.name + ' potrà di nuovo accedere e giocare, e ricompare in classifica con i punteggi che aveva. L’operazione viene scritta nel log.', 'Sì, riabilita');
+    ? await ask('Bloccare ' + p.name + '?', p.name + ' non potrà più accedere all’app' + (tipoOf(p) !== 'giocatore' ? ' né a questo pannello' : '') + ', i nuovi punteggi non verranno salvati e sparirà dalle classifiche (app e schermo). I punteggi già fatti restano salvati: se lo sblocchi torna in classifica com’era. L’operazione viene scritta nel log.', 'Sì, blocca', true)
+    : await ask('Sbloccare ' + p.name + '?', p.name + ' potrà di nuovo accedere e giocare, e ricompare in classifica con i punteggi che aveva. L’operazione viene scritta nel log.', 'Sì, sblocca');
   if (!ok) return;
-  act(() => call('efg_admin_set_disabilitato', { p_email: p.email, p_on: on }), on ? 'Utente disabilitato.' : 'Utente riabilitato.');
-};
+  const done = (on ? 'Bloccato: ' : 'Sbloccato: ') + p.name + '.';
+  if (fromPopup) return act(() => call('efg_admin_set_disabilitato', { p_email: p.email, p_on: on }), done);
+  try { await call('efg_admin_set_disabilitato', { p_email: p.email, p_on: on }); await loadPlayers(); $('pInfo').textContent += ' · ' + done; refreshStats(); }
+  catch(err){ if (needSql(err)) $('pInfo').textContent = 'Prima esegui supabase-tipi-utenti.sql nel SQL Editor di Supabase.'; else onErr(err, $('pInfo')); }
+}
+$('peDis').onclick = () => toggleBlock(editing, true);
 $('peDel').onclick = async () => {
   const p = editing;
   if (!await ask('Eliminare ' + p.name + '?', p.name + ' (' + p.email + ') e tutti i suoi punteggi vengono cancellati dal database e spariscono dalla classifica. Il log resta. Potrà registrarsi di nuovo con la stessa email, ma ripartirà da zero. Non si può annullare (si recupera solo da un backup).', 'Sì, elimina', true)) return;
@@ -698,7 +716,7 @@ $('peDel').onclick = async () => {
 };
 $('pReload').onclick = loadPlayers;
 $('pCsv').onclick = () => {
-  const head = ['Nome', 'Email', 'Tipo', 'Disabilitato', 'Registrato', 'Giochi usati', 'Livelli totali', 'Punti totali'];
+  const head = ['Nome', 'Email', 'Tipo', 'Bloccato', 'Registrato', 'Giochi sbloccati', 'Livelli totali', 'Punti totali'];
   Object.values(GAMES).forEach(n => head.push(n + ' livelli', n + ' punti'));
   const rows = players.map(p => { const r = [p.name, p.email, TIPI[tipoOf(p)], p.disabilitato ? 'sì' : 'no', fmtDate(p.created_at), p.giochi, p.livelli, p.punti];
     Object.keys(GAMES).forEach(g => { const x = p.dettaglio && p.dettaglio[g]; r.push(x ? x.livelli : '', x ? x.punti : ''); }); return r; });

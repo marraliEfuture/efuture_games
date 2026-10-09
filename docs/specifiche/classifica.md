@@ -124,11 +124,11 @@ La finestra "Countdown della gara" contiene:
 ## Proietta (secondo monitor) e schermo intero
 
 - Il pulsante **📺 Proietta** (al posto del vecchio "Schermo intero") apre la classifica in una **nuova finestra sul secondo monitor** (ledwall o proiettore), con gli stessi filtri (`?…&proietta=1`, nome finestra `efgLedwall`). La finestra da cui si preme resta dov'è: se è aperta dall'admin, il primo monitor resta sull'admin e non si chiedono di nuovo le credenziali.
-- Con Chrome o Edge usa la Window Management API (`getScreenDetails`) per posizionare la finestra (`window.open` con `popup,left,top,width,height`) sull'altro schermo, preferendo uno non principale:
+- Con Chrome o Edge usa la Window Management API (`getScreenDetails`) per posizionare la finestra (`window.open` con `popup,fullscreen,left,top,width,height`, grande quanto lo schermo) sull'altro schermo, preferendo uno non principale:
   - la prima volta il browser chiede il permesso "Gestione finestre"; se la finestra viene bloccata, il messaggio dice "premi di nuovo";
   - se il permesso c'è già, gli schermi si leggono all'apertura della pagina;
   - senza secondo monitor, senza permesso o con altri browser la finestra si apre normale (1280×760) e un messaggio in basso dice di trascinarla sull'altro schermo.
-- **Finestra proiettata** (`?proietta=1`): un velo scuro dice "Clicca qui per lo schermo intero"; il clic la mette a schermo intero **su quel monitor**. Il pulsante lì si chiama **Schermo intero** e mette o toglie lo schermo intero senza spostare la finestra. Uscendo dallo schermo intero il velo ricompare.
+- **Finestra proiettata** (`?proietta=1`): **un solo passaggio**. Si vede subito con l'aspetto da schermo intero (classe `.proj` sulla pagina: come `:fullscreen`, senza pulsanti di visualizzazione, Countdown e Admin) e prova da sola a mettersi a schermo intero vero: ci riesce dove il browser lo consente (finestre `fullscreen` o schermo intero automatico, previsti da Chrome/Edge con "Gestione finestre" ma non ancora disponibili ovunque). Altrimenti la finestra è comunque grande quanto lo schermo e basta un clic in un punto qualsiasi per togliere anche la barra. Il pulsante lì si chiama **Schermo intero** e mette o toglie lo schermo intero senza spostare la finestra. Non c'è più il velo scuro davanti alla classifica.
 - A schermo intero si nascondono Countdown, Admin e i pulsanti di visualizzazione. La barra del countdown resta visibile e il QR diventa più grande.
 
 ## Modalità demo

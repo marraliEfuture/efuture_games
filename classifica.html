@@ -58,7 +58,7 @@ mark{background:none;color:var(--sky);padding:0}
 .btn:hover{background:#e66200}
 .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);text-decoration:none}
 .btn.ghost:hover{background:var(--row)}
-:fullscreen .btn.ghost,:fullscreen .controls{display:none}
+:fullscreen .btn.ghost,:fullscreen .controls,.proj .btn.ghost,.proj .controls{display:none}
 /* interruttori di visualizzazione */
 .controls{background:#fff;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;padding:10px clamp(16px,3vw,48px);font-size:clamp(12px,.9vw,14px);color:var(--text)}
 .controls .seg-grp + .seg-grp{border-left:1px solid var(--line);padding-left:22px}
@@ -113,7 +113,7 @@ li.fresh{background:#ffe7d4}
 .gmin{display:flex;align-items:center;gap:10px;font-weight:600}
 .gmin input{width:110px;font:inherit;font-size:18px;padding:8px 10px;border:1px solid var(--line);border-radius:4px}
 .grow2{display:flex;gap:10px;flex-wrap:wrap}
-:fullscreen #btnGate{display:none}
+:fullscreen #btnGate,.proj #btnGate{display:none}
 /* contenitore delle classifiche: giochi e generale affiancati */
 .boards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:inherit;align-items:start;min-width:0}
 main.only-total .boards,main.only-games .boards{grid-template-columns:minmax(0,1fr)}
@@ -125,7 +125,7 @@ main.only-total .boards,main.only-games .boards{grid-template-columns:minmax(0,1
 .qrcap{text-align:center;font-family:var(--title)}
 .qrcap b{display:block;font-weight:700;font-size:clamp(18px,2vw,40px);letter-spacing:-.5px;color:var(--ink)}
 .qrcap span{font-family:var(--body);font-weight:300;font-size:clamp(12px,1vw,20px);color:var(--muted)}
-:fullscreen .qrbig{--qr:min(22vw, calc((100vh - 290px) / 2))}
+:fullscreen .qrbig,.proj .qrbig{--qr:min(22vw, calc((100vh - 290px) / 2))}
 /* classifica generale: sezione blu notte come sul sito */
 .panel.total{background:var(--navy);border-color:var(--navy);box-shadow:0 16px 40px rgba(0,34,56,.25)}
 .total .ph h2{color:#fff;font-size:clamp(18px,1.7vw,30px);letter-spacing:-1px}
@@ -178,11 +178,8 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 @media (prefers-reduced-motion:reduce){.dot{animation:none}li{transition:none}}
 .fsmsg{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:50;max-width:min(560px,calc(100vw - 32px));background:#1f2a37;color:#fff;font-size:14px;line-height:1.4;padding:10px 16px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.25);text-align:center}
 :fullscreen .fsmsg{display:none}
-/* finestra aperta dall'admin sul secondo monitor (?proietta=1): un clic per lo schermo intero */
-.projgo{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;border:0;cursor:pointer;background:rgba(14,30,51,.82);color:#fff;font:inherit;text-align:center;padding:24px}
-.projgo b{font-size:clamp(22px,3.4vw,44px)}
-.projgo span{font-size:clamp(14px,1.6vw,20px);opacity:.85}
-:fullscreen .projgo{display:none}
+/* finestra aperta dall'admin sul secondo monitor (?proietta=1): si vede subito come a schermo intero
+   (classe .proj); lo schermo intero vero arriva da solo se il browser lo consente, altrimenti con un clic ovunque */
 </style>
 </head>
 <body>
@@ -258,9 +255,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=45"></script>
+<script src="config.js?v=46"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=45"></script>
+<script src="backend.js?v=46"></script>
 <script>
 (function(){
 "use strict";
@@ -435,12 +432,12 @@ async function proietta(){
   const first = !screens && 'getScreenDetails' in window;
   if (first) await loadScreens(true);       // la prima volta il browser chiede il permesso "Gestione finestre"
   const scr = otherScreen();
-  const f = scr ? 'popup,left=' + scr.availLeft + ',top=' + scr.availTop + ',width=' + scr.availWidth + ',height=' + scr.availHeight
+  const f = scr ? 'popup,fullscreen,left=' + scr.availLeft + ',top=' + scr.availTop + ',width=' + scr.availWidth + ',height=' + scr.availHeight
                 : 'popup,width=1280,height=760';
   const u = new URL(location.href); u.searchParams.set('proietta', '1');
   const w = window.open(u.pathname + u.search, 'efgLedwall', f);
   if (!w){ fsMsg(first ? 'Permesso concesso: premi di nuovo "Proietta".' : 'Il browser ha bloccato la finestra: consenti i popup per questo sito e riprova.'); return; }
-  if (scr) fsMsg('Classifica aperta sul secondo monitor: cliccaci sopra una volta per lo schermo intero.');
+  if (scr) fsMsg('Classifica aperta sul secondo monitor, grande quanto lo schermo. Se vedi ancora la barra della finestra, clicca una volta sulla classifica.');
   else if (!('getScreenDetails' in window)) fsMsg('Questo browser non sa scegliere il monitor: trascina la finestra della classifica sul secondo schermo e cliccaci sopra (meglio Chrome o Edge).');
   else fsMsg('Non trovo un secondo monitor (o il permesso è negato): trascina la finestra della classifica sull\'altro schermo e cliccaci sopra.');
 }
@@ -451,12 +448,12 @@ if (PROJ){
     if (document.fullscreenElement) document.exitFullscreen && document.exitFullscreen();
     else document.documentElement.requestFullscreen().catch(() => {});
   };
+  document.documentElement.classList.add('proj');   // aspetto da schermo intero subito, senza clic
   if (document.documentElement.requestFullscreen){
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'projgo'; b.id = 'projGo';
-    b.innerHTML = '<b>Clicca qui per lo schermo intero</b><span>La classifica resta su questo monitor. Per uscire: Esc</span>';
-    b.onclick = () => document.documentElement.requestFullscreen().catch(() => {});
-    document.body.appendChild(b);
+    const full = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); };
+    full();   // riesce se il browser consente lo schermo intero automatico per questo sito
+    // altrimenti basta un clic in un punto qualsiasi (niente più velo davanti alla classifica) o il pulsante Schermo intero
+    document.addEventListener('click', e => { if (!e.target.closest('#btnFull')) full(); });
   } else $('btnFull').hidden = true;
 } else {
   $('btnFull').onclick = proietta;
