@@ -170,7 +170,7 @@ Quando `times` manca, i livelli superati sono 3 se `ok` è vero, altrimenti `lev
   - non è un record: "Il tuo record resta … in classifica conta solo il risultato migliore.";
   - record senza account: "Nuovo record! Registrati o accedi per entrare in classifica.";
   - record con account: invio con `Backend.submit(session, game, punti, livelli)`, cioè `efg_submit`. Poi "Nuovo record salvato in classifica!" oppure l'errore, per esempio "La gara è chiusa…".
-- **Pulsanti:** **Rigioca** (stesso gioco) e **Torna ai giochi**.
+- **Pulsanti:** **Riprova livello N** (solo dopo una sconfitta e solo se il gioco lo consente, cioè se `result` ha `retry: true`: oggi Efuture Bros; chiude il riepilogo e manda al gioco `{type:'efg-cmd', cmd:'retry'}`, che riparte dal livello perso tenendo i livelli già superati), **Rigioca** (stesso gioco, da capo) e **Torna ai giochi**.
 - Solo i nuovi record locali vengono inviati al server. Il server comunque tiene solo il migliore (vedi [database.md](database.md)).
 
 ## Countdown di apertura e chiusura
