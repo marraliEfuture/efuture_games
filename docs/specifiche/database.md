@@ -183,6 +183,7 @@ Formato di `efg_backups.data`, che è anche il file JSON scaricato dall'admin. P
 | `supabase-classifica-gruppi.sql` | `efg_board_group` e permessi | Rieseguibile. Se manca, la classifica mostra un avviso e tutti i giocatori |
 | `supabase-countdown.sql` | Tabella `efg_gate` con la riga 1. Funzioni `efg_gate_state`, `efg_gate_open`, `efg_admin_gate`. Nuova `efg_submit` con il controllo `gara chiusa` (tolleranza 10 s) | Rieseguibile. Se manca, app e classifica funzionano senza countdown e il pulsante Start segnala lo script mancante |
 | `supabase-privacy-utenti.sql` | Toglie `phone` da `efg_players` e dai backup salvati (non si può annullare). Nuove `efg_register`, `efg_admin_players`, `efg_admin_restore`, `efg_admin_delete_player` | Per i database creati prima della v23. Il contenuto è già incluso in `supabase.sql` |
+| `supabase-tipi-utenti.sql` | Colonna `tipo` in `efg_players` (`giocatore`, `admin_giocatore`, `admin`; predefinito `giocatore`). Nuove `efg_admin_players` (con il tipo), `efg_admin_set_tipo`, `efg_admin_restore` (conserva il tipo) | Una volta, anche su un database nuovo (dalla v35): `supabase.sql` non lo contiene |
 
 **Ordine su un progetto nuovo:**
 1. `supabase.sql`;

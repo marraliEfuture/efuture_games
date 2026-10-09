@@ -59,11 +59,24 @@ input[type=text],input[type=password],select{width:100%;padding:10px 12px;border
 .stat{background:var(--navy);color:#fff;border-radius:6px;padding:14px 16px}
 .stat b{font-family:var(--title);font-weight:800;font-size:26px;display:block;line-height:1.1}
 .stat span{font-size:12px;font-weight:300;color:#b7c7d8}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
-.tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px;cursor:pointer;color:var(--muted);font-weight:600}
-.tab.on{color:var(--ink);border-bottom-color:var(--sky)}
-.tab.danger{color:#b84a4a} .tab.danger.on{color:var(--danger);border-bottom-color:var(--danger)}
-.tsep{width:1px;background:var(--line);margin:8px 4px}
+.adm{display:grid;grid-template-columns:200px minmax(0,1fr);gap:18px;align-items:start}   /* menu laterale + contenuto */
+.side{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:2px;position:sticky;top:12px}
+.side .grp{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:12px 10px 4px}
+.tab{background:none;border:0;border-left:3px solid transparent;border-radius:3px;padding:9px 10px;cursor:pointer;color:var(--ink);font-weight:600;text-align:left}
+.tab:hover{background:var(--row)}
+.tab.sub{padding-left:20px;font-weight:500;color:var(--muted)}
+.tab.on{color:var(--ink);background:var(--row);border-left-color:var(--sky)}
+.tab.danger{color:#b84a4a} .tab.danger.on{color:var(--danger);border-left-color:var(--danger)}
+.tab.logout{margin-top:10px;border-top:1px solid var(--line);border-radius:0;padding-top:12px}
+@media (max-width:760px){
+  .adm{grid-template-columns:minmax(0,1fr)}
+  .side{position:static;flex-direction:row;flex-wrap:wrap;gap:4px}
+  .side .grp{width:100%;padding:8px 4px 0}
+  .tab,.tab.sub{padding:7px 10px;border-left:0;border-bottom:3px solid transparent}
+  .tab.on{border-bottom-color:var(--sky)}
+  .tab.logout{margin:6px 0 0;border-top:0;width:100%}
+}
+.tipo{width:auto;min-width:165px;padding:5px 8px;font-size:13px}
 .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .bar .grow{flex:1}
 .tablewrap{overflow:auto;border:1px solid var(--line);border-radius:4px;max-height:65vh}
@@ -156,9 +169,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 @media print{
   @page{size:A4 portrait;margin:8mm}
   html,body{background:#fff!important}
-  .topbar,header,#stats,.tabs,.noprint,#noRemote{display:none!important}
+  .topbar,header,#stats,.side,.noprint,#noRemote{display:none!important}
   main{padding:0;max-width:none}
-  #dash>.card{border:0;box-shadow:none;padding:0}
+  #dash .adm{display:block}
+  #dash .adm>.card{border:0;box-shadow:none;padding:0}
   .qrsheet{grid-template-columns:1fr 1fr;grid-auto-rows:92mm;gap:0}
   .qrcard{height:92mm;border-radius:0;padding:4mm;justify-content:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .qrcard svg{width:56mm;max-width:none;margin:2mm 0}
@@ -169,11 +183,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 <body>
 <div class="topbar"><b>Efuture Games</b> · pannello di amministrazione</div>
 <header>
-  <div class="special"><h1><mark>Admin</mark> Efuture Games</h1><div class="label"><b>CARE Conference</b> Edition · classifica, backup e registro</div></div>
+  <div class="special"><h1><mark>Admin</mark> Efuture Games</h1><div class="label"><b>CARE Conference</b> Edition · utenti, classifica, backup e log</div></div>
   <div class="hright" id="hRight" hidden>
     <a class="btn ghost" href="index.html" target="_blank" rel="noopener" style="text-decoration:none">Gioca ↗</a>
     <a class="btn ghost" href="classifica.html" target="_blank" rel="noopener" style="text-decoration:none">Classifica ↗</a>
-    <button class="btn ghost" id="btnOut" type="button">Esci</button>
   </div>
 </header>
 
@@ -190,27 +203,25 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
   <!-- dashboard -->
   <div id="dash" hidden style="display:flex;flex-direction:column;gap:18px">
     <div class="stats" id="stats"></div>
+    <div class="adm">
+      <!-- menu laterale -->
+      <nav class="side" aria-label="Menu admin">
+        <button class="tab on" data-tab="players" type="button">Utenti</button>
+        <div class="grp">Collegamenti</div>
+        <button class="tab sub" data-tab="qr" type="button">QR</button>
+        <button class="tab sub" data-tab="links" type="button">Link</button>
+        <div class="grp">Formazione</div>
+        <button class="tab sub" data-tab="videos" type="button">Video utili</button>
+        <button class="tab sub" data-tab="tutorials" type="button">Tutorial</button>
+        <button class="tab sub" data-tab="skills" type="button">Skills</button>
+        <div class="grp">Admin</div>
+        <button class="tab sub" data-tab="log" type="button">Log</button>
+        <button class="tab sub" data-tab="backup" type="button">Backup</button>
+        <button class="tab sub" data-tab="key" type="button">Chiave</button>
+        <button class="tab sub danger" data-tab="reset" type="button">Reset</button>
+        <button class="tab logout" id="btnOut" type="button">Logout</button>
+      </nav>
     <div class="card">
-      <div class="tabs" role="tablist">
-        <!-- evento: giocatori e attività -->
-        <button class="tab on" data-tab="players" type="button">Giocatori</button>
-        <button class="tab" data-tab="log" type="button">Registro</button>
-        <span class="tsep" aria-hidden="true"></span>
-        <!-- strumenti: QR, link e skill -->
-        <button class="tab" data-tab="qr" type="button">QR</button>
-        <button class="tab" data-tab="links" type="button">Link</button>
-        <button class="tab" data-tab="skills" type="button">Skills</button>
-        <span class="tsep" aria-hidden="true"></span>
-        <!-- guide: video e tutorial -->
-        <button class="tab" data-tab="videos" type="button">Video utili</button>
-        <button class="tab" data-tab="tutorials" type="button">Tutorial</button>
-        <span class="tsep" aria-hidden="true"></span>
-        <!-- manutenzione: le operazioni delicate in fondo -->
-        <button class="tab" data-tab="backup" type="button">Backup</button>
-        <button class="tab" data-tab="key" type="button">Chiave</button>
-        <button class="tab danger" data-tab="reset" type="button">Reset</button>
-      </div>
-
       <section data-pane="players">
         <div class="bar"><span class="grow dim" id="pInfo"></span>
           <button class="btn ghost" id="pReload" type="button">Aggiorna</button>
@@ -253,12 +264,12 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <p class="dim">Prima di azzerare viene creato un backup automatico, che puoi ripristinare dalla scheda Backup.</p>
         <div class="danger-box">
           <h3>Azzera i punti di tutti</h3>
-          <p>Cancella tutti i punteggi e i livelli. I giocatori restano registrati e possono rigiocare subito.</p>
+          <p>Cancella tutti i punteggi e i livelli. Gli utenti restano registrati e possono rigiocare subito.</p>
           <div class="bar"><input type="text" id="rConf1" placeholder="Scrivi AZZERA per confermare" style="max-width:260px"><button class="btn danger" id="rScores" type="button">Azzera i punti</button></div>
         </div>
         <div class="danger-box" style="margin-top:12px">
           <h3>Cancella tutto</h3>
-          <p>Cancella punteggi <b>e giocatori registrati</b> (nomi ed email). Tutti dovranno registrarsi di nuovo.</p>
+          <p>Cancella punteggi <b>e utenti registrati</b> (nomi ed email). Tutti dovranno registrarsi di nuovo.</p>
           <div class="bar"><input type="text" id="rConf2" placeholder="Scrivi CANCELLA TUTTO per confermare" style="max-width:300px"><button class="btn danger" id="rAll" type="button">Cancella tutto</button></div>
         </div>
         <div class="msg" id="rMsg" aria-live="polite" style="margin-top:10px"></div>
@@ -316,6 +327,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         </div>
         <div class="qrsheet" id="qSheet" style="margin-top:14px"></div>
       </section>
+    </div>
     </div>
   </div>
 
@@ -378,7 +390,7 @@ async function enter(){
   renderStats(st); loadPlayers();
 }
 function renderStats(st){
-  const items = [['giocatori','Giocatori registrati'], ['punteggi','Record salvati'], ['eventi','Eventi nel registro'], ['backup','Backup salvati']];
+  const items = [['giocatori','Utenti registrati'], ['punteggi','Record salvati'], ['eventi','Eventi nel log'], ['backup','Backup salvati']];
   $('stats').innerHTML = '';
   for (const [k, label] of items){ const d = document.createElement('div'); d.className = 'stat'; d.innerHTML = '<b></b><span></span>'; d.querySelector('b').textContent = st[k] ?? 0; d.querySelector('span').textContent = label; $('stats').appendChild(d); }
   const d = document.createElement('div'); d.className = 'stat'; d.innerHTML = '<b style="font-size:15px;padding:6px 0"></b><span>Ultimo backup</span>'; d.querySelector('b').textContent = st.ultimo_backup ? fmtDate(st.ultimo_backup) : 'mai'; $('stats').appendChild(d);
@@ -392,8 +404,8 @@ $('fLogin').addEventListener('submit', async e => {
 $('btnOut').onclick = () => logout();
 
 /* ---------- tabs ---------- */
-document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
-  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+document.querySelectorAll('.tab[data-tab]').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab[data-tab]').forEach(x => x.classList.toggle('on', x === t));
   document.querySelectorAll('[data-pane]').forEach(p => p.hidden = p.dataset.pane !== t.dataset.tab);
   if (t.dataset.tab === 'players') loadPlayers();
   if (t.dataset.tab === 'log') loadLogs();
@@ -404,23 +416,41 @@ document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
   if (t.dataset.tab === 'tutorials') renderTutorials();
 });
 
-/* ---------- giocatori ---------- */
+/* ---------- utenti ---------- */
 let players = [];
 async function loadPlayers(){
   $('pInfo').textContent = 'Carico…';
   try { players = await call('efg_admin_players') || []; } catch(err){ return onErr(err, $('pInfo')); }
-  $('pInfo').textContent = players.length + ' giocatori registrati';
+  $('pInfo').textContent = players.length + ' utenti registrati';
   const det = p => Object.keys(GAMES).map(g => { const x = p.dettaglio && p.dettaglio[g]; return x ? GAMES[g] + ' ' + x.livelli + '/3 · ' + x.punti : null; }).filter(Boolean).join(' — ');
   const sorted = players.slice().sort((a, b) => b.livelli - a.livelli || b.punti - a.punti);
-  fillTable($('pTable'), ['#', 'Nome', 'Email', 'Registrato', 'Giochi', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
-    sorted.map((p, i) => [i + 1, p.name, p.email, fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), delBtn(p)]),
-    [null, null, null, 'small', 'num', 'num', 'num', 'small', null]);
+  fillTable($('pTable'), ['#', 'Nome', 'Email', 'Tipo', 'Registrato', 'Giochi', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
+    sorted.map((p, i) => [i + 1, p.name, p.email, tipoSel(p), fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), delBtn(p)]),
+    [null, null, null, null, 'small', 'num', 'num', 'num', 'small', null]);
 }
-// elimina un giocatore: sparisce dai giocatori e dalla classifica, il registro resta
+// tipo di utente: solo giocatore, admin e giocatore, solo admin (serve supabase-tipi-utenti.sql)
+const TIPI = { giocatore:'Giocatore', admin_giocatore:'Admin e giocatore', admin:'Solo admin' };
+function tipoSel(p){
+  const sel = document.createElement('select'); sel.className = 'tipo'; sel.setAttribute('aria-label', 'Tipo di ' + p.name);
+  for (const [v, t] of Object.entries(TIPI)){ const o = document.createElement('option'); o.value = v; o.textContent = t; sel.appendChild(o); }
+  const prima = p.tipo || 'giocatore'; sel.value = prima;
+  sel.onchange = async () => {
+    sel.disabled = true;
+    try { await call('efg_admin_set_tipo', { p_email: p.email, p_tipo: sel.value }); p.tipo = sel.value; $('pInfo').textContent = players.length + ' utenti registrati · ' + p.name + ': ' + TIPI[sel.value]; }
+    catch(err){
+      sel.value = prima;
+      if (/efg_admin_set_tipo|PGRST202|does not exist/i.test(String(err && err.message))) setMsg($('pInfo'), 'Per cambiare il tipo esegui prima supabase-tipi-utenti.sql nel SQL Editor di Supabase.', 'err');
+      else onErr(err, $('pInfo'));
+    }
+    sel.disabled = false;
+  };
+  return sel;
+}
+// elimina un utente: sparisce dagli utenti e dalla classifica, il log resta
 function delBtn(p){
   const b = document.createElement('button'); b.type = 'button'; b.className = 'btn del'; b.textContent = 'Elimina';
   b.onclick = async () => {
-    if (!confirm('Eliminare ' + p.name + ' (' + p.email + ')?\n\nIl giocatore e i suoi punteggi vengono cancellati dal database e spariscono dalla classifica. Il registro eventi resta. Non si può annullare.')) return;
+    if (!confirm('Eliminare ' + p.name + ' (' + p.email + ')?\n\nL\'utente e i suoi punteggi vengono cancellati dal database e spariscono dalla classifica. Il log resta. Non si può annullare.')) return;
     b.disabled = true;
     try { const r = await call('efg_admin_delete_player', { p_email: p.email }); await loadPlayers(); $('pInfo').textContent += ' · eliminato ' + r.nome; refreshStats(); }
     catch(err){ b.disabled = false; onErr(err, $('pInfo')); }
@@ -429,14 +459,14 @@ function delBtn(p){
 }
 $('pReload').onclick = loadPlayers;
 $('pCsv').onclick = () => {
-  const head = ['Nome', 'Email', 'Registrato', 'Giochi usati', 'Livelli totali', 'Punti totali'];
+  const head = ['Nome', 'Email', 'Tipo', 'Registrato', 'Giochi usati', 'Livelli totali', 'Punti totali'];
   Object.values(GAMES).forEach(n => head.push(n + ' livelli', n + ' punti'));
-  const rows = players.map(p => { const r = [p.name, p.email, fmtDate(p.created_at), p.giochi, p.livelli, p.punti];
+  const rows = players.map(p => { const r = [p.name, p.email, TIPI[p.tipo || 'giocatore'], fmtDate(p.created_at), p.giochi, p.livelli, p.punti];
     Object.keys(GAMES).forEach(g => { const x = p.dettaglio && p.dettaglio[g]; r.push(x ? x.livelli : '', x ? x.punti : ''); }); return r; });
-  download('efuture-games-giocatori-' + stamp() + '.csv', toCsv(head, rows), 'text/csv;charset=utf-8');
+  download('efuture-games-utenti-' + stamp() + '.csv', toCsv(head, rows), 'text/csv;charset=utf-8');
 };
 
-/* ---------- registro ---------- */
+/* ---------- log ---------- */
 let logs = [], autoT = 0;
 const describe = l => {
   const d = l.detail || {};
@@ -456,14 +486,14 @@ async function loadLogs(){
 function stopAuto(){ clearInterval(autoT); autoT = 0; const c = $('lAuto'); if (c) c.checked = false; }
 $('lReload').onclick = loadLogs; $('lKind').onchange = loadLogs; $('lLimit').onchange = loadLogs;
 $('lAuto').onchange = e => { clearInterval(autoT); autoT = e.target.checked ? setInterval(() => { if (!$('dash').hidden) loadLogs(); }, 15000) : 0; };
-$('lCsv').onclick = () => download('efuture-games-registro-' + stamp() + '.csv',
+$('lCsv').onclick = () => download('efuture-games-log-' + stamp() + '.csv',
   toCsv(['Quando', 'Evento', 'Email', 'Gioco', 'Dettagli'], logs.map(l => [fmtDate(l.at), l.kind, l.email || '', l.game || '', describe(l)])), 'text/csv;charset=utf-8');
 
 /* ---------- backup ---------- */
 async function loadBackups(){
   let list;
   try { list = await call('efg_admin_backups') || []; } catch(err){ return onErr(err, $('bMsg')); }
-  fillTable($('bTable'), ['#', 'Creato', 'Nota', 'Giocatori', 'Record', ''],
+  fillTable($('bTable'), ['#', 'Creato', 'Nota', 'Utenti', 'Record', ''],
     list.map(b => {
       const box = document.createElement('div'); box.className = 'bar';
       const dl = document.createElement('button'); dl.className = 'btn ghost'; dl.type = 'button'; dl.textContent = 'Scarica';
@@ -497,7 +527,7 @@ async function doReset(what, input, word){
   try {
     const r = await call('efg_admin_reset', { p_what: what });
     $(input).value = '';
-    setMsg($('rMsg'), 'Fatto: cancellati ' + r.punteggi + ' record' + (what === 'tutto' ? ' e ' + r.giocatori + ' giocatori' : '') + '. Backup automatico #' + r.backup + ' (ripristinabile dalla scheda Backup).', 'ok');
+    setMsg($('rMsg'), 'Fatto: cancellati ' + r.punteggi + ' record' + (what === 'tutto' ? ' e ' + r.giocatori + ' utenti' : '') + '. Backup automatico #' + r.backup + ' (ripristinabile dalla scheda Backup).', 'ok');
     refreshStats();
   } catch(err){ onErr(err, $('rMsg')); }
 }

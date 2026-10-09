@@ -3,8 +3,8 @@
 ## In breve
 
 `admin.html` è il pannello degli organizzatori. Si entra con la chiave admin, che nel database è salvata solo cifrata. Dal pannello si può:
-- vedere ed eliminare giocatori, ed esportarli in CSV;
-- consultare il registro eventi;
+- vedere gli utenti, cambiarne il tipo, eliminarli ed esportarli in CSV;
+- consultare il log degli eventi;
 - generare e stampare i QR;
 - avere tutti i link a portata di mano;
 - vedere skill, video e tutorial;
@@ -21,7 +21,7 @@ Indirizzo: `https://marraliefuture.github.io/efuture_games/admin.html`. Script c
 - **Entra** chiama `efg_admin_login(p_key)`.
 - Se la chiave è giusta:
   - compare la dashboard;
-  - in alto a destra compaiono **Gioca ↗** (apre l'app dei giocatori in una nuova scheda), **Classifica ↗** e **Esci**;
+  - in alto a destra compaiono **Gioca ↗** (apre l'app dei giocatori in una nuova scheda) e **Classifica ↗**;
   - la chiave si salva in `sessionStorage` (`efgAdminKey`). Vale solo per quella scheda del browser e si perde chiudendola.
 - Ricaricando la pagina si rientra da soli con la chiave salvata.
 - **Errori**, restituiti dal server come `{errore: …}`:
@@ -30,33 +30,34 @@ Indirizzo: `https://marraliefuture.github.io/efuture_games/admin.html`. Script c
   - "troppi tentativi sbagliati: riprova tra 10 minuti".
 - **Blocco:** dopo **8 chiavi sbagliate in 10 minuti**, contate in tutto il sistema e non per persona, ogni funzione admin rifiuta l'accesso per 10 minuti. Vale anche per il Countdown della classifica.
 - Ogni chiamata manda la chiave (`p_key`), che il server ricontrolla ogni volta. Se una risposta segnala un errore di chiave o di tentativi, il pannello esce da solo e mostra il messaggio.
-- **Esci** dimentica la chiave e torna al login.
+- **Logout** (nel menu laterale) dimentica la chiave e torna al login.
 - **Chiave persa:** si reimposta da Supabase › SQL Editor con `select efg_admin_init('NUOVA-CHIAVE-LUNGA');`.
 
 ## Riquadri in alto
 
 Valori presi da `efg_admin_login`:
-- Giocatori registrati;
+- Utenti registrati;
 - Record salvati (righe di `efg_scores`);
-- Eventi nel registro;
+- Eventi nel log;
 - Backup salvati;
 - Ultimo backup (data o "mai").
 
 Si aggiornano dopo Elimina, Backup, Ripristino e Reset.
 
-## Schede
+## Menu laterale
 
-Sono in 4 gruppi separati da una linea:
-1. Giocatori, Registro;
-2. QR, Link, Skills;
-3. Video utili, Tutorial;
-4. Backup, Chiave, Reset (Reset in rosso).
+A sinistra del contenuto (sopra, sul telefono):
+- **Utenti**;
+- **Collegamenti:** QR, Link;
+- **Formazione:** Video utili, Tutorial, Skills;
+- **Admin:** Log, Backup, Chiave, Reset (Reset in rosso);
+- **Logout:** dimentica la chiave e torna al login.
 
-All'ingresso è aperta Giocatori.
+All'ingresso è aperta Utenti. In stampa il menu non compare.
 
-### Giocatori
+### Utenti
 
-- Dati da `efg_admin_players`. Testo in alto: "N giocatori registrati". Pulsanti **Aggiorna** e **Scarica CSV**.
+- Dati da `efg_admin_players`. Testo in alto: "N utenti registrati". Pulsanti **Aggiorna** e **Scarica CSV**.
 - **Tabella**, ordinata per livelli totali, poi per punti totali:
 
   | Colonna | Contenuto |
@@ -64,6 +65,7 @@ All'ingresso è aperta Giocatori.
   | `#` | Posizione |
   | Nome | |
   | Email | |
+  | Tipo | Menu a tendina: **Giocatore** (predefinito), **Admin e giocatore**, **Solo admin**. Cambiandolo chiama `efg_admin_set_tipo(p_key, p_email, p_tipo)` (valori `giocatore`, `admin_giocatore`, `admin`) e scrive "admin: tipo utente" nel log. Serve `supabase-tipi-utenti.sql`: senza, il menu torna indietro e chiede di eseguirlo. |
   | Registrato | Data e ora |
   | Giochi | Giochi con almeno 1 livello, su 4 |
   | Livelli | Livelli totali, su 12 |
@@ -72,13 +74,13 @@ All'ingresso è aperta Giocatori.
   | (ultima) | Pulsante **Elimina** |
 
 - **Elimina:**
-  1. chiede conferma ("…vengono cancellati dal database e spariscono dalla classifica. Il registro eventi resta. Non si può annullare.");
+  1. chiede conferma ("…vengono cancellati dal database e spariscono dalla classifica. Il log resta. Non si può annullare.");
   2. chiama `efg_admin_delete_player(p_key, p_email)`;
   3. ricarica la tabella e aggiunge "· eliminato *nome*".
 
-  Il giocatore potrà registrarsi di nuovo con la stessa email.
+  L'utente potrà registrarsi di nuovo con la stessa email.
 
-### Registro
+### Log
 
 - Dati da `efg_admin_logs(p_key, p_limit, p_kind)`, dal più recente.
 - **Filtri:**
@@ -176,7 +178,7 @@ Tutorial presenti:
 - Campo **Nota** (facoltativo) e pulsante **Crea backup e scarica**, che chiama `efg_admin_backup(p_key, p_note)`:
   - salva la copia nel database, con nota predefinita "backup manuale";
   - scarica il file `efuture-games-backup-<id>-<AAAAMMGG-HHMM>.json`.
-- **Tabella dei backup:** `#`, Creato, Nota, Giocatori, Record e i pulsanti:
+- **Tabella dei backup:** `#`, Creato, Nota, Utenti, Record e i pulsanti:
   - **Scarica**: `efuture-games-backup-<id>.json`, tramite `efg_admin_backup_get`;
   - **Ripristina**: chiede conferma e chiama `efg_admin_restore`. Prima salva lo stato attuale in un nuovo backup automatico, di cui mostra il numero.
 - Il ripristino usa solo i backup salvati nel database. **Non si può caricare un file JSON dal computer.**
@@ -205,15 +207,15 @@ Ci sono due riquadri rossi. Prima di ogni reset il server crea un **backup autom
 
 Tutti i CSV usano il separatore `;`, il BOM UTF-8 e righe CRLF, così si aprono bene in Excel in italiano. I campi che contengono `;`, `"` o un a capo vanno tra virgolette. Date in formato italiano `gg/mm/aaaa, hh:mm:ss`.
 
-**Giocatori** (`efuture-games-giocatori-<AAAAMMGG-HHMM>.csv`). Righe nell'ordine del server, cioè per data di registrazione:
+**Utenti** (`efuture-games-utenti-<AAAAMMGG-HHMM>.csv`). Righe nell'ordine del server, cioè per data di registrazione:
 
 ```
-Nome;Email;Registrato;Giochi usati;Livelli totali;Punti totali;SysAdmin livelli;SysAdmin punti;CoreTech livelli;CoreTech punti;Timenet livelli;Timenet punti;Inncloud livelli;Inncloud punti
+Nome;Email;Tipo;Registrato;Giochi usati;Livelli totali;Punti totali;SysAdmin livelli;SysAdmin punti;CoreTech livelli;CoreTech punti;Timenet livelli;Timenet punti;Inncloud livelli;Inncloud punti
 ```
 
 Se un giocatore non ha giocato a un gioco, le celle di quel gioco restano vuote.
 
-**Registro** (`efuture-games-registro-<AAAAMMGG-HHMM>.csv`). Le righe caricate a video, con lo stesso filtro:
+**Log** (`efuture-games-log-<AAAAMMGG-HHMM>.csv`). Le righe caricate a video, con lo stesso filtro:
 
 ```
 Quando;Evento;Email;Gioco;Dettagli
