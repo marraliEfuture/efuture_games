@@ -1,6 +1,6 @@
-# SysAdmin Runner – documentazione tecnica
+# Efuture Bros – documentazione tecnica
 
-Questo documento spiega **come è fatto il codice** del gioco SysAdmin Runner. Cosa vede e fa il giocatore (schermate, regole, comandi) è descritto nelle specifiche funzionali, che qui non si ripetono:
+Questo documento spiega **come è fatto il codice** del gioco Efuture Bros. Cosa vede e fa il giocatore (schermate, regole, comandi) è descritto nelle specifiche funzionali, che qui non si ripetono:
 
 - [../specifiche/gioco-sysadmin.md](../specifiche/gioco-sysadmin.md) – specifica del gioco;
 - [../specifiche/giochi-comune.md](../specifiche/giochi-comune.md) – parti comuni ai 4 giochi (modalità gara, scocca "Game Boy").

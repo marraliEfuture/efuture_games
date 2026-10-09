@@ -67,7 +67,8 @@ La riga 1 viene creata dallo script.
 
 | Funzione | Parametri | Restituisce | Effetti e registro |
 |---|---|---|---|
-| `efg_register` | `p_email`, `p_name`, `p_phone` (facoltativo, **ignorato**: resta solo per le app vecchie) | `(pid, name)` | Controlla email e nome. Errori: `invalid email`, `invalid name`, `already registered`. Inserisce il giocatore. Log `registrazione` con `{nome}` |
+| `efg_register` | `p_email`, `p_name`, `p_phone` (facoltativo, **ignorato**: resta solo per le app vecchie) | `(pid, name)` | Controlla email e nome. Errori: `invalid email`, `invalid name`, `already registered`, `name taken` (nickname già usato, senza distinguere maiuscole e minuscole: da `supabase-nickname-unico.sql`). Inserisce il giocatore. Log `registrazione` con `{nome}` |
+| `efg_signup_check` | `p_email`, `p_name` | `(nome_usato, email_usata)` booleani | Sola lettura, per l'app mentre il giocatore scrive. Da `supabase-nickname-unico.sql` |
 | `efg_login` | `p_email` | `(pid, name)`, oppure nessuna riga se l'email non esiste | Log `accesso` con `{esito: 'ok' \| 'email sconosciuta'}`, anche per email inesistenti |
 | `efg_submit` | `p_email`, `p_game`, `p_score`, `p_levels` | boolean: `true` se è un nuovo record | Vedi sotto |
 | `efg_board` | `p_game` (`'all'` o id del gioco) | righe `(pid, name, levels, score, games)` | Sola lettura. Vedi sotto |
@@ -184,12 +185,15 @@ Formato di `efg_backups.data`, che è anche il file JSON scaricato dall'admin. P
 | `supabase-countdown.sql` | Tabella `efg_gate` con la riga 1. Funzioni `efg_gate_state`, `efg_gate_open`, `efg_admin_gate`. Nuova `efg_submit` con il controllo `gara chiusa` (tolleranza 10 s) | Rieseguibile. Se manca, app e classifica funzionano senza countdown e il pulsante Start segnala lo script mancante |
 | `supabase-privacy-utenti.sql` | Toglie `phone` da `efg_players` e dai backup salvati (non si può annullare). Nuove `efg_register`, `efg_admin_players`, `efg_admin_restore`, `efg_admin_delete_player` | Per i database creati prima della v23. Il contenuto è già incluso in `supabase.sql` |
 | `supabase-tipi-utenti.sql` | Colonne `tipo` (`giocatore`, `admin_giocatore`, `admin`), `disabilitato` e `admin_key_hash` (bcrypt della chiave admin personale) in `efg_players`. Nuove `efg_admin_set_tipo` (tornando giocatore toglie la chiave), `efg_admin_set_disabilitato`, `efg_admin_set_user_key`, `efg_admin_me`; aggiornate `efg_admin_players` (tipo, disabilitato, `chiave` sì/no, mai l'hash), `efg_admin_restore`, `efg_admin_auth` (accetta `email` + a capo + `chiave` per le chiavi personali, oltre alla chiave principale), `efg_admin_set_key` (cambia la chiave di chi è collegato), `efg_login`, `efg_submit`, `efg_board`, `efg_board_group` (escludono i disabilitati) | Dalla v35, anche su un database nuovo, dopo `supabase-countdown.sql`; da rieseguire dalla v37 per le chiavi personali. `supabase.sql` non lo contiene |
+| `supabase-nickname-unico.sql` | Nuova `efg_register` (rifiuta un nickname già usato: `name taken`), nuova `efg_signup_check`, indice unico `efg_players_name_unique` su `lower(trim(name))` creato solo se non ci sono già doppioni | Dalla v42, anche su un database nuovo, **dopo** `supabase.sql` (che ridefinisce `efg_register` senza il controllo del nickname): rieseguirlo dopo ogni riesecuzione di `supabase.sql` |
 
 **Ordine su un progetto nuovo:**
 1. `supabase.sql`;
 2. `supabase-classifica-gruppi.sql`;
 3. `supabase-countdown.sql`;
-4. `select efg_admin_init('…');`.
+4. `supabase-tipi-utenti.sql`;
+5. `supabase-nickname-unico.sql`;
+6. `select efg_admin_init('…');`.
 
 ---
 Ultimo aggiornamento: 07/10/2026 (v27)

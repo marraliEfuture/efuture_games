@@ -7,7 +7,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 ## Il progetto
 
 - **Cos'è:** Efuture Games – CARE Conference Edition. Web app (PWA installabile) con 4 giochi da sbloccare con un QR allo stand dei 4 marchi, registrazione senza password e classifica comune.
-- **I giochi:** SysAdmin Runner (Efuture), CoreTech Pac, Timenet Breakout, inncloud Invaders.
+- **I giochi:** Efuture Bros (Efuture, prima "SysAdmin Runner"), CoreTech Pac, Timenet Breakout, inncloud Invaders.
 - **Dove gira:** GitHub Pages dal ramo `main` → https://marraliefuture.github.io/efuture_games/ · dati su Supabase (regione Frankfurt).
 - **Referente:** marrali@efuture.it (Efuture). Scrive in italiano e preferisce spiegazioni semplici, senza gergo tecnico.
 

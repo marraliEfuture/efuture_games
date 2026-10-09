@@ -1,4 +1,6 @@
-# Gioco SysAdmin Runner (Efuture)
+# Gioco Efuture Bros (Efuture)
+
+Fino alla v41 si chiamava "SysAdmin Runner". La cartella resta `games/sysadmin/` e l'id del gioco resta `sysadmin` (classifica e codici non cambiano).
 
 ## In breve
 
@@ -29,9 +31,9 @@ Le schermate sono overlay sopra il canvas, con una card bianca al centro.
 
 | Schermata | Contenuto | Pulsanti |
 |---|---|---|
-| **Titolo** (`ov-title`) | Riga piccola "Livello 1 di 10 · missione IT" (in gara: "3 livelli · 1 minuto · 3 vite"), titolo SYSADMIN RUNNER, "Sei il sysadmin di guardia: elimina i bug e raggiungi il cliente." In modalità libera anche "Record attuale" (tempo) e "Miglior pulizia" (%), se esistono | **Risolvi il ticket del cliente**, **Continua · Liv. N** (solo modalità libera, se c'è un livello raggiunto), **Istruzioni** |
+| **Titolo** (`ov-title`) | Riga piccola "Livello 1 di 10 · missione IT" (in gara: "3 livelli · 1 minuto · 3 vite"), titolo EFUTURE BROS, "Sei il sistemista di Efuture: elimina i bug del cliente. Ne sarà soddisfatto!" In modalità libera anche "Record attuale" (tempo) e "Miglior pulizia" (%), se esistono | **Inizia**, **Continua · Liv. N** (solo modalità libera, se c'è un livello raggiunto), **Istruzioni** |
 | **Istruzioni** (`howBox`, dentro il titolo) | Salta sui bug o lanciagli il mouse · Schiva chiodi, scosse e seghe · 3 bug di fila: sblocchi l'antivirus · Sali la scala e raggiungi il cliente. Sotto: ← → muovi · ↑ salta · X mouse · V antivirus | – |
-| **Scheda del livello** (`ov-intro`) | Etichetta "Cliente N/9" (gara: "Livello N/3"; boss: "Livello finale", viola), "*Nome* — *Stanza*", messaggio del cliente (per esempio "La stampante non va e ci sono bug ovunque!") | **Ci penso io** (boss: **Affrontalo**) |
+| **Scheda del livello** (`ov-intro`) | Etichetta "Cliente N/9" (gara: "Livello N/3"; boss: "Livello finale", viola), "Ticket di *Nome*" (boss: "*Nome* — *Stanza*"), messaggio del cliente (per esempio "La stampante non va e ci sono bug ovunque!") | **Risolvi!** (boss: **Affrontalo**) |
 | **Cliente non convinto** (`ov-complaint`) | Si apre se si arriva al cliente con bug ancora vivi: "*Nome* non è convinto", "Ci sono ancora N bug in giro. Torni a stanarli?" | **Torna a debuggare** (riporta il giocatore prima della scala), **Chiudi il ticket** |
 | **Livello completato** (`ov-complete`) | "Problema risolto", "*Nome* ringrazia!" con il ringraziamento del cliente; se rimasti bug: "*Nome* ringrazia, ma..." e "Ma qualche bug è rimasto in giro." Punteggio | **Prossimo ticket** |
 | **Pausa** (`ov-pause`) | PAUSA | **Riprendi**, **Riparti dal ticket**, **Menu** |
@@ -54,7 +56,7 @@ Regole comuni e protocollo: [giochi-comune.md](giochi-comune.md#modalità-libera
 | Fine | Vittoria dopo il boss | `result` alla fine del livello 3 (senza schermata del gioco) |
 
 **Messaggi all'app:**
-- `start`: all'avvio del livello 1 (pulsante **Risolvi il ticket del cliente**).
+- `start`: all'avvio del livello 1 (pulsante **Inizia**).
 - `tick`: ogni 0,25 s nello stato di gioco. Il tempo si ferma su pausa, scheda del livello, "Cliente non convinto" e livello completato.
 - Livello superato (anche con **Chiudi il ticket**, cioè con bug rimasti): salva tempo e vite; al livello 3 manda `result` con `ok: true`.
 - Vite finite: `result` con `reason: 'lives'`, poi la schermata GAME OVER.

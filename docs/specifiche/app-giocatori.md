@@ -26,7 +26,7 @@ Elenco `GAMES` in `hub.js`:
 
 | id | Nome | Stand (sponsor) | Icona | Pagina |
 |---|---|---|---|---|
-| `sysadmin` | SysAdmin Runner | Efuture | `img/g-sysadmin.png` | `games/sysadmin/index.html` |
+| `sysadmin` | Efuture Bros | Efuture | `img/g-sysadmin.png` | `games/sysadmin/index.html` |
 | `coretech` | CoreTech Pac | CoreTech | `img/g-coretech.png` | `games/coretech/index.html` |
 | `timenet` | Timenet Breakout | Timenet | `img/g-timenet.png` | `games/timenet/index.html` |
 | `inncloud` | inncloud Invaders | inncloud | `img/g-inncloud.png` | `games/inncloud/index.html` |
@@ -102,9 +102,12 @@ Finestra `mAuth` con due schede: **Registrati** e **Accedi**.
 - **Registrazione:** nome (2–20 caratteri, visibile in classifica) ed email. Il cellulare non si chiede più dalla v23.
   - Validazione nel client: lunghezza del nome ed email nel formato `x@y.z`.
   - Chiama `Backend.signUp`, cioè `efg_register`. L'email è salvata in minuscolo e senza spazi.
+  - **Nickname ed email devono essere nuovi.** Mentre il giocatore scrive (400 ms dopo l'ultimo tasto) l'app chiama `Backend.checkSignup`, cioè `efg_signup_check`. Se il nickname è già usato (senza distinguere maiuscole e minuscole) compare sotto il campo, in rosso, "Nickname già utilizzato"; se l'email è già registrata, "Indirizzo email già utilizzato". Il campo si colora di rosso e **Registrati e gioca** resta disattivato finché non si scrive un nickname o un'email nuovi. Lo stesso succede se è il server a rifiutare la registrazione (`name taken` o `already registered`).
+  - Senza `supabase-nickname-unico.sql` il controllo mentre si scrive non c'è e il server blocca solo le email già usate.
 - **Accesso:** basta l'email. Chiama `Backend.signIn`, cioè `efg_login`. Se l'email non esiste: "Nessun giocatore registrato con questa email: usa Registrati."
 - **Errori tradotti** da `EFG_FRIENDLY`:
-  - email già registrata: "usa Accedi";
+  - nickname già usato: "Nickname già utilizzato: scegline un altro.";
+  - email già registrata: "Indirizzo email già utilizzato: usa Accedi oppure un'altra email.";
   - email o nome non validi;
   - nessuna connessione;
   - gara chiusa.

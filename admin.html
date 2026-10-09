@@ -449,7 +449,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=41"></script>
+<script src="config.js?v=42"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script>
@@ -790,7 +790,7 @@ $('fKey').addEventListener('submit', async e => {
 // I codici non sono scritti in questa pagina: si ricavano dagli hash di hub.js
 // (SHA-256 di "efg:" + codice senza trattino), provando le 10.000 combinazioni del prefisso del gioco.
 const QR_GAMES = [
-  { id:'sysadmin', name:'SysAdmin Runner',   stand:'Efuture',  pre:'RUN' },
+  { id:'sysadmin', name:'Efuture Bros',   stand:'Efuture',  pre:'RUN' },
   { id:'coretech', name:'CoreTech Pac',      stand:'CoreTech', pre:'PAC' },
   { id:'timenet',  name:'Timenet Breakout',  stand:'Timenet',  pre:'BRK' },
   { id:'inncloud', name:'inncloud Invaders', stand:'inncloud', pre:'INV' },
@@ -869,11 +869,12 @@ $('qPrint').onclick = () => window.print();
 /* ---------- Qualità: test su codice, database, prestazioni, spazio e vulnerabilità ----------
    I dati li scrive lo script .claude/skills/efuture-games-commit/scripts/qualita.py
    in docs/qualita/ultimo.json (dettagli) e docs/qualita/storico.json (un riepilogo per data). */
-let QUAL = null, QHIST = [], qSel = null;
+let QUAL = null, QHIST = [], qSel = null, QBACK = null;
 const ES = { ok:'✅ ok', avviso:'⚠️ avviso', errore:'❌ errore' };
 const fmtDay = d => d.slice(8,10) + '/' + d.slice(5,7);
 async function loadQuality(){
   $('qInfo').textContent = 'Carico i controlli…';
+  loadQBackups();
   try {
     const [a, b] = await Promise.all(['docs/qualita/ultimo.json', 'docs/qualita/storico.json'].map(f => fetch(f + '?t=' + Date.now(), { cache:'no-store' }).then(r => { if (!r.ok) throw new Error('manca ' + f); return r.json(); })));
     QUAL = a; QHIST = b;
@@ -899,6 +900,36 @@ function spark(vals, opt){
   const lab = opt.axis ? vals.map((v, i) => '<text x="' + (pad + i*sx).toFixed(1) + '" y="' + (H - 2) + '" font-size="12" text-anchor="middle" fill="#6b7a8a">' + opt.labels[i] + '</text><text x="' + (pad + i*sx).toFixed(1) + '" y="' + (sy(v) - 8).toFixed(1) + '" font-size="12" font-weight="700" text-anchor="middle" fill="#1d2b3a">' + v + '</text>').join('') : '';
   return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + (opt.aria || '') + '"><polyline points="' + pts + '" fill="none" stroke="#0b6db3" stroke-width="2"/>' + dots + lab + '</svg>';
 }
+// backup fatti: si leggono dal database, non dai file della qualità
+async function loadQBackups(){
+  try { QBACK = await call('efg_admin_backups') || []; } catch(err){ if (err.auth) return onErr(err, $('bMsg')); QBACK = { errore: err.message }; }
+  if (QUAL){ renderQCards(); if (qSel === 'backup') showQDetail('backup'); }
+}
+const isAutoBackup = b => /^automatico/i.test(b.nota || '');
+const daysAgo = d => Math.floor((Date.now() - new Date(d).getTime()) / 86400000);
+const backupDays = () => { // backup per giorno, ultimi 14 giorni
+  const out = [];
+  for (let i = 13; i >= 0; i--){ const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10); out.push({ d, n: QBACK.filter(b => String(b.creato).slice(0, 10) === d).length }); }
+  return out;
+};
+function backupCard(){
+  const b = document.createElement('button'); b.type = 'button';
+  let big, sub, extra = '', cls = '';
+  if (!QBACK){ big = '…'; sub = 'carico i backup dal database'; }
+  else if (QBACK.errore){ big = '—'; sub = 'backup non disponibili: ' + QBACK.errore; cls = ' warn'; }
+  else if (!QBACK.length){ big = '0 backup'; sub = 'nessun backup salvato: creane uno dalla scheda Backup'; cls = ' bad'; }
+  else {
+    const last = QBACK[0], g = daysAgo(last.creato), auto = QBACK.filter(isAutoBackup).length;
+    big = QBACK.length + ' backup'; sub = 'ultimo ' + (g === 0 ? 'oggi' : g === 1 ? 'ieri' : g + ' giorni fa') + ' · ' + (QBACK.length - auto) + ' manuali, ' + auto + ' automatici';
+    if (g > 1) cls = ' warn';
+    const bd = backupDays(); extra = spark(bd.map(x => ({ alta:0, media:0, bassa:x.n })), { bars:true, labels: bd.map(x => fmtDay(x.d)), aria:'Backup per giorno' }).replace(/#c9a400/g, '#0b6db3');
+  }
+  b.className = 'qcard' + cls + (qSel === 'backup' ? ' on' : '');
+  b.innerHTML = '<h4>Backup fatti</h4><div class="big"></div><div class="sub"></div>' + extra + '<span class="go">Vedi elenco ›</span>';
+  b.querySelector('.big').textContent = big; b.querySelector('.sub').textContent = sub;
+  b.onclick = () => showQDetail('backup');
+  return b;
+}
 function renderQCards(){
   const box = $('qCards'); box.innerHTML = '';
   const days = QHIST.map(h => fmtDay(h.data));
@@ -906,6 +937,7 @@ function renderQCards(){
     const e = a.esiti, b = document.createElement('button'); b.type = 'button'; b.className = 'qcard' + (e.errore ? ' bad' : e.avviso ? ' warn' : '') + (qSel === id ? ' on' : '');
     let big, sub, extra = '';
     if (id === 'spazio'){ big = (a.totale_kb / 1024).toFixed(1) + ' MB'; sub = 'occupati dal sito · trend per data'; extra = spark(QHIST.map(h => Math.round(h.spazio_kb / 102.4) / 10), { labels: days, unit:' MB', aria:'Trend dello spazio' }); }
+    else if (id === 'sicurezza'){ big = a.punteggio + '/100 · ' + a.livello; sub = (e.avviso + e.errore ? (e.avviso + e.errore) + ' punti da migliorare · ' : 'nessun problema · ') + 'trend per data'; extra = spark(QHIST.map(h => h.sicurezza ?? 0), { labels: days, unit:'/100', aria:'Trend del punteggio di sicurezza' }); }
     else if (id === 'vulnerabilita'){ const g = a.gravita; big = (g.alta + g.media + g.bassa) + ' segnalate'; sub = 'alta ' + g.alta + ' · media ' + g.media + ' · bassa ' + g.bassa + ' · trend per data'; extra = spark(QHIST.map(h => h.vulnerabilita), { bars:true, labels: days, aria:'Trend delle vulnerabilità' }); }
     else { const n = a.test.length; big = (n - e.avviso - e.errore) + '/' + n + ' ok'; sub = (e.errore ? e.errore + ' errori · ' : '') + (e.avviso ? e.avviso + ' avvisi · ' : '') + n + ' test eseguiti'; }
     b.innerHTML = '<h4></h4><div class="big"></div><div class="sub"></div>' + extra + '<span class="go">Vedi elenco ›</span>';
@@ -913,19 +945,24 @@ function renderQCards(){
     b.onclick = () => showQDetail(id);
     box.appendChild(b);
   }
+  box.appendChild(backupCard());
 }
 function showQDetail(id){
   qSel = id; renderQCards();
   document.querySelectorAll('[data-extra]').forEach(w => w.remove());
-  const a = QUAL.aree[id]; $('qDetail').hidden = false; $('qdTitle').textContent = a.titolo + ' – elenco dei controlli';
+  $('qDetail').hidden = false;
+  if (id === 'backup') return showBackupDetail();
+  const a = QUAL.aree[id]; $('qdTitle').textContent = a.titolo + ' – elenco dei controlli';
   const days = QHIST.map(h => fmtDay(h.data)); let chart = '';
   if (id === 'spazio') chart = '<p class="dim" style="margin:6px 0 0">Spazio totale per data (MB)</p>' + spark(QHIST.map(h => Math.round(h.spazio_kb / 102.4) / 10), { w:760, h:190, pad:28, r:4, axis:true, labels: days, unit:' MB', aria:'Trend dello spazio' }).replace('<svg ', '<svg class="qchart" ');
+  if (id === 'sicurezza') chart = '<p class="dim" style="margin:6px 0 0">Punteggio di sicurezza per data (0–100): sopra 90 ottimo, sopra 75 buono, sopra 50 sufficiente, sotto è a rischio</p>' + spark(QHIST.map(h => h.sicurezza ?? 0), { w:760, h:190, pad:28, r:4, axis:true, labels: days, unit:'/100', aria:'Trend del punteggio di sicurezza' }).replace('<svg ', '<svg class="qchart" ');
   if (id === 'vulnerabilita') chart = '<p class="dim" style="margin:6px 0 0">Vulnerabilità per data: <span class="grav alta">alta</span> <span class="grav media">media</span> <span class="grav bassa">bassa</span></p>' + spark(QHIST.map(h => h.vulnerabilita), { w:760, h:190, pad:28, bars:true, axis:true, labels: days, aria:'Trend delle vulnerabilità' }).replace('<svg ', '<svg class="qchart" ');
   $('qdChart').innerHTML = chart;
   const es = t => { const s = document.createElement('span'); s.className = 'es ' + t.esito; s.textContent = ES[t.esito] || t.esito; return s; };
   const gv = t => { if (!t.gravita) return ''; const s = document.createElement('span'); s.className = 'grav ' + t.gravita; s.textContent = t.gravita; return s; };
   const order = { errore:0, avviso:1, ok:2 }, tests = a.test.slice().sort((x, y) => order[x.esito] - order[y.esito]);
-  if (id === 'vulnerabilita') fillTable($('qdTable'), ['Esito', 'Gravità', 'Controllo', 'Dettaglio'], tests.map(t => [es(t), gv(t), t.nome, t.dettaglio]), [null, null, null, 'small']);
+  if (id === 'sicurezza') fillTable($('qdTable'), ['Esito', 'Gravità', 'Controllo', 'Punti', 'Dettaglio'], tests.map(t => [es(t), gv(t), t.nome, t.punti ? String(t.punti) : '', t.dettaglio]), [null, null, null, 'num', 'small']);
+  else if (id === 'vulnerabilita') fillTable($('qdTable'), ['Esito', 'Gravità', 'Controllo', 'Dettaglio'], tests.map(t => [es(t), gv(t), t.nome, t.dettaglio]), [null, null, null, 'small']);
   else if (id === 'spazio') fillTable($('qdTable'), ['Data', 'Versione', 'Spazio totale', 'Variazione'], QHIST.slice().reverse().map((h, i, arr) => [fmtDate(h.data + 'T12:00:00Z').split(',')[0], h.versione, (h.spazio_kb / 1024).toFixed(2) + ' MB', arr[i+1] ? ((h.spazio_kb - arr[i+1].spazio_kb) >= 0 ? '+' : '') + Math.round(h.spazio_kb - arr[i+1].spazio_kb) + ' KB' : '—']), [null, null, 'num', 'num']);
   else fillTable($('qdTable'), ['Esito', 'Controllo', 'Dettaglio'], tests.map(t => [es(t), t.nome, t.dettaglio]), [null, null, 'small']);
   if (id === 'spazio'){ // anche le cartelle, sotto lo storico
@@ -933,6 +970,20 @@ function showQDetail(id){
     fillTable(t2, ['Cartella', 'Spazio'], tests.map(t => [t.nome, t.dettaglio]), [null, 'num']);
     wrap.dataset.extra = '1'; $('qdTable').parentNode.after(wrap);
   }
+  $('qDetail').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function showBackupDetail(){
+  $('qdTitle').textContent = 'Backup fatti – elenco';
+  if (!QBACK || QBACK.errore || !QBACK.length){
+    $('qdChart').innerHTML = ''; $('qdChart').append(Object.assign(document.createElement('p'), { className:'dim', textContent: !QBACK ? 'Carico i backup…' : QBACK.errore ? 'Backup non disponibili: ' + QBACK.errore : 'Nessun backup salvato. Creane uno dalla scheda Backup.' }));
+    fillTable($('qdTable'), [], [], []); return;
+  }
+  const bd = backupDays();
+  $('qdChart').innerHTML = '<p class="dim" style="margin:6px 0 0">Backup per giorno, ultimi 14 giorni. Per scaricare o ripristinare un backup usa la scheda Backup.</p>' +
+    spark(bd.map(x => ({ alta:0, media:0, bassa:x.n })), { w:760, h:190, pad:28, bars:true, axis:true, labels: bd.map(x => fmtDay(x.d)), aria:'Backup per giorno' }).replace(/#c9a400/g, '#0b6db3').replace('<svg ', '<svg class="qchart" ');
+  fillTable($('qdTable'), ['#', 'Creato', 'Tipo', 'Nota', 'Utenti', 'Record'],
+    QBACK.map(b => [b.id, fmtDate(b.creato), isAutoBackup(b) ? 'automatico' : 'manuale', b.nota || '', b.giocatori, b.punteggi]), [null, 'small', null, 'small', 'num', 'num']);
   $('qDetail').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
@@ -988,7 +1039,7 @@ const DOCS = [
     [SP+'README.md', SP+'app-giocatori.md', SP+'classifica.md', SP+'admin.md', SP+'giochi-comune.md', SP+'gioco-sysadmin.md', SP+'gioco-coretech.md', SP+'gioco-timenet.md', SP+'gioco-inncloud.md', SP+'database.md', 'FAQ'],
     [TE+'piattaforma.md', TE+'app.md', TE+'gioco-sysadmin.md', TE+'gioco-coretech.md', TE+'gioco-timenet.md', TE+'gioco-inncloud.md']],
   ['app', 'App Efuture Games', 'home, sblocco, account, gara, classifica in app, installazione', [SP+'app-giocatori.md', 'FAQ'], [TE+'app.md']],
-  ['sysadmin', 'SysAdmin Runner', 'gioco di Efuture', [SP+'gioco-sysadmin.md', SP+'giochi-comune.md'], [TE+'gioco-sysadmin.md']],
+  ['sysadmin', 'Efuture Bros', 'gioco di Efuture', [SP+'gioco-sysadmin.md', SP+'giochi-comune.md'], [TE+'gioco-sysadmin.md']],
   ['coretech', 'CoreTech Pac', 'gioco di CoreTech', [SP+'gioco-coretech.md', SP+'giochi-comune.md'], [TE+'gioco-coretech.md']],
   ['timenet', 'Timenet Breakout', 'gioco di Timenet', [SP+'gioco-timenet.md', SP+'giochi-comune.md'], [TE+'gioco-timenet.md']],
   ['inncloud', 'inncloud Invaders', 'gioco di inncloud', [SP+'gioco-inncloud.md', SP+'giochi-comune.md'], [TE+'gioco-inncloud.md']],

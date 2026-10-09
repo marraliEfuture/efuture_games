@@ -4,7 +4,7 @@
 /* ================= GAMES ================= */
 // unlock codes are checked against SHA-256("efg:" + CODE without dashes, upper case)
 const GAMES = [
-  { id:'sysadmin', name:'SysAdmin Runner',   sponsor:'Efuture',  icon:'img/g-sysadmin.png', path:'games/sysadmin/index.html',
+  { id:'sysadmin', name:'Efuture Bros',   sponsor:'Efuture',  icon:'img/g-sysadmin.png', path:'games/sysadmin/index.html',
     hash:'d11666b04b40ab1e45c11191ae7aa717be9c9275f64b633525559dc8895d936b' },
   { id:'coretech', name:'CoreTech Pac',      sponsor:'CoreTech', icon:'img/g-coretech.png', path:'games/coretech/index.html',
     hash:'8b9458de8fd04f3d7303d6317f3731330b0966acae29322d30b911291191fd9a' },
@@ -101,7 +101,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v41' : 'Modalità demo: account e classifica restano su questo telefono. · v41';
+  mn.textContent = remote ? 'Classifica online · v42' : 'Modalità demo: account e classifica restano su questo telefono. · v42';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -269,15 +269,42 @@ async function loggedIn(user){
   for (const g of GAMES){ const b = bests[g.id]; if (b && b.l > 0){ try { await Backend.submit(session, g.id, b.s, b.l); } catch(e){} } }   // records made before logging in
   loadRanks();
 }
+// nickname ed email devono essere nuovi: finché uno dei due è già usato non ci si registra
+const taken = { name:false, email:false };
+function markTaken(field, on){
+  taken[field] = !!on;
+  const inp = $(field === 'name' ? 'sName' : 'sEmail');
+  inp.classList.toggle('taken', taken[field]); $(inp.id + 'Err').hidden = !taken[field];
+  $('sGo').disabled = taken.name || taken.email;
+}
+let checkSeq = 0, checkTimer = null;
+async function checkSignup(){
+  const name = $('sName').value.trim(), email = $('sEmail').value.trim(), seq = ++checkSeq;
+  const n = name.length >= 2 ? name : '', em = validEmail(email) ? email : '';
+  if (!n && !em){ markTaken('name', false); markTaken('email', false); return; }
+  let r = null; try { r = await Backend.checkSignup({ name:n, email:em }); } catch(e){}
+  if (seq !== checkSeq || !r) return;   // risposta vecchia, o controllo non disponibile: decide la registrazione
+  markTaken('name', n && r.nome_usato); markTaken('email', em && r.email_usata);
+}
+['sName','sEmail'].forEach(id => $(id).addEventListener('input', ()=>{
+  markTaken(id === 'sName' ? 'name' : 'email', false); setMsg($('sMsg'), '');
+  clearTimeout(checkTimer); checkTimer = setTimeout(checkSignup, 400);
+}));
 $('fSignup').addEventListener('submit', async e=>{
   e.preventDefault();
   const name = $('sName').value.trim(), email = $('sEmail').value.trim();
   const m = $('sMsg');
   if (name.length < 2 || name.length > 20) return setMsg(m, 'Il nome deve avere da 2 a 20 caratteri.', 'err');
   if (!validEmail(email)) return setMsg(m, 'Scrivi un indirizzo email valido.', 'err');
+  if (taken.name || taken.email) return;
   setMsg(m, 'Un attimo…');
   try { const r = await Backend.signUp({ name, email }); loggedIn(r.user); }
-  catch(err){ setMsg(m, friendly(err), 'err'); }
+  catch(err){
+    const t = String(err && err.message || err);
+    if (/name taken|efg_players_name_unique/i.test(t)){ markTaken('name', true); return setMsg(m, ''); }
+    if (/already registered|duplicate/i.test(t)){ markTaken('email', true); return setMsg(m, ''); }
+    setMsg(m, friendly(err), 'err');
+  }
 });
 $('fLogin').addEventListener('submit', async e=>{
   e.preventDefault(); const m = $('lMsg');

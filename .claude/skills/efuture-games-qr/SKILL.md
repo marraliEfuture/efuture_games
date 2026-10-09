@@ -1,6 +1,6 @@
 ---
 name: efuture-games-qr
-description: Genera e propone i 5 QR di Efuture Games — il QR dell'app (installazione) e i 4 QR di sblocco dei giochi (SysAdmin Runner, CoreTech Pac, Timenet Breakout, inncloud Invaders) — come cartellini pronti da stampare. Usala quando l'utente chiede i QR dell'app o dei giochi, di rigenerarli, ristamparli o aggiornarli dopo un cambio di indirizzo o di codice.
+description: Genera e propone i 5 QR di Efuture Games — il QR dell'app (installazione) e i 4 QR di sblocco dei giochi (Efuture Bros, CoreTech Pac, Timenet Breakout, inncloud Invaders) — come cartellini pronti da stampare. Usala quando l'utente chiede i QR dell'app o dei giochi, di rigenerarli, ristamparli o aggiornarli dopo un cambio di indirizzo o di codice.
 ---
 
 # Efuture Games – i 5 QR
@@ -12,7 +12,7 @@ Rispondi all'utente in italiano.
 | QR | Link | Dove va |
 |---|---|---|
 | App | `PUBLIC_URL?installa=1` | ingresso / ledwall: apre l'app e propone l'installazione |
-| SysAdmin Runner | `PUBLIC_URL?sblocca=<codice>` | stand Efuture |
+| Efuture Bros | `PUBLIC_URL?sblocca=<codice>` | stand Efuture |
 | CoreTech Pac | `PUBLIC_URL?sblocca=<codice>` | stand CoreTech |
 | Timenet Breakout | `PUBLIC_URL?sblocca=<codice>` | stand Timenet |
 | inncloud Invaders | `PUBLIC_URL?sblocca=<codice>` | stand inncloud |
