@@ -258,9 +258,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=53"></script>
+<script src="config.js?v=54"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=53"></script>
+<script src="backend.js?v=54"></script>
 <script>
 (function(){
 "use strict";
@@ -543,20 +543,22 @@ $('gdClose').onclick = () => { $('gateDlg').hidden = true; };
 $('gateDlg').addEventListener('click', e => { if (e.target === $('gateDlg')) $('gateDlg').hidden = true; });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') $('gateDlg').hidden = true; });
 const gdMsg = (t, k) => { $('gdMsg').textContent = t; $('gdMsg').className = 'gnote' + (k ? ' ' + k : ''); };
+// regia → ledwall: avvisa subito le altre finestre della classifica (senza aspettare il controllo ogni 10 s)
+const gatePing = () => { try { localStorage.setItem('efgGatePing', String(Date.now())); } catch(e){} };
 $('gdStart').onclick = async () => {
   const m = parseInt($('gdMin').value, 10);
   if (!(m >= 1 && m <= 1440)) return gdMsg('Scrivi i minuti: da 1 a 1440.', 'err');
-  try { gate = await gateCommand(gdMode, m) || gate; if (gate.now) gateOffset = new Date(gate.now).getTime() - Date.now(); renderGate(); gdMsg('Countdown di ' + gdMode + ' avviato: ' + m + ' min.', 'ok'); }
+  try { gate = await gateCommand(gdMode, m) || gate; if (gate.now) gateOffset = new Date(gate.now).getTime() - Date.now(); renderGate(); gatePing(); gdMsg('Countdown di ' + gdMode + ' avviato: ' + m + ' min.', 'ok'); }
   catch(e){ gdMsg('Non riesco ad avviarlo: ' + (e.message || e), 'err'); }
 };
 $('gdStop').onclick = async () => {
-  try { gate = await gateCommand('stop') || { mode:null }; renderGate(); gdMsg('Countdown fermato: i giochi sono liberi.', 'ok'); }
+  try { gate = await gateCommand('stop') || { mode:null }; renderGate(); gatePing(); gdMsg('Countdown fermato: i giochi sono liberi.', 'ok'); }
   catch(e){ gdMsg('Non riesco a fermarlo: ' + (e.message || e), 'err'); }
 };
 setInterval(renderGate, 1000);
 setInterval(loadGate, 10000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) loadGate(); });
-window.addEventListener('storage', e => { if (e.key === 'efgDemoGate') loadGate(); });
+window.addEventListener('storage', e => { if (e.key === 'efgDemoGate' || e.key === 'efgGatePing') loadGate(); });
 loadGate();
 
 refresh();
