@@ -43,8 +43,17 @@ const Backend = remote ? {
   },
   async signOut(){ store.set('efgSessionLive', null); },
   async submit(user, game, score, levels){ return !!(await rpc('efg_submit', { p_email:user.email, p_game:game, p_score:score, p_levels:levels })); },
-  // game: 'all' (somma dei 4 giochi) oppure l'id del gioco → [{pid, name, levels, score, games}] ordinati
+  // game: 'all' (somma dei 4 giochi) oppure l'id del gioco → [{pid, name, levels, score, games, bonus}] ordinati
+  // nella generale "bonus" sono i punti del Bonus Recensione già compresi in score
   async board(game, group){
+    const rows = await this.boardRows(game, group);
+    if (game === 'all' && rows.length){
+      try { const b = new Map(((await rpc('efg_recensione_bonus', {})) || []).map(x => [x.pid, x.punti])); rows.forEach(r => { if (b.has(r.pid)) r.bonus = b.get(r.pid); }); }
+      catch(e){}   // funzione non ancora creata su Supabase: niente etichetta, i punti restano giusti
+    }
+    return rows;
+  },
+  async boardRows(game, group){
     if (group && group !== 'tutti'){
       try { return (await rpc('efg_board_group', { p_game:game, p_group:group })) || []; }
       catch(e){ if (!/efg_board_group|PGRST202|does not exist/i.test(String(e && (e.code + ' ' + e.message)))) throw e; }

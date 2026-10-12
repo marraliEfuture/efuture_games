@@ -102,7 +102,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v50' : 'Modalità demo: account e classifica restano su questo telefono. · v50';
+  mn.textContent = remote ? 'Classifica online · v51' : 'Modalità demo: account e classifica restano su questo telefono. · v51';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -343,7 +343,7 @@ async function loadBoard(){
     const w = document.createElement('span'); w.className = 'who';
     const n = document.createElement('span'); n.className = 'n'; n.textContent = r.name;
     const d = document.createElement('span'); d.className = 'd';
-    d.textContent = (boardTab === 'all' ? (r.games||0) + '/' + GAMES.length + ' giochi · ' + (r.levels||0) + '/' + LEVELS*GAMES.length : (r.levels||0) + '/' + LEVELS) + ' livelli';
+    d.textContent = (boardTab === 'all' ? (r.games||0) + '/' + GAMES.length + ' giochi · ' + (r.levels||0) + '/' + LEVELS*GAMES.length : (r.levels||0) + '/' + LEVELS) + ' livelli' + (r.bonus ? ' · ⭐ +' + r.bonus + ' bonus' : '');
     w.append(n, d);
     const s = document.createElement('span'); s.className = 's'; s.textContent = r.score;
     const u = document.createElement('small'); u.textContent = 'pt'; s.appendChild(u);
@@ -351,7 +351,7 @@ async function loadBoard(){
   });
 }
 $('btnBoard').onclick = ()=>{
-  $('bNote').textContent = (boardTab === 'all' ? 'Totale = somma dei 4 giochi. ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
+  $('bNote').textContent = (boardTab === 'all' ? 'Totale = somma dei 4 giochi + ⭐ bonus recensione. ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
   renderBoardTabs(); openModal('mBoard'); loadBoard();
 };
 
