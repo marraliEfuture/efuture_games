@@ -309,12 +309,12 @@
  },
  {
   "data": "2026-10-12",
-  "commit": "8db2c63",
-  "versione": "v55",
+  "commit": "820915f",
+  "versione": "v56",
   "esiti": {
    "codice": {
-    "ok": 34,
-    "avviso": 0,
+    "ok": 33,
+    "avviso": 1,
     "errore": 0
    },
    "db": {
@@ -343,13 +343,13 @@
     "errore": 0
    }
   },
-  "spazio_kb": 11986.7,
+  "spazio_kb": 12006.7,
   "cartelle_kb": {
-   ".claude": 119.4,
-   "(file principali)": 282.5,
-   "docs": 271.3,
+   ".claude": 120.2,
+   "(file principali)": 289.4,
+   "docs": 277.3,
    "fonts": 120.3,
-   "games": 899.3,
+   "games": 905.5,
    "icons": 105.6,
    "img": 92.5,
    "qr": 159.6,

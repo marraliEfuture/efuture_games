@@ -100,6 +100,9 @@ tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 .pop .opts{display:flex;flex-wrap:wrap;gap:6px}
 .pop .opt{background:#fff;border:1px solid var(--line);border-radius:4px;padding:8px 10px;cursor:pointer;font-weight:600;color:var(--ink);display:inline-flex;gap:6px;align-items:center}
 .pop .opt.on{border-color:var(--sky);background:#eaf6ff;cursor:default}
+#vDef{display:flex;flex-wrap:wrap;gap:6px}
+#vDef .opt{background:#fff;border:1px solid var(--line);border-radius:4px;padding:10px 12px;cursor:pointer;font-weight:600;color:var(--ink)}
+#vDef .opt.on{border-color:var(--sky);background:#eaf6ff;box-shadow:inset 0 0 0 1px var(--sky)}
 .pop .row2{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 .pop p{margin:0;font-size:14px;line-height:1.55;color:var(--text)}
 .keyform{display:flex;flex-direction:column;gap:8px}
@@ -279,6 +282,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <button class="tab sub" data-tab="faq" type="button">FAQ</button>
         <button class="tab sub" data-tab="docs" type="button">Documentazione</button>
         <div class="grp">Admin</div>
+        <button class="tab sub" data-tab="settings" type="button">Impostazioni</button>
         <button class="tab sub" data-tab="quality" type="button">Qualità</button>
         <button class="tab sub" data-tab="log" type="button">Log</button>
         <button class="tab sub" data-tab="backup" type="button">Backup</button>
@@ -295,10 +299,12 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <form class="rlink" id="rLinkForm" autocomplete="off">
           <label for="rLink">⭐ Link recensioni Google</label>
           <input id="rLink" type="url" inputmode="url" placeholder="https://g.page/r/… (vuoto = ricerca di efuture su Google Maps)">
-          <button class="btn ghost" type="submit">Salva link</button>
+          <label for="rPts" style="font-weight:600">Punti</label>
+          <input id="rPts" type="number" min="0" max="5000" step="10" inputmode="numeric" value="200" style="flex:0 0 90px;min-width:0" title="Punti in classifica generale per una recensione confermata">
+          <button class="btn ghost" type="submit">Salva</button>
           <span class="msg" id="rLinkMsg" aria-live="polite"></span>
         </form>
-        <p class="dim small" style="margin:6px 0 0">Colonna ⭐: <b>gialla</b> = ha cliccato «Bonus Recensione» nell'app; cliccala dopo aver trovato la sua recensione su Google per farla diventare <b>verde</b> (+200 punti nella classifica generale). Clic sulla verde per toglierla.</p>
+        <p class="dim small" style="margin:6px 0 0">Colonna ⭐: <b>gialla</b> = ha cliccato «Bonus Recensione» nell'app; cliccala dopo aver trovato la sua recensione su Google per farla diventare <b>verde</b> (+<span class="rPtsTxt">200</span> punti nella classifica generale). Clic sulla verde per toglierla.</p>
         <div class="tablewrap" style="margin-top:10px"><table id="pTable"></table></div>
       </section>
 
@@ -347,6 +353,19 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
           <div class="bar"><input type="text" id="rConf2" placeholder="Scrivi CANCELLA TUTTO per confermare" style="max-width:300px"><button class="btn danger" id="rAll" type="button">Cancella tutto</button></div>
         </div>
         <div class="msg" id="rMsg" aria-live="polite" style="margin-top:10px"></div>
+      </section>
+
+      <section data-pane="settings" hidden>
+        <h3 style="margin:0;font-family:var(--title)">🎮 Visualizzazione dei giochi</h3>
+        <p class="dim" style="margin:4px 0 10px">Come si aprono i 4 giochi sui telefoni. Ogni giocatore può cambiarla con il pulsante in alto nel gioco: la sua scelta resta sul suo telefono. Questa vale per chi non ha ancora scelto.</p>
+        <div class="opts" id="vDef" role="radiogroup" aria-label="Visualizzazione predefinita">
+          <button class="opt" type="button" role="radio" data-v="game">🎮 Game · scocca Game Boy in verticale</button>
+          <button class="opt" type="button" role="radio" data-v="light">☀ Light · chiaro, gioco a tutta larghezza</button>
+          <button class="opt" type="button" role="radio" data-v="dark">☾ Dark · scuro, gioco a tutta larghezza</button>
+        </div>
+        <div class="msg" id="vMsg" aria-live="polite" style="margin-top:10px"></div>
+        <h3 style="margin:22px 0 0;font-family:var(--title)">⭐ Bonus Recensione</h3>
+        <p class="dim" style="margin:4px 0 0">Link alle recensioni Google e punti del bonus si impostano in <b>Utenti</b>, sopra la tabella.</p>
       </section>
 
       <section data-pane="key" hidden>
@@ -466,7 +485,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=55"></script>
+<script src="config.js?v=56"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script>
@@ -599,6 +618,7 @@ document.querySelectorAll('.tab[data-tab]').forEach(t => t.onclick = () => {
   if (t.dataset.tab === 'skills') renderSkills();
   if (t.dataset.tab === 'faq') renderFaq();
   if (t.dataset.tab === 'quality') loadQuality();
+  if (t.dataset.tab === 'settings') loadSettings();
   if (t.dataset.tab === 'docs') renderDocs();
   if (t.dataset.tab === 'tutorials') renderTutorials();
 });
@@ -623,7 +643,7 @@ const TIPO_ICO = { giocatore:'🎮', admin_giocatore:'🎮🛡️', admin:'🛡�
 const tipoOf = p => TIPI[p.tipo] ? p.tipo : 'giocatore';
 function tipoIco(p){ const s = document.createElement('span'); s.className = 'ttype'; const t = tipoOf(p); s.textContent = TIPO_ICO[t] + (p.chiave ? ' 🔑' : ''); s.title = TIPI[t] + (p.chiave ? ' · chiave admin personale impostata' : '') + (p.disabilitato ? ' · bloccato' : ''); s.setAttribute('aria-label', s.title); return s; }
 // Bonus Recensione (serve supabase-recensioni.sql): gialla = ha cliccato, verde = recensione confermata
-const REVIEW_PT = 200;
+let REVIEW_PT = 200;
 function reviewStar(p){
   const b = document.createElement('button'); b.type = 'button';
   if (p.recensione_ok){ b.className = 'rstar g'; b.textContent = '★'; b.title = 'Recensione confermata il ' + fmtDate(p.recensione_ok) + ' · +' + REVIEW_PT + ' punti in classifica generale. Clic per toglierla.'; }
@@ -641,13 +661,43 @@ async function setReview(p, ok){
   try { await call('efg_admin_set_recensione', { p_email: p.email, p_ok: ok }); await loadPlayers(); $('pInfo').textContent += ' · ' + p.name + (ok ? ': recensione confermata' : ': recensione tolta'); }
   catch(err){ if (/efg_admin_set_recensione|PGRST202|does not exist/i.test(String(err && err.message))) $('pInfo').textContent = 'Prima esegui supabase-recensioni.sql nel SQL Editor di Supabase.'; else onErr(err, $('pInfo')); }
 }
-async function loadReviewLink(){
-  try { const r = await sb.rpc('efg_recensione_info', { p_email: '' }); if (!r.error && r.data) $('rLink').value = (Array.isArray(r.data) ? r.data[0] : r.data).link || ''; } catch(e){}
+// impostazioni lette dal database (efg_impostazioni): link e punti del bonus, visualizzazione dei giochi
+let SETTINGS = null;
+async function readSettings(){
+  try { const r = await sb.rpc('efg_impostazioni'); if (!r.error && r.data){ SETTINGS = Array.isArray(r.data) ? r.data[0] : r.data; return SETTINGS; } } catch(e){}
+  try { const r = await sb.rpc('efg_recensione_info', { p_email: '' }); if (!r.error && r.data){ const x = Array.isArray(r.data) ? r.data[0] : r.data; SETTINGS = { recensione_link: x.link, recensione_punti: x.punti || 200 }; } } catch(e){}
+  return SETTINGS;
 }
+function showReviewPts(n){ REVIEW_PT = n; document.querySelectorAll('.rPtsTxt').forEach(x => x.textContent = n); }
+async function loadReviewLink(){
+  const st = await readSettings(); if (!st) return;
+  $('rLink').value = st.recensione_link || '';
+  if (st.recensione_punti != null){ $('rPts').value = st.recensione_punti; showReviewPts(st.recensione_punti); }
+}
+const needRevSql = err => /efg_admin_set_recensione_link|efg_admin_set_impostazione|PGRST202|does not exist/i.test(String(err && err.message));
 $('rLinkForm').addEventListener('submit', async e => {
   e.preventDefault();
-  try { const r = await call('efg_admin_set_recensione_link', { p_link: $('rLink').value }); $('rLink').value = r.link || ''; setMsg($('rLinkMsg'), r.link ? 'Link salvato.' : 'Link tolto: il pulsante apre la ricerca di efuture su Google Maps.', 'ok'); }
-  catch(err){ if (/efg_admin_set_recensione_link|PGRST202|does not exist/i.test(String(err && err.message))) setMsg($('rLinkMsg'), 'Prima esegui supabase-recensioni.sql nel SQL Editor di Supabase.', 'err'); else onErr(err, $('rLinkMsg')); }
+  const pts = parseInt($('rPts').value, 10);
+  if (!(pts >= 0 && pts <= 5000)) return setMsg($('rLinkMsg'), 'Punti: un numero da 0 a 5000.', 'err');
+  try {
+    const r = await call('efg_admin_set_recensione_link', { p_link: $('rLink').value }); $('rLink').value = r.link || '';
+    const st = await call('efg_admin_set_impostazione', { p_nome: 'recensione_punti', p_valore: String(pts) }); showReviewPts(st.recensione_punti);
+    setMsg($('rLinkMsg'), 'Salvato: ' + (r.link ? 'link' : 'ricerca su Google Maps') + ' · ' + st.recensione_punti + ' punti.', 'ok');
+    loadPlayers();
+  }
+  catch(err){ if (needRevSql(err)) setMsg($('rLinkMsg'), 'Prima esegui supabase-recensioni.sql nel SQL Editor di Supabase.', 'err'); else onErr(err, $('rLinkMsg')); }
+});
+/* visualizzazione predefinita dei giochi */
+function showViewDef(v){ $('vDef').querySelectorAll('.opt').forEach(b => { const on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); }
+async function loadSettings(){
+  const st = await readSettings();
+  showViewDef((st && st.vista_default) || 'game');
+  if (!st || st.vista_default === undefined) setMsg($('vMsg'), 'Per salvarla esegui prima supabase-recensioni.sql nel SQL Editor di Supabase.', 'err');
+}
+$('vDef').addEventListener('click', async e => {
+  const b = e.target.closest('.opt'); if (!b) return;
+  try { const st = await call('efg_admin_set_impostazione', { p_nome: 'vista_default', p_valore: b.dataset.v }); showViewDef(st.vista_default); setMsg($('vMsg'), 'Salvato: i giocatori che non hanno scelto vedono «' + b.textContent.split(' · ')[0] + '» dalla prossima apertura dell\'app.', 'ok'); }
+  catch(err){ if (needRevSql(err)) setMsg($('vMsg'), 'Prima esegui supabase-recensioni.sql nel SQL Editor di Supabase.', 'err'); else onErr(err, $('vMsg')); }
 });
 function nameCell(p){ const d = document.createElement('span'); d.textContent = p.name; if (p.disabilitato){ const t = document.createElement('span'); t.className = 'offtag'; t.textContent = 'bloccato'; d.appendChild(t); } return d; }
 function editBtn(p){ const b = document.createElement('button'); b.type = 'button'; b.className = 'btn edit'; b.textContent = 'Modifica'; b.onclick = () => openEdit(p); return b; }

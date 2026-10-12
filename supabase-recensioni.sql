@@ -10,8 +10,11 @@
 --  2. In admin › Utenti chi ha cliccato ha la stellina gialla; l'admin, dopo
 --     aver visto la recensione su Google, la conferma: stellina verde
 --     (recensione_ok).
---  3. La recensione confermata vale +200 punti nella classifica generale.
+--  3. La recensione confermata vale punti nella classifica generale (200 se
+--     non scelti diversamente in admin › Utenti, accanto al link).
 --  4. Il link alle recensioni Google si imposta da admin › Utenti.
+--  5. Impostazioni (efg_impostazioni): anche la visualizzazione predefinita dei
+--     giochi (Game, Light o Dark), scelta in admin › Impostazioni.
 -- ============================================================
 
 -- 0. colonne di supabase-tipi-utenti.sql, se non è ancora stato eseguito (stesse definizioni)
@@ -30,9 +33,11 @@ create table if not exists public.efg_settings (
 );
 alter table public.efg_settings enable row level security;   -- nessun accesso diretto: solo dalle funzioni
 
--- punti del bonus (uguali in classifica e nell'app)
+-- punti del bonus (uguali in classifica e nell'app): si scelgono in admin, 200 se non impostati
 create or replace function public.efg_bonus_recensione() returns integer
-language sql immutable as $$ select 200 $$;
+language sql stable security definer set search_path = public as $$
+  select coalesce((select value::int from efg_settings where key = 'recensione_punti' and value ~ '^[0-9]+$'), 200)
+$$;
 revoke all on function public.efg_bonus_recensione() from public;
 grant execute on function public.efg_bonus_recensione() to anon, authenticated;
 
@@ -162,6 +167,35 @@ language sql stable security definer set search_path = public as $$
 $$;
 revoke all on function public.efg_board(text), public.efg_board_group(text, text) from public;
 grant execute on function public.efg_board(text), public.efg_board_group(text, text) to anon, authenticated;
+
+-- 8. impostazioni scelte in admin e lette dall'app: visualizzazione predefinita dei giochi e punti del bonus
+create or replace function public.efg_impostazioni() returns jsonb
+language sql stable security definer set search_path = public as $$
+  select jsonb_build_object(
+    'vista_default', coalesce((select value from efg_settings where key = 'vista_default'), 'game'),
+    'recensione_punti', efg_bonus_recensione(),
+    'recensione_link', (select value from efg_settings where key = 'recensione_link'));
+$$;
+create or replace function public.efg_admin_set_impostazione(p_key text, p_nome text, p_valore text)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare err text; v text := trim(coalesce(p_valore, ''));
+begin
+  err := efg_admin_auth(p_key); if err is not null then return jsonb_build_object('errore', err); end if;
+  if p_nome = 'vista_default' then
+    if v not in ('game', 'light', 'dark') then return jsonb_build_object('errore', 'visualizzazione non valida'); end if;
+  elsif p_nome = 'recensione_punti' then
+    if v !~ '^[0-9]+$' or v::int > 5000 then return jsonb_build_object('errore', 'i punti devono essere un numero da 0 a 5000'); end if;
+    v := (v::int)::text;
+  else
+    return jsonb_build_object('errore', 'impostazione sconosciuta');
+  end if;
+  insert into efg_settings(key, value, updated_at) values (p_nome, v, now())
+    on conflict (key) do update set value = excluded.value, updated_at = now();
+  insert into efg_log(kind, detail) values ('admin: impostazione', jsonb_build_object('nome', p_nome, 'valore', v));
+  return efg_impostazioni();
+end $$;
+revoke all on function public.efg_impostazioni(), public.efg_admin_set_impostazione(text,text,text) from public;
+grant execute on function public.efg_impostazioni(), public.efg_admin_set_impostazione(text,text,text) to anon, authenticated;
 
 -- 7. chi ha il bonus (per l'etichetta "+200 bonus" nella classifica generale)
 create or replace function public.efg_recensione_bonus()

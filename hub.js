@@ -102,7 +102,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v55' : 'Modalità demo: account e classifica restano su questo telefono. · v55';
+  mn.textContent = remote ? 'Classifica online · v56' : 'Modalità demo: account e classifica restano su questo telefono. · v56';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -474,4 +474,7 @@ $('btnReview').addEventListener('click', ()=>{
 /* ================= BOOT ================= */
 renderGrid(); renderDock(); loadGate();
 Backend.current().then(u=>{ session = u; renderDock(); loadRanks(); });
+// visualizzazione predefinita dei giochi scelta in admin (Game, Light o Dark): i giochi la leggono da qui
+// finché il giocatore non ne sceglie una con il pulsante in alto nel gioco
+Backend.settings().then(st=>{ try { if (st && /^(game|light|dark)$/.test(st.vista_default)) localStorage.setItem('efgViewDefault', st.vista_default); } catch(e){} }).catch(()=>{});
 })();

@@ -193,6 +193,17 @@ L'orologio usa l'ora del server: l'app calcola lo scarto tra l'ora del server (`
 
 Il server rifiuta i punteggi a gara chiusa, con una tolleranza di 10 s (vedi [database.md](database.md)).
 
+## Bonus Recensione
+
+- In home, sotto i giochi, chi ha fatto l'accesso vede il pulsante giallo **⭐ Bonus Recensione** con la spiegazione dei punti. Il tocco apre subito la pagina delle recensioni Google di efuture (il link scelto in admin, altrimenti la ricerca su Google Maps) e registra il clic (`efg_recensione_click`).
+- Dopo il clic: "Grazie! Quando confermiamo la tua recensione su Google ricevi +N punti…". Quando l'admin la conferma il pulsante diventa verde, **✅ Bonus Recensione ottenuto**, e i punti sono già nella classifica generale.
+- Nella classifica generale (app e schermo) chi ha il bonus ha l'etichetta **⭐ +N bonus**; la nota dice "Totale = somma dei 4 giochi + ⭐ bonus recensione".
+- Senza `supabase-recensioni.sql` il pulsante non compare.
+
+## Visualizzazione dei giochi
+
+All'avvio l'app legge `efg_impostazioni` e salva la visualizzazione predefinita scelta in admin in `efgViewDefault`; i giochi la usano finché il giocatore non ne sceglie una con il pulsante in alto nel gioco (vedi [giochi-comune.md](giochi-comune.md#visualizzazione-game-light-dark)).
+
 ## Classifica in app
 
 Si apre con il pulsante **Classifica** (finestra `mBoard`).
@@ -267,6 +278,9 @@ Si apre con il pulsante **Classifica** (finestra `mBoard`).
 | `efgDemoUsers3` | Utenti demo | `backend.js` (demo) |
 | `efgDemoScores4` | Punteggi demo | `backend.js` (demo) |
 | `efgDemoGate` | Countdown demo `{mode, minutes, ends_at}` | `backend.js` (demo) |
+| `efgViewDefault` | Visualizzazione predefinita dei giochi (`game`, `light`, `dark`) scelta in admin | `hub.js` |
+| `efgView` | Visualizzazione scelta dal giocatore con il pulsante nel gioco | `games/gameboy.js` |
+| `efgDemoReview` | Clic demo sul Bonus Recensione | `backend.js` (demo) |
 | `efgInstalled` | Data e ora (ms) dell'installazione accettata | `hub.js` |
 | `efgInstallLater` | Data e ora (ms) del "Più tardi". Oggi non viene letta | `hub.js` |
 

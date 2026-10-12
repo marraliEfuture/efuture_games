@@ -13,13 +13,13 @@
     --gb-shell-lo:#c9c5bd;
     --gb-bezel:#4a4e5a;
     --gb-bezel-hi:#565a67;
-    --gb-bz:10px;              /* spessore della cornice dello schermo */
+    --gb-bz:7px;               /* spessore della cornice dello schermo (sottile: schermo più largo) */
     --gb-lcd:#e9eef2;          /* fascia punteggio dentro la cornice */
     --gb-ink:#004675;          /* scritte sul corpo, blu Efuture */
     --gb-font:'IBM Plex Mono',ui-monospace,Consolas,monospace;
   }
   html,body{background:#b7b2a8}
-  body{padding:5px;height:100%}
+  body{padding:3px;height:100%}
   #app{
     position:relative;
     height:100%;
@@ -29,7 +29,7 @@
     overflow:hidden;
     display:flex;
     flex-direction:column;
-    padding:calc(8px + env(safe-area-inset-top,0px)) calc(10px + env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) calc(10px + env(safe-area-inset-left,0px));
+    padding:calc(8px + env(safe-area-inset-top,0px)) calc(6px + env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) calc(6px + env(safe-area-inset-left,0px));
     background:
       radial-gradient(120% 60% at 20% 0%, rgba(255,255,255,.55), rgba(255,255,255,0) 60%),
       linear-gradient(180deg, var(--gb-shell-hi) 0%, var(--gb-shell) 45%, var(--gb-shell-lo) 100%);
@@ -78,7 +78,7 @@
     z-index:1;
     flex:1 1 auto;
     margin:0 var(--gb-bz) calc(var(--gb-bz) + 8px);
-    padding:6px;
+    padding:4px;
     background:var(--gb-bezel);
     border-radius:2px 2px 30px 2px;
     box-shadow:0 0 0 var(--gb-bz) var(--gb-bezel), 0 8px 0 var(--gb-bz) var(--gb-bezel);
