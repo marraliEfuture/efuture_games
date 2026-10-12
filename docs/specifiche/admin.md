@@ -54,7 +54,7 @@ Si apre con il pulsante **☰ Menu** a sinistra nell'intestazione (visibile dopo
 - **Utenti**;
 - **Collegamenti:** QR, Link;
 - **Formazione:** Video utili, Tutorial, Skills, FAQ, Documentazione;
-- **Admin:** Qualità, Log, Backup, Chiave, Reset (Reset in rosso);
+- **Admin:** Impostazioni, Qualità, Log, Backup, Chiave, Reset (Reset in rosso);
 - **Logout:** dimentica la chiave e torna al login.
 
 All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
@@ -62,11 +62,13 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
 ### Utenti
 
 - Dati da `efg_admin_players`. Testo in alto: "N utenti registrati". Pulsanti **Aggiorna** e **Scarica CSV**.
+- **Bonus Recensione** (riquadro sopra la tabella): campo **⭐ Link recensioni Google** (deve iniziare con `https://`; vuoto = il pulsante dell'app apre la ricerca di efuture su Google Maps), campo **Punti** (da 0 a 5000, predefinito 200) e pulsante **Salva**. Chiama `efg_admin_set_recensione_link` e `efg_admin_set_impostazione('recensione_punti')`. Sotto, una riga spiega i colori della colonna ⭐. Il CSV aggiunge le colonne "Clic Bonus Recensione" e "Recensione confermata". Serve `supabase-recensioni.sql`.
 - **Tabella**, ordinata per livelli totali, poi per punti totali:
 
   | Colonna | Contenuto |
   |---|---|
   | `#` | Posizione |
+  | ⭐ | Bonus Recensione: ☆ grigia = non ha cliccato il pulsante nell'app; ★ **gialla** = ha cliccato (data nel suggerimento); ★ **verde** = recensione confermata dall'admin. Clic sulla gialla → conferma (diventa verde, il giocatore riceve i punti del bonus nella classifica generale); clic sulla verde → la toglie. Chiama `efg_admin_set_recensione(p_key, p_email, p_ok)`; nel log "admin: recensione confermata/tolta" |
   | Tipo | Simbolo: 🎮 Giocatore, 🎮🛡️ Admin e giocatore (prima il joystick, poi lo scudo), 🛡️ Solo admin (il nome del tipo compare passandoci sopra). Gli utenti senza tipo valgono come Giocatore |
   | Nome | Con l'etichetta rossa **bloccato** se l'utente è bloccato (tutta la riga in grigio) |
   | Email | |
@@ -89,6 +91,12 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
   - **Elimina utente:** chiama `efg_admin_delete_player(p_key, p_email)`, chiude il popup, ricarica la tabella e aggiunge "· eliminato *nome*". L'utente potrà registrarsi di nuovo con la stessa email, ripartendo da zero.
 - **Ogni modifica chiede conferma** in una seconda finestra con la domanda ("Cambiare il tipo di…?", "Bloccare…?", "Sbloccare…?", "Reset della chiave di…?", "Eliminare…?"), le conseguenze spiegate e i pulsanti **Annulla** e **Sì, …** (rosso per bloccare ed eliminare). Con Annulla non cambia niente.
 - Tipo e disabilitazione servono `supabase-tipi-utenti.sql`: senza, il popup dice di eseguirlo.
+
+### Impostazioni
+
+- **🎮 Visualizzazione dei giochi:** tre scelte, quella attiva evidenziata: **🎮 Game** (scocca Game Boy in verticale, predefinita), **☀ Light** (chiaro, gioco a tutta larghezza), **☾ Dark** (scuro, gioco a tutta larghezza). È la visualizzazione con cui si aprono i giochi per chi non ne ha ancora scelta una con il pulsante in alto nel gioco. Chiama `efg_admin_set_impostazione(p_key, 'vista_default', …)`; nel log "admin: impostazione". L'app la legge all'avvio (`efg_impostazioni`), quindi vale dalla prossima apertura dell'app.
+- **⭐ Bonus Recensione:** rimanda a Utenti, dove si impostano link e punti.
+- Serve `supabase-recensioni.sql`: senza, compare l'avviso di eseguirlo.
 
 ### Qualità
 

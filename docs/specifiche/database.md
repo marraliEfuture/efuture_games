@@ -24,6 +24,12 @@ Lo schema si crea e si aggiorna eseguendo a mano i file `supabase*.sql` nel SQL 
 
 La colonna `phone` è stata tolta nella v23: `drop column if exists phone`.
 
+Da `supabase-recensioni.sql`: `recensione_clic` (timestamptz, primo clic sul pulsante Bonus Recensione) e `recensione_ok` (timestamptz, recensione confermata dall'admin).
+
+### `efg_settings`: impostazioni (da `supabase-recensioni.sql`)
+
+`key` (text, PK), `value` (text), `updated_at`. RLS senza regole: si legge e scrive solo con le funzioni. Chiavi: `recensione_link` (link alle recensioni Google), `recensione_punti` (punti del bonus, predefinito 200), `vista_default` (`game`, `light` o `dark`, predefinita `game`).
+
 ### `efg_scores`: record (il migliore per giocatore e gioco)
 
 | Colonna | Tipo | Vincoli |
@@ -105,6 +111,8 @@ La stessa regola è ripetuta in `backend.js` per la modalità demo.
 | `efg_snapshot()` | Crea il jsonb del backup (vedi sotto) |
 | `efg_gate_open(p_grace)` | true se si può giocare. Apertura: `now() >= ends_at`. Chiusura: `now() < ends_at + p_grace`. Nessun countdown: true. Non è concessa ad anon, ma la usa `efg_submit` |
 
+**Bonus Recensione e impostazioni** (da `supabase-recensioni.sql`): `efg_recensione_info(p_email)` → `{link, clic, ok, punti}`; `efg_recensione_click(p_email)` registra il clic (il primo in `recensione_clic`, ogni clic nel log `recensione: clic`); `efg_recensione_bonus()` → `(pid, punti)` di chi ha la recensione confermata (per l'etichetta in classifica); `efg_impostazioni()` → `{vista_default, recensione_punti, recensione_link}`; `efg_bonus_recensione()` → punti del bonus. `efg_board` e `efg_board_group` aggiungono i punti del bonus nella classifica generale (`all`).
+
 ## Funzioni admin (anon e authenticated, con chiave)
 
 Tutte iniziano con `efg_admin_auth(p_key)`. Se la chiave non va, restituiscono `{errore: '…'}` senza eccezione. Tutte restituiscono jsonb.
@@ -185,6 +193,7 @@ Formato di `efg_backups.data`, che è anche il file JSON scaricato dall'admin. P
 | `supabase-countdown.sql` | Tabella `efg_gate` con la riga 1. Funzioni `efg_gate_state`, `efg_gate_open`, `efg_admin_gate`. Nuova `efg_submit` con il controllo `gara chiusa` (tolleranza 10 s) | Rieseguibile. Se manca, app e classifica funzionano senza countdown e il pulsante Start segnala lo script mancante |
 | `supabase-privacy-utenti.sql` | Toglie `phone` da `efg_players` e dai backup salvati (non si può annullare). Nuove `efg_register`, `efg_admin_players`, `efg_admin_restore`, `efg_admin_delete_player` | Per i database creati prima della v23. Il contenuto è già incluso in `supabase.sql` |
 | `supabase-tipi-utenti.sql` | Colonne `tipo` (`giocatore`, `admin_giocatore`, `admin`), `disabilitato` e `admin_key_hash` (bcrypt della chiave admin personale) in `efg_players`. Nuove `efg_admin_set_tipo` (tornando giocatore toglie la chiave), `efg_admin_set_disabilitato`, `efg_admin_set_user_key`, `efg_admin_me`; aggiornate `efg_admin_players` (tipo, disabilitato, `chiave` sì/no, mai l'hash), `efg_admin_restore`, `efg_admin_auth` (accetta `email` + a capo + `chiave` per le chiavi personali, oltre alla chiave principale), `efg_admin_set_key` (cambia la chiave di chi è collegato), `efg_login`, `efg_submit`, `efg_board`, `efg_board_group` (escludono i disabilitati) | Dalla v35, anche su un database nuovo, dopo `supabase-countdown.sql`; da rieseguire dalla v37 per le chiavi personali. `supabase.sql` non lo contiene |
+| `supabase-recensioni.sql` | Colonne `recensione_clic`, `recensione_ok` (e `tipo`, `disabilitato`, `admin_key_hash` se mancano). Tabella `efg_settings`. Funzioni del Bonus Recensione e delle impostazioni (vedi sopra), `efg_admin_set_recensione`, `efg_admin_set_recensione_link`, `efg_admin_set_impostazione`; aggiornate `efg_admin_players`, `efg_admin_restore`, `efg_board`, `efg_board_group` | Rieseguibile. **Dopo** `supabase-tipi-utenti.sql`: se riesegui quello, riesegui anche questo |
 | `supabase-nickname-unico.sql` | Nuova `efg_register` (rifiuta un nickname già usato: `name taken`), nuova `efg_signup_check`, indice unico `efg_players_name_unique` su `lower(trim(name))` creato solo se non ci sono già doppioni | Dalla v42, anche su un database nuovo, **dopo** `supabase.sql` (che ridefinisce `efg_register` senza il controllo del nickname): rieseguirlo dopo ogni riesecuzione di `supabase.sql` |
 
 **Ordine su un progetto nuovo:**
@@ -193,7 +202,8 @@ Formato di `efg_backups.data`, che è anche il file JSON scaricato dall'admin. P
 3. `supabase-countdown.sql`;
 4. `supabase-tipi-utenti.sql`;
 5. `supabase-nickname-unico.sql`;
-6. `select efg_admin_init('…');`.
+6. `supabase-recensioni.sql`;
+7. `select efg_admin_init('…');`.
 
 ---
 Ultimo aggiornamento: 07/10/2026 (v27)
