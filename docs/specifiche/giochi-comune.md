@@ -79,9 +79,18 @@ Il protocollo completo è in [app-giocatori.md](app-giocatori.md#protocollo-post
 - Dopo `result` il gioco può ancora essere usato (per esempio "Riprova"), ma non manda più nulla finché non riparte dal livello 1.
 - **Codice non usato:** Timenet, inncloud e CoreTech definiscono in `index.html` anche `window.efgReport` (messaggio `efg-score`). Nessuno lo chiama e l'app non lo ascolta.
 
+## Visualizzazione: Game, Light, Dark
+
+- In alto in ogni gioco, accanto alla pausa, c'è il pulsante della visualizzazione (`#viewBtn`, creato da `gameboy.js`): **🎮 Game** → **☀ Light** → **☾ Dark** → di nuovo Game. A ogni tocco compare per un attimo "Visualizzazione …".
+  - **Game:** scocca "Game Boy" con il telefono in verticale (qui sotto); in orizzontale il layout del gioco.
+  - **Light:** tema chiaro, senza scocca: in verticale il gioco usa tutta la larghezza con i comandi sotto.
+  - **Dark:** come Light ma scuro: sfondo `#0e1621`, riquadri `#172230`/`#1e2b3b`, bordi `#33465c`, testo `#e7eef6`, punti `#ffb04a`; schermate con velo scuro; barra, comandi e piste di trascinamento scuri. Il campo di gioco disegnato nel canvas resta com'è.
+- La scelta vale per tutti e 4 i giochi e resta sul telefono (`efgView`). Finché il giocatore non sceglie vale la visualizzazione predefinita decisa in admin › Impostazioni (`efgViewDefault`, scritta dall'app all'avvio); senza, Game.
+- Come funziona: `gameboy.js` mette `data-view` su `<html>`; fuori da Game spegne `gameboy.css` (`link.disabled`), toglie `data-gb` e la classe `gb` e lascia i tasti A/B al loro posto. Gli stili del pulsante e del tema scuro sono dentro `gameboy.js`, sempre attivi.
+
 ## Scocca "Game Boy" (verticale)
 
-Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`). In orizzontale ogni gioco usa il suo layout, descritto nella sua specifica. Lo script non cambia la logica dei giochi: aggiunge parti decorative e due tastini che premono pulsanti già esistenti.
+Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`) e **solo nella visualizzazione Game**. Dalla v56 bordi più sottili (corpo 6 px ai lati, cornice dello schermo 7 px): lo schermo di gioco è più largo (Efuture Bros su un telefono da 412 px: da 362 a 380 px). In orizzontale ogni gioco usa il suo layout, descritto nella sua specifica. Lo script non cambia la logica dei giochi: aggiunge parti decorative e due tastini che premono pulsanti già esistenti.
 
 ### Aspetto
 
@@ -114,8 +123,8 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
 - **AVVIA / PAUSA:** il testo cambia da solo (controllo ogni 0,3 s).
   - Schermata di pausa aperta: scritta PAUSA, il tocco preme il pulsante pausa e il gioco riprende.
   - Una schermata con un pulsante principale visibile (Inizia, Via!, Prossimo livello, Riprova…): scritta AVVIA, il tocco preme il primo visibile.
-- **Fine livello:** in tutti e 4 i giochi il pulsante per andare avanti (Prossimo livello, Prossimo ticket, Chiudi il ticket) è **arancione** (`#f18c22`, classe `btn go` nei giochi con `game.js`) ed è il primo; le alternative (per esempio Torna a debuggare) sono bianche.
   - Durante il gioco: scritta PAUSA, il tocco mette in pausa.
+- **Fine livello:** in tutti e 4 i giochi il pulsante per andare avanti (Prossimo livello, Prossimo ticket, Chiudi il ticket) è **arancione** (`#f18c22`, classe `btn go` nei giochi con `game.js`) ed è il primo; le alternative (per esempio Torna a debuggare) sono bianche.
 - I tastini scattano al rilascio del dito. Non fanno partire trascinamenti o lanci del gioco sotto.
 
 ### Tasti A e B
