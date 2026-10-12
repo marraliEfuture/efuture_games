@@ -57,7 +57,8 @@ CODICI DI SBLOCCO (uno per gioco)
      scrive in alto e mostra tutti i giocatori. Da indirizzo, ad esempio:
        classifica.html?classifica=tutti&top=10&giocatori=efuture&qr=no
    - Pulsante "⏱ Countdown": scegli Apertura o Chiusura, i minuti, scrivi
-     la chiave admin (la stessa di admin.html) e premi Start; Stop lo annulla. Una volta sola esegui
+     email e chiave admin (le stesse di admin.html; email vuota per la
+     chiave principale) e premi Start; Stop lo annulla. Una volta sola esegui
      supabase-countdown.sql nel SQL Editor.
        Apertura: fino allo zero i 4 giochi sono bloccati per tutti, poi si aprono.
        Chiusura: si gioca fino allo zero, poi i giochi si bloccano (anche
