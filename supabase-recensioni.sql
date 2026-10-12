@@ -1,8 +1,9 @@
 -- ============================================================
 -- EFUTURE GAMES — Bonus Recensione
--- Da eseguire nel SQL Editor di Supabase DOPO supabase-tipi-utenti.sql
--- (si può rieseguire). Se riesegui supabase-tipi-utenti.sql, riesegui poi
--- anche questo: entrambi ridefiniscono la classifica e l'elenco utenti.
+-- Da eseguire nel SQL Editor di Supabase (si può rieseguire). Funziona anche
+-- se supabase-tipi-utenti.sql non è ancora stato eseguito. Se esegui o
+-- riesegui supabase-tipi-utenti.sql, riesegui poi anche questo: entrambi
+-- ridefiniscono la classifica e l'elenco utenti.
 --  1. Il pulsante "Bonus Recensione" dell'app apre la pagina delle recensioni
 --     Google di efuture e registra il clic sul giocatore (recensione_clic,
 --     la prima volta) e nel log (ogni volta).
@@ -12,6 +13,11 @@
 --  3. La recensione confermata vale +200 punti nella classifica generale.
 --  4. Il link alle recensioni Google si imposta da admin › Utenti.
 -- ============================================================
+
+-- 0. colonne di supabase-tipi-utenti.sql, se non è ancora stato eseguito (stesse definizioni)
+alter table public.efg_players add column if not exists tipo text not null default 'giocatore';
+alter table public.efg_players add column if not exists disabilitato boolean not null default false;
+alter table public.efg_players add column if not exists admin_key_hash text;
 
 -- 1. dati sul giocatore e impostazioni
 alter table public.efg_players add column if not exists recensione_clic timestamptz;   -- primo clic sul pulsante

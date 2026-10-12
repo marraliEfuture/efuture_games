@@ -62,7 +62,7 @@ CODICI DI SBLOCCO (uno per gioco)
      cliccato: dopo aver trovato la sua recensione su Google cliccala e
      diventa verde (+200 punti nella classifica generale). Il link alle
      recensioni si incolla sopra la tabella Utenti. Una volta sola esegui
-     supabase-recensioni.sql nel SQL Editor (dopo supabase-tipi-utenti.sql).
+     supabase-recensioni.sql nel SQL Editor.
    - Pulsante "⏱ Countdown": scegli Apertura o Chiusura, i minuti, scrivi
      email e chiave admin (le stesse di admin.html; email vuota per la
      chiave principale) e premi Start; Stop lo annulla. Una volta sola esegui
