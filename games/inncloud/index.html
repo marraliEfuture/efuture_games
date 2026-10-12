@@ -109,6 +109,7 @@ body{font-family:var(--mono);overflow:hidden;-webkit-user-select:none;user-selec
 button.btn{font-family:var(--pixel);font-size:11px;padding:12px 16px;border-radius:8px;border:1px solid var(--ct-deep);background:var(--ic-red);color:#fff;cursor:pointer;box-shadow:0 4px 0 var(--ct-deep),0 6px 14px rgba(13,43,69,.2)}
 button.btn:active{box-shadow:0 1px 0 var(--ct-deep);transform:translateY(3px)}
 button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--text);box-shadow:0 4px 0 var(--line),0 6px 14px rgba(13,43,69,.12)}
+button.btn.go{background:var(--orange);border-color:#b8610b;color:#1d0f00;box-shadow:0 4px 0 #a9570a,0 6px 14px rgba(13,43,69,.18)}   /* fine livello: andare avanti è sempre arancione */
 .stats{display:grid;grid-template-columns:1fr auto;gap:4px 12px;text-align:left;font-size:12px}
 .stats b{font-family:var(--pixel);font-size:11px;color:var(--navy);text-align:right}
 .hint{font-size:10.5px;color:var(--dim)}
@@ -183,7 +184,7 @@ button.btn.alt{background:var(--panel-2);border-color:var(--line);color:var(--te
             <span>Attaccanti</span><b id="clearBugs">0</b>
             <span>Tempo</span><b id="clearTime">0:00</b>
           </div>
-          <div class="btnrow"><button class="btn" id="btnNext">Prossimo livello</button></div>
+          <div class="btnrow"><button class="btn go" id="btnNext">Prossimo livello</button></div>
         </div>
       </div>
 

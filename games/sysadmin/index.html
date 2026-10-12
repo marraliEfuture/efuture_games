@@ -438,6 +438,11 @@ img{max-width:100%}
     #btnJump{width:76px;height:76px;}
     #actions{gap:6px;}
   }
+  /* PC con mouse e tastiera: niente joystick e tasti touch, il gioco usa tutta l'altezza
+     (si gioca con frecce, spazio, X e V). Telefoni e tablet non cambiano. */
+  @media (hover:hover) and (pointer:fine) and (min-height:561px){
+    #controls{display:none;}
+  }
 </style>
 <link rel="stylesheet" href="../gameboy.css">
 
@@ -501,8 +506,8 @@ img{max-width:100%}
         <div class="bubble" id="complaintMsg"></div>
         <p class="dim">Bug ancora in giro: <b id="complaintCount" style="color:var(--ef-yellow)">0</b></p>
         <div class="btnrow">
-          <button class="game-btn" id="btnComplaintBack">Torna a debuggare</button>
-          <button class="game-btn secondary" id="btnComplaintFinish">Chiudi il ticket</button>
+          <button class="game-btn" id="btnComplaintFinish">Chiudi il ticket</button>
+          <button class="game-btn secondary" id="btnComplaintBack">Torna a debuggare</button>
         </div>
       </div>
     </div>
@@ -596,7 +601,7 @@ const JUMP_V = -800;
 const MOVE_SPEED = 350;
 const THROW_COOLDOWN = 0.42;
 const PROJ_SPEED = 680;
-const PROJ_W = 26, PROJ_H = 16;
+const PROJ_W = 40, PROJ_H = 24;   // mouse lanciato: grande e rasoterra
 const SPECIAL_COOLDOWN = 1.0;
 const SPECIAL_SPEED = 560;
 const INVULN_TIME = 1.3;
@@ -1170,10 +1175,11 @@ function updatePlayer(dt){
     throwPressedEdge = false;
     if (player.throwCd <= 0){
       player.throwCd = THROW_COOLDOWN;
+      // il mouse parte dai piedi e scivola a filo del terreno; lanciato in salto, cade e poi scivola
       projectiles.push({
         x: player.x + (player.facing>0? player.w : -PROJ_W),
-        y: player.y + player.h*0.38,
-        vx: PROJ_SPEED*player.facing, w:PROJ_W, h:PROJ_H, owner:'player', kind:'mouse', alive:true
+        y: player.onGround ? player.y + player.h - PROJ_H : player.y + player.h*0.5,
+        vx: PROJ_SPEED*player.facing, vy:0, w:PROJ_W, h:PROJ_H, owner:'player', kind:'mouse', alive:true, onGround:player.onGround
       });
     }
   }
@@ -1301,9 +1307,14 @@ function updateEnemiesAndCombat(dt, t){
     }
   }
 
+  const solidsForMouse = projectiles.some(p=>p.kind==='mouse') ? allSolids() : null;
   for (const p of projectiles){
     if (!p.alive) continue;
     p.x += p.vx*dt;
+    if (p.kind==='mouse'){   // gravità: resta appoggiato a terra o sulle piattaforme, nei burroni cade
+      resolveVertical(p, dt, solidsForMouse);
+      if (p.y > VH + 40){ p.alive = false; continue; }
+    }
     if (p.owner==='player'){
       for (const e of level.enemies){
         if (!e.alive) continue;
@@ -1869,7 +1880,6 @@ function drawHouse(x, t){   // la casa dell'omino, da cui parte all'alba
   ctx.fillStyle = '#ffd98a'; ctx.fillRect(x + 36, g - 86, 34, 86);
   ctx.fillStyle = '#ffe6a8'; ctx.fillRect(x + 110, g - 110, 46, 40); ctx.fillRect(x + 176, g - 110, 46, 40);
   ctx.strokeStyle = '#6b4a33'; ctx.lineWidth = 4; ctx.strokeRect(x + 110, g - 110, 46, 40); ctx.strokeRect(x + 176, g - 110, 46, 40);
-  ctx.fillStyle = '#6b4a33'; ctx.font = 'bold 22px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('CASA', x + w/2 + 40, g - 124);
 }
 function drawClientOffice(x){   // l'ufficio del cliente, dove arriva alla fine
   const g = GROUND_Y, w = 360, h = 330;
@@ -1877,8 +1887,6 @@ function drawClientOffice(x){   // l'ufficio del cliente, dove arriva alla fine
   ctx.fillStyle = '#cfd6de'; ctx.fillRect(x, g - h, w, h);
   ctx.fillStyle = '#9fb0c2'; ctx.fillRect(x - 10, g - h - 16, w + 20, 18);
   for (let r=0;r<6;r++) for (let c=0;c<5;c++){ ctx.fillStyle = ((r+c)%3) ? '#8fb4d6' : '#ffe2a0'; ctx.fillRect(x + 20 + c*68, g - h + 24 + r*44, 48, 28); }
-  ctx.fillStyle = '#004675'; ctx.fillRect(x + 90, g - h - 64, 180, 40);
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 24px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('CLIENTE', x + 180, g - h - 35);
 }
 function drawScene(kind, t){
   if (kind === 'alba'){
@@ -2706,15 +2714,20 @@ function drawProjectile(p){
   ctx.save();
   ctx.translate(x, p.y);
   if (p.kind==='mouse'){
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';   // ombra a terra
+    ctx.beginPath(); ctx.ellipse(p.w/2, p.h, p.w*0.45, 3, 0,0,7); ctx.fill();
     ctx.fillStyle = '#dfe6ee';
     ctx.beginPath(); ctx.ellipse(p.w/2, p.h/2, p.w/2, p.h/2, 0,0,7); ctx.fill();
-    ctx.strokeStyle = '#56718a'; ctx.lineWidth = 1.5; ctx.stroke();
-    ctx.fillStyle = '#9aa7b5';
-    ctx.fillRect(p.w*0.35, 1, p.w*0.12, p.h*0.35);
+    ctx.strokeStyle = '#56718a'; ctx.lineWidth = 2; ctx.stroke();
+    const front = p.vx>0 ? p.w*0.62 : p.w*0.38;   // tasti e rotellina sul davanti
+    ctx.beginPath(); ctx.moveTo(front, 2); ctx.lineTo(front, p.h*0.5); ctx.stroke();
+    ctx.fillStyle = '#56718a'; ctx.fillRect(front - 2, p.h*0.14, 4, p.h*0.22);
     ctx.strokeStyle = '#8aa0b5'; ctx.lineWidth=2;
-    ctx.beginPath();
-    ctx.moveTo(p.vx>0? 0:p.w, p.h/2);
-    ctx.lineTo(p.vx>0? -14:p.w+14, p.h/2+4);
+    ctx.beginPath();   // scia a terra
+    ctx.moveTo(p.vx>0? 0:p.w, p.h*0.75);
+    ctx.lineTo(p.vx>0? -22:p.w+22, p.h*0.8);
+    ctx.moveTo(p.vx>0? -4:p.w+4, p.h*0.45);
+    ctx.lineTo(p.vx>0? -16:p.w+16, p.h*0.5);
     ctx.stroke();
   } else if (p.kind==='special'){
     ctx.fillStyle = '#eafff2';

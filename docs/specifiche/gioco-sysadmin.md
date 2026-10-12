@@ -34,7 +34,7 @@ Le schermate sono overlay sopra il canvas, con una card bianca al centro.
 | **Titolo** (`ov-title`) | Riga piccola "Livello 1 di 10 · missione IT" (in gara: "3 livelli · 1 minuto · 3 vite"), titolo EFUTURE BROS, "Sei il sistemista di Efuture: elimina i bug del cliente. Ne sarà soddisfatto!" In modalità libera anche "Record attuale" (tempo) e "Miglior pulizia" (%), se esistono | **Inizia**, **Continua · Liv. N** (solo modalità libera, se c'è un livello raggiunto), **Istruzioni** |
 | **Istruzioni** (`howBox`, dentro il titolo) | Salta sui bug o lanciagli il mouse · Schiva chiodi, scosse e seghe · 3 bug di fila: sblocchi l'antivirus · Sali la scala e raggiungi il cliente. Sotto: ← → muovi · ↑ salta · X mouse · V antivirus | – |
 | **Scheda del livello** (`ov-intro`) | Etichetta "Cliente N/9" (gara: "Livello N/3"; boss: "Livello finale", viola), "Ticket di *Nome*" (boss: "*Nome* — *Stanza*"), messaggio del cliente (per esempio "È l'alba: gioca d'anticipo e ferma i bug prima che arrivino in ufficio!") | **Risolvi!** (boss: **Affrontalo**) |
-| **Cliente non convinto** (`ov-complaint`) | Si apre se si arriva al cliente con bug ancora vivi: "*Nome* non è convinto", "Ci sono ancora N bug in giro. Torni a stanarli?" | **Torna a debuggare** (riporta il giocatore prima della scala), **Chiudi il ticket** |
+| **Cliente non convinto** (`ov-complaint`) | Si apre se si arriva al cliente con bug ancora vivi: "*Nome* non è convinto", "Ci sono ancora N bug in giro. Torni a stanarli?" | **Chiudi il ticket** (arancione, primo: si va avanti), **Torna a debuggare** (bianco: riporta il giocatore prima della scala). In verticale il tastino AVVIA preme Chiudi il ticket |
 | **Livello completato** (`ov-complete`) | "Problema risolto", "*Nome* ringrazia!" con il ringraziamento del cliente; se rimasti bug: "*Nome* ringrazia, ma..." e "Ma qualche bug è rimasto in giro." Punteggio | **Prossimo ticket** |
 | **Pausa** (`ov-pause`) | PAUSA | **Riprendi**, **Riparti dal ticket**, **Menu** |
 | **Game over** (`ov-gameover`) | "Sistema compromesso", GAME OVER, "Stavolta hanno vinto i bug.", punteggio e "Cliente N di 10" | **Riprova ticket**, **Menu** |
@@ -71,7 +71,7 @@ Campo logico 960 × 540, terreno a y = 470. I livelli 1–9 sono generati da un 
 
 | Liv. | Sfondo | Cosa rappresenta | Parametri (`LV3` nel codice) |
 |---|---|---|---|
-| 1 | **Alba: da casa al cliente**: l'omino **parte da casa sua** (casetta con la porta aperta e il camino che fuma, scritta CASA) e attraversa un campo di grano all'alba (sole che sorge, colline, nuvole rosate); in fondo, dietro la scala, c'è **l'ufficio del cliente** (palazzo con l'insegna CLIENTE). Se esiste `games/sysadmin/img/alba.jpg` (l'immagine dell'evento) il cielo e il campo sono quella foto | Proattività: si parte presto | lunghezza 6200, 15 bug a terra, 2 volanti, 2 chiodi, 1 scossa, nessuna sega, burroni 16%, bug 60 px/s |
+| 1 | **Alba: da casa al cliente**: l'omino **parte da casa sua** (casetta con la porta aperta e il camino che fuma, senza scritte) e attraversa un campo di grano all'alba (sole che sorge, colline, nuvole rosate); in fondo, dietro la scala, c'è **l'ufficio del cliente** (palazzo con le finestre, senza insegna). Se esiste `games/sysadmin/img/alba.jpg` (l'immagine dell'evento) il cielo e il campo sono quella foto | Proattività: si parte presto | lunghezza 6200, 15 bug a terra, 2 volanti, 2 chiodi, 1 scossa, nessuna sega, burroni 16%, bug 60 px/s |
 | 2 | **In ufficio al tramonto**: l'omino è **in ufficio**: vetrate sul tramonto con lo skyline, file di scrivanie con pc e stampanti da cui volano via i fogli | Quasi fine giornata | lunghezza 7000, 16 bug, 4 volanti, 3 chiodi, 2 scosse, 2 seghe, burroni 24%, bug 72 px/s |
 | 3 | **Notte in smart working**: l'omino è **a casa sua, di notte, in smart working**: stanza con finestre sulla città di notte (stelle, luna), orologio e quadri, scrivania con il portatile acceso e la lampada, libreria e divano; luce rossa d'emergenza che lampeggia. Bug **cattivi con il cappuccio** e occhi rossi (anche quelli volanti) | Emergenza | lunghezza 7800, 20 bug, 5 volanti, 4 chiodi, 4 scosse (accese più a lungo), 3 seghe più veloci (140 px/s), burroni 30%, bug 88 px/s |
 
@@ -130,7 +130,7 @@ L'antivirus è sbloccato dall'inizio.
 - si gira nella direzione di marcia (anche la testa-logo è specchiata).
 
 **Armi:**
-- **Mouse** (X): proiettile dritto a 680 px/s, una volta ogni 0,42 s. Elimina un bug; sull'hacker toglie 1 vita.
+- **Mouse** (X): mouse grande (40 × 24 px) che parte dai piedi e **scivola a filo del terreno** a 680 px/s, una volta ogni 0,42 s; resta appoggiato a terra o sulle piattaforme e cade nei burroni. Lanciato durante un salto parte a metà altezza, cade e poi scivola: così può colpire anche un bug volante mentre scende. Elimina un bug; sull'hacker toglie 1 vita. I bug volanti si eliminano soprattutto saltandoci sopra o con l'antivirus.
 - **Antivirus** (V): si sblocca con **3 bug eliminati di fila senza essere colpiti**. Proiettile verde a 560 px/s, ogni 1 s, che attraversa i nemici e li elimina tutti; sull'hacker toglie 2 vite. Si perde quando si viene colpiti.
 
 **Collisioni:**
@@ -180,7 +180,7 @@ L'antivirus è sbloccato dall'inizio.
 
 - **Verticale:** scocca "Game Boy" ([giochi-comune.md](giochi-comune.md#scocca-game-boy-verticale)). Schermo 16:9; joystick a sinistra; a destra SALTA (A, arancio, grande), MOUSE (B, blu) e ANTIVIRUS (piccolo, sopra MOUSE). Il pulsante `II` è nascosto: la pausa si fa con il tastino AVVIA/PAUSA. Le schermate coprono tutta la console, tranne i tastini.
 - **Orizzontale** (altezza ≤ 560 px): HUD sottile in alto; joystick nella colonna di sinistra; ANTIVIRUS, MOUSE e SALTA impilati nella colonna di destra; gioco al centro. Le schermate coprono tutto lo schermo. Sotto i 360 px di altezza i tasti si rimpiccioliscono.
-- **Schermo grande** (computer): gioco al centro, fascia comandi touch sotto.
+- **Schermo grande** (computer con mouse e tastiera, altezza oltre 560 px): niente comandi touch, il gioco usa tutta l'altezza disponibile; si gioca con la tastiera. Tablet e schermi touch tengono la fascia comandi sotto il gioco.
 - Il canvas mantiene il rapporto 960:540 e si adatta allo spazio libero (densità fino a 2×).
 
 ## Colori
