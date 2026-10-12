@@ -258,9 +258,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=52"></script>
+<script src="config.js?v=53"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=52"></script>
+<script src="backend.js?v=53"></script>
 <script>
 (function(){
 "use strict";
@@ -383,6 +383,16 @@ document.querySelectorAll('.seg').forEach(seg => {
   });
 });
 view.apply();
+// regia e ledwall nello stesso browser: le scelte fatte in una finestra arrivano subito anche all'altra
+window.addEventListener('storage', e => {
+  if (e.key !== 'efgBoardView3' || !e.newValue) return;
+  let n; try { n = JSON.parse(e.newValue); } catch(err){ return; }
+  const before = st.group + '|' + st.top; let changed = false;
+  for (const k in OPTS) if (OPTS[k].includes(n[k]) && st[k] !== n[k]){ st[k] = n[k]; changed = true; }
+  if (!changed) return;
+  view.apply();
+  if (st.group + '|' + st.top !== before){ Object.keys(rowsByKey).forEach(k => delete rowsByKey[k]); document.querySelectorAll('main ol').forEach(o => o.innerHTML = ''); refresh(); }
+});
 
 let timer = 0;
 async function refresh(){
@@ -405,11 +415,13 @@ async function refresh(){
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
 window.addEventListener('storage', () => { if (!B.remote) refresh(); });   // demo: aggiorna quando l'app scrive
 /* 📺 Proietta: mette QUESTA classifica a schermo intero sul secondo monitor (ledwall o proiettore),
-   senza barre del browser. Con Chrome/Edge (Window Management API) basta un clic: lo schermo
-   intero va direttamente sull'altro monitor; Esc lo chiude e la finestra torna qui.
+   senza barre del browser, e nello stesso clic riapre la regia (?regia=1) qui sul primo monitor,
+   dove era la finestra. Con Chrome/Edge (Window Management API) basta un clic; le scelte fatte
+   nella regia arrivano subito al ledwall. Esc sul ledwall chiude lo schermo intero.
    Senza secondo monitor o senza permesso: schermo intero su questo monitor.
    ?proietta=1 resta per la finestra aperta da admin › Proietta. */
 const PROJ = Q.get('proietta') === '1';   // finestra aperta dall'admin sul secondo monitor
+if (Q.get('regia') === '1') document.title = 'Regia · ' + document.title;   // finestra di regia aperta da Proietta
 let screens = null;                       // dettagli degli schermi, dopo il permesso
 async function loadScreens(ask){
   if (!('getScreenDetails' in window)) return null;
@@ -440,8 +452,18 @@ async function proietta(){
   const asked = !screens && 'getScreenDetails' in window;
   if (asked) await loadScreens(true);
   const scr = otherScreen();
+  const here = { left: window.screenX, top: window.screenY, width: window.outerWidth, height: window.outerHeight };   // dove resta la regia
   try {
     await el.requestFullscreen(scr ? { screen: scr, navigationUI: 'hide' } : { navigationUI: 'hide' });
+    if (scr){
+      // regia sul primo monitor: con il permesso "Gestione finestre" il browser consente questa finestra nello stesso clic
+      const u = new URL(location.href); u.searchParams.delete('proietta'); u.searchParams.set('regia', '1');
+      const w = window.open(u.pathname + u.search, 'efgRegia', 'popup,left=' + here.left + ',top=' + here.top + ',width=' + here.width + ',height=' + here.height);
+      if (!w){   // regia bloccata: si torna qui per non restare senza regia
+        await document.exitFullscreen().catch(() => {});
+        fsMsg('Il browser ha bloccato la finestra di regia: consenti i popup per questo sito (icona nella barra dell\'indirizzo) e premi di nuovo "Proietta".');
+      }
+    }
     if (!scr) fsMsg('getScreenDetails' in window
       ? 'Non trovo un secondo monitor (o il permesso "Gestione finestre" è negato): classifica a schermo intero su questo monitor. Esc per uscire.'
       : 'Questo browser non sa scegliere il monitor (meglio Chrome o Edge): classifica a schermo intero su questo monitor. Esc per uscire.');

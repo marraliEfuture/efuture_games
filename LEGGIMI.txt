@@ -38,8 +38,11 @@ CODICI DI SBLOCCO (uno per gioco)
    ledwall:  https://marraliefuture.github.io/efuture_games/classifica.html
    - Si aggiorna da sola ogni 15 secondi. Pulsante "📺 Proietta": con
      Chrome o Edge mette la classifica A SCHERMO INTERO SUL SECONDO MONITOR
-     (ledwall/proiettore), senza barre del browser, con un solo clic. Esc
-     la chiude e la finestra torna sul primo monitor. La prima volta il
+     (ledwall/proiettore), senza barre del browser, con un solo clic; sul
+     primo monitor si riapre subito la finestra di REGIA (titolo "Regia ·"):
+     le scelte fatte lì (classifica, Top, giocatori, QR) arrivano subito al
+     ledwall. Esc sul ledwall chiude lo schermo intero. Se il browser blocca
+     la regia, consenti i popup per il sito e premi di nuovo Proietta. La prima volta il
      browser chiede il permesso "Gestione finestre": consenti e premi di
      nuovo Proietta. Con un solo schermo o altri browser va a schermo
      intero sul monitor dove si trova.

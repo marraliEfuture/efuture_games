@@ -102,7 +102,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v52' : 'Modalità demo: account e classifica restano su questo telefono. · v52';
+  mn.textContent = remote ? 'Classifica online · v53' : 'Modalità demo: account e classifica restano su questo telefono. · v53';
 }
 
 /* ================= UNLOCK: camera + code ================= */
