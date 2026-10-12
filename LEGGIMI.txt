@@ -56,6 +56,13 @@ CODICI DI SBLOCCO (uno per gioco)
      Editor (rieseguilo quando il file cambia). Se manca, la classifica lo
      scrive in alto e mostra tutti i giocatori. Da indirizzo, ad esempio:
        classifica.html?classifica=tutti&top=10&giocatori=efuture&qr=no
+   - Bonus Recensione: in home, sotto i giochi, chi ha fatto l'accesso trova
+     il pulsante "⭐ Bonus Recensione". Apre le recensioni Google di efuture
+     e registra il clic. In admin › Utenti la colonna ⭐ è gialla per chi ha
+     cliccato: dopo aver trovato la sua recensione su Google cliccala e
+     diventa verde (+200 punti nella classifica generale). Il link alle
+     recensioni si incolla sopra la tabella Utenti. Una volta sola esegui
+     supabase-recensioni.sql nel SQL Editor (dopo supabase-tipi-utenti.sql).
    - Pulsante "⏱ Countdown": scegli Apertura o Chiusura, i minuti, scrivi
      email e chiave admin (le stesse di admin.html; email vuota per la
      chiave principale) e premi Start; Stop lo annulla. Una volta sola esegui

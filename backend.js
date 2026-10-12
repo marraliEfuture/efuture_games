@@ -54,6 +54,12 @@ const Backend = remote ? {
     }
     return (await rpc('efg_board', { p_game:game })) || [];
   },
+  // Bonus Recensione: { link, clic, ok, punti } (null se il database non ha ancora le funzioni)
+  async review(user){
+    try { return one(await rpc('efg_recensione_info', { p_email:user ? user.email : '' })); }
+    catch(e){ if (/efg_recensione_info|PGRST202|does not exist/i.test(String(e && (e.code + ' ' + e.message)))) return null; throw e; }
+  },
+  async reviewClick(user){ return one(await rpc('efg_recensione_click', { p_email:user.email })); },
   // countdown di apertura/chiusura: { mode:'apertura'|'chiusura'|null, ends_at, minutes, now }
   async gate(){
     try { return one(await rpc('efg_gate_state', {})) || { mode:null }; }
@@ -101,6 +107,14 @@ const Backend = remote ? {
     return Object.values(tot).sort((a,b)=>b.levels-a.levels || b.score-a.score).slice(0,50);
   },
 };
+
+// demo: il clic sul Bonus Recensione resta su questo dispositivo (nessun admin che lo conferma)
+if (!Backend.remote){
+  Backend.review = async user => ({ link:null, clic:!!(user && store.get('efgDemoReview', {})[user.email]), ok:false, punti:200 });
+  Backend.reviewClick = async user => { const r = store.get('efgDemoReview', {}); r[user.email] = r[user.email] || new Date().toISOString(); store.set('efgDemoReview', r); return Backend.review(user); };
+}
+// pagina delle recensioni Google di efuture: il link scelto in admin, altrimenti la ricerca su Google Maps
+window.EFG_REVIEW_URL = link => link || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('efuture recensioni');
 
 // demo: countdown salvato su questo dispositivo (app e classifica aperte nello stesso browser lo condividono)
 if (!Backend.remote){
