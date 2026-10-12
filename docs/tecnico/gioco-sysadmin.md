@@ -277,7 +277,7 @@ Definite in cima allo script (sezione CONSTANTS) o direttamente nelle funzioni i
 | `JUMP_BUFFER` | 0,12 s | Salto premuto poco prima di atterrare |
 | `STOMP_BOUNCE` | −520 px/s | Rimbalzo dopo una pestata (×0,8 sull'hacker) |
 | `THROW_COOLDOWN` | 0,42 s | Pausa tra due lanci del mouse |
-| `PROJ_SPEED`, `PROJ_W`, `PROJ_H` | 680 px/s, 40 × 24 px | Proiettile mouse: parte dai piedi (`player.y + player.h - PROJ_H`, a metà corpo se lanciato in salto) e nel ciclo dei proiettili usa `resolveVertical` con `allSolids()`, quindi scivola a terra o sulle piattaforme e cade nei burroni |
+| `PROJ_SPEED`, `PROJ_W`, `PROJ_H` | 680 px/s, 40 × 24 px | Proiettile mouse: parte all'altezza dei piedi (`player.y + player.h - PROJ_H`) e si muove solo in orizzontale (niente gravità) |
 | `SPECIAL_SPEED` | 560 px/s | Proiettile antivirus (40 × 30 px) |
 | `SPECIAL_COOLDOWN` | 1,0 s | Pausa dopo l'antivirus (vedi Limiti noti) |
 | `INVULN_TIME` | 1,3 s | Invulnerabilità dopo un colpo |
