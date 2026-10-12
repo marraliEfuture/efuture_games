@@ -29,7 +29,7 @@ Sparatutto nello stile di Space Invaders. Il giocatore guida la nuvola di innclo
 | **Istruzioni** (`howBox`) | Tre righe con disegnino: "Premi SPARA per colpire, trascina per muoverti.", "Abbatti tutti, schiva i codici verdi.", "Riparati dietro le nuvolette." "5 livelli, boss finale." Tasti: Trascina o frecce · Spazio spara · P pausa | – |
 | **Animazione iniziale** | Dopo **Inizia** (e **Gioca ancora**): un hacker scende sul logo, il pallino rosso della "i" parte e lo abbatte, il logo scivola giù e diventa la nuvola, compare INVADERS. Dura 4,3 s; "TOCCA PER SALTARE": un tocco o un tasto la salta | – |
 | **Scheda del livello** (`ov-level`) | **Non compare più:** il livello parte subito, senza nome né frase di spiegazione (la scheda resta nella pagina ma non viene mostrata) | – |
-| **Livello superato** (`ov-clear`) | Dopo 1,1 s: "Attacco respinto", "Livello N superato!", punti, attaccanti abbattuti, tempo | **Prossimo livello** |
+| **Livello superato** (`ov-clear`) | Dopo 1,1 s: "Attacco respinto", "Livello N superato!", punti, attaccanti abbattuti, tempo | **Prossimo livello** (arancione, come in tutti i giochi) |
 | **Pausa** (`ov-pause`) | PAUSA | **Riprendi**, **Menu** |
 | **Game over** (`ov-over`) | "Cloud violato", GAME OVER, "Difese bucate.", punti, livello N/5 (gara N/3) | **Riprova livello**, **Menu** |
 | **Vittoria** (`ov-win`) | "Missione compiuta", CLOUD AL SICURO, "Ransomware sconfitto: dati al sicuro.", punteggio finale, record, "Nuovo record!" o "Record da battere: N" | **Gioca ancora** |

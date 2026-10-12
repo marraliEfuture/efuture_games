@@ -114,6 +114,7 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
 - **AVVIA / PAUSA:** il testo cambia da solo (controllo ogni 0,3 s).
   - Schermata di pausa aperta: scritta PAUSA, il tocco preme il pulsante pausa e il gioco riprende.
   - Una schermata con un pulsante principale visibile (Inizia, Via!, Prossimo livello, Riprova…): scritta AVVIA, il tocco preme il primo visibile.
+- **Fine livello:** in tutti e 4 i giochi il pulsante per andare avanti (Prossimo livello, Prossimo ticket, Chiudi il ticket) è **arancione** (`#f18c22`, classe `btn go` nei giochi con `game.js`) ed è il primo; le alternative (per esempio Torna a debuggare) sono bianche.
   - Durante il gioco: scritta PAUSA, il tocco mette in pausa.
 - I tastini scattano al rilascio del dito. Non fanno partire trascinamenti o lanci del gioco sotto.
 

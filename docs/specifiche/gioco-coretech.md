@@ -30,7 +30,7 @@ Labirinto nello stile di Pac-Man. Il giocatore guida la **C del logo CoreTech**,
 | **Animazione iniziale** | Dopo **Inizia** (e **Gioca ancora**): la C del logo si stacca e "mangia" le lettere di "oreTech", poi compare PAC. Dura circa 4,2 s; "TOCCA PER SALTARE": un tocco o un tasto la salta | – |
 | **Scheda del livello** (`ov-level`) | "Livello 1/5" (gara: "/3"), nome, frase e numero di bug (per esempio "Labirinto piccolo, bug lenti. Bug: 2.") | **Via!** |
 | **Pronti** | Dopo Via! e dopo ogni vita persa: scritta PRONTI! sul labirinto per 1,8 s, poi si parte | – |
-| **Livello completato** (`ov-clear`) | Dopo 0,9 s: "Sistema ripulito", "Livello N completato!", punti, bug mangiati, tempo | **Prossimo livello** |
+| **Livello completato** (`ov-clear`) | Dopo 0,9 s: "Sistema ripulito", "Livello N completato!", punti, bug mangiati, tempo | **Prossimo livello** (arancione, come in tutti i giochi) |
 | **Pausa** (`ov-pause`) | PAUSA | **Riprendi**, **Menu** |
 | **Game over** (`ov-over`) | "Sistema compromesso", GAME OVER, "I bug hanno vinto, per stavolta.", punti, livello N/5 (gara N/3) | **Riprova livello**, **Menu** |
 | **Vittoria** (`ov-win`) | "Missione compiuta", CORE PULITO, "Tutti i 5 livelli ripuliti!", punteggio finale, record, "Nuovo record!" o "Record da battere: N" | **Gioca ancora** |
