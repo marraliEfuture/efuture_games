@@ -258,9 +258,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=50"></script>
+<script src="config.js?v=51"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=50"></script>
+<script src="backend.js?v=51"></script>
 <script>
 (function(){
 "use strict";
@@ -313,7 +313,7 @@ function render(key, rows, top){
     const li = e.li;
     li.querySelector('.r').textContent = i + 1;
     li.querySelector('.n').textContent = r.name;
-    li.querySelector('.lv').textContent = (key === 'all' ? (r.games || 0) + '/4 giochi · ' + (r.levels || 0) + '/12 liv' : (r.levels || 0) + '/3 liv');
+    li.querySelector('.lv').textContent = (key === 'all' ? (r.games || 0) + '/4 giochi · ' + (r.levels || 0) + '/12 liv' + (r.bonus ? ' · ⭐ +' + r.bonus + ' bonus' : '') : (r.levels || 0) + '/3 liv');
     li.querySelector('.s b').textContent = r.score;
     const changed = !firstTime && (isNew || e.sig !== sig);
     e.sig = sig; e.changed = changed; e.isNew = isNew && !firstTime;

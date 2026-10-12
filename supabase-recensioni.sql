@@ -163,5 +163,15 @@ $$;
 revoke all on function public.efg_board(text), public.efg_board_group(text, text) from public;
 grant execute on function public.efg_board(text), public.efg_board_group(text, text) to anon, authenticated;
 
+-- 7. chi ha il bonus (per l'etichetta "+200 bonus" nella classifica generale)
+create or replace function public.efg_recensione_bonus()
+returns table (pid uuid, punti integer)
+language sql stable security definer set search_path = public as $$
+  select p.pid, efg_bonus_recensione() from efg_players p
+  where p.recensione_ok is not null and not p.disabilitato;
+$$;
+revoke all on function public.efg_recensione_bonus() from public;
+grant execute on function public.efg_recensione_bonus() to anon, authenticated;
+
 -- fa vedere subito le nuove funzioni all'app (senza aspettare)
 notify pgrst, 'reload schema';
