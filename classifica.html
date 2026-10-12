@@ -113,7 +113,7 @@ li.fresh{background:#ffe7d4}
 .gmin{display:flex;align-items:center;gap:10px;font-weight:600}
 .gmin input{width:110px;font:inherit;font-size:18px;padding:8px 10px;border:1px solid var(--line);border-radius:4px}
 .grow2{display:flex;gap:10px;flex-wrap:wrap}
-:fullscreen #btnGate,.proj #btnGate{display:none}
+:fullscreen #btnGate,.proj #btnGate,:fullscreen #btnFull{display:none}
 /* contenitore delle classifiche: giochi e generale affiancati */
 .boards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:inherit;align-items:start;min-width:0}
 main.only-total .boards,main.only-games .boards{grid-template-columns:minmax(0,1fr)}
@@ -192,7 +192,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   <div class="live">
     <span class="dot" id="dot" aria-hidden="true"></span>
     <span id="status" aria-live="polite">Carico…</span>
-    <button class="btn" id="btnFull" type="button" title="Apre la classifica sul secondo monitor (ledwall o proiettore); questa finestra resta qui">📺 Proietta</button>
+    <button class="btn" id="btnFull" type="button" title="Classifica a schermo intero sul secondo monitor (ledwall o proiettore), senza barre del browser. Esc per tornare qui">📺 Proietta</button>
     <button class="btn ghost" id="btnGate" type="button">⏱ Countdown</button>
     <a class="btn ghost" id="btnAdmin" href="admin.html" title="Area amministratori">Admin</a>
   </div>
@@ -258,9 +258,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=51"></script>
+<script src="config.js?v=52"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=51"></script>
+<script src="backend.js?v=52"></script>
 <script>
 (function(){
 "use strict";
@@ -404,10 +404,12 @@ async function refresh(){
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
 window.addEventListener('storage', () => { if (!B.remote) refresh(); });   // demo: aggiorna quando l'app scrive
-/* 📺 Proietta: apre la classifica in una finestra sul secondo monitor (ledwall o proiettore);
-   questa finestra resta dov'è. Con Chrome/Edge (Window Management API) la finestra va
-   direttamente sull'altro schermo; lì un clic la mette a schermo intero (?proietta=1). */
-const PROJ = Q.get('proietta') === '1';   // finestra già sul secondo monitor
+/* 📺 Proietta: mette QUESTA classifica a schermo intero sul secondo monitor (ledwall o proiettore),
+   senza barre del browser. Con Chrome/Edge (Window Management API) basta un clic: lo schermo
+   intero va direttamente sull'altro monitor; Esc lo chiude e la finestra torna qui.
+   Senza secondo monitor o senza permesso: schermo intero su questo monitor.
+   ?proietta=1 resta per la finestra aperta da admin › Proietta. */
+const PROJ = Q.get('proietta') === '1';   // finestra aperta dall'admin sul secondo monitor
 let screens = null;                       // dettagli degli schermi, dopo il permesso
 async function loadScreens(ask){
   if (!('getScreenDetails' in window)) return null;
@@ -432,17 +434,21 @@ function fsMsg(t){
   clearTimeout(fsMsg.t); fsMsg.t = setTimeout(() => { m.hidden = true; }, 9000);
 }
 async function proietta(){
-  const first = !screens && 'getScreenDetails' in window;
-  if (first) await loadScreens(true);       // la prima volta il browser chiede il permesso "Gestione finestre"
+  const el = document.documentElement;
+  if (!el.requestFullscreen) return fsMsg('Questo browser non consente lo schermo intero: usa Chrome o Edge.');
+  // la prima volta il browser chiede il permesso "Gestione finestre" (serve per scegliere il monitor)
+  const asked = !screens && 'getScreenDetails' in window;
+  if (asked) await loadScreens(true);
   const scr = otherScreen();
-  const f = scr ? 'popup,fullscreen,left=' + scr.availLeft + ',top=' + scr.availTop + ',width=' + scr.availWidth + ',height=' + scr.availHeight
-                : 'popup,width=1280,height=760';
-  const u = new URL(location.href); u.searchParams.set('proietta', '1');
-  const w = window.open(u.pathname + u.search, 'efgLedwall', f);
-  if (!w){ fsMsg(first ? 'Permesso concesso: premi di nuovo "Proietta".' : 'Il browser ha bloccato la finestra: consenti i popup per questo sito e riprova.'); return; }
-  if (scr) fsMsg('Classifica aperta sul secondo monitor, grande quanto lo schermo. Se vedi ancora la barra della finestra, clicca una volta sulla classifica.');
-  else if (!('getScreenDetails' in window)) fsMsg('Questo browser non sa scegliere il monitor: trascina la finestra della classifica sul secondo schermo e cliccaci sopra (meglio Chrome o Edge).');
-  else fsMsg('Non trovo un secondo monitor (o il permesso è negato): trascina la finestra della classifica sull\'altro schermo e cliccaci sopra.');
+  try {
+    await el.requestFullscreen(scr ? { screen: scr, navigationUI: 'hide' } : { navigationUI: 'hide' });
+    if (!scr) fsMsg('getScreenDetails' in window
+      ? 'Non trovo un secondo monitor (o il permesso "Gestione finestre" è negato): classifica a schermo intero su questo monitor. Esc per uscire.'
+      : 'Questo browser non sa scegliere il monitor (meglio Chrome o Edge): classifica a schermo intero su questo monitor. Esc per uscire.');
+  } catch (e) {
+    // dopo la richiesta di permesso il browser può non accettare più il clic: basta premere di nuovo
+    fsMsg(asked ? 'Permesso concesso: premi di nuovo "Proietta".' : 'Il browser non ha concesso lo schermo intero: premi di nuovo "Proietta".');
+  }
 }
 if (PROJ){
   // finestra proiettata: il pulsante mette o toglie lo schermo intero su questo monitor

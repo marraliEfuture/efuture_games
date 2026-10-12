@@ -36,15 +36,16 @@ CODICI DI SBLOCCO (uno per gioco)
 2b) CLASSIFICA DA PROIETTARE
    Pagina dedicata, da aprire su un PC collegato allo schermo o al
    ledwall:  https://marraliefuture.github.io/efuture_games/classifica.html
-   - Si aggiorna da sola ogni 15 secondi. Pulsante "📺 Proietta" (anche
-     nel pannello admin): con Chrome o Edge apre la classifica in una
-     finestra sul SECONDO MONITOR (ledwall/proiettore); la finestra da cui
-     premi (per esempio l'admin) resta sul primo. Sul ledwall la classifica
-     si apre gia' grande quanto lo schermo; se resta la barra della
-     finestra, un clic sulla classifica la toglie. La prima volta il browser
-     chiede il permesso "Gestione finestre": consenti (se serve, premi di
-     nuovo Proietta). Con un solo schermo o altri browser la finestra si
-     apre normale: trascinala sull'altro schermo. Per uscire: Esc.
+   - Si aggiorna da sola ogni 15 secondi. Pulsante "📺 Proietta": con
+     Chrome o Edge mette la classifica A SCHERMO INTERO SUL SECONDO MONITOR
+     (ledwall/proiettore), senza barre del browser, con un solo clic. Esc
+     la chiude e la finestra torna sul primo monitor. La prima volta il
+     browser chiede il permesso "Gestione finestre": consenti e premi di
+     nuovo Proietta. Con un solo schermo o altri browser va a schermo
+     intero sul monitor dove si trova.
+     "📺 Proietta" del pannello admin invece apre la classifica in una
+     nuova finestra sul secondo monitor e l'admin resta sul primo: lì
+     serve un clic sulla classifica per togliere la barra della finestra.
    - Mostra le classifiche dei giochi, la classifica generale e un QR
      grande per aprire l'app.
    - Pulsanti sotto il titolo (le scelte restano salvate sullo schermo):
