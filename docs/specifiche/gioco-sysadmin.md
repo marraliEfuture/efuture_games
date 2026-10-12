@@ -128,9 +128,10 @@ L'antivirus è sbloccato dall'inizio.
 - velocità 350 px/s, gravità 2200, salto −800 px/s, caduta massima 1200 px/s;
 - salto "tollerante": vale ancora per 0,09 s dopo aver lasciato il bordo e se premuto fino a 0,12 s prima di toccare terra;
 - si gira nella direzione di marcia (anche la testa-logo è specchiata).
+- **corporatura media** (dalla v58): felpa larga circa il 58% del giocatore, gambe e braccia robuste; la testa è la "e" del logo. Il bordo di collisione non cambia.
 
 **Armi:**
-- **Mouse** (X): mouse grande (40 × 24 px) che parte dai piedi e **scivola a filo del terreno** a 680 px/s, una volta ogni 0,42 s; resta appoggiato a terra o sulle piattaforme e cade nei burroni. Lanciato durante un salto parte a metà altezza, cade e poi scivola: così può colpire anche un bug volante mentre scende. Elimina un bug; sull'hacker toglie 1 vita. I bug volanti si eliminano soprattutto saltandoci sopra o con l'antivirus.
+- **Mouse** (X): mouse grande (40 × 24 px) che parte all'altezza dei piedi e va **dritto in orizzontale** a 680 px/s, senza gravità, una volta ogni 0,42 s: lanciato da terra corre a filo del terreno (colpisce i bug a terra), lanciato in salto resta all'altezza da cui è partito (così può colpire un bug volante). Elimina un bug; sull'hacker toglie 1 vita. I bug volanti si eliminano soprattutto saltandoci sopra o con l'antivirus.
 - **Antivirus** (V): si sblocca con **3 bug eliminati di fila senza essere colpiti**. Proiettile verde a 560 px/s, ogni 1 s, che attraversa i nemici e li elimina tutti; sull'hacker toglie 2 vite. Si perde quando si viene colpiti.
 
 **Collisioni:**

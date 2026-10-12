@@ -1180,11 +1180,11 @@ function updatePlayer(dt){
     throwPressedEdge = false;
     if (player.throwCd <= 0){
       player.throwCd = THROW_COOLDOWN;
-      // il mouse parte dai piedi e scivola a filo del terreno; lanciato in salto, cade e poi scivola
+      // il mouse parte all'altezza dei piedi (a terra: a filo del terreno) e va dritto in orizzontale
       projectiles.push({
         x: player.x + (player.facing>0? player.w : -PROJ_W),
-        y: player.onGround ? player.y + player.h - PROJ_H : player.y + player.h*0.5,
-        vx: PROJ_SPEED*player.facing, vy:0, w:PROJ_W, h:PROJ_H, owner:'player', kind:'mouse', alive:true, onGround:player.onGround
+        y: player.y + player.h - PROJ_H,
+        vx: PROJ_SPEED*player.facing, w:PROJ_W, h:PROJ_H, owner:'player', kind:'mouse', alive:true
       });
     }
   }
@@ -1312,14 +1312,9 @@ function updateEnemiesAndCombat(dt, t){
     }
   }
 
-  const solidsForMouse = projectiles.some(p=>p.kind==='mouse') ? allSolids() : null;
   for (const p of projectiles){
     if (!p.alive) continue;
     p.x += p.vx*dt;
-    if (p.kind==='mouse'){   // gravità: resta appoggiato a terra o sulle piattaforme, nei burroni cade
-      resolveVertical(p, dt, solidsForMouse);
-      if (p.y > VH + 40){ p.alive = false; continue; }
-    }
     if (p.owner==='player'){
       for (const e of level.enemies){
         if (!e.alive) continue;
@@ -2364,34 +2359,34 @@ function drawHumanLogoFigure(c, w, h, o){
   const cx = w/2;
   const shoulderY = h*0.45, hipY = h*0.69;
   const legLen = h*0.28, armLen = h*0.24;
-  const legW = Math.max(3, w*0.13), armW = Math.max(2.5, w*0.1);
+  const legW = Math.max(4, w*0.17), armW = Math.max(3.5, w*0.13);   // corporatura media
   // body is drawn in "facing right" space and mirrored; the logo head is mirrored with it (drawLogoHead)
   c.save();
   if (o.facing < 0){ c.translate(w,0); c.scale(-1,1); }
   // back arm and back leg (darker, behind torso)
   const airLeg = o.air ? 0.5 : 0;
-  let f = limb(c, cx-w*0.08, hipY, legLen, -swing - airLeg*0.6, legW, '#16263a');
+  let f = limb(c, cx-w*0.11, hipY, legLen, -swing - airLeg*0.6, legW, '#16263a');
   c.fillStyle = SHOE; c.fillRect(f[0]-legW*0.55, f[1]-2, legW*1.5, 4);
-  if (armsUp){ limb(c, cx-w*0.17, shoulderY, armLen, Math.PI*0.85, armW, HOOD_D); }
-  else { const a = limb(c, cx-w*0.17, shoulderY, armLen, swing*0.9 + (o.air?-0.9:0), armW, HOOD_D);
+  if (armsUp){ limb(c, cx-w*0.24, shoulderY, armLen, Math.PI*0.85, armW, HOOD_D); }
+  else { const a = limb(c, cx-w*0.24, shoulderY, armLen, swing*0.9 + (o.air?-0.9:0), armW, HOOD_D);
          c.fillStyle = SKIN; c.beginPath(); c.arc(a[0],a[1],armW*0.55,0,7); c.fill(); }
   // torso: hoodie
   c.fillStyle = HOOD;
-  const tx = cx-w*0.21, tw = w*0.42, ty = shoulderY-h*0.05, th = hipY-ty+h*0.03;
-  c.beginPath(); c.roundRect ? c.roundRect(tx,ty,tw,th,[w*0.12,w*0.12,w*0.05,w*0.05]) : c.rect(tx,ty,tw,th); c.fill();
+  const tx = cx-w*0.29, tw = w*0.58, ty = shoulderY-h*0.05, th = hipY-ty+h*0.03;
+  c.beginPath(); c.roundRect ? c.roundRect(tx,ty,tw,th,[w*0.15,w*0.15,w*0.07,w*0.07]) : c.rect(tx,ty,tw,th); c.fill();
   // zip + pocket
   c.strokeStyle = SHOE; c.lineWidth = 1.2;
   c.beginPath(); c.moveTo(cx+w*0.02, ty+2); c.lineTo(cx+w*0.02, ty+th-1); c.stroke();
   c.fillStyle = 'rgba(0,0,0,0.18)'; c.fillRect(tx+tw*0.2, ty+th*0.62, tw*0.6, th*0.26);
   // neck
-  c.fillStyle = SKIN; c.fillRect(cx-w*0.06, ty-h*0.05, w*0.12, h*0.06);
+  c.fillStyle = SKIN; c.fillRect(cx-w*0.075, ty-h*0.05, w*0.15, h*0.06);
   // front leg
-  f = limb(c, cx+w*0.08, hipY, legLen, swing + airLeg, legW, PANTS);
+  f = limb(c, cx+w*0.11, hipY, legLen, swing + airLeg, legW, PANTS);
   c.fillStyle = SHOE; c.fillRect(f[0]-legW*0.55, f[1]-2, legW*1.5, 4);
   // front arm (holds the mouse)
-  if (armsUp){ limb(c, cx+w*0.17, shoulderY, armLen, Math.PI*0.85, armW, HOOD); }
+  if (armsUp){ limb(c, cx+w*0.24, shoulderY, armLen, Math.PI*0.85, armW, HOOD); }
   else {
-    const a = limb(c, cx+w*0.17, shoulderY, armLen, -swing*0.9 + (o.air?0.9:0.25), armW, HOOD);
+    const a = limb(c, cx+w*0.24, shoulderY, armLen, -swing*0.9 + (o.air?0.9:0.25), armW, HOOD);
     c.fillStyle = SKIN; c.beginPath(); c.arc(a[0],a[1],armW*0.55,0,7); c.fill();
     if (o.mouse){ c.fillStyle = '#c8d0d8'; c.fillRect(a[0]+1, a[1]-3, 7, 6); c.fillStyle='#8a96a3'; c.fillRect(a[0]+4, a[1]-3, 1, 3); }
   }
