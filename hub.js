@@ -98,10 +98,11 @@ document.addEventListener('visibilitychange', ()=>{ if (!document.hidden && $('p
 
 function renderDock(){
   $('dockOut').hidden = !!session; $('dockIn').hidden = !session;
+  loadReview();
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v49' : 'Modalità demo: account e classifica restano su questo telefono. · v49';
+  mn.textContent = remote ? 'Classifica online · v50' : 'Modalità demo: account e classifica restano su questo telefono. · v50';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -442,6 +443,33 @@ setInterval(renderGate, 1000);
 setInterval(loadGate, 15000);
 document.addEventListener('visibilitychange', ()=>{ if (!document.hidden) loadGate(); });
 window.addEventListener('storage', e=>{ if (e.key === 'efgDemoGate') loadGate(); });   // demo: countdown avviato dalla classifica nello stesso browser
+
+/* ================= BONUS RECENSIONE =================
+   Il pulsante apre le recensioni Google di efuture e registra il clic (admin › Utenti:
+   stellina gialla). Quando un admin conferma la recensione (stellina verde) il giocatore
+   riceve i punti bonus nella classifica generale. */
+let review = null;   // { link, clic, ok, punti }
+async function loadReview(){
+  const me = session;
+  if (!me){ review = null; renderReview(); return; }
+  try { const r = await Backend.review(me); if (session === me){ review = r; renderReview(); } } catch(e){}
+}
+function renderReview(){
+  const box = $('review'), txt = $('reviewTxt'), pt = (review && review.punti) || 200;
+  box.hidden = !session || review === null;
+  if (box.hidden) return;
+  box.classList.toggle('ok', !!review.ok);
+  $('btnReview').textContent = review.ok ? '✅ Bonus Recensione ottenuto' : '⭐ Bonus Recensione';
+  txt.innerHTML = review.ok ? 'Grazie! I tuoi <b>+' + pt + ' punti</b> sono già nella classifica generale.'
+    : review.clic ? 'Grazie! Quando confermiamo la tua recensione su Google ricevi <b>+' + pt + ' punti</b> nella classifica generale.'
+    : 'Lascia una recensione a efuture su Google: quando la confermiamo ricevi <b>+' + pt + ' punti</b> nella classifica generale.';
+}
+$('btnReview').addEventListener('click', ()=>{
+  if (!session) return;
+  window.open(window.EFG_REVIEW_URL(review && review.link), '_blank', 'noopener');   // subito, prima della rete: niente blocco dei popup
+  const me = session;
+  Backend.reviewClick(me).then(r=>{ if (session === me && r){ review = r; renderReview(); } }).catch(err=>toast(friendly(err)));
+});
 
 /* ================= BOOT ================= */
 renderGrid(); renderDock(); loadGate();

@@ -84,6 +84,12 @@ tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 .offtag{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;color:var(--danger);border:1px solid var(--danger);border-radius:3px;padding:0 5px;vertical-align:1px}
 .btn.edit{background:#fff;color:var(--navy);border:1px solid var(--navy);padding:4px 10px;font-size:12px}
 .acts{display:flex;gap:6px;flex-wrap:nowrap}
+.rstar{background:none;border:0;padding:2px;font-size:24px;line-height:1;cursor:pointer;text-shadow:0 1px 0 rgba(0,0,0,.18)}
+.rstar.y{color:#f5b301}.rstar.g{color:#1f9d5c}
+.rstar.no{cursor:default;color:#c9d2db;text-shadow:none}
+.rlink{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border:1px dashed var(--line);border-radius:6px}
+.rlink label{font-weight:600;white-space:nowrap}
+.rlink input{flex:1;min-width:220px}
 .btn.block{padding:4px 10px;font-size:12px;white-space:nowrap}
 .pop{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(20,29,40,.45);padding:16px}
 .pop .box{background:#fff;border-radius:8px;box-shadow:0 20px 50px rgba(20,29,40,.3);width:100%;max-width:440px;padding:20px;display:flex;flex-direction:column;gap:14px;max-height:calc(100vh - 32px);overflow-y:auto}
@@ -286,6 +292,13 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <div class="bar"><span class="grow dim" id="pInfo"></span>
           <button class="btn ghost" id="pReload" type="button">Aggiorna</button>
           <button class="btn navy" id="pCsv" type="button">Scarica CSV</button></div>
+        <form class="rlink" id="rLinkForm" autocomplete="off">
+          <label for="rLink">⭐ Link recensioni Google</label>
+          <input id="rLink" type="url" inputmode="url" placeholder="https://g.page/r/… (vuoto = ricerca di efuture su Google Maps)">
+          <button class="btn ghost" type="submit">Salva link</button>
+          <span class="msg" id="rLinkMsg" aria-live="polite"></span>
+        </form>
+        <p class="dim small" style="margin:6px 0 0">Colonna ⭐: <b>gialla</b> = ha cliccato «Bonus Recensione» nell'app; cliccala dopo aver trovato la sua recensione su Google per farla diventare <b>verde</b> (+200 punti nella classifica generale). Clic sulla verde per toglierla.</p>
         <div class="tablewrap" style="margin-top:10px"><table id="pTable"></table></div>
       </section>
 
@@ -296,6 +309,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
             <option value="partita">Partite</option>
             <option value="registrazione">Registrazioni</option>
             <option value="accesso">Accessi giocatori</option>
+            <option value="recensione">Clic Bonus Recensione</option>
             <option value="admin">Operazioni admin</option>
           </select>
           <select id="lLimit" style="max-width:140px"><option>100</option><option selected>300</option><option>1000</option><option>2000</option></select>
@@ -452,7 +466,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=49"></script>
+<script src="config.js?v=50"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script>
@@ -594,12 +608,13 @@ let players = [];
 async function loadPlayers(){
   $('pInfo').textContent = 'Carico…';
   try { players = await call('efg_admin_players') || []; } catch(err){ return onErr(err, $('pInfo')); }
+  if (!$('rLink').value && document.activeElement !== $('rLink')) loadReviewLink();
   $('pInfo').textContent = players.length + ' utenti registrati';
   const det = p => Object.keys(GAMES).map(g => { const x = p.dettaglio && p.dettaglio[g]; return x ? GAMES[g] + ' ' + x.livelli + '/3 · ' + x.punti : null; }).filter(Boolean).join(' — ');
   const sorted = players.slice().sort((a, b) => b.livelli - a.livelli || b.punti - a.punti);
-  fillTable($('pTable'), ['#', 'Tipo', 'Nome', 'Email', 'Registrato', 'Giochi sbloccati', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
-    sorted.map((p, i) => [i + 1, tipoIco(p), nameCell(p), p.email, fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), actions(p)]),
-    [null, null, null, null, 'small', 'num', 'num', 'num', 'small', null]);
+  fillTable($('pTable'), ['#', 'Tipo', '⭐', 'Nome', 'Email', 'Registrato', 'Giochi sbloccati', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
+    sorted.map((p, i) => [i + 1, tipoIco(p), reviewStar(p), nameCell(p), p.email, fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), actions(p)]),
+    [null, null, null, null, null, 'small', 'num', 'num', 'num', 'small', null]);
   $('pTable').querySelectorAll('tbody tr').forEach((tr, i) => { if (sorted[i] && sorted[i].disabilitato) tr.classList.add('off'); });
 }
 // tipo di utente (serve supabase-tipi-utenti.sql): simbolo in tabella, si cambia da Modifica
@@ -607,6 +622,33 @@ const TIPI = { giocatore:'Giocatore', admin_giocatore:'Admin e giocatore', admin
 const TIPO_ICO = { giocatore:'🎮', admin_giocatore:'🎮🛡️', admin:'🛡️' };   // prima il joystick, poi lo scudo
 const tipoOf = p => TIPI[p.tipo] ? p.tipo : 'giocatore';
 function tipoIco(p){ const s = document.createElement('span'); s.className = 'ttype'; const t = tipoOf(p); s.textContent = TIPO_ICO[t] + (p.chiave ? ' 🔑' : ''); s.title = TIPI[t] + (p.chiave ? ' · chiave admin personale impostata' : '') + (p.disabilitato ? ' · bloccato' : ''); s.setAttribute('aria-label', s.title); return s; }
+// Bonus Recensione (serve supabase-recensioni.sql): gialla = ha cliccato, verde = recensione confermata
+const REVIEW_PT = 200;
+function reviewStar(p){
+  const b = document.createElement('button'); b.type = 'button';
+  if (p.recensione_ok){ b.className = 'rstar g'; b.textContent = '★'; b.title = 'Recensione confermata il ' + fmtDate(p.recensione_ok) + ' · +' + REVIEW_PT + ' punti in classifica generale. Clic per toglierla.'; }
+  else if (p.recensione_clic){ b.className = 'rstar y'; b.textContent = '★'; b.title = 'Ha cliccato «Bonus Recensione» il ' + fmtDate(p.recensione_clic) + '. Clic per confermare la recensione.'; }
+  else { b.className = 'rstar no'; b.textContent = '☆'; b.title = 'Non ha cliccato «Bonus Recensione»'; b.disabled = true; }
+  b.setAttribute('aria-label', b.title);
+  b.onclick = () => setReview(p, !p.recensione_ok);
+  return b;
+}
+async function setReview(p, ok){
+  if (!await ask(ok ? 'Confermare la recensione di ' + p.name + '?' : 'Togliere la recensione di ' + p.name + '?',
+    ok ? 'Fallo solo se hai trovato la sua recensione tra quelle di efuture su Google. La stellina diventa verde e ' + p.name + ' riceve +' + REVIEW_PT + ' punti nella classifica generale.'
+       : 'La stellina torna gialla e ' + p.name + ' perde i +' + REVIEW_PT + ' punti nella classifica generale.',
+    ok ? 'Sì, conferma' : 'Sì, togli', !ok)) return;
+  try { await call('efg_admin_set_recensione', { p_email: p.email, p_ok: ok }); await loadPlayers(); $('pInfo').textContent += ' · ' + p.name + (ok ? ': recensione confermata' : ': recensione tolta'); }
+  catch(err){ if (/efg_admin_set_recensione|PGRST202|does not exist/i.test(String(err && err.message))) $('pInfo').textContent = 'Prima esegui supabase-recensioni.sql nel SQL Editor di Supabase.'; else onErr(err, $('pInfo')); }
+}
+async function loadReviewLink(){
+  try { const r = await sb.rpc('efg_recensione_info', { p_email: '' }); if (!r.error && r.data) $('rLink').value = (Array.isArray(r.data) ? r.data[0] : r.data).link || ''; } catch(e){}
+}
+$('rLinkForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  try { const r = await call('efg_admin_set_recensione_link', { p_link: $('rLink').value }); $('rLink').value = r.link || ''; setMsg($('rLinkMsg'), r.link ? 'Link salvato.' : 'Link tolto: il pulsante apre la ricerca di efuture su Google Maps.', 'ok'); }
+  catch(err){ if (/efg_admin_set_recensione_link|PGRST202|does not exist/i.test(String(err && err.message))) setMsg($('rLinkMsg'), 'Prima esegui supabase-recensioni.sql nel SQL Editor di Supabase.', 'err'); else onErr(err, $('rLinkMsg')); }
+});
 function nameCell(p){ const d = document.createElement('span'); d.textContent = p.name; if (p.disabilitato){ const t = document.createElement('span'); t.className = 'offtag'; t.textContent = 'bloccato'; d.appendChild(t); } return d; }
 function editBtn(p){ const b = document.createElement('button'); b.type = 'button'; b.className = 'btn edit'; b.textContent = 'Modifica'; b.onclick = () => openEdit(p); return b; }
 // in tabella: Modifica e, subito accanto, Blocca / Sblocca
@@ -716,9 +758,9 @@ $('peDel').onclick = async () => {
 };
 $('pReload').onclick = loadPlayers;
 $('pCsv').onclick = () => {
-  const head = ['Nome', 'Email', 'Tipo', 'Bloccato', 'Registrato', 'Giochi sbloccati', 'Livelli totali', 'Punti totali'];
+  const head = ['Nome', 'Email', 'Tipo', 'Bloccato', 'Registrato', 'Giochi sbloccati', 'Livelli totali', 'Punti totali', 'Clic Bonus Recensione', 'Recensione confermata'];
   Object.values(GAMES).forEach(n => head.push(n + ' livelli', n + ' punti'));
-  const rows = players.map(p => { const r = [p.name, p.email, TIPI[tipoOf(p)], p.disabilitato ? 'sì' : 'no', fmtDate(p.created_at), p.giochi, p.livelli, p.punti];
+  const rows = players.map(p => { const r = [p.name, p.email, TIPI[tipoOf(p)], p.disabilitato ? 'sì' : 'no', fmtDate(p.created_at), p.giochi, p.livelli, p.punti, p.recensione_clic ? fmtDate(p.recensione_clic) : '', p.recensione_ok ? fmtDate(p.recensione_ok) : ''];
     Object.keys(GAMES).forEach(g => { const x = p.dettaglio && p.dettaglio[g]; r.push(x ? x.livelli : '', x ? x.punti : ''); }); return r; });
   download('efuture-games-utenti-' + stamp() + '.csv', toCsv(head, rows), 'text/csv;charset=utf-8');
 };
@@ -730,6 +772,7 @@ const describe = l => {
   if (l.kind === 'partita') return d.livelli + '/3 livelli · ' + d.punti + ' punti' + (d.record ? ' · nuovo record' : '');
   if (l.kind === 'registrazione') return d.nome || '';
   if (l.kind === 'accesso') return d.esito || '';
+  if (l.kind === 'recensione: clic') return d.nome || '';
   return Object.keys(d).map(k => k.replace(/_/g, ' ') + ': ' + d[k]).join(' · ');
 };
 async function loadLogs(){
