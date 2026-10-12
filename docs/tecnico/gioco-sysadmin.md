@@ -277,7 +277,7 @@ Definite in cima allo script (sezione CONSTANTS) o direttamente nelle funzioni i
 | `JUMP_BUFFER` | 0,12 s | Salto premuto poco prima di atterrare |
 | `STOMP_BOUNCE` | −520 px/s | Rimbalzo dopo una pestata (×0,8 sull'hacker) |
 | `THROW_COOLDOWN` | 0,42 s | Pausa tra due lanci del mouse |
-| `PROJ_SPEED`, `PROJ_W`, `PROJ_H` | 680 px/s, 26 × 16 px | Proiettile mouse |
+| `PROJ_SPEED`, `PROJ_W`, `PROJ_H` | 680 px/s, 40 × 24 px | Proiettile mouse: parte dai piedi (`player.y + player.h - PROJ_H`, a metà corpo se lanciato in salto) e nel ciclo dei proiettili usa `resolveVertical` con `allSolids()`, quindi scivola a terra o sulle piattaforme e cade nei burroni |
 | `SPECIAL_SPEED` | 560 px/s | Proiettile antivirus (40 × 30 px) |
 | `SPECIAL_COOLDOWN` | 1,0 s | Pausa dopo l'antivirus (vedi Limiti noti) |
 | `INVULN_TIME` | 1,3 s | Invulnerabilità dopo un colpo |
@@ -352,6 +352,7 @@ Le frecce, lo spazio e le lettere del gioco hanno `preventDefault()` per non far
 - **Joystick `#joy`:** `pointerdown` prende il dito con `setPointerCapture`. `joyUpdate()` limita la manopola al 62% del raggio; zona morta `JOY_DEAD = 0.2` per destra e sinistra (`touch.left`, `touch.right`); salto quando la spinta in alto supera `JOY_UP_ON = 0.6` ed è più verticale che orizzontale; per un nuovo salto si torna sotto `JOY_UP_OFF = 0.35`. Classi CSS `held`, `left`, `right`, `up` per la grafica.
 - **Tasti `#btnJump`, `#btnThrow`, `#btnSpecial`:** collegati con `bindHold()`; classe `active` mentre sono premuti. `#btnSpecial` ha la classe `unlocked` quando l'antivirus è pronto (impostata da `updateHud()`).
 - Su `#controls` sono bloccati `touchstart`, `touchmove`, `touchend` e il menu contestuale.
+- Con `@media (hover:hover) and (pointer:fine) and (min-height:561px)` (computer con mouse) `#controls` è nascosto: `fitCanvas()` allarga il gioco a tutta l'altezza di `#stage`.
 
 ### Scocca "Game Boy"
 
