@@ -5,13 +5,23 @@ description: Carica in memoria tutto il progetto Efuture Games — stato dell'ap
 
 # Efuture Games – tutto il progetto in memoria
 
-Rispondi all'utente in italiano, in modo semplice.
+Rispondi all'utente in italiano, in modo semplice. `<skill>` è la cartella di questa skill (quella che contiene questo SKILL.md).
+
+## Dove lavorare
+
+Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
+- `<repo>` è il repository efuture_games. Se la cartella corrente lo è già (c'è `config.js`), usa quella. Altrimenti, per esempio in una chat, scaricalo in una cartella temporanea:
+  ```
+  git clone --depth 1 https://github.com/marraliEfuture/efuture_games <temp>/efuture_games
+  ```
+  ed esegui i comandi da lì, con `export EFG_REPO=<temp>/efuture_games`. Se il download non riesce, dillo all'utente.
+- In una chat il clone non ha il permesso di push: per salvare la memoria serve il connettore GitHub o una sessione di Claude Code.
 
 ## 1. Carica il contesto
 
 1. Esegui lo script e leggi tutto l'output: è la base di quello che sai sul progetto.
    ```
-   python3 .claude/skills/efuture-games/scripts/contesto.py
+   python3 <skill>/scripts/contesto.py
    ```
    Contiene stato e versione dell'app (ramo corrente e online), mappa dei file, skill, link e artifact, sessioni di Claude Code ricavate dai commit, ultimi commit e `memoria.md`.
 2. Completa con le fonti esterne, se gli strumenti ci sono. Se uno manca o non risponde, saltalo senza bloccarti:
@@ -33,7 +43,7 @@ Chiudi chiedendo su cosa vuole lavorare. Se l'utente aveva già chiesto altro in
 
 ## 3. Tieni aggiornata la memoria
 
-`memoria.md` è il ponte tra le sessioni e le chat. Aggiornalo quando:
+`memoria.md` (in `<repo>/.claude/skills/efuture-games/`) è il ponte tra le sessioni e le chat. Aggiornalo quando:
 - finisce un lavoro: aggiungi una riga alla **Cronologia delle chat** con data, link della sessione corrente (dal `Claude-Session` delle istruzioni di commit) e cosa si è fatto;
 - l'utente prende una decisione o esprime una preferenza: va in **Regole e convenzioni** o nella sezione giusta;
 - l'utente racconta o incolla una chat di claude.ai, un Progetto di claude.ai o una chat di ChatGPT: riassumila in una riga di cronologia e aggiungi gli eventuali link in `links.json`;

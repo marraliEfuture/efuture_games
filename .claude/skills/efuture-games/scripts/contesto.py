@@ -13,9 +13,18 @@ import json, re, subprocess, sys
 from collections import OrderedDict
 from pathlib import Path
 
+import os
 SKILL = Path(__file__).resolve().parents[1]
-SKILLS = SKILL.parent
-REPO = SKILLS.parents[1]
+# repository: EFG_REPO, altrimenti quello che contiene la skill, altrimenti la cartella corrente
+def _repo():
+    if os.environ.get("EFG_REPO"): return Path(os.environ["EFG_REPO"]).resolve()
+    for d in [SKILL, *SKILL.parents, Path.cwd(), *Path.cwd().parents]:
+        if (d / "config.js").exists(): return d
+    return Path.cwd()
+REPO = _repo()
+# skill, memoria e link si leggono dal repository (sempre aggiornati), se ci sono
+SKILLS = REPO / ".claude" / "skills" if (REPO / ".claude" / "skills").is_dir() else SKILL.parent
+if (SKILLS / "efuture-games").is_dir(): SKILL = SKILLS / "efuture-games"
 BREVE = "--breve" in sys.argv
 
 # cosa contiene ogni file o cartella del sito (i file nuovi compaiono come "(da descrivere)")
