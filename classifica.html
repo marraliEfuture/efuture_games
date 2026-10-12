@@ -249,15 +249,18 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
       </div></div>
     <p class="gnote" id="gdHelp"></p>
     <label class="gmin">Minuti <input type="number" id="gdMin" min="1" max="1440" step="1" value="10" inputmode="numeric"></label>
-    <label class="gmin" id="gdKeyRow">Chiave admin <input type="password" id="gdKey" autocomplete="current-password" style="width:180px"></label>
+    <div id="gdKeyRow" style="display:flex;flex-direction:column;gap:10px">
+      <label class="gmin">Email <input type="email" id="gdEmail" autocomplete="username" inputmode="email" placeholder="vuota per la chiave principale" style="width:260px;font-size:15px"></label>
+      <label class="gmin">Chiave admin <input type="password" id="gdKey" autocomplete="current-password" style="width:180px"></label>
+    </div>
     <div class="grow2"><button class="btn" type="button" id="gdStart">▶ Start</button><button class="btn ghost" type="button" id="gdStop">■ Stop</button><button class="btn ghost" type="button" id="gdClose">Chiudi</button></div>
     <p class="gnote" id="gdMsg" aria-live="polite"></p>
   </div>
 </div>
 
-<script src="config.js?v=48"></script>
+<script src="config.js?v=49"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=48"></script>
+<script src="backend.js?v=49"></script>
 <script>
 (function(){
 "use strict";
@@ -495,17 +498,19 @@ const gdKey = { get(){ try { return sessionStorage.getItem('efgAdminKey') || '';
 let adminSb = null;
 async function gateCommand(mode, minutes){
   if (!B.remote) return B.gateSet(mode, minutes);
-  const key = $('gdKey').value;
-  if (!key) throw new Error('scrivi la chiave admin');
+  // come in admin.html: "email" + a capo + "chiave" per la chiave personale, solo "chiave" per la principale
+  const em = $('gdEmail').value.trim().toLowerCase(), k = $('gdKey').value;
+  if (!k) throw new Error('scrivi la chiave admin');
+  const key = em ? em + '\n' + k : k;
   const C = window.EFG_CONFIG || {};
   adminSb = adminSb || window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY, { auth:{ persistSession:false } });
   const { data, error } = await adminSb.rpc('efg_admin_gate', { p_key:key, p_mode:mode, p_minutes:minutes || null });
   if (error){ if (/efg_admin_gate|PGRST202|does not exist/i.test(String(error.code + ' ' + error.message))) throw new Error('esegui prima supabase-countdown.sql nel SQL Editor di Supabase'); throw error; }
-  if (data && data.errore){ if (/chiave/i.test(data.errore)) gdKey.set(''); throw new Error(data.errore); }
+  if (data && data.errore){ if (/chiave|amministrator/i.test(data.errore)) gdKey.set(''); throw new Error(data.errore); }
   gdKey.set(key); return data;
 }
 if (!B.remote) $('gdKeyRow').style.display = 'none';
-$('btnGate').onclick = () => { $('gdMsg').textContent = ''; $('gdMsg').className = 'gnote'; if (gate.mode) setGdMode(gate.mode); if (gate.minutes) $('gdMin').value = gate.minutes; renderGate(); $('gdKey').value = gdKey.get(); $('gateDlg').hidden = false; $('gdMin').focus(); };
+$('btnGate').onclick = () => { $('gdMsg').textContent = ''; $('gdMsg').className = 'gnote'; if (gate.mode) setGdMode(gate.mode); if (gate.minutes) $('gdMin').value = gate.minutes; renderGate(); { const sk = gdKey.get(), i = sk.indexOf('\n'); $('gdEmail').value = i >= 0 ? sk.slice(0, i) : ''; $('gdKey').value = i >= 0 ? sk.slice(i + 1) : sk; } $('gateDlg').hidden = false; $('gdMin').focus(); };
 $('gdClose').onclick = () => { $('gateDlg').hidden = true; };
 $('gateDlg').addEventListener('click', e => { if (e.target === $('gateDlg')) $('gateDlg').hidden = true; });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') $('gateDlg').hidden = true; });
