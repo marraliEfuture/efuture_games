@@ -178,6 +178,7 @@ L'antivirus è sbloccato dall'inizio.
 
 ## Layout
 
+- **Zoom in verticale:** con il telefono in verticale (in tutte le visualizzazioni: Game, Light, Dark) la scena è ingrandita 1,35 volte: si vede circa il 74% del livello in larghezza e in altezza, ma omino, bug e trappole sono più grandi. La finestra ingrandita segue l'omino in orizzontale (lui al 42% della larghezza) e resta appoggiata in basso, così il terreno è sempre in vista; sale solo quando l'omino va molto in alto (piattaforme alte). In orizzontale e su computer nessuno zoom.
 - **Verticale:** scocca "Game Boy" ([giochi-comune.md](giochi-comune.md#scocca-game-boy-verticale)). Schermo 16:9; joystick a sinistra; a destra SALTA (A, arancio, grande), MOUSE (B, blu) e ANTIVIRUS (piccolo, sopra MOUSE). Il pulsante `II` è nascosto: la pausa si fa con il tastino AVVIA/PAUSA. Le schermate coprono tutta la console, tranne i tastini.
 - **Orizzontale** (altezza ≤ 560 px): HUD sottile in alto; joystick nella colonna di sinistra; ANTIVIRUS, MOUSE e SALTA impilati nella colonna di destra; gioco al centro. Le schermate coprono tutto lo schermo. Sotto i 360 px di altezza i tasti si rimpiccioliscono.
 - **Schermo grande** (computer con mouse e tastiera, altezza oltre 560 px): niente comandi touch, il gioco usa tutta l'altezza disponibile; si gioca con la tastiera. Tablet e schermi touch tengono la fascia comandi sotto il gioco.

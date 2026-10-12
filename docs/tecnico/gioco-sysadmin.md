@@ -351,6 +351,7 @@ Le frecce, lo spazio e le lettere del gioco hanno `preventDefault()` per non far
 
 - **Joystick `#joy`:** `pointerdown` prende il dito con `setPointerCapture`. `joyUpdate()` limita la manopola al 62% del raggio; zona morta `JOY_DEAD = 0.2` per destra e sinistra (`touch.left`, `touch.right`); salto quando la spinta in alto supera `JOY_UP_ON = 0.6` ed è più verticale che orizzontale; per un nuovo salto si torna sotto `JOY_UP_OFF = 0.35`. Classi CSS `held`, `left`, `right`, `up` per la grafica.
 - **Tasti `#btnJump`, `#btnThrow`, `#btnSpecial`:** collegati con `bindHold()`; classe `active` mentre sono premuti. `#btnSpecial` ha la classe `unlocked` quando l'antivirus è pronto (impostata da `updateHud()`).
+- **Zoom in verticale:** `ZOOM_PORTRAIT` (1,35) vale quando `portraitMQ` (`(orientation:portrait)`) è vero; `fitCanvas()` salva la scala base (`baseSX`, `baseSY`) e imposta `zoom`. `render()` parte dalla scala base, poi con `zoom > 1` calcola la finestra (`zoomX`, `zoomY`, larghezza `VW/zoom`): orizzontale `player.x - camX + player.w/2 - 0,42 × VW/zoom`, verticale `player.y - 0,25 × VH/zoom`, entrambe limitate allo schermo, seguite con fattore 0,18 a fotogramma mentre si gioca. La sfumatura ai bordi si disegna dopo aver rimesso la scala base. La fisica e `camX` non cambiano.
 - Su `#controls` sono bloccati `touchstart`, `touchmove`, `touchend` e il menu contestuale.
 - Con `@media (hover:hover) and (pointer:fine) and (min-height:561px)` (computer con mouse) `#controls` è nascosto: `fitCanvas()` allarga il gioco a tutta l'altezza di `#stage`.
 
