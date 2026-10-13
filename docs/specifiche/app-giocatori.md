@@ -16,6 +16,7 @@ Il giocatore si registra con nome ed email e accede con la sola email. I record 
 | `config.js` | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PUBLIC_URL` |
 | `sw.js` | Service worker: cache offline e aggiornamenti |
 | `manifest.webmanifest` | Nome, icone, `display: standalone`, `start_url ./` |
+| `icons/` | Icona dell'app (favicon, apple-touch, 192, 512 e maskable): la "e" arancione di Efuture con i quadratini bianchi, la stessa della testa di Efuture Bros (`games/sysadmin/img/logo-testa.png`), su sfondo blu `#004675` |
 | `vendor/supabase.js`, `vendor/jsQR.js` | Client Supabase, lettura dei QR |
 
 Ordine degli script in `index.html`: `config.js?v=N`, `vendor/supabase.js`, `backend.js?v=N`, `vendor/jsQR.js`, `hub.js?v=N`. Al `load` della pagina viene registrato `sw.js`.

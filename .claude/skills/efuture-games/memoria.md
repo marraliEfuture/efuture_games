@@ -15,6 +15,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 
 - A fine lavoro l'utente vuole che si pubblichi tutto su main (lo ha chiesto più volte il 12/10).
 - A fine livello il pulsante per andare avanti è sempre arancione e viene per primo.
+- Icona dell'app: solo la "e" di Efuture (quella della testa di Efuture Bros) su sfondo blu, senza la scritta efuture (13/10).
 
 - Risposte, commit e testi dell'app in **italiano**. Commit nello stile "Area: cosa cambia per chi usa l'app".
 - Se cambia un file del sito si aumenta la **versione** (`sw.js` efuture-games-vN, `?v=N` negli html, `· vN` in hub.js) con `/efuture-games-commit`, così i telefoni scaricano l'aggiornamento.
@@ -48,6 +49,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 07/10 – 09/10 | Claude Code `session_015LsFVpYFCmd5CgErkamknr` | Skill caricabili sull'account (zip); CoreTech senza schermata a ogni livello, joystick a destra in orizzontale, bug che rinascono dal liv. 2; Timenet senza schermata e pallone grande che sfonda; risultato con solo punti/livelli/tempo; posizione in classifica nella home; SysAdmin (omino, piattaforme, bug, antivirus una volta); home: giochi che chiedono l'accesso, Classifica solo dopo l'accesso; titolo classifica arcade; pulsante Gioca nell'admin (v23-v34, PR #19-#22). |
 | 09/10 | Claude Code `session_015LsFVpYFCmd5CgErkamknr` | Admin: tipi utente, menu a comparsa, popup Modifica con conferme, FAQ, Documentazione, chiavi admin personali cifrate, sezione Qualità (v35-v37, PR #25-#26); skill `/efuture-games-admin`. Classifica: Schermo intero sul secondo monitor (v38). |
 | 12/10 | Claude Code `session_014RiPo4gT2e1UtaJRgiE7ap` | Countdown dalla classifica con email + chiave admin; Bonus Recensione (pulsante in home, stella gialla/verde in admin, punti in classifica generale, etichetta ⭐); Proietta a schermo intero sul secondo monitor con finestra di regia; Efuture Bros con mouse rasoterra e senza scritte CASA/CLIENTE; pulsante arancione a fine livello nei 4 giochi; visualizzazioni Game/Light/Dark dei giochi e scocca più larga (v41-v56). |
+| 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Icona dell'app: solo la "e" di Efuture (come la testa di Efuture Bros) su sfondo blu. |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 

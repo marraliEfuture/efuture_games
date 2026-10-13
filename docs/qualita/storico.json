@@ -363,5 +363,62 @@
    "bassa": 1
   },
   "sicurezza": 87
+ },
+ {
+  "data": "2026-10-13",
+  "commit": "e4c3225",
+  "versione": "v58",
+  "esiti": {
+   "codice": {
+    "ok": 33,
+    "avviso": 1,
+    "errore": 0
+   },
+   "db": {
+    "ok": 9,
+    "avviso": 0,
+    "errore": 0
+   },
+   "prestazioni": {
+    "ok": 17,
+    "avviso": 0,
+    "errore": 0
+   },
+   "spazio": {
+    "ok": 12,
+    "avviso": 0,
+    "errore": 0
+   },
+   "vulnerabilita": {
+    "ok": 7,
+    "avviso": 2,
+    "errore": 0
+   },
+   "sicurezza": {
+    "ok": 2,
+    "avviso": 2,
+    "errore": 0
+   }
+  },
+  "spazio_kb": 11955.8,
+  "cartelle_kb": {
+   ".claude": 120.2,
+   "(file principali)": 289.4,
+   "docs": 278.5,
+   "fonts": 120.3,
+   "games": 906.2,
+   "icons": 52.9,
+   "img": 92.5,
+   "qr": 159.6,
+   "tutorial": 1334.2,
+   "vendor": 426.8,
+   "video": 8175.2
+  },
+  "vulnerabilita": {
+   "alta": 0,
+   "media": 1,
+   "bassa": 1
+  },
+  "sicurezza": 87
  }
 ]
