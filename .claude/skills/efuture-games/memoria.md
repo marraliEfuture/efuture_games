@@ -15,7 +15,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 
 - A fine lavoro l'utente vuole che si pubblichi tutto su main (lo ha chiesto più volte il 12/10).
 - A fine livello il pulsante per andare avanti è sempre arancione e viene per primo.
-- Icona dell'app: solo la "e" di Efuture (quella della testa di Efuture Bros) su sfondo blu, senza la scritta efuture; sotto, "GAMES" in stile arcade anni '80 (13/10).
+- Icona dell'app: solo la "e" di Efuture (quella della testa di Efuture Bros) su sfondo blu, senza la scritta efuture; sotto, "GAMES" in stile arcade anni '80; forma quadrata con angoli stondati (13/10).
 
 - Risposte, commit e testi dell'app in **italiano**. Commit nello stile "Area: cosa cambia per chi usa l'app".
 - Se cambia un file del sito si aumenta la **versione** (`sw.js` efuture-games-vN, `?v=N` negli html, `· vN` in hub.js) con `/efuture-games-commit`, così i telefoni scaricano l'aggiornamento.
