@@ -52,7 +52,7 @@
   .gb-led{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffc2b8 0,#ff4a33 50%,#b3180c 100%);box-shadow:0 0 6px 1px rgba(255,80,50,.7)}
   .gb-on{flex:0 0 auto;font:600 7px/1 var(--gb-font);letter-spacing:.16em;color:#b3b7c2}
   .gb-lines{flex:1 1 auto;height:5px;margin-left:6px;background:linear-gradient(180deg,#f18c22 0 2px,transparent 2px 3px,#6ea8d8 3px 5px)}
-  .gb-top .gb-clock{flex:0 0 auto;margin-left:8px}
+  .gb-top .gb-clock{flex:0 0 auto;margin-left:8px;font-size:9px}
   #stage>.gb-clock{display:none}   /* con la scocca il tempo sta nella riga in alto */
 
   #hud{

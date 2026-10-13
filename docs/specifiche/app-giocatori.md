@@ -136,7 +136,8 @@ Finestra `mAuth` con due schede: **Registrati** e **Accedi**.
   - orologio del livello;
   - logo.
 - L'iframe con `games/<id>/index.html?hub=1` occupa tutto lo schermo e la barra gli sta sopra. Il parametro `hub=1` dice al gioco di usare le regole di gara.
-- **Mentre si gioca la barra sparisce** (scorre verso l'alto): ricompare quando il gioco mostra una sua schermata (titolo, pausa, tra un livello e l'altro, fine) e con il riepilogo. Il tempo del livello intanto si vede dentro il gioco (vedi `giochi-comune.md`).
+- **La barra si vede solo mentre il gioco si carica** (dalla v67): appena il gioco risponde (`efg-ui`) scorre via e non torna, così non copre punti e vite. "← Torna ai giochi" è dentro la schermata iniziale e la pausa del gioco (vedi `giochi-comune.md`); il tempo del livello si vede nella scocca.
+- **Uscita con conferma:** con una partita in corso (dopo `start` e prima di `result`) l'uscita apre la finestra `mExit`: "Uscire dal gioco? Perderai il livello in corso. I livelli già superati e il tuo record restano." con **Resta** / **Esci**. Prima di iniziare si esce subito.
 - Con il telefono in orizzontale (altezza ≤ 560 px) la barra si assottiglia.
 
 ### Protocollo postMessage (gioco → app)
@@ -325,4 +326,10 @@ Ultimo aggiornamento: 07/10/2026 (v27)
 - Testi della home a 12-13 px (titoli in carattere pixel a 11 px); grigio `--dim` `#4a6580` (contrasto 5,5:1 sullo sfondo).
 - Aree di tocco di almeno 44 px: Esci, ✕ delle finestre, pulsanti Classifica / Installa / Istruzioni; pulsante Gioca e schede della classifica più alti.
 - Nei giochi aperti dall'app la schermata iniziale mostra **Record in gara: L/3 liv · P pt** (lo stesso della home, passato nell'URL come `rec`), al posto del record interno del gioco.
+
+## Home: barra in basso, classifica e bonus (v67)
+
+- La barra in basso (Registrati / Ciao… Esci / Classifica / Installa / Istruzioni) sul telefono in verticale resta fissa, con sfondo pieno e una riga sottile sopra; con poca altezza (≤ 500 px, telefono in orizzontale) e sul computer (≥ 900 px con mouse) non è fissa e sta subito sotto le schede.
+- Schede della finestra Classifica senza barra di scorrimento; con il mouse vanno a capo.
+- Bonus Recensione ottenuto: etichetta verde chiara non cliccabile (`disabled`).
 

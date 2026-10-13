@@ -36,7 +36,7 @@ $('btnHelp').addEventListener('click', ()=>openModal('mHelp'));
 document.querySelectorAll('.modal').forEach(m=>{
   m.addEventListener('click', e=>{ if ((e.target === m && m.id !== 'mResult') || e.target.closest('[data-close]')){ m.hidden = true; if (m.id === 'mUnlock') stopCam(); } });
 });
-document.addEventListener('keydown', e=>{ if (e.key === 'Escape'){ ['mUnlock','mAuth','mBoard','mInstall','mHelp'].forEach(id=>$(id).hidden = true); stopCam(); } });
+document.addEventListener('keydown', e=>{ if (e.key === 'Escape'){ ['mUnlock','mAuth','mBoard','mInstall','mHelp','mExit'].forEach(id=>$(id).hidden = true); stopCam(); } });
 
 /* ================= STATE ================= */
 let unlocked = new Set(store.get('efgUnlocked', []));
@@ -66,7 +66,7 @@ function renderGrid(){
     if (!session) rank.hidden = true;   // senza accesso niente riga della classifica
     else if (rk > 0){ rank.innerHTML = 'In classifica: <b></b>'; rank.querySelector('b').textContent = rk + '°'; }
     else if (rk === -2) rank.textContent = 'Oltre il 50° posto';
-    else if (rk === -1) rank.textContent = bests[g.id] ? 'Supera almeno un livello per entrare in classifica' : 'Non ancora in classifica';
+    else if (rk === -1) rank.textContent = (bests[g.id] && !bests[g.id].l) ? 'Supera almeno un livello per entrare in classifica' : 'Non ancora in classifica';
     const best = document.createElement('span'); best.className = 'best';
     if (bests[g.id]){ best.innerHTML = 'Record: <b></b>'; best.querySelector('b').textContent = fmtRes(bests[g.id]); }
     b.append(img, name, st, rank, best);
@@ -115,7 +115,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v66' : 'Modalità demo: account e classifica restano su questo telefono. · v66';
+  mn.textContent = remote ? 'Classifica online · v67' : 'Modalità demo: account e classifica restano su questo telefono. · v67';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -203,7 +203,7 @@ $('btnCam').addEventListener('click', startCam);
 })();
 
 /* ================= PLAY (competition mode: 3 levels x 60 s) ================= */
-let playing = null, runUsed = 0;
+let playing = null, runUsed = 0, inRun = false;   // inRun: partita iniziata e non ancora finita
 function play(g){
   if (!session){ showAuth('signup'); openModal('mAuth'); return; }
   if (isBlocked()){ toast(gatePhase().phase === 'prima' ? 'I giochi non sono ancora aperti.' : 'La gara è chiusa.'); return; }
@@ -217,21 +217,28 @@ function play(g){
   document.body.style.overflow = 'hidden';
 }
 function closePlayer(){
+  inRun = false; $('mExit').hidden = true;
   if (window.EFGFuochi) window.EFGFuochi.stop();
   $('player').hidden = true; $('mResult').hidden = true; $('frame').src = 'about:blank'; playing = null;
   document.body.style.overflow = ''; renderGrid(); loadRanks();
 }
-$('btnBack').addEventListener('click', closePlayer);
+// uscita dal gioco: con una partita in corso si chiede conferma
+function askExit(){ if (inRun) $('mExit').hidden = false; else closePlayer(); }
+$('btnBack').addEventListener('click', askExit);
+$('exStay').addEventListener('click', ()=>{ $('mExit').hidden = true; });
+$('exLeave').addEventListener('click', ()=>{ $('mExit').hidden = true; closePlayer(); });
 $('rsHome').addEventListener('click', closePlayer);
 $('rsAgain').addEventListener('click', ()=>{ if (window.EFGFuochi) window.EFGFuochi.stop(); const g = playing; if (g) play(g); });
-$('rsRetry').addEventListener('click', ()=>{ $('mResult').hidden = true; try { $('frame').contentWindow.postMessage({ type:'efg-cmd', cmd:'retry' }, '*'); } catch(e){} });
+$('rsRetry').addEventListener('click', ()=>{ $('mResult').hidden = true; inRun = true; try { $('frame').contentWindow.postMessage({ type:'efg-cmd', cmd:'retry' }, '*'); } catch(e){} });
 
 window.addEventListener('message', async e=>{
   const d = e.data;
   // il gioco dice se c'è una sua schermata aperta: se no si sta giocando e la barra in alto sparisce
-  if (d && d.type === 'efg-ui' && playing && e.source === $('frame').contentWindow){ $('playerBar').classList.toggle('away', !d.menu); return; }
+  // il gioco è caricato: la barra dell'app sparisce ("Torna ai giochi" è nelle schermate del gioco, il tempo nella scocca)
+  if (d && d.type === 'efg-ui' && playing && e.source === $('frame').contentWindow){ $('playerBar').classList.add('away'); return; }
+  if (d && d.type === 'efg-exit' && playing && e.source === $('frame').contentWindow){ askExit(); return; }
   if (!d || d.type !== 'efg' || !playing || e.source !== $('frame').contentWindow) return;
-  if (d.ev === 'start'){ runUsed = 0; $('playerClock').textContent = ''; return; }
+  if (d.ev === 'start'){ runUsed = 0; inRun = true; $('playerClock').textContent = ''; return; }
   if (d.ev === 'tick'){
     const left = Math.max(0, LEVEL_SECONDS - d.t);
     const clk = $('playerClock');
@@ -241,6 +248,7 @@ window.addEventListener('message', async e=>{
     try { e.source.postMessage({ type:'efg-clock', text:'LIV ' + d.level + ' · ' + fmt(left), warn: left <= 10 }, '*'); } catch(err){}
     return;
   }
+  if (d.ev === 'result'){ inRun = false; }
   if (d.ev === 'result') showResult(playing, !!d.ok, d.reason, Number(d.seconds)||0, Number(d.level)||1, Number(d.used)||0, Array.isArray(d.times) ? d.times.map(Number) : null, Array.isArray(d.lives) ? d.lives.map(Number) : null, !!d.retry);
 });
 
@@ -248,7 +256,6 @@ window.addEventListener('message', async e=>{
 // es. livello 1 finito a 35 s con 2 vite → 1 x 25 x 2 = 50; livello 2 con 20 s e 3 vite → 2 x 20 x 3 = 120.
 // Un livello non finito vale 0; alla fine si sommano i livelli superati.
 async function showResult(g, ok, reason, seconds, level, used, times, lives, retry){
-  $('playerBar').classList.remove('away');   // la barra torna visibile col risultato
   // il gioco consente di riprovare il livello perso (i livelli già superati restano): il punteggio intanto è già salvato
   $('rsRetry').hidden = ok || !retry; $('rsRetry').textContent = 'Riprova livello ' + level;
   if (!times){ const n = ok ? LEVELS : Math.max(0, level - 1); times = Array.from({length:n}, ()=> n ? used / n : 0); }
@@ -497,6 +504,7 @@ function renderReview(){
   if (box.hidden) return;
   box.classList.toggle('ok', !!review.ok);
   $('btnReview').textContent = review.ok ? '✅ Bonus Recensione ottenuto' : '⭐ Bonus Recensione';
+  $('btnReview').disabled = !!review.ok;   // ottenuto: solo un'etichetta, non si clicca più
   txt.innerHTML = review.ok ? 'Grazie! I tuoi <b>+' + pt + ' punti</b> si sommano ai tuoi record nella classifica generale.'
     : review.clic ? 'Grazie! Quando confermiamo la tua recensione su Google ricevi <b>+' + pt + ' punti</b> nella classifica generale.'
     : 'Lascia una recensione a efuture su Google: quando la confermiamo ricevi <b>+' + pt + ' punti</b> nella classifica generale.';
