@@ -63,6 +63,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Avvio Android: tolto l'effetto zoom, icona a 192 px come quella di Chrome (v64). Se resta un salto, chiedere se il logo si ingrandisce o si rimpicciolisce. |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Avvio: su Android dopo la schermata di sistema solo "Powered by" con il logo efuture sotto; il logo esplode in mattoncini prima della home; immagini iPhone rigenerate (v65). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Analisi con l'estensione Claude di Chrome (17 punti). Fatti i 3 alti: record della home presi dalla classifica online (dopo un reset spariscono anche dal telefono, niente reinvio), record in gara nei giochi, Timenet responsive, home più leggibile (v66). |
+| 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Punti 4-17: un solo timer in gara, "Torna ai giochi" dentro i giochi con conferma, barra dell'app nascosta, barra in basso della home non fissa su PC e in orizzontale, schede classifica, riga "3 livelli · 1 minuto · 3 vite", tasti al posto dei comandi touch su PC, bonus come etichetta (v67). |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 
@@ -97,7 +98,7 @@ Risposte dell'utente (07/10):
 
 ## In sospeso / da ricordare
 
-- Analisi Chrome del 13/10: restano i punti 4-17 (timer unico, conferma uscita, barra hub, barra in basso della home, schede classifica, uniformità dei giochi, controlli touch su PC, ecc.).
+- Analisi Chrome del 13/10, punto 12: decidere se mettere "Ricomincia livello" nella pausa di tutti i giochi (in gara inciderebbe sul tempo). Punti 11, 14 e 17 lasciati così di proposito (10 livelli fuori gara, logo Timenet scoperto dai mattoncini, Efuture Bros grande su PC).
 - La sezione ChatGPT di `links.json` ha solo il link generico: mancano i link alle chat vere.
 - Le skill sono disponibili solo nelle sessioni aperte sul repository. Per usarle nelle chat di claude.ai vanno caricate a mano (Impostazioni → Capabilities → Skills) e non si aggiornano da sole.
 - Sul database vanno eseguiti `supabase-tipi-utenti.sql` e poi `supabase-recensioni.sql` (al 12/10 tipi-utenti non risultava eseguito: Blocca/Tipo/chiavi personali non funzionano finché non lo è).

@@ -107,7 +107,7 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 .game .best{font-size:12px;color:var(--dim);min-height:1.2em}
 .game .best b{color:var(--text);font-variant-numeric:tabular-nums}
 
-.dock{position:sticky;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(0deg,var(--bg) 70%,rgba(238,244,250,0));display:flex;flex-direction:column;gap:8px;align-items:center}
+.dock{position:sticky;bottom:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line);box-shadow:0 -6px 14px -10px rgba(13,43,69,.35);display:flex;flex-direction:column;gap:8px;align-items:center}
 .dock-row{display:flex;gap:10px;justify-content:center;width:100%;max-width:560px}
 .who{font-size:13px;color:var(--dim)}
 .who b{color:var(--text)}
@@ -120,6 +120,11 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 .dock-row.tools .btn{flex:1 1 0;min-width:0;min-height:44px;padding:11px 6px;font-size:10px;line-height:1.4;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .dock-row.tools .ico{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}   /* coppa, download, libro */
 #dockIn{align-items:center;gap:4px}
+/* telefono in orizzontale (poca altezza) e computer: la barra in basso non è fissa, sta subito sotto le schede */
+@media (max-height:500px), (min-width:900px) and (hover:hover) and (pointer:fine){
+  .dock{position:static;border-top:0;box-shadow:none;background:none;padding-top:4px}
+  main{flex:0 0 auto}
+}
 .mode{font-size:12px;color:var(--dim);text-align:center;max-width:420px;line-height:1.5}
 
 /* modals */
@@ -143,8 +148,11 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 .field .ferr{font-size:12.5px;color:var(--danger);font-weight:600}
 .field input.taken{border-color:var(--danger);box-shadow:0 0 0 2px rgba(217,58,43,.15)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
+.review.ok .btn:disabled{opacity:1;cursor:default}
 .msg.ok{color:var(--ok)}
-.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+@media (hover:hover) and (pointer:fine){.tabs{flex-wrap:wrap;overflow:visible}}
 #bTabs{padding-bottom:14px;margin-bottom:6px;border-bottom:1px solid var(--line)}   /* filtri della classifica staccati dalla prima posizione */
 .sheet > *{flex-shrink:0}   /* con una lista lunga i filtri non si schiacciano: scorre la finestra */
 .tab{flex:0 0 auto;font-size:12px;padding:9px 12px;min-height:38px;border-radius:20px;border:1px solid var(--line);background:none;color:var(--dim);cursor:pointer}
@@ -178,7 +186,7 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 .review{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
 .review .btn{flex:0 0 auto;max-width:none;width:100%;background:#ffd84d;border-color:#c9a20f;box-shadow:0 4px 0 #b08b05}
 .review .btn:active{box-shadow:0 1px 0 #b08b05}
-.review.ok .btn{background:#4ccf7d;border-color:#2c9a55;box-shadow:0 4px 0 #237c45}
+.review.ok .btn{background:#e6f6ec;border-color:#9ed5b2;color:#1f6b3d;box-shadow:none;cursor:default;font-size:9px;padding:9px 12px}
 .review p{margin:0;font-size:12.5px;line-height:1.5;color:var(--dim)}
 .review p b{color:var(--text)}
 .rules b{color:var(--text)}
@@ -343,6 +351,14 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
   </div>
 </div>
 
+<!-- conferma prima di uscire da una partita in corso -->
+<div class="modal" id="mExit" hidden role="dialog" aria-modal="true" aria-labelledby="exTitle" style="z-index:36">
+  <div class="sheet">
+    <div class="head"><h2 id="exTitle">Uscire dal gioco?</h2></div>
+    <p>Perderai il livello in corso. I livelli già superati e il tuo record restano.</p>
+    <div class="row"><button class="btn" id="exStay">Resta</button><button class="btn alt" id="exLeave">Esci</button></div>
+  </div>
+</div>
 <!-- result of a run -->
 <div class="modal" id="mResult" hidden role="dialog" aria-modal="true" aria-labelledby="rsTitle" style="z-index:35">
   <div class="sheet">
@@ -394,12 +410,12 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=66"></script>
+<script src="config.js?v=67"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=66"></script>
+<script src="backend.js?v=67"></script>
 <script src="vendor/jsQR.js"></script>
-<script src="fuochi.js?v=66"></script>
-<script src="hub.js?v=66"></script>
+<script src="fuochi.js?v=67"></script>
+<script src="hub.js?v=67"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });

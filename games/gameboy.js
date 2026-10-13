@@ -21,10 +21,16 @@
     /* in verticale con la scocca il cambio di visualizzazione è sul tastino MODE */
     '@media (orientation:portrait){html[data-view=game] .gb-view{display:none}}',
     /* tempo della gara (lo manda l\'app): nell\'angolo dello schermo, o nella riga della scocca */
-    '.gb-clock{font:8px/1 "Press Start 2P","IBM Plex Mono",monospace;color:#ffb04a;white-space:nowrap;font-variant-numeric:tabular-nums}',
+    '.gb-clock{font:10px/1 "Press Start 2P","IBM Plex Mono",monospace;color:#ffb04a;white-space:nowrap;font-variant-numeric:tabular-nums}',
     '.gb-clock.warn{color:#ff5d56}',
     '.gb-clock:empty{display:none}',
-    '#stage>.gb-clock{position:absolute;top:4px;right:4px;z-index:4;padding:4px 7px;border-radius:999px;background:rgba(13,43,69,.78);pointer-events:none}',
+    '#stage>.gb-clock{position:absolute;top:6px;left:6px;z-index:4;padding:6px 10px;border-radius:999px;background:rgba(13,43,69,.85);box-shadow:0 2px 6px rgba(0,0,0,.25);pointer-events:none}',
+    /* in gara un solo timer: quello alla rovescia dell'app (il contatore di Efuture Bros si nasconde) */
+    'html.efg-hub #timerWrap{display:none!important}',
+    /* computer con mouse e tastiera: niente joystick o piste di trascinamento, al loro posto i tasti da usare */
+    '.gb-keys{display:none;margin:0;padding:10px 12px;text-align:center;font:600 12px/1.5 "IBM Plex Mono",ui-monospace,monospace;color:var(--dim,#4a6580)}',
+    '.gb-keys kbd{display:inline-block;min-width:1.6em;padding:1px 6px;margin:0 2px;border:1px solid var(--line,#cddcea);border-bottom-width:2px;border-radius:5px;background:var(--panel,#fff);color:var(--text,#0d2b45);font:inherit}',
+    '@media (hover:hover) and (pointer:fine){html[data-efg-game=coretech] #joy,html[data-efg-game=timenet] #strip,html[data-efg-game=inncloud] #strip,html[data-efg-game=inncloud] #fireBtn{display:none!important}.gb-keys{display:block}}',
     /* Dark: stessi giochi, interfaccia scura (il campo di gioco disegnato resta com\'è) */
     'html[data-view=dark]{color-scheme:dark;--bg:#0e1621;--panel:#172230;--panel-2:#1e2b3b;--line:#33465c;--text:#e7eef6;--dim:#a3b6ca;--text-dim:#a3b6ca;--coin:#ffb04a;--ef-yellow:#ffb04a}',
     'html[data-view=dark][data-efg-game=coretech]{--ct-light:#8ab8e6;--navy:#8ac4f0}',
@@ -188,6 +194,7 @@
 
   /* in gara la schermata iniziale mostra il record di gara (lo stesso della home: livelli e punti di gara),
      non il punteggio interno del gioco, che ha un'altra scala */
+  if (inHub) root.classList.add('efg-hub');
   if (inHub){
     var rec = new URLSearchParams(location.search).get('rec');
     var own = ['bestLine', 'bestTimeLineTitle', 'bestDebugLineTitle'].map($).filter(Boolean);
@@ -197,6 +204,37 @@
       rp.innerHTML = 'Record in gara: <b></b>'; rp.querySelector('b').textContent = rec || 'nessuno, gioca!';
       own[0].parentNode.insertBefore(rp, own[0]);
     }
+  }
+
+  var KEYS = {
+    coretech: '<kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> o <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> per muovere la C · <kbd>P</kbd> pausa',
+    timenet: '<kbd>←</kbd><kbd>→</kbd> o <kbd>A</kbd><kbd>D</kbd> per muovere il delfino · <kbd>Spazio</kbd> per lanciare · <kbd>P</kbd> pausa',
+    inncloud: '<kbd>←</kbd><kbd>→</kbd> o <kbd>A</kbd><kbd>D</kbd> per muoverti · <kbd>Spazio</kbd> per sparare · <kbd>P</kbd> pausa'
+  };
+  if (KEYS[gameId]){ var kh = mk('p', 'gb-keys', KEYS[gameId]); controls.insertBefore(kh, controls.firstChild); }
+
+  /* in gara tutte le schermate iniziali hanno in cima la stessa riga delle regole (come Efuture Bros) */
+  if (inHub && !$('kickerLv')){
+    var tc = doc.querySelector('#ov-title .card');
+    if (tc){
+      var kk = mk('p', 'gb-kicker', '3 livelli &middot; 1 minuto &middot; 3 vite');
+      kk.style.cssText = 'margin:0;font:600 11px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--dim,#4a6580)';
+      tc.insertBefore(kk, tc.firstChild);
+    }
+  }
+
+  /* in gara "Torna ai giochi" sta dentro le schermate del gioco (titolo e pausa): la barra dell'app non serve
+     e non copre punti e vite. L'app chiede conferma se la partita è in corso. */
+  if (inHub){
+    [['btnHow', 'btnStart'], ['btnResume']].forEach(function(ids){
+      var ref = null; ids.some(function(id){ ref = $(id); return !!ref; });
+      if (!ref || !ref.parentNode) return;
+      var sib = ref.parentNode.querySelector('.alt, .secondary');
+      var bx = mk('button', sib ? sib.className.replace(/\s*gb-[ab]\b/g, '') : 'btn alt', '← Torna ai giochi');
+      bx.type = 'button'; bx.removeAttribute('id');
+      bx.addEventListener('click', function(){ try { window.parent.postMessage({ type:'efg-exit' }, '*'); } catch(e){} });
+      ref.parentNode.appendChild(bx);
+    });
   }
 
   /* tempo della gara mandato dall'app: nella riga in alto della scocca, altrimenti nell'angolo dello schermo */

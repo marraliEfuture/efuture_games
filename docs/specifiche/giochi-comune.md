@@ -169,6 +169,12 @@ Ultimo aggiornamento: 08/10/2026 (v28)
 
 ## Barra dell'app durante la gara
 
-- In gara (`?hub=1`) `gameboy.js` dice all'app (`{type:'efg-ui', menu}`) se è aperta una schermata del gioco (`.overlay` visibile: titolo, scheda del livello, pausa, livello completato, fine). Mentre si gioca non ce n'è nessuna e l'app nasconde la sua barra in alto (Torna ai giochi, nome, tempo): il gioco usa tutto lo schermo.
-- Il tempo del livello resta visibile dentro il gioco: l'app lo manda a ogni tick (`{type:'efg-clock', text, warn}`) e `gameboy.js` lo mostra nella riga in alto della scocca (vista Game, in verticale) oppure in una pillola nell'angolo in alto a destra dello schermo del gioco.
+- In gara (`?hub=1`) `gameboy.js` manda all'app `{type:'efg-ui', menu}`: al primo messaggio l'app nasconde la sua barra in alto per tutta la partita (v67).
+- **Torna ai giochi:** `gameboy.js` aggiunge il pulsante "← Torna ai giochi" (stile dei pulsanti secondari del gioco) nella schermata iniziale e nella pausa; il tocco manda `{type:'efg-exit'}` e l'app chiede conferma se la partita è in corso.
+- **Un solo timer:** il tempo del livello lo manda l'app a ogni tick (`{type:'efg-clock', text, warn}`); `gameboy.js` lo mostra nella riga in alto della scocca (vista Game, in verticale) oppure in una pillola più grande in alto a sinistra dello schermo del gioco. Il contatore che sale di Efuture Bros (`#timerWrap`) in gara è nascosto (classe `efg-hub` su `<html>`).
+- **Riga delle regole:** in gara CoreTech, Timenet e inncloud hanno in cima alla schermata iniziale "3 livelli · 1 minuto · 3 vite", come Efuture Bros.
+
+## Computer con mouse e tastiera
+
+- Con `(hover:hover) and (pointer:fine)` sono nascosti il joystick di CoreTech, le piste di trascinamento di Timenet e inncloud e il tasto SPARA; al loro posto `gameboy.js` mostra una riga con i tasti (frecce o WASD, Spazio, P pausa).
 
