@@ -366,7 +366,7 @@
  },
  {
   "data": "2026-10-13",
-  "commit": "e4c3225",
+  "commit": "aaf75ea",
   "versione": "v58",
   "esiti": {
    "codice": {
@@ -400,14 +400,14 @@
     "errore": 0
    }
   },
-  "spazio_kb": 11955.8,
+  "spazio_kb": 11942.9,
   "cartelle_kb": {
-   ".claude": 120.2,
+   ".claude": 120.6,
    "(file principali)": 289.4,
-   "docs": 278.5,
+   "docs": 278.8,
    "fonts": 120.3,
    "games": 906.2,
-   "icons": 52.9,
+   "icons": 39.2,
    "img": 92.5,
    "qr": 159.6,
    "tutorial": 1334.2,
