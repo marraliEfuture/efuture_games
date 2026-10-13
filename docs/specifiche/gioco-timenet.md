@@ -26,7 +26,7 @@ Breakout (rompi-mattoncini) con il delfino di Timenet. Il delfino nuota sul pelo
 
 | Schermata | Contenuto | Pulsanti |
 |---|---|---|
-| **Titolo** (`ov-title`) | Logo Timenet su badge bianco, BREAKOUT, "Muovi il delfino e rompi i mattoncini col pallone.", "Record: N" se esiste. Sotto, sul campo, il delfino che ondeggia | **Inizia**, **Continua · Liv. N** (solo modalità libera, se c'è un livello raggiunto), **Istruzioni** |
+| **Titolo** (`ov-title`) | Logo Timenet su badge bianco, BREAKOUT, "Muovi il delfino e rompi i mattoncini col pallone.", "Record: N" se esiste. Sotto, sul campo, il delfino che ondeggia | **Inizia**, **Continua · Liv. N** (solo modalità libera, se c'è un livello raggiunto), **Istruzioni**. Sotto i 380 px di larghezza i pulsanti stanno uno sotto l'altro; in orizzontale logo e spazi più piccoli perché la scheda entri in altezza |
 | **Istruzioni** (`howBox`) | Tre righe con disegnino: mattoncini ("alcuni reggono più colpi"), pallone ("Non far cadere il pallone in acqua"), capsule ("C 3 palloni · S rete · ✓ delfino grande · T pallone grande"). "5 livelli, dalle 08:00 alle 18:00." Tasti: Trascina o frecce · spazio lancia · P pausa | – |
 | **Animazione iniziale** | Dopo **Inizia** (e **Gioca ancora**): il delfino salta fuori dall'acqua, lancia il pallone, il logo va in frantumi, compare BREAKOUT. Dura 4,2 s; "TOCCA PER SALTARE": un tocco o un tasto la salta | – |
 | **Scheda del livello** (`ov-level`) | Etichetta "08:00 · Livello 1/5" (gara: "/3"), nome e frase del livello | **Via!** |

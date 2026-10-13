@@ -66,7 +66,7 @@ function renderGrid(){
     if (!session) rank.hidden = true;   // senza accesso niente riga della classifica
     else if (rk > 0){ rank.innerHTML = 'In classifica: <b></b>'; rank.querySelector('b').textContent = rk + '°'; }
     else if (rk === -2) rank.textContent = 'Oltre il 50° posto';
-    else if (rk === -1) rank.textContent = 'Non ancora in classifica';
+    else if (rk === -1) rank.textContent = bests[g.id] ? 'Supera almeno un livello per entrare in classifica' : 'Non ancora in classifica';
     const best = document.createElement('span'); best.className = 'best';
     if (bests[g.id]){ best.innerHTML = 'Record: <b></b>'; best.querySelector('b').textContent = fmtRes(bests[g.id]); }
     b.append(img, name, st, rank, best);
@@ -88,10 +88,23 @@ async function loadRanks(){
   if (!me){ ranks = {}; renderGrid(); return; }
   const res = await Promise.all(GAMES.map(g => Backend.board(g.id).then(rows => {
     const i = rows.findIndex(r => r.pid === me.id);
-    return [g.id, i >= 0 ? i + 1 : (rows.length >= 50 ? -2 : -1)];
-  }, () => [g.id, ranks[g.id]])));
+    return [g.id, i >= 0 ? i + 1 : (rows.length >= 50 ? -2 : -1), i >= 0 ? rows[i] : null];
+  }, () => [g.id, ranks[g.id], undefined])));
   if (session !== me) return;
-  ranks = Object.fromEntries(res); renderGrid();
+  ranks = Object.fromEntries(res.map(r => [r[0], r[1]]));
+  // il record mostrato in home è quello della classifica online (unica fonte): se l'admin ha azzerato i punti,
+  // spariscono anche dal telefono. Si tiene la copia del telefono solo se la classifica non si legge o si è oltre il 50° posto.
+  if (remote){
+    let changed = false;
+    res.forEach(([id, rk, row]) => {
+      if (row === undefined || rk === -2) return;
+      const want = row ? { l: row.levels || 0, s: row.score || 0 } : null;
+      const have = bests[id] || null;
+      if (JSON.stringify(want) !== JSON.stringify(have)){ if (want) bests[id] = want; else delete bests[id]; changed = true; }
+    });
+    if (changed) store.set('efgBests4', bests);
+  }
+  renderGrid();
 }
 setInterval(()=>{ if (!document.hidden && $('player').hidden) loadRanks(); }, 30000);
 document.addEventListener('visibilitychange', ()=>{ if (!document.hidden && $('player').hidden) loadRanks(); });
@@ -102,7 +115,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v65' : 'Modalità demo: account e classifica restano su questo telefono. · v65';
+  mn.textContent = remote ? 'Classifica online · v66' : 'Modalità demo: account e classifica restano su questo telefono. · v66';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -197,7 +210,8 @@ function play(g){
   playing = g; runUsed = 0;
   $('playerTitle').textContent = g.name;
   $('playerClock').textContent = '';
-  $('frame').src = g.path + '?hub=1';
+  const rb = bests[g.id];   // il gioco mostra nella schermata iniziale lo stesso record di gara della home
+  $('frame').src = g.path + '?hub=1' + (rb ? '&rec=' + encodeURIComponent(fmtRes(rb)) : '');
   $('playerBar').classList.remove('away');
   $('player').hidden = false; $('mResult').hidden = true;
   document.body.style.overflow = 'hidden';
@@ -279,7 +293,6 @@ const validEmail = e => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
 
 async function loggedIn(user){
   session = user; $('mAuth').hidden = true; renderDock(); toast('Benvenuto, ' + session.nickname + '!');
-  for (const g of GAMES){ const b = bests[g.id]; if (b && b.l > 0){ try { await Backend.submit(session, g.id, b.s, b.l); } catch(e){} } }   // records made before logging in
   loadRanks();
 }
 // nickname ed email devono essere nuovi: finché uno dei due è già usato non ci si registra
@@ -484,7 +497,7 @@ function renderReview(){
   if (box.hidden) return;
   box.classList.toggle('ok', !!review.ok);
   $('btnReview').textContent = review.ok ? '✅ Bonus Recensione ottenuto' : '⭐ Bonus Recensione';
-  txt.innerHTML = review.ok ? 'Grazie! I tuoi <b>+' + pt + ' punti</b> sono già nella classifica generale.'
+  txt.innerHTML = review.ok ? 'Grazie! I tuoi <b>+' + pt + ' punti</b> si sommano ai tuoi record nella classifica generale.'
     : review.clic ? 'Grazie! Quando confermiamo la tua recensione su Google ricevi <b>+' + pt + ' punti</b> nella classifica generale.'
     : 'Lascia una recensione a efuture su Google: quando la confermiamo ricevi <b>+' + pt + ' punti</b> nella classifica generale.';
 }

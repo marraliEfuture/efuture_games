@@ -103,6 +103,19 @@ button.btn.go{background:var(--orange);border-color:#b8610b;color:#1d0f00;box-sh
 #ov-title .card > p.dim{font-size:11px}
 #ov-title .btnrow .btn{flex:1 1 0;min-width:0}   /* Inizia e Istruzioni larghi uguali */
 @media (orientation:landscape) and (max-height:560px){#ov-title .card > p{font-size:13px;line-height:1.4}}
+/* telefoni stretti: i pulsanti della schermata iniziale uno sotto l'altro, senza testo tagliato */
+@media (max-width:380px){
+  #ov-title .btnrow{flex-direction:column}
+  #ov-title .btnrow .btn{flex:none;width:100%}
+}
+/* telefono in orizzontale: logo e spazi più piccoli, la scheda entra in altezza */
+@media (orientation:landscape) and (max-height:560px){
+  .overlay{padding:8px}
+  #ov-title .card{padding:10px 14px;gap:6px;max-height:calc(100dvh - 16px)}
+  #ov-title .logo-badge{padding:6px 10px;width:min(100%,200px)}
+  #ov-title .logo{width:min(60%,180px)}
+  #ov-title .btn{padding:9px 10px;font-size:10px}
+}
 #ov-title .howto{font-size:11px;line-height:1.5;padding:9px 12px;gap:6px}
 #ov-title .legend{gap:5px 9px}
 #ov-title .legend canvas{width:20px;height:20px}

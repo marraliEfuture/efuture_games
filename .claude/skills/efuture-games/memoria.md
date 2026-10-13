@@ -20,6 +20,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 - Mentre si gioca la barra dell'app in alto non si vede: più spazio allo schermo del gioco, meno ai pulsanti (13/10).
 - Prima di committare modifiche grafiche l'utente può chiedere un mockup prima/dopo: mostrarlo e aspettare l'ok (13/10).
 - Dall'app non si apre mai la classifica a schermo intero (13/10).
+- I record si leggono dalla classifica online: mai rimandare al server i record del telefono (l'admin può aver azzerato i punti) (13/10).
 - Icona dell'app: solo la "e" di Efuture (quella della testa di Efuture Bros) su sfondo blu, senza la scritta efuture; sotto, "GAMES" in stile arcade anni '80; forma quadrata con angoli stondati (13/10).
 
 - Risposte, commit e testi dell'app in **italiano**. Commit nello stile "Area: cosa cambia per chi usa l'app".
@@ -61,6 +62,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Avvio su Android (Samsung): una sola schermata che continua, icona maskable con più margine blu, "Powered by efuture" in dissolvenza (v63, dopo mockup). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Avvio Android: tolto l'effetto zoom, icona a 192 px come quella di Chrome (v64). Se resta un salto, chiedere se il logo si ingrandisce o si rimpicciolisce. |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Avvio: su Android dopo la schermata di sistema solo "Powered by" con il logo efuture sotto; il logo esplode in mattoncini prima della home; immagini iPhone rigenerate (v65). |
+| 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Analisi con l'estensione Claude di Chrome (17 punti). Fatti i 3 alti: record della home presi dalla classifica online (dopo un reset spariscono anche dal telefono, niente reinvio), record in gara nei giochi, Timenet responsive, home più leggibile (v66). |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 
@@ -95,6 +97,7 @@ Risposte dell'utente (07/10):
 
 ## In sospeso / da ricordare
 
+- Analisi Chrome del 13/10: restano i punti 4-17 (timer unico, conferma uscita, barra hub, barra in basso della home, schede classifica, uniformità dei giochi, controlli touch su PC, ecc.).
 - La sezione ChatGPT di `links.json` ha solo il link generico: mancano i link alle chat vere.
 - Le skill sono disponibili solo nelle sessioni aperte sul repository. Per usarle nelle chat di claude.ai vanno caricate a mano (Impostazioni → Capabilities → Skills) e non si aggiornano da sole.
 - Sul database vanno eseguiti `supabase-tipi-utenti.sql` e poi `supabase-recensioni.sql` (al 12/10 tipi-utenti non risultava eseguito: Blocca/Tipo/chiavi personali non funzionano finché non lo è).

@@ -163,6 +163,10 @@ Ultimo aggiornamento: 08/10/2026 (v28)
 - Fuori dalla gara (gioco aperto da solo) `gameboy.js` accende gli stessi fuochi quando compare la schermata finale del gioco (`#ov-win`, in Efuture Bros `#ov-victory`) e li spegne quando si chiude. `fuochi.js` viene caricato solo in quel momento.
 - Non bloccano i tocchi. Con "riduci movimento" attivo durano al massimo 2,5 s.
 
+## Record in gara
+
+- In gara (`?hub=1&rec=…`) `gameboy.js` nasconde il record interno del gioco (`#bestLine`, in Efuture Bros `#bestTimeLineTitle` e `#bestDebugLineTitle`) e mostra **Record in gara: L/3 liv · P pt**, lo stesso della home; senza record "nessuno, gioca!".
+
 ## Barra dell'app durante la gara
 
 - In gara (`?hub=1`) `gameboy.js` dice all'app (`{type:'efg-ui', menu}`) se è aperta una schermata del gioco (`.overlay` visibile: titolo, scheda del livello, pausa, livello completato, fine). Mentre si gioca non ce n'è nessuna e l'app nasconde la sua barra in alto (Torna ai giochi, nome, tempo): il gioco usa tutto lo schermo.
