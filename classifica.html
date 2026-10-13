@@ -112,6 +112,15 @@ li.fresh{background:#ffe7d4}
 .gatebar.closing b{color:var(--sky)}
 .gatebar.warn b{color:#ff5a5f}
 .gatebar.closed{background:#5a1418}
+.lock{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:16px;background:var(--bg)}
+html.locked .lock{display:flex}
+html.locked body > :not(.lock):not(script){visibility:hidden}
+.lock form{background:#fff;border:1px solid var(--line);border-radius:6px;max-width:420px;width:100%;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(13,43,69,.12)}
+.lock h2{font-family:'Press Start 2P',var(--title);font-weight:400;font-size:16px;line-height:1.5;margin:0}
+.lock p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.lock label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:13px;color:var(--text)}
+.lock input{padding:10px 12px;border:1px solid var(--line);border-radius:4px;font-size:15px}
+.lock .err{color:#c0392b;font-size:13px;min-height:1.2em}
 .gmodal{position:fixed;inset:0;background:rgba(2,16,28,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
 .gcard{background:#fff;border-radius:6px;max-width:440px;width:100%;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .gcard h2{margin:0;font-family:var(--title);font-size:20px;color:var(--ink)}
@@ -190,6 +199,18 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 </style>
 </head>
 <body>
+<!-- la classifica da proiettare si apre solo dopo l'accesso admin (stessa chiave di admin.html) -->
+<script>try{ if (!sessionStorage.getItem('efgAdminKey')) document.documentElement.classList.add('locked'); }catch(e){ document.documentElement.classList.add('locked'); }</script>
+<div class="lock" id="lockBox" role="dialog" aria-modal="true" aria-labelledby="lkT">
+  <form id="lkForm" autocomplete="off">
+    <h2 id="lkT"><mark>Classifica</mark> · accesso admin</h2>
+    <p>La classifica da proiettare e la regia sono riservate agli amministratori. Entra con la tua email e la tua chiave admin personale, oppure solo con la chiave principale.</p>
+    <label>Email (vuota per la chiave principale)<input type="email" id="lkEmail" autocomplete="username" inputmode="email"></label>
+    <label>Chiave admin<input type="password" id="lkKey" autocomplete="current-password" required></label>
+    <button class="btn" type="submit">Entra</button>
+    <div class="err" id="lkMsg" aria-live="polite"></div>
+  </form>
+</div>
 <div class="topbar"><b class="care">CARE Conference</b> <b>2026</b> · Efuture Games<span class="pill">Classifica live</span></div>
 <header>
   <div class="special">
@@ -270,9 +291,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=71"></script>
+<script src="config.js?v=72"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=71"></script>
+<script src="backend.js?v=72"></script>
 <script>
 (function(){
 "use strict";
@@ -287,6 +308,42 @@ let TOP_GAME = 5;   // righe per gioco: scelta con i pulsanti "Top"
 const EVERY = 15;   // secondi tra un aggiornamento e l'altro
 const B = window.EFG_BACKEND;
 const $ = id => document.getElementById(id);
+/* ---------- accesso admin ----------
+   Senza una chiave admin valida (efg_admin_login) la pagina resta coperta dal modulo di accesso.
+   La chiave resta solo in questa scheda (sessionStorage, come in admin.html); le finestre aperte
+   da qui o dall'admin con "Proietta" ne ricevono una copia, quindi il proiettore si apre già sbloccato. */
+const lock = (() => {
+  const root = document.documentElement, C = window.EFG_CONFIG || {};
+  let sb = null;
+  const getK = () => { try { return sessionStorage.getItem('efgAdminKey') || ''; } catch(e){ return ''; } };
+  const setK = v => { try { v ? sessionStorage.setItem('efgAdminKey', v) : sessionStorage.removeItem('efgAdminKey'); } catch(e){} };
+  async function check(key){
+    if (!B.remote) return true;   // demo senza database: niente accesso da controllare
+    sb = sb || window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY, { auth:{ persistSession:false } });
+    const { data, error } = await sb.rpc('efg_admin_login', { p_key:key });
+    if (error) throw new Error(/fetch|network/i.test(error.message) ? 'nessuna connessione con il database' : error.message);
+    if (data && !Array.isArray(data) && data.errore) throw new Error(data.errore);
+    return true;
+  }
+  const open = () => root.classList.remove('locked');
+  const shut = msg => { root.classList.add('locked'); $('lkMsg').textContent = msg || ''; setTimeout(() => $('lkKey').focus(), 50); };
+  $('lkForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const em = $('lkEmail').value.trim().toLowerCase(), k = $('lkKey').value;
+    if (!k) return shut('Scrivi la chiave admin.');
+    const key = em ? em + '\n' + k : k;
+    $('lkMsg').textContent = 'Controllo…';
+    try { await check(key); setK(key); $('lkKey').value = ''; open(); }
+    catch(err){ shut('Accesso negato: ' + (err.message || err)); }
+  });
+  (async () => {
+    if (!B.remote){ open(); return; }
+    const k = getK();
+    if (!k) return shut('');
+    try { await check(k); open(); } catch(err){ setK(''); shut(/connessione/.test(err.message) ? 'Accesso non verificato: ' + err.message : 'Accesso scaduto: entra di nuovo.'); }
+  })();
+  return { open, shut };
+})();
 $('demoNote').hidden = B.remote;
 
 // game panels
