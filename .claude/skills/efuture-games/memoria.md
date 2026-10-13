@@ -60,6 +60,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | App: niente più link alla classifica a schermo intero; schermata di avvio bianca con icona e "Powered by efuture" (anche immagini di avvio iPhone); schermo intero al primo tocco nel browser (v62, dopo mockup). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Avvio su Android (Samsung): una sola schermata che continua, icona maskable con più margine blu, "Powered by efuture" in dissolvenza (v63, dopo mockup). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Avvio Android: tolto l'effetto zoom, icona a 192 px come quella di Chrome (v64). Se resta un salto, chiedere se il logo si ingrandisce o si rimpicciolisce. |
+| 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Avvio: su Android dopo la schermata di sistema solo "Powered by" con il logo efuture sotto; il logo esplode in mattoncini prima della home; immagini iPhone rigenerate (v65). |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 

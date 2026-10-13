@@ -32,13 +32,15 @@
 #splash{display:none}
 html.splash #splash{display:flex;position:fixed;inset:0;z-index:100;flex-direction:column;align-items:center;justify-content:center;background:#fff;transition:opacity .35s ease}
 #splash .ic{width:min(38vw,190px);height:auto;border-radius:22%}
-#splash .pw{position:absolute;left:0;right:0;bottom:calc(36px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;justify-content:center;gap:8px;font:400 13px/1 'IBM Plex Mono',ui-monospace,monospace;color:#56718a;letter-spacing:.02em}
-#splash .pw img{height:20px;width:auto;display:block}
+#splash .pw{position:absolute;left:0;right:0;bottom:calc(34px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;font:400 13px/1 'IBM Plex Mono',ui-monospace,monospace;color:#56718a;letter-spacing:.02em}
+#splash .pw img{height:26px;width:auto;display:block}
+#splash canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
 #splash.out{opacity:0;pointer-events:none}
-/* Android: prima compare la schermata di avvio di Chrome (icona "any" a 192 px al centro, su bianco,
-   non modificabile dal sito). Qui l'icona è la stessa, alla stessa misura e nello stesso punto,
-   e "Powered by efuture" entra con una dissolvenza: niente salto né zoom tra le due schermate */
-html.splash-and #splash .ic{width:192px;height:192px;border-radius:0}
+/* Android: prima compare la schermata di avvio del sistema (logo tondo su bianco, non modificabile dal sito);
+   dopo c'è solo "Powered by" con sotto il logo efuture, al centro, che entra con una dissolvenza */
+html.splash-and #splash .ic{display:none}
+html.splash-and #splash .pw{position:static;gap:14px;font-size:16px}
+html.splash-and #splash .pw img{height:40px}
 html.splash-and #splash .pw{animation:efgPw .5s ease .15s both}
 @keyframes efgPw{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @font-face{font-family:'Press Start 2P';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/press-start-2p-latin-400-normal.woff2) format('woff2');}
@@ -201,8 +203,53 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 </style>
 </head>
 <body>
-<div id="splash" aria-hidden="true"><img class="ic" src="icons/app-icon-512.png" alt=""><div class="pw">Powered by <img src="img/efuture-logo.png" alt="efuture"></div></div>
-<script>setTimeout(function(){var s=document.getElementById('splash');if(!s||!document.documentElement.classList.contains('splash'))return;s.classList.add('out');setTimeout(function(){document.documentElement.classList.remove('splash')},400)},1500)</script>
+<div id="splash" aria-hidden="true"><img class="ic" src="icons/app-icon-512.png" alt=""><div class="pw"><span>Powered by</span><img src="img/efuture-logo.png" alt="efuture"></div></div>
+<script>
+/* schermata di avvio: dopo 1,4 s il logo efuture esplode in tanti mattoncini, poi la schermata sfuma */
+(function(){
+  var root = document.documentElement, sp = document.getElementById('splash');
+  if (!sp || !root.classList.contains('splash')) return;
+  function close(){ sp.classList.add('out'); setTimeout(function(){ root.classList.remove('splash'); }, 400); }
+  function explode(img, done){
+    var r = img.getBoundingClientRect(), W = Math.round(r.width), H = Math.round(r.height);
+    if (!W || !H) return done();
+    var off = document.createElement('canvas'); off.width = W; off.height = H;
+    var o = off.getContext('2d'), px;
+    try { o.drawImage(img, 0, 0, W, H); px = o.getImageData(0, 0, W, H).data; } catch(e){ return done(); }
+    var dpr = Math.min(2, window.devicePixelRatio || 1), cv = document.createElement('canvas');
+    cv.width = Math.round(innerWidth * dpr); cv.height = Math.round(innerHeight * dpr);
+    var c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var BW = Math.max(6, Math.round(H / 3.6)), BH = Math.max(4, Math.round(BW / 1.8)), bricks = [], cx = W / 2, cy = H / 2;   /* mattoncini */
+    for (var y = 0, row = 0; y < H; y += BH, row++) for (var x = (row % 2) ? -BW / 2 : 0; x < W; x += BW){
+      var sx = Math.max(0, Math.min(W - 1, Math.round(x + BW / 2))), sy = Math.min(H - 1, Math.round(y + BH / 2)), i = (sy * W + sx) * 4;
+      if (px[i + 3] < 90) continue;
+      var dx = x - cx, dy = y - cy, sp2 = 90 + Math.random() * 200;
+      var a = Math.atan2(dy - H * 0.6, dx) + (Math.random() - 0.5) * 0.9;
+      bricks.push({ x: r.left + x, y: r.top + y, vx: Math.cos(a) * sp2, vy: Math.sin(a) * sp2 - 80, rot: 0, vr: (Math.random() - 0.5) * 9,
+        col: 'rgb(' + px[i] + ',' + px[i + 1] + ',' + px[i + 2] + ')' });
+    }
+    img.style.visibility = 'hidden'; sp.appendChild(cv);
+    var t0 = 0, DUR = 1000;
+    (function frame(ts){
+      if (!t0) t0 = ts;
+      var t = ts - t0, dt = 1 / 60, k = Math.min(1, t / DUR);
+      c.clearRect(0, 0, innerWidth, innerHeight);
+      c.globalAlpha = 1 - k * k;
+      bricks.forEach(function(b){
+        b.vy += 520 * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.rot += b.vr * dt;
+        c.save(); c.translate(b.x + BW / 2, b.y + BH / 2); c.rotate(b.rot); c.fillStyle = b.col; c.fillRect(-BW / 2, -BH / 2, BW - 1.5, BH - 1.5); c.fillStyle = 'rgba(255,255,255,.28)'; c.fillRect(-BW / 2, -BH / 2, BW - 1.5, 1.5); c.restore();
+      });
+      if (t < DUR) requestAnimationFrame(frame); else done();
+    })(performance.now());
+  }
+  setTimeout(function(){
+    var logo = sp.querySelector('.pw img');
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches;
+    if (still || !logo || !logo.complete) return close();
+    explode(logo, close);
+  }, 1400);
+})();
+</script>
 <div id="lobby">
   <header>
     <h1>EFUTURE <span class="e">GAMES</span></h1>
@@ -346,12 +393,12 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=64"></script>
+<script src="config.js?v=65"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=64"></script>
+<script src="backend.js?v=65"></script>
 <script src="vendor/jsQR.js"></script>
-<script src="fuochi.js?v=64"></script>
-<script src="hub.js?v=64"></script>
+<script src="fuochi.js?v=65"></script>
+<script src="hub.js?v=65"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });
