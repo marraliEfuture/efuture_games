@@ -18,6 +18,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 - Visualizzazioni dei giochi: si chiamano Normal, Dark e Game, in quest'ordine; il primo tastino della scocca è MODE (13/10).
 - Fine del gioco: complimenti e fuochi d'artificio, poi Rigioca o Torna ai giochi (13/10).
 - Mentre si gioca la barra dell'app in alto non si vede: più spazio allo schermo del gioco, meno ai pulsanti (13/10).
+- Prima di committare modifiche grafiche l'utente può chiedere un mockup prima/dopo: mostrarlo e aspettare l'ok (13/10).
 - Icona dell'app: solo la "e" di Efuture (quella della testa di Efuture Bros) su sfondo blu, senza la scritta efuture; sotto, "GAMES" in stile arcade anni '80; forma quadrata con angoli stondati (13/10).
 
 - Risposte, commit e testi dell'app in **italiano**. Commit nello stile "Area: cosa cambia per chi usa l'app".
@@ -54,6 +55,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 12/10 | Claude Code `session_014RiPo4gT2e1UtaJRgiE7ap` | Countdown dalla classifica con email + chiave admin; Bonus Recensione (pulsante in home, stella gialla/verde in admin, punti in classifica generale, etichetta ⭐); Proietta a schermo intero sul secondo monitor con finestra di regia; Efuture Bros con mouse rasoterra e senza scritte CASA/CLIENTE; pulsante arancione a fine livello nei 4 giochi; visualizzazioni Game/Light/Dark dei giochi e scocca più larga (v41-v56). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Icona dell'app: solo la "e" di Efuture (come la testa di Efuture Bros) su sfondo blu, con la scritta "GAMES" in stile anni '80; CoreTech Pac: livelli 1-3 con meno monetine e bug più lenti (v59, PR #47). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Giochi: barra dell'app nascosta mentre si gioca (tempo dentro la scocca), scocca più sottile e comandi compatti, tastino MODE (Normal → Dark → Game) al posto di ISTRUZIONI, fuochi d'artificio e "Complimenti, hai finito!" alla fine; icone rinominate `app-*` perché i telefoni le aggiornino (v60). |
+| 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Classifica in app: tolto il logo efuture, filtri staccati dalla prima posizione (v61, dopo mockup approvato). |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 

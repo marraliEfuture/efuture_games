@@ -209,7 +209,9 @@ All'avvio l'app legge `efg_impostazioni` e salva la visualizzazione predefinita 
 ## Classifica in app
 
 Si apre con il pulsante **Classifica** (finestra `mBoard`).
+- In cima solo il titolo "Classifica" e la ✕, senza logo efuture (v61).
 - **Schede:** **Totale** e i 4 giochi. Ogni cambio di scheda ricarica i dati con `Backend.board(id)`, cioè `efg_board`. Non c'è filtro per gruppo.
+  Le schede sono staccate dalla prima posizione: 14 px di spazio e una riga sottile sotto (`#bTabs`).
 - **Riga su due livelli:**
   - posizione: tondo oro, argento o bronzo per i primi 3;
   - nome grande e, sotto, il dettaglio: `G/4 giochi · L/12 livelli` nel Totale, `L/3 livelli` nei giochi;
