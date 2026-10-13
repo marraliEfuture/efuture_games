@@ -49,7 +49,7 @@ Stile del sito efuture.it:
 | Gruppo | Valori | Predefinito | Parametro URL | Effetto |
 |---|---|---|---|---|
 | Classifica | Generale / Giochi / Entrambi | Entrambi | `classifica=generale\|giochi\|tutti` | Cosa mostrare: solo la generale, solo i 4 riquadri dei giochi, oppure tutti e due |
-| Visualizzazione | Statica / A comparsa manuale / A comparsa automatica | A comparsa automatica | `visualizzazione=statica\|manuale\|auto` | Come si vede la **generale**: statica (riquadro sempre visibile) oppure a comparsa a tutto schermo dalla 10ª alla 1ª posizione (vedi sotto). Con Classifica = Giochi è sbiadito |
+| Visualizzazione | Statica / A comparsa manuale / A comparsa automatica | A comparsa automatica | `visualizzazione=statica\|manuale\|auto` | Come compaiono i record della **generale**: statici oppure a comparsa dall'ultimo al primo, ognuno in cima alla pila (vedi sotto). I 4 giochi restano statici |
 | Top | 3 / 5 / 10 | 5 | `top=3\|5\|10` | Righe mostrate per **ogni** classifica, generale compresa |
 | Giocatori | Ospiti / Efuture / Tutti | Ospiti | `giocatori=ospiti\|efuture\|tutti` | Filtro per gruppo (vedi sotto) |
 | QR | Sì / No | Sì | `qr=si\|no` (accetta anche `1`/`0`) | Mostra o nasconde il QR grande |
@@ -59,20 +59,13 @@ Stile del sito efuture.it:
 - Esempio: `classifica.html?classifica=tutti&visualizzazione=statica&top=10&giocatori=efuture&qr=no`.
 - **Predefinito al proiettore (v70):** Classifica Entrambi + Visualizzazione A comparsa automatica (i 4 riquadri dei giochi sempre visibili, la generale a comparsa), solo ospiti, QR visibile.
 
-### Classifica generale a comparsa (v69)
+### Comparsa dei record della classifica generale (v71)
 
-- Riquadro `#reveal` a tutto schermo, blu scuro: "Classifica generale", il gruppo (Ospiti / Utenti Efuture) e fino a 10 righe. Le posizioni si svelano dal fondo (10ª) verso l'alto (1ª); la 1ª è evidenziata in oro.
-- **Automatica:** ogni 150 s si apre, svela una posizione ogni 2,2 s, resta aperta 12 s e si chiude. Con Classifica = Generale, finita la comparsa resta aperta fino al giro successivo. Il ritmo dipende dall'orologio, quindi regia e ledwall sono allineati.
-- **Manuale:** in regia compare **▶ Prossima posizione** (anche barra spaziatrice o freccia destra): ogni tocco svela la posizione successiva; dopo la 1ª il tocco chiude. Il passo è condiviso tra regia e ledwall con `localStorage` (`efgReveal`).
-- Nella finestra di regia (non proiettata e non a schermo intero) la comparsa si vede in piccolo in basso a destra, così i comandi restano usabili.
-- **Tastiera:** i gruppi funzionano come radiogroup, con le frecce ← → che passano da un valore all'altro.
-- Cambiare Top o Giocatori ridisegna le liste senza animazioni e ricarica subito.
-
-**Filtro Giocatori:**
-- **Efuture:** email che finisce con `@efuture.it`, sottodomini compresi (per esempio `@reparto.efuture.it`). Maiuscole e spazi non contano.
-- **Ospiti:** tutti gli altri.
-- Con Ospiti o Efuture la pagina chiama `efg_board_group`; con Tutti chiama `efg_board`.
-- Se `efg_board_group` non esiste su Supabase (`supabase-classifica-gruppi.sql` non eseguito), la pagina mostra **tutti** i giocatori. Nello stato in alto compare: "⚠ Filtro Giocatori non attivo: eseguire supabase-classifica-gruppi.sql su Supabase (mostro tutti) · ora".
+- Vale **solo per la classifica generale**: i 4 riquadri dei giochi restano sempre completi.
+- Le righe compaiono dall'ultima posizione alla prima: all'inizio si vede solo l'ultima (per esempio la 5ª con Top 5), poi a ogni passo compare il record sopra, **in cima alla pila**, e le righe già visibili scendono con un'animazione, fino al 1°. Quante righe dipende da Top (3, 5 o 10).
+- **Statica:** tutte le righe visibili.
+- **Automatica:** ogni 150 s la lista si svuota e si riempie, una riga ogni 2 s, poi resta piena fino al giro successivo. Il ritmo dipende dall'orologio, quindi regia e ledwall sono allineati.
+- **Manuale:** in regia **▶ Prossima posizione** (anche barra spaziatrice o freccia destra) fa comparire il record successivo; a lista piena il tocco successivo la svuota e si ricomincia. Il passo è condiviso tra regia e ledwall con `localStorage` (`efgReveal`).
 
 ## Dati, ordine e aggiornamento
 
