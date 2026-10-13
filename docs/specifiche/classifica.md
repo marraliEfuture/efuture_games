@@ -48,14 +48,22 @@ Stile del sito efuture.it:
 
 | Gruppo | Valori | Predefinito | Parametro URL | Effetto |
 |---|---|---|---|---|
-| Classifica | Generale / Giochi / Tutti | Giochi | `classifica=generale\|giochi\|tutti` | Solo la generale / solo i 4 giochi / entrambi |
+| Generale | Intera / A comparsa auto / A comparsa manuale | A comparsa auto | `generale=intera\|auto\|manuale` | I 4 riquadri dei giochi si vedono **sempre**. Intera: la generale sta accanto ai giochi. A comparsa: la generale non si vede, si apre a tutto schermo e svela le posizioni dalla 10ª alla 1ª (vedi sotto) |
 | Top | 3 / 5 / 10 | 5 | `top=3\|5\|10` | Righe mostrate per **ogni** classifica, generale compresa |
-| Giocatori | Ospiti / Efuture / Tutti | Tutti | `giocatori=ospiti\|efuture\|tutti` | Filtro per gruppo (vedi sotto) |
+| Giocatori | Ospiti / Efuture / Tutti | Ospiti | `giocatori=ospiti\|efuture\|tutti` | Filtro per gruppo (vedi sotto) |
 | QR | Sì / No | Sì | `qr=si\|no` (accetta anche `1`/`0`) | Mostra o nasconde il QR grande |
 
 - **Priorità:** parametro URL valido, poi scelta salvata, poi predefinito.
-- Le scelte si salvano a ogni cambio in `localStorage` alla chiave `efgBoardView3`. Restano su quello schermo.
-- Esempio: `classifica.html?classifica=tutti&top=10&giocatori=efuture&qr=no`.
+- Le scelte si salvano a ogni cambio in `localStorage` alla chiave `efgBoardView4` (dalla v69: le scelte salvate prima non valgono più). Restano su quello schermo.
+- Esempio: `classifica.html?generale=intera&top=10&giocatori=efuture&qr=no`.
+- **Predefinito al proiettore (v69):** 4 riquadri dei giochi, solo ospiti, QR visibile, generale a comparsa automatica.
+
+### Classifica generale a comparsa (v69)
+
+- Riquadro `#reveal` a tutto schermo, blu scuro: "Classifica generale", il gruppo (Ospiti / Utenti Efuture) e fino a 10 righe. Le posizioni si svelano dal fondo (10ª) verso l'alto (1ª); la 1ª è evidenziata in oro.
+- **Automatica:** ogni 150 s si apre, svela una posizione ogni 2,2 s, resta aperta 12 s e si chiude. Il ritmo dipende dall'orologio, quindi regia e ledwall sono allineati.
+- **Manuale:** in regia compare **▶ Prossima posizione** (anche barra spaziatrice o freccia destra): ogni tocco svela la posizione successiva; dopo la 1ª il tocco chiude. Il passo è condiviso tra regia e ledwall con `localStorage` (`efgReveal`).
+- Nella finestra di regia (non proiettata e non a schermo intero) la comparsa si vede in piccolo in basso a destra, così i comandi restano usabili.
 - **Tastiera:** i gruppi funzionano come radiogroup, con le frecce ← → che passano da un valore all'altro.
 - Cambiare Top o Giocatori ridisegna le liste senza animazioni e ricarica subito.
 
