@@ -139,3 +139,11 @@ Senza Supabase compare la nota "Modalità demo: il database online non è ancora
 
 ---
 Ultimo aggiornamento: 07/10/2026 (v27)
+
+## Accesso solo admin (v72)
+
+- La pagina si apre solo dopo l'accesso admin: finché non c'è una chiave valida è coperta dal modulo "Classifica · accesso admin" (email + chiave personale, oppure solo la chiave principale), verificata con `efg_admin_login`.
+- La chiave resta solo in quella scheda (`sessionStorage` `efgAdminKey`, la stessa di admin.html): entrando dall'admin la classifica è già sbloccata; le finestre aperte con Proietta (ledwall e regia) ne ricevono una copia e si aprono sbloccate. Una nuova scheda o un nuovo browser chiedono di nuovo l'accesso.
+- Chiave sbagliata: "Accesso negato: …". Chiave salvata non più valida: "Accesso scaduto: entra di nuovo.". In modalità demo (senza database) la pagina è libera.
+- È un blocco della pagina: i dati della classifica restano pubblici (li legge anche l'app dei giocatori).
+

@@ -23,6 +23,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 - I record si leggono dalla classifica online: mai rimandare al server i record del telefono (l'admin può aver azzerato i punti) (13/10).
 - Classifica al proiettore: due filtri distinti, Classifica (generale / giochi / entrambi) e Visualizzazione (statica / a comparsa manuale / a comparsa automatica). Di default 4 giochi + generale a comparsa 10ª→1ª, solo ospiti, QR visibile (13/10).
 - Prima di ogni commit mostrare i mockup; dopo l'ok commit e pubblicazione automatici (13/10).
+- La pagina classifica.html (proiettore e regia) è solo per admin (13/10).
 - Icona dell'app: solo la "e" di Efuture (quella della testa di Efuture Bros) su sfondo blu, senza la scritta efuture; sotto, "GAMES" in stile arcade anni '80; forma quadrata con angoli stondati (13/10).
 
 - Risposte, commit e testi dell'app in **italiano**. Commit nello stile "Area: cosa cambia per chi usa l'app".
@@ -70,6 +71,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Classifica da proiettare: di default 4 giochi, solo ospiti, QR; nuovo filtro Generale (intera, a comparsa automatica, a comparsa manuale dalla 10ª alla 1ª) (v69). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Corretti i filtri della classifica: Classifica (generale, giochi, entrambi) e Visualizzazione (statica, a comparsa manuale, a comparsa automatica); predefinito Entrambi + comparsa automatica (v70). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Comparsa: niente riquadro a tutto schermo; i record della sola classifica generale compaiono dall'ultimo al primo, ognuno in cima alla pila (v71). |
+| 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Classifica da proiettare accessibile solo agli admin (email + chiave o chiave principale) (v72). |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 
