@@ -50,7 +50,7 @@ Se `SUPABASE_URL` o `SUPABASE_ANON_KEY` sono vuoti, l'app va in modalità demo.
 | `gateBar` (`gateTxt`, `gateClock`) | Barra del countdown di apertura o chiusura |
 | `grid` | Griglia dei 4 giochi, generata da `renderGrid()` |
 | `dock` | Pulsanti in basso: `dockOut` (`btnAuth`), `dockIn` (`who`, `btnLogout`), `btnBoard`, `btnInstall`, `btnHelp`, e la nota `modeNote` con modalità e versione |
-| `player` | Player a tutto schermo: `playerBar` (`btnBack`, `playerTitle`, `playerClock`, logo) e `iframe#frame` |
+| `player` | Player a tutto schermo: `iframe#frame` e sopra `playerBar` (`btnBack`, `playerTitle`, `playerClock`, logo), con la classe `away` (nascosta) mentre si gioca |
 | `toast` | Messaggio temporaneo |
 
 ### Modali (`div.modal`, chiuse con `hidden`)

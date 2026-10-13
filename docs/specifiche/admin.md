@@ -94,7 +94,7 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
 
 ### Impostazioni
 
-- **🎮 Visualizzazione dei giochi:** tre scelte, quella attiva evidenziata: **🎮 Game** (scocca Game Boy in verticale, predefinita), **☀ Light** (chiaro, gioco a tutta larghezza), **☾ Dark** (scuro, gioco a tutta larghezza). È la visualizzazione con cui si aprono i giochi per chi non ne ha ancora scelta una con il pulsante in alto nel gioco. Chiama `efg_admin_set_impostazione(p_key, 'vista_default', …)`; nel log "admin: impostazione". L'app la legge all'avvio (`efg_impostazioni`), quindi vale dalla prossima apertura dell'app.
+- **🎮 Visualizzazione dei giochi:** tre scelte, quella attiva evidenziata: **🎮 Game** (scocca Game Boy in verticale, predefinita), **☀ Normal** (chiaro, gioco a tutta larghezza; nel database `light`), **☾ Dark** (scuro, gioco a tutta larghezza). È la visualizzazione con cui si aprono i giochi per chi non ne ha ancora scelta una con il pulsante in alto nel gioco. Chiama `efg_admin_set_impostazione(p_key, 'vista_default', …)`; nel log "admin: impostazione". L'app la legge all'avvio (`efg_impostazioni`), quindi vale dalla prossima apertura dell'app.
 - **⭐ Bonus Recensione:** rimanda a Utenti, dove si impostano link e punti.
 - Serve `supabase-recensioni.sql`: senza, compare l'avviso di eseguirlo.
 

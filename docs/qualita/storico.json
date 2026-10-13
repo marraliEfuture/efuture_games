@@ -366,11 +366,11 @@
  },
  {
   "data": "2026-10-13",
-  "commit": "8a01173",
-  "versione": "v59",
+  "commit": "b96b7cb",
+  "versione": "v60",
   "esiti": {
    "codice": {
-    "ok": 33,
+    "ok": 34,
     "avviso": 1,
     "errore": 0
    },
@@ -400,13 +400,13 @@
     "errore": 0
    }
   },
-  "spazio_kb": 11944.8,
+  "spazio_kb": 11955.4,
   "cartelle_kb": {
-   ".claude": 120.7,
-   "(file principali)": 289.4,
-   "docs": 279.4,
+   ".claude": 121.4,
+   "(file principali)": 294.3,
+   "docs": 281.8,
    "fonts": 120.3,
-   "games": 906.2,
+   "games": 908.8,
    "icons": 40.6,
    "img": 92.5,
    "qr": 159.6,

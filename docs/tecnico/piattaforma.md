@@ -59,7 +59,8 @@ Efuture Games – CARE Conference Edition è una web app statica (PWA) con 4 gio
 | `games/gameboy.css`, `games/gameboy.js` | Scocca "Game Boy" in verticale, comune ai giochi. Lo script aggiunge solo parti decorative e due tastini centrali, e sposta i pulsanti indicati nei tasti A/B; non tocca la logica dei giochi |
 | `vendor/` | Librerie di terze parti (vedi sotto) |
 | `fonts/` | Font locali `.woff2` dell'app, della classifica e dell'admin |
-| `icons/` | Favicon, apple-touch-icon e icone della PWA (192, 512, maskable 512) |
+| `icons/` | Favicon, apple-touch-icon e icone della PWA (192, 512, maskable 512), con il prefisso `app-` |
+| `fuochi.js` | Fuochi d'artificio di fine gioco (`EFGFuochi`), usati dall'app e da `gameboy.js` |
 | `img/` | Loghi Efuture e icone dei 4 giochi (`g-<id>.png`) |
 | `qr/` | `qr-app.png` / `qr-app.svg` (QR dell'app, usato anche dalla classifica), vecchi QR di sblocco in PNG e `stampa.html` (vecchio foglio di stampa; oggi i QR si generano dall'admin) |
 | `video/` | Video `.mp4` e copertine `.jpg` della sezione "Video utili" dell'admin |
