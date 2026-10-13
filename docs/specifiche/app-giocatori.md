@@ -46,7 +46,7 @@ Dall'alto in basso:
 3. **Griglia 2×2 dei giochi.** Ogni card mostra:
    - icona e nome;
    - stato: `Gioca ▶` se sbloccato (pillola arancio), `🔒 Da sbloccare` se bloccato (icona in grigio);
-   - `Record: L/3 liv · P pt`, se sul telefono c'è un record.
+   - `Record: L/3 liv · P pt`, se c'è un record (dalla v66 è quello della classifica online, vedi Record).
 
    Tocco su un gioco sbloccato: si gioca. Tocco su un gioco bloccato: si apre la finestra di sblocco. Durante l'attesa di apertura o a gara chiusa le card sono disabilitate.
 4. **Fascia in basso**, fissa:
@@ -117,7 +117,7 @@ Finestra `mAuth` con due schede: **Registrati** e **Accedi**.
   - demo: `efgSession3`.
 
   Resta finché non si preme **Esci**, che cancella solo la sessione: record locali e sblocchi restano.
-- **Al login o alla registrazione:** toast "Benvenuto, *nome*!". Poi l'app invia alla classifica tutti i record locali con almeno 1 livello (`efgBests4`). Così i record fatti prima di accedere non si perdono. Eventuali errori sono ignorati.
+- **Al login o alla registrazione:** toast "Benvenuto, *nome*!". Dalla v66 l'app **non** rimanda più al server i record del telefono: dopo un azzeramento dall'admin riporterebbe in classifica i punti vecchi (e senza accesso non si può giocare).
 
 ## Gara
 
@@ -166,7 +166,7 @@ Quando `times` manca, i livelli superati sono 3 se `ok` è vero, altrimenti `lev
   - riga `Calcolo`, per esempio `1×25×2 + 2×20×3 = 170`;
   - riga `Tempo`, la somma dei tempi dei livelli superati;
   - riga `Il tuo record`.
-- **Record:** si conserva il miglior risultato per gioco **su questo telefono** in `efgBests4`, nella forma `{id: {l: livelli, s: punti}}`. È migliore chi ha più livelli; a parità di livelli, più punti. Una partita con 0 livelli non è mai un record.
+- **Record:** il miglior risultato per gioco è in `efgBests4`, nella forma `{id: {l: livelli, s: punti}}`. Dalla v66 la fonte è la classifica online: ogni volta che l'app legge le classifiche dei 4 giochi (`loadRanks`) riscrive `efgBests4` con livelli e punti del giocatore sul server, e cancella i record che sul server non ci sono (per esempio dopo un azzeramento). La copia del telefono resta solo se la classifica non si legge o se il giocatore è oltre il 50° posto. In home la riga sotto il gioco dice "In classifica: N°", "Oltre il 50° posto", "Non ancora in classifica" o "Supera almeno un livello per entrare in classifica". È migliore chi ha più livelli; a parità di livelli, più punti. Una partita con 0 livelli non è mai un record.
 - **Messaggi:**
   - 0 livelli: "Supera almeno un livello entro il minuto per entrare in classifica." (più "Il tuo record resta valido." se un record esiste);
   - non è un record: "Il tuo record resta … in classifica conta solo il risultato migliore.";
@@ -198,7 +198,7 @@ Il server rifiuta i punteggi a gara chiusa, con una tolleranza di 10 s (vedi [da
 ## Bonus Recensione
 
 - In home, sotto i giochi, chi ha fatto l'accesso vede il pulsante giallo **⭐ Bonus Recensione** con la spiegazione dei punti. Il tocco apre subito la pagina delle recensioni Google di efuture (il link scelto in admin, altrimenti la ricerca su Google Maps) e registra il clic (`efg_recensione_click`).
-- Dopo il clic: "Grazie! Quando confermiamo la tua recensione su Google ricevi +N punti…". Quando l'admin la conferma il pulsante diventa verde, **✅ Bonus Recensione ottenuto**, e i punti sono già nella classifica generale.
+- Dopo il clic: "Grazie! Quando confermiamo la tua recensione su Google ricevi +N punti…". Quando l'admin la conferma il pulsante diventa verde, **✅ Bonus Recensione ottenuto**, e il testo dice "I tuoi +N punti si sommano ai tuoi record nella classifica generale".
 - Nella classifica generale (app e schermo) chi ha il bonus ha l'etichetta **⭐ +N bonus**; la nota dice "Totale = somma dei 4 giochi + ⭐ bonus recensione".
 - Senza `supabase-recensioni.sql` il pulsante non compare.
 
@@ -318,4 +318,11 @@ Ultimo aggiornamento: 07/10/2026 (v27)
 
 - **App installata:** all'apertura compare per 1,5 s una schermata bianca con l'icona al centro e in basso "Powered by" con il logo efuture (`#splash` in `index.html`, solo in `display-mode: standalone`), poi sfuma nella home. Su Android la prima schermata è quella del sistema (logo tondo su bianco, non modificabile): dalla v65 la nostra non ripete l'icona e mostra solo "Powered by" con sotto il logo efuture, al centro, in dissolvenza. Su iPhone "Powered by" e sotto il logo stanno in basso, sotto l'icona. Dopo 1,4 s il logo efuture esplode in mattoncini (canvas, 1 s; non con "riduci movimento") e la schermata sfuma. L'icona maskable ha "e" e "GAMES" più piccole, con più margine blu. Il manifest ha `background_color` bianco, così la schermata di avvio di Android (icona su bianco, non modificabile dal sito) si lega senza stacco. Su iPhone le immagini `icons/avvio/avvio-LxA.png` (`apple-touch-startup-image`, 10 misure di iPhone in verticale) mostrano la stessa schermata già prima che la pagina si carichi.
 - **App aperta dal browser del telefono (non installata):** al primo tocco la pagina va a schermo intero senza barre del browser (`requestFullscreen`, `hub.js`); se si esce, ci torna al tocco successivo. Solo su dispositivi touch e fuori dall'iframe. Su iPhone Safari non è possibile: serve installare l'app.
+
+## Leggibilità (v66)
+
+- Viewport della home senza `maximum-scale` e `user-scalable=no`: si può ingrandire (nei giochi lo zoom resta bloccato).
+- Testi della home a 12-13 px (titoli in carattere pixel a 11 px); grigio `--dim` `#4a6580` (contrasto 5,5:1 sullo sfondo).
+- Aree di tocco di almeno 44 px: Esci, ✕ delle finestre, pulsanti Classifica / Installa / Istruzioni; pulsante Gioca e schede della classifica più alti.
+- Nei giochi aperti dall'app la schermata iniziale mostra **Record in gara: L/3 liv · P pt** (lo stesso della home, passato nell'URL come `rec`), al posto del record interno del gioco.
 

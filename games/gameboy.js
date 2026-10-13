@@ -186,6 +186,19 @@
   }
   setInterval(refresh, 300); refresh();
 
+  /* in gara la schermata iniziale mostra il record di gara (lo stesso della home: livelli e punti di gara),
+     non il punteggio interno del gioco, che ha un'altra scala */
+  if (inHub){
+    var rec = new URLSearchParams(location.search).get('rec');
+    var own = ['bestLine', 'bestTimeLineTitle', 'bestDebugLineTitle'].map($).filter(Boolean);
+    if (own.length){
+      var st = mk0('style'); st.textContent = '#bestLine,#bestTimeLineTitle,#bestDebugLineTitle{display:none!important}'; doc.head.appendChild(st);
+      var rp = mk('p', 'dim gb-rec'); rp.style.color = 'var(--ok,#1f9d55)';
+      rp.innerHTML = 'Record in gara: <b></b>'; rp.querySelector('b').textContent = rec || 'nessuno, gioca!';
+      own[0].parentNode.insertBefore(rp, own[0]);
+    }
+  }
+
   /* tempo della gara mandato dall'app: nella riga in alto della scocca, altrimenti nell'angolo dello schermo */
   var stageEl = $('stage'), clocks = [top.querySelector('.gb-clock')];
   if (stageEl){ var ck = mk('span', 'gb-clock'); ck.setAttribute('aria-hidden', 'true'); stageEl.appendChild(ck); clocks.push(ck); }
