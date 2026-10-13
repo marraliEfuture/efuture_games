@@ -52,6 +52,11 @@ main{flex:1;width:100%;max-width:1200px;margin:0 auto;padding:20px clamp(16px,3v
 .login{max-width:420px;margin:40px auto 0;width:100%}
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:12px;color:var(--muted);font-weight:600}
+.pwrap{position:relative;display:block;width:100%}
+.pwrap input{padding-right:46px}
+.eye{position:absolute;right:2px;top:50%;transform:translateY(-50%);width:42px;height:38px;border:0;background:none;cursor:pointer;color:var(--muted,#5a6b7d);display:grid;place-items:center;border-radius:4px}
+.eye:hover{color:var(--ink)}
+.eye svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 input[type=text],input[type=password],select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#fff;color:var(--ink);font-size:15px}
 .msg{font-size:13px;min-height:1.2em;color:var(--muted)}
 .msg.err{color:var(--danger)} .msg.ok{color:var(--ok)}
@@ -485,7 +490,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=67"></script>
+<script src="config.js?v=68"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script>
@@ -1384,6 +1389,31 @@ function renderLinks(){
 }
 
 if (KEY) enter().catch(err => logout(err.auth ? err.message : ''));
+})();
+
+/* occhio per vedere la chiave mentre la si scrive (nuova chiave e ripeti): di default è nascosta */
+(function(){
+  const OPEN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const SHUT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7c2 0 3.7.6 5.1 1.5M22 12s-3.5 7-10 7c-2 0-3.7-.6-5.1-1.5"/><path d="M3 3l18 18"/></svg>';
+  const fields = ['kNew', 'kNew2', 'peK1', 'peK2'].map(id => document.getElementById(id)).filter(Boolean);
+  function set(inp, btn, show){
+    inp.type = show ? 'text' : 'password';
+    btn.innerHTML = show ? SHUT : OPEN;
+    btn.setAttribute('aria-label', show ? 'Nascondi la chiave' : 'Mostra la chiave');
+    btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+  }
+  const pairs = fields.map(inp => {
+    const w = document.createElement('span'); w.className = 'pwrap';
+    inp.parentNode.insertBefore(w, inp); w.appendChild(inp);
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'eye'; w.appendChild(b);
+    set(inp, b, false);
+    b.addEventListener('click', () => { set(inp, b, inp.type === 'password'); inp.focus(); });
+    return [inp, b];
+  });
+  // a ogni salvataggio, annullamento o nuova apertura le chiavi tornano nascoste
+  const hideAll = () => pairs.forEach(([i, b]) => set(i, b, false));
+  ['fKey', 'peKeyForm'].forEach(id => { const f = document.getElementById(id); if (f) f.addEventListener('submit', hideAll); });
+  ['peKeySet', 'peKeyCancel'].forEach(id => { const b = document.getElementById(id); if (b) b.addEventListener('click', hideAll); });
 })();
 </script>
 </body>

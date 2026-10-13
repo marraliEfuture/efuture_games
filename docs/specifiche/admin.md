@@ -316,3 +316,7 @@ Tutti gli elenchi sono array nello script di `admin.html`. Dopo la modifica:
 
 ---
 Ultimo aggiornamento: 07/10/2026 (v27)
+
+## Occhio sulle chiavi (v68)
+
+- I campi "Nuova chiave" e "Ripeti la chiave" (scheda Chiave e chiave personale nella scheda Utenti) hanno un pulsante a forma di occhio per vedere quello che si scrive. Di default la chiave è nascosta; torna nascosta a ogni salvataggio, annullamento o nuova apertura.
