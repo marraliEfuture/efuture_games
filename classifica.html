@@ -73,6 +73,7 @@ mark{background:none;color:var(--sky);padding:0}
 .who-tag{display:inline-block;font-family:var(--body);font-size:.6em;font-weight:600;letter-spacing:.04em;vertical-align:.25em;margin-left:.5em;padding:.2em .6em;border-radius:3px;background:var(--orange);color:#fff}
 @media (max-width:560px){.controls .seg-grp + .seg-grp{border-left:0;padding-left:0}}
 #btnNext{display:none}
+.vis-off #grpVis{opacity:.45;pointer-events:none}   /* solo giochi: la visualizzazione riguarda la generale */
 .gen-manuale #btnNext{display:inline-block}
 /* classifica generale a comparsa: a tutto schermo, le posizioni si svelano dalla 10ª alla 1ª */
 #reveal{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,1.4vw,22px);padding:clamp(16px,3vw,48px);background:radial-gradient(ellipse at 50% 0%,#0d3b5e 0%,var(--navy) 70%);color:#fff;opacity:0;pointer-events:none;transition:opacity .5s ease}
@@ -223,9 +224,13 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 </header>
 <div class="gatebar" id="gateBar" hidden role="status" aria-live="polite"><span id="gateTxt"></span><b id="gateClock"></b></div>
 <div class="controls" id="controls" aria-label="Cosa mostrare">
-  <div class="seg-grp"><span class="ttl" id="lbGen">Generale</span>
-    <div class="seg" role="radiogroup" aria-labelledby="lbGen" data-key="gen">
-      <button type="button" role="radio" data-v="intera">Intera</button><button type="button" role="radio" data-v="auto">A comparsa auto</button><button type="button" role="radio" data-v="manuale">A comparsa manuale</button>
+  <div class="seg-grp"><span class="ttl" id="lbBoard">Classifica</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lbBoard" data-key="board">
+      <button type="button" role="radio" data-v="generale">Generale</button><button type="button" role="radio" data-v="giochi">Giochi</button><button type="button" role="radio" data-v="tutti">Entrambi</button>
+    </div></div>
+  <div class="seg-grp" id="grpVis"><span class="ttl" id="lbVis">Visualizzazione</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lbVis" data-key="vis">
+      <button type="button" role="radio" data-v="statica">Statica</button><button type="button" role="radio" data-v="manuale">A comparsa manuale</button><button type="button" role="radio" data-v="auto">A comparsa automatica</button>
     </div>
     <button class="btn" id="btnNext" type="button" title="Svela la prossima posizione della classifica generale (anche con la barra spaziatrice o la freccia destra)">▶ Prossima posizione</button></div>
   <div class="seg-grp"><span class="ttl" id="lbTop">Top</span>
@@ -285,9 +290,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=69"></script>
+<script src="config.js?v=70"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=69"></script>
+<script src="backend.js?v=70"></script>
 <script>
 (function(){
 "use strict";
@@ -361,18 +366,19 @@ function render(key, rows, top){
   });
 }
 
-/* ---------- pulsanti: Generale / Top / Giocatori / QR ----------
-   I 4 riquadri dei giochi si vedono sempre. La classifica generale: intera (accanto ai giochi),
-   a comparsa automatica o a comparsa manuale (dalla 10ª alla 1ª posizione, a tutto schermo).
+/* ---------- pulsanti: Classifica / Visualizzazione / Top / Giocatori / QR ----------
+   Classifica: generale, giochi (i 4 riquadri) o entrambi.
+   Visualizzazione (della generale): statica, a comparsa manuale o a comparsa automatica
+   (a tutto schermo, dalla 10ª alla 1ª posizione).
    Le scelte restano su questo schermo; si possono anche fissare dall'indirizzo:
-   classifica.html?generale=intera|auto|manuale&top=3|5|10&giocatori=ospiti|efuture|tutti&qr=si|no */
+   classifica.html?classifica=generale|giochi|tutti&visualizzazione=statica|manuale|auto&top=3|5|10&giocatori=ospiti|efuture|tutti&qr=si|no */
 const store = { get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
                 set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
-const OPTS = { gen:['intera','auto','manuale'], top:['3','5','10'], group:['ospiti','efuture','tutti'], qr:['si','no'] };
-// predefinito (ospiti al proiettore): 4 riquadri dei giochi, solo ospiti, QR visibile, generale a comparsa automatica
-const DEF  = { gen:'auto', top:'5', group:'ospiti', qr:'si' };
-const URLK = { gen:'generale', top:'top', group:'giocatori', qr:'qr' };
-const VKEY = 'efgBoardView4';   // chiave nuova: le scelte salvate con la versione precedente non valgono più
+const OPTS = { board:['generale','giochi','tutti'], vis:['statica','manuale','auto'], top:['3','5','10'], group:['ospiti','efuture','tutti'], qr:['si','no'] };
+// predefinito (ospiti al proiettore): i 4 giochi più la generale a comparsa automatica, solo ospiti, QR visibile
+const DEF  = { board:'tutti', vis:'auto', top:'5', group:'ospiti', qr:'si' };
+const URLK = { board:'classifica', vis:'visualizzazione', top:'top', group:'giocatori', qr:'qr' };
+const VKEY = 'efgBoardView5';   // chiave nuova: le scelte salvate con la versione precedente non valgono più
 const saved = store.get(VKEY, {});
 const st = {};
 for (const k in OPTS){
@@ -412,14 +418,17 @@ const reveal = (() => {
   function autoStep(){
     const tot = Math.min(MAX, rows.length);
     const t = (Date.now() / 1000) % CYCLE, open = tot * STEP + HOLD;
+    // solo generale: finita la comparsa resta aperta fino al giro successivo (sotto non c'è altro da vedere)
+    if (st.board === 'generale') return draw(tot ? Math.min(tot, Math.floor(t / STEP) + 1) : 0);
     draw(tot && t < open ? Math.min(tot, Math.floor(t / STEP) + 1) : 0);
   }
   function manualStep(){ const m = store.get(KEY, { n:0 }); draw(m.n || 0); }
   function mode(){
     clearInterval(tick);
     $('revWho').textContent = st.group === 'ospiti' ? 'Ospiti' : st.group === 'efuture' ? 'Utenti Efuture' : '';
-    if (st.gen === 'auto'){ autoStep(); tick = setInterval(autoStep, 250); }
-    else if (st.gen === 'manuale') manualStep();
+    const on = st.board !== 'giochi';
+    if (on && st.vis === 'auto'){ autoStep(); tick = setInterval(autoStep, 250); }
+    else if (on && st.vis === 'manuale') manualStep();
     else draw(0);
   }
   function next(){
@@ -427,22 +436,24 @@ const reveal = (() => {
     const n = (m.n || 0) >= tot ? 0 : (m.n || 0) + 1;   // dopo la 1ª: si chiude
     store.set(KEY, { n, t: Date.now() }); manualStep();
   }
-  window.addEventListener('storage', e => { if (e.key === KEY && st.gen === 'manuale') manualStep(); });
+  window.addEventListener('storage', e => { if (e.key === KEY && st.board !== 'giochi' && st.vis === 'manuale') manualStep(); });
   return {
     mode, next,
-    data(r){ const changed = JSON.stringify(r.slice(0, MAX).map(x => x.pid + x.score)) !== JSON.stringify(rows.slice(0, MAX).map(x => x.pid + x.score)); rows = r.slice(); if (changed) shown = -1; if (st.gen === 'manuale') manualStep(); else if (st.gen === 'auto') autoStep(); }
+    data(r){ const changed = JSON.stringify(r.slice(0, MAX).map(x => x.pid + x.score)) !== JSON.stringify(rows.slice(0, MAX).map(x => x.pid + x.score)); rows = r.slice(); if (changed) shown = -1; if (st.board === 'giochi') return; if (st.vis === 'manuale') manualStep(); else if (st.vis === 'auto') autoStep(); }
   };
 })();
 $('btnNext').addEventListener('click', () => reveal.next());
 document.addEventListener('keydown', e => {
-  if (st.gen !== 'manuale' || document.documentElement.classList.contains('proj') || e.target.closest('input,textarea,select,.seg')) return;
+  if (st.board === 'giochi' || st.vis !== 'manuale' || document.documentElement.classList.contains('proj') || e.target.closest('input,textarea,select,.seg')) return;
   if (e.key === ' ' || e.key === 'ArrowRight'){ e.preventDefault(); reveal.next(); }
 });
 const view = {
   group(){ return st.group; },
   apply(){
-    const t = st.gen === 'intera', g = true;
-    document.documentElement.classList.toggle('gen-manuale', st.gen === 'manuale');
+    const hasGen = st.board !== 'giochi';
+    const t = hasGen && st.vis === 'statica', g = st.board !== 'generale';
+    document.documentElement.classList.toggle('gen-manuale', hasGen && st.vis === 'manuale');
+    document.documentElement.classList.toggle('vis-off', !hasGen);
     TOP_GAME = parseInt(st.top, 10);
     $('secTotal').hidden = !t; $('games').hidden = !g;
     $('qrBig').hidden = st.qr === 'no'; $('main').classList.toggle('no-qr', st.qr === 'no');
