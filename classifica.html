@@ -72,6 +72,30 @@ mark{background:none;color:var(--sky);padding:0}
 .seg button:focus-visible{outline:2px solid var(--sky);outline-offset:-2px}
 .who-tag{display:inline-block;font-family:var(--body);font-size:.6em;font-weight:600;letter-spacing:.04em;vertical-align:.25em;margin-left:.5em;padding:.2em .6em;border-radius:3px;background:var(--orange);color:#fff}
 @media (max-width:560px){.controls .seg-grp + .seg-grp{border-left:0;padding-left:0}}
+#btnNext{display:none}
+.gen-manuale #btnNext{display:inline-block}
+/* classifica generale a comparsa: a tutto schermo, le posizioni si svelano dalla 10ª alla 1ª */
+#reveal{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,1.4vw,22px);padding:clamp(16px,3vw,48px);background:radial-gradient(ellipse at 50% 0%,#0d3b5e 0%,var(--navy) 70%);color:#fff;opacity:0;pointer-events:none;transition:opacity .5s ease}
+#reveal.on{opacity:1}
+.regia #reveal{top:auto;height:auto;inset:auto 16px 16px auto;width:min(420px,90vw);border-radius:10px;padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.35);gap:8px}   /* in regia: anteprima piccola, i comandi restano usabili */
+#reveal h2{font-family:'Press Start 2P',var(--title);font-weight:400;font-size:clamp(18px,2.6vw,46px);margin:0;letter-spacing:0;text-align:center}
+#reveal h2 mark{color:var(--brand-orange)}
+.regia #reveal h2{font-size:14px}
+#reveal .who{font-size:clamp(12px,1vw,18px);letter-spacing:.2em;text-transform:uppercase;color:#9fc6e6}
+#reveal ol{list-style:none;margin:0;padding:0;width:min(1100px,100%);display:flex;flex-direction:column;gap:clamp(4px,.6vw,10px)}
+#reveal li{display:grid;grid-template-columns:3em minmax(0,1fr) auto auto;align-items:center;gap:1em;padding:.45em 1em;border-radius:8px;background:rgba(255,255,255,.07);font-size:clamp(14px,1.6vw,30px);visibility:hidden}
+.regia #reveal li{font-size:12px;padding:.3em .6em}
+#reveal li.in{visibility:visible;animation:revIn .7s cubic-bezier(.2,.8,.2,1)}
+#reveal li .r{font-family:var(--title);font-weight:800;color:#9fc6e6;background:rgba(255,255,255,.1);border:0;width:2.2em;height:2.2em;font-size:.8em}
+#reveal li .n{font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#reveal li .lv{font-size:.55em;color:#cfe6f7;background:rgba(255,255,255,.12)}
+#reveal li .s{font-family:var(--title);font-weight:800;color:var(--brand-orange);font-variant-numeric:tabular-nums}
+#reveal li:nth-child(1).in{background:rgba(255,209,102,.22);box-shadow:0 0 0 2px #ffd166 inset}
+#reveal li:nth-child(1) .r{color:#3a2a00;background:#ffd166}
+#reveal li:nth-child(2) .r{color:#1d2b3a;background:#d9e2ec}
+#reveal li:nth-child(3) .r{color:#3a1f05;background:#e0a36b}
+@keyframes revIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#reveal li.in{animation:none}}
 
 main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) auto;}
 main.no-qr{grid-template-columns:minmax(0,1fr)}
@@ -199,10 +223,11 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 </header>
 <div class="gatebar" id="gateBar" hidden role="status" aria-live="polite"><span id="gateTxt"></span><b id="gateClock"></b></div>
 <div class="controls" id="controls" aria-label="Cosa mostrare">
-  <div class="seg-grp"><span class="ttl" id="lbBoard">Classifica</span>
-    <div class="seg" role="radiogroup" aria-labelledby="lbBoard" data-key="board">
-      <button type="button" role="radio" data-v="generale">Generale</button><button type="button" role="radio" data-v="giochi">Giochi</button><button type="button" role="radio" data-v="tutti">Tutti</button>
-    </div></div>
+  <div class="seg-grp"><span class="ttl" id="lbGen">Generale</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lbGen" data-key="gen">
+      <button type="button" role="radio" data-v="intera">Intera</button><button type="button" role="radio" data-v="auto">A comparsa auto</button><button type="button" role="radio" data-v="manuale">A comparsa manuale</button>
+    </div>
+    <button class="btn" id="btnNext" type="button" title="Svela la prossima posizione della classifica generale (anche con la barra spaziatrice o la freccia destra)">▶ Prossima posizione</button></div>
   <div class="seg-grp"><span class="ttl" id="lbTop">Top</span>
     <div class="seg" role="radiogroup" aria-labelledby="lbTop" data-key="top">
       <button type="button" role="radio" data-v="3">3</button><button type="button" role="radio" data-v="5">5</button><button type="button" role="radio" data-v="10">10</button>
@@ -231,6 +256,8 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </aside>
 </main>
 
+<div id="reveal" aria-live="polite" aria-hidden="true"><h2><mark>Classifica</mark> generale</h2><div class="who" id="revWho"></div><ol id="revList"></ol></div>
+
 <p class="note" id="demoNote" hidden>Modalità demo: il database online non è ancora configurato, qui vedi solo i punteggi fatti su questo dispositivo.</p>
 
 <footer>
@@ -258,9 +285,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=68"></script>
+<script src="config.js?v=69"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=68"></script>
+<script src="backend.js?v=69"></script>
 <script>
 (function(){
 "use strict";
@@ -334,24 +361,88 @@ function render(key, rows, top){
   });
 }
 
-/* ---------- pulsanti: Classifica / Top / Giocatori / QR ----------
+/* ---------- pulsanti: Generale / Top / Giocatori / QR ----------
+   I 4 riquadri dei giochi si vedono sempre. La classifica generale: intera (accanto ai giochi),
+   a comparsa automatica o a comparsa manuale (dalla 10ª alla 1ª posizione, a tutto schermo).
    Le scelte restano su questo schermo; si possono anche fissare dall'indirizzo:
-   classifica.html?classifica=generale|giochi|tutti&top=3|5|10&giocatori=ospiti|efuture|tutti&qr=si|no */
+   classifica.html?generale=intera|auto|manuale&top=3|5|10&giocatori=ospiti|efuture|tutti&qr=si|no */
 const store = { get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
                 set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
-const OPTS = { board:['generale','giochi','tutti'], top:['3','5','10'], group:['ospiti','efuture','tutti'], qr:['si','no'] };
-const DEF  = { board:'giochi', top:'5', group:'tutti', qr:'si' };
-const URLK = { board:'classifica', top:'top', group:'giocatori', qr:'qr' };
-const saved = store.get('efgBoardView3', {});
+const OPTS = { gen:['intera','auto','manuale'], top:['3','5','10'], group:['ospiti','efuture','tutti'], qr:['si','no'] };
+// predefinito (ospiti al proiettore): 4 riquadri dei giochi, solo ospiti, QR visibile, generale a comparsa automatica
+const DEF  = { gen:'auto', top:'5', group:'ospiti', qr:'si' };
+const URLK = { gen:'generale', top:'top', group:'giocatori', qr:'qr' };
+const VKEY = 'efgBoardView4';   // chiave nuova: le scelte salvate con la versione precedente non valgono più
+const saved = store.get(VKEY, {});
 const st = {};
 for (const k in OPTS){
   let v = Q.get(URLK[k]); if (k === 'qr' && (v === '1' || v === '0')) v = v === '1' ? 'si' : 'no';
   st[k] = OPTS[k].includes(v) ? v : (OPTS[k].includes(saved[k]) ? saved[k] : DEF[k]);
 }
+/* ---------- classifica generale a comparsa (10ª → 1ª) ----------
+   auto: ogni CYCLE secondi si apre e svela una posizione ogni STEP secondi, resta HOLD secondi e si chiude;
+         il ritmo dipende dall'orologio, così regia e ledwall sono allineati.
+   manuale: ogni "Prossima posizione" in regia (o barra spaziatrice / freccia destra) svela la successiva;
+         dopo la 1ª il clic successivo chiude. Il passo è condiviso tra le finestre con localStorage. */
+const reveal = (() => {
+  const CYCLE = 150, STEP = 2.2, HOLD = 12, MAX = 10, KEY = 'efgReveal';
+  let rows = [], shown = -1, tick = 0;
+  const box = $('reveal'), list = $('revList');
+  function draw(n){   // n = quante posizioni svelate (0 = chiusa)
+    const tot = Math.min(MAX, rows.length);
+    box.classList.toggle('on', n > 0 && tot > 0); box.setAttribute('aria-hidden', n > 0 ? 'false' : 'true');
+    if (n <= 0 || !tot){ shown = -1; return; }
+    if (list.children.length !== tot || shown === -1){
+      list.innerHTML = '';
+      rows.slice(0, tot).forEach((r, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = '<span class="r"></span><span class="n"></span><span class="lv"></span><span class="s"></span>';
+        li.querySelector('.r').textContent = (i + 1) + '°';
+        li.querySelector('.n').textContent = r.name;
+        li.querySelector('.lv').textContent = (r.games || 0) + '/4 giochi · ' + (r.levels || 0) + '/12 liv' + (r.bonus ? ' · ⭐ +' + r.bonus : '');
+        li.querySelector('.s').textContent = r.score + ' pt';
+        list.appendChild(li);
+      });
+      shown = 0;
+    }
+    // si svelano dal fondo (10ª) verso l'alto (1ª)
+    [...list.children].forEach((li, i) => { const on = i >= tot - Math.min(n, tot); if (on && !li.classList.contains('in')) li.classList.add('in'); if (!on) li.classList.remove('in'); });
+    shown = n;
+  }
+  function autoStep(){
+    const tot = Math.min(MAX, rows.length);
+    const t = (Date.now() / 1000) % CYCLE, open = tot * STEP + HOLD;
+    draw(tot && t < open ? Math.min(tot, Math.floor(t / STEP) + 1) : 0);
+  }
+  function manualStep(){ const m = store.get(KEY, { n:0 }); draw(m.n || 0); }
+  function mode(){
+    clearInterval(tick);
+    $('revWho').textContent = st.group === 'ospiti' ? 'Ospiti' : st.group === 'efuture' ? 'Utenti Efuture' : '';
+    if (st.gen === 'auto'){ autoStep(); tick = setInterval(autoStep, 250); }
+    else if (st.gen === 'manuale') manualStep();
+    else draw(0);
+  }
+  function next(){
+    const tot = Math.min(MAX, rows.length), m = store.get(KEY, { n:0 });
+    const n = (m.n || 0) >= tot ? 0 : (m.n || 0) + 1;   // dopo la 1ª: si chiude
+    store.set(KEY, { n, t: Date.now() }); manualStep();
+  }
+  window.addEventListener('storage', e => { if (e.key === KEY && st.gen === 'manuale') manualStep(); });
+  return {
+    mode, next,
+    data(r){ const changed = JSON.stringify(r.slice(0, MAX).map(x => x.pid + x.score)) !== JSON.stringify(rows.slice(0, MAX).map(x => x.pid + x.score)); rows = r.slice(); if (changed) shown = -1; if (st.gen === 'manuale') manualStep(); else if (st.gen === 'auto') autoStep(); }
+  };
+})();
+$('btnNext').addEventListener('click', () => reveal.next());
+document.addEventListener('keydown', e => {
+  if (st.gen !== 'manuale' || document.documentElement.classList.contains('proj') || e.target.closest('input,textarea,select,.seg')) return;
+  if (e.key === ' ' || e.key === 'ArrowRight'){ e.preventDefault(); reveal.next(); }
+});
 const view = {
   group(){ return st.group; },
   apply(){
-    const t = st.board !== 'giochi', g = st.board !== 'generale';
+    const t = st.gen === 'intera', g = true;
+    document.documentElement.classList.toggle('gen-manuale', st.gen === 'manuale');
     TOP_GAME = parseInt(st.top, 10);
     $('secTotal').hidden = !t; $('games').hidden = !g;
     $('qrBig').hidden = st.qr === 'no'; $('main').classList.toggle('no-qr', st.qr === 'no');
@@ -363,7 +454,8 @@ const view = {
     const label = st.group === 'efuture' ? 'Solo utenti Efuture' : st.group === 'ospiti' ? 'Solo ospiti' : '';
     $('whoTag').hidden = !label; $('whoTag').textContent = label;
     document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · livelli, poi punti' + (label ? ' · ' + label.toLowerCase() : ''));
-    store.set('efgBoardView3', st);
+    store.set(VKEY, st);
+    reveal.mode();
   }
 };
 function choose(key, v){
@@ -383,9 +475,12 @@ document.querySelectorAll('.seg').forEach(seg => {
   });
 });
 view.apply();
+// la finestra di regia (non proiettata, non a schermo intero) mostra la comparsa in piccolo, per lasciare usabili i comandi
+const setRegia = () => document.documentElement.classList.toggle('regia', !document.documentElement.classList.contains('proj') && !document.fullscreenElement);
+document.addEventListener('fullscreenchange', setRegia); setRegia();
 // regia e ledwall nello stesso browser: le scelte fatte in una finestra arrivano subito anche all'altra
 window.addEventListener('storage', e => {
-  if (e.key !== 'efgBoardView3' || !e.newValue) return;
+  if (e.key !== VKEY || !e.newValue) return;
   let n; try { n = JSON.parse(e.newValue); } catch(err){ return; }
   const before = st.group + '|' + st.top; let changed = false;
   for (const k in OPTS) if (OPTS[k].includes(n[k]) && st[k] !== n[k]){ st[k] = n[k]; changed = true; }
@@ -400,6 +495,7 @@ async function refresh(){
   try {
     const boards = await Promise.all(['all', ...GAMES.map(g => g.id)].map(k => B.board(k, view.group())));
     render('all', boards[0], TOP_GAME);   // "Top" vale per tutte le classifiche
+    reveal.data(boards[0]);
     GAMES.forEach((g, i) => render(g.id, boards[i + 1], TOP_GAME));
     const t = new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
     $('status').textContent = boards.some(b => b.filtroMancante)
@@ -480,6 +576,7 @@ if (PROJ){
     else document.documentElement.requestFullscreen().catch(() => {});
   };
   document.documentElement.classList.add('proj');   // aspetto da schermo intero subito, senza clic
+  setRegia();
   if (document.documentElement.requestFullscreen){
     const full = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); };
     full();   // riesce se il browser consente lo schermo intero automatico per questo sito
