@@ -64,6 +64,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Avvio: su Android dopo la schermata di sistema solo "Powered by" con il logo efuture sotto; il logo esplode in mattoncini prima della home; immagini iPhone rigenerate (v65). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Analisi con l'estensione Claude di Chrome (17 punti). Fatti i 3 alti: record della home presi dalla classifica online (dopo un reset spariscono anche dal telefono, niente reinvio), record in gara nei giochi, Timenet responsive, home più leggibile (v66). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Punti 4-17: un solo timer in gara, "Torna ai giochi" dentro i giochi con conferma, barra dell'app nascosta, barra in basso della home non fissa su PC e in orizzontale, schede classifica, riga "3 livelli · 1 minuto · 3 vite", tasti al posto dei comandi touch su PC, bonus come etichetta (v67). |
+| 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Admin: occhio per vedere la nuova chiave (di default nascosta) (v68). Spiegato che l'email vuota nel login vale per la chiave principale; email obbligatoria proposta, non decisa. |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 
