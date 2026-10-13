@@ -102,7 +102,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v61' : 'Modalità demo: account e classifica restano su questo telefono. · v61';
+  mn.textContent = remote ? 'Classifica online · v62' : 'Modalità demo: account e classifica restano su questo telefono. · v62';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -364,6 +364,22 @@ $('btnBoard').onclick = ()=>{
   renderBoardTabs(); openModal('mBoard'); loadBoard();
 };
 
+/* ================= SCHERMO INTERO NEL BROWSER =================
+   App aperta dal browser del telefono (non installata): al primo tocco va a schermo intero,
+   senza barre del browser. Se si esce (tasto Indietro), ci torna al tocco successivo.
+   Il browser lo permette solo dopo un tocco; su iPhone Safari non lo permette (lì serve installare). */
+(function(){
+  const standalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  const de = document.documentElement;
+  const req = de.requestFullscreen || de.webkitRequestFullscreen;
+  const touch = window.matchMedia && matchMedia('(pointer:coarse)').matches;
+  if (!req || !touch || standalone() || window.top !== window) return;
+  document.addEventListener('pointerup', ()=>{
+    if (document.fullscreenElement || document.webkitFullscreenElement || standalone()) return;
+    try { const r = req.call(de, { navigationUI:'hide' }); if (r && r.catch) r.catch(()=>{}); } catch(e){}
+  }, true);
+})();
+
 /* ================= INSTALLA L'APP =================
    Android/Chrome: usa la richiesta di installazione del browser (beforeinstallprompt).
    iPhone/iPad: Safari non ha una richiesta automatica, quindi mostriamo le istruzioni.
@@ -424,7 +440,6 @@ function autoInstallDue(){
 })();
 
 // link alla classifica sempre verso il sito pubblico (anche dall'anteprima in Claude)
-try { const pu = (window.EFG_CONFIG || {}).PUBLIC_URL; if (pu) $('lnkBoard').href = pu.replace(/\/?$/, '/') + 'classifica.html'; } catch(e){}
 
 /* ================= COUNTDOWN DI APERTURA / CHIUSURA =================
    Lo fa partire un amministratore dalla classifica. L'ora è quella del server,
