@@ -294,50 +294,50 @@
     {
      "nome": "Download della cache offline al primo avvio",
      "esito": "ok",
-     "dettaglio": "1583.7 KB scaricati da sw.js per giocare offline",
-     "valore": 1583.7
+     "dettaglio": "1583.8 KB scaricati da sw.js per giocare offline",
+     "valore": 1583.8
     },
     {
      "nome": "Caricamento nel browser: index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 121 ms (DOM pronto in 114 ms) su telefono simulato, file locali, database escluso",
-     "valore": 121
+     "dettaglio": "caricata in 125 ms (DOM pronto in 112 ms) su telefono simulato, file locali, database escluso",
+     "valore": 125
     },
     {
      "nome": "Caricamento nel browser: classifica.html",
      "esito": "ok",
-     "dettaglio": "caricata in 122 ms (DOM pronto in 106 ms) su telefono simulato, file locali, database escluso",
-     "valore": 122
+     "dettaglio": "caricata in 107 ms (DOM pronto in 96 ms) su telefono simulato, file locali, database escluso",
+     "valore": 107
     },
     {
      "nome": "Caricamento nel browser: admin.html",
      "esito": "ok",
-     "dettaglio": "caricata in 105 ms (DOM pronto in 84 ms) su telefono simulato, file locali, database escluso",
-     "valore": 105
+     "dettaglio": "caricata in 85 ms (DOM pronto in 81 ms) su telefono simulato, file locali, database escluso",
+     "valore": 85
     },
     {
      "nome": "Caricamento nel browser: games/sysadmin/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 131 ms (DOM pronto in 119 ms) su telefono simulato, file locali, database escluso",
-     "valore": 131
+     "dettaglio": "caricata in 118 ms (DOM pronto in 111 ms) su telefono simulato, file locali, database escluso",
+     "valore": 118
     },
     {
      "nome": "Caricamento nel browser: games/coretech/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 103 ms (DOM pronto in 99 ms) su telefono simulato, file locali, database escluso",
-     "valore": 103
+     "dettaglio": "caricata in 98 ms (DOM pronto in 93 ms) su telefono simulato, file locali, database escluso",
+     "valore": 98
     },
     {
      "nome": "Caricamento nel browser: games/timenet/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 131 ms (DOM pronto in 129 ms) su telefono simulato, file locali, database escluso",
-     "valore": 131
+     "dettaglio": "caricata in 109 ms (DOM pronto in 106 ms) su telefono simulato, file locali, database escluso",
+     "valore": 109
     },
     {
      "nome": "Caricamento nel browser: games/inncloud/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 79 ms (DOM pronto in 73 ms) su telefono simulato, file locali, database escluso",
-     "valore": 79
+     "dettaglio": "caricata in 88 ms (DOM pronto in 82 ms) su telefono simulato, file locali, database escluso",
+     "valore": 88
     }
    ],
    "esiti": {
@@ -353,7 +353,7 @@
      "nome": "Spazio totale del sito",
      "esito": "ok",
      "dettaglio": "11.66 MB (limite consigliato GitHub Pages: 1 GB)",
-     "valore": 11942.9
+     "valore": 11943.0
     },
     {
      "nome": "Cartella video",
@@ -388,8 +388,8 @@
     {
      "nome": "Cartella docs",
      "esito": "ok",
-     "dettaglio": "278.8 KB",
-     "valore": 278.8
+     "dettaglio": "278.9 KB",
+     "valore": 278.9
     },
     {
      "nome": "Cartella qr",
@@ -418,8 +418,8 @@
     {
      "nome": "Cartella icons",
      "esito": "ok",
-     "dettaglio": "39.2 KB",
-     "valore": 39.2
+     "dettaglio": "39.3 KB",
+     "valore": 39.3
     }
    ],
    "esiti": {
@@ -427,14 +427,14 @@
     "avviso": 0,
     "errore": 0
    },
-   "totale_kb": 11942.9,
+   "totale_kb": 11943.0,
    "cartelle_kb": {
     ".claude": 120.6,
     "(file principali)": 289.4,
-    "docs": 278.8,
+    "docs": 278.9,
     "fonts": 120.3,
     "games": 906.2,
-    "icons": 39.2,
+    "icons": 39.3,
     "img": 92.5,
     "qr": 159.6,
     "tutorial": 1334.2,
@@ -541,6 +541,6 @@
    "livello": "Buono"
   }
  },
- "data": "2026-10-13T07:25:47+00:00",
- "commit": "9595913"
+ "data": "2026-10-13T07:26:11+00:00",
+ "commit": "c33e2c2"
 }
