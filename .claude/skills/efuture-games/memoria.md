@@ -58,6 +58,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Giochi: barra dell'app nascosta mentre si gioca (tempo dentro la scocca), scocca più sottile e comandi compatti, tastino MODE (Normal → Dark → Game) al posto di ISTRUZIONI, fuochi d'artificio e "Complimenti, hai finito!" alla fine; icone rinominate `app-*` perché i telefoni le aggiornino (v60). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Classifica in app: tolto il logo efuture, filtri staccati dalla prima posizione (v61, dopo mockup approvato). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | App: niente più link alla classifica a schermo intero; schermata di avvio bianca con icona e "Powered by efuture" (anche immagini di avvio iPhone); schermo intero al primo tocco nel browser (v62, dopo mockup). |
+| 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Avvio su Android (Samsung): una sola schermata che continua, icona maskable con più margine blu, "Powered by efuture" in dissolvenza (v63, dopo mockup). |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 
