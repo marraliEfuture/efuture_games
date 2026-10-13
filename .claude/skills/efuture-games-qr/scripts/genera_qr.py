@@ -115,13 +115,13 @@ def main():
     items = []
     app_url = base + "?installa=1"
     segno.make(app_url, error="m").save(str(out / "qr-app.png"), scale=10, border=2, dark=NAVY, light="white")
-    card(repo, app_url, "Installa l'app", repo / "icons" / "icon-192.png",
+    card(repo, app_url, "Installa l'app", repo / "icons" / "app-icon-192.png",
          ["Inquadra con la fotocamera", "e aggiungi l'app alla Home"], None).save(out / "qr-app-card.png")
     items.append({"file": "qr-app-card.png", "titolo": "App – installazione", "stand": "ingresso / ledwall",
                   "link": app_url, "codice": None})
     for gid, name, sponsor in GAMES:
         url = base + "?sblocca=" + codes[gid]
-        card(repo, url, "Sblocca " + name, repo / "games" / gid / "icons" / "icon-192.png",
+        card(repo, url, "Sblocca " + name, repo / "games" / gid / "icons" / "app-icon-192.png",
              ["Inquadra con la fotocamera", "oppure inserisci il codice"], codes[gid]).save(out / f"qr-{gid}.png")
         items.append({"file": f"qr-{gid}.png", "titolo": name, "stand": "Stand " + sponsor,
                       "link": url, "codice": codes[gid]})
