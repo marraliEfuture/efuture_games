@@ -79,30 +79,30 @@ Il protocollo completo è in [app-giocatori.md](app-giocatori.md#protocollo-post
 - Dopo `result` il gioco può ancora essere usato (per esempio "Riprova"), ma non manda più nulla finché non riparte dal livello 1.
 - **Codice non usato:** Timenet, inncloud e CoreTech definiscono in `index.html` anche `window.efgReport` (messaggio `efg-score`). Nessuno lo chiama e l'app non lo ascolta.
 
-## Visualizzazione: Game, Light, Dark
+## Visualizzazione: Normal, Dark, Game
 
-- In alto in ogni gioco, accanto alla pausa, c'è il pulsante della visualizzazione (`#viewBtn`, creato da `gameboy.js`): **🎮 Game** → **☀ Light** → **☾ Dark** → di nuovo Game. A ogni tocco compare per un attimo "Visualizzazione …".
+- Si cambia con il tastino **MODE** della scocca (in verticale) o con il pulsante in alto accanto alla pausa (`#viewBtn`, creato da `gameboy.js`; in verticale nella vista Game è nascosto perché c'è MODE). Ogni tocco passa alla successiva: **☀ Normal** → **☾ Dark** → **🎮 Game** → di nuovo Normal. A ogni tocco compare per un attimo "Visualizzazione …". Nel codice Normal si chiama ancora `light`.
   - **Game:** scocca "Game Boy" con il telefono in verticale (qui sotto); in orizzontale il layout del gioco.
-  - **Light:** tema chiaro, senza scocca: in verticale il gioco usa tutta la larghezza con i comandi sotto.
-  - **Dark:** come Light ma scuro: sfondo `#0e1621`, riquadri `#172230`/`#1e2b3b`, bordi `#33465c`, testo `#e7eef6`, punti `#ffb04a`; schermate con velo scuro; barra, comandi e piste di trascinamento scuri. Il campo di gioco disegnato nel canvas resta com'è.
+  - **Normal:** tema chiaro, senza scocca: in verticale il gioco usa tutta la larghezza con i comandi sotto.
+  - **Dark:** come Normal ma scuro: sfondo `#0e1621`, riquadri `#172230`/`#1e2b3b`, bordi `#33465c`, testo `#e7eef6`, punti `#ffb04a`; schermate con velo scuro; barra, comandi e piste di trascinamento scuri. Il campo di gioco disegnato nel canvas resta com'è.
 - La scelta vale per tutti e 4 i giochi e resta sul telefono (`efgView`). Finché il giocatore non sceglie vale la visualizzazione predefinita decisa in admin › Impostazioni (`efgViewDefault`, scritta dall'app all'avvio); senza, Game.
 - Come funziona: `gameboy.js` mette `data-view` su `<html>`; fuori da Game spegne `gameboy.css` (`link.disabled`), toglie `data-gb` e la classe `gb` e lascia i tasti A/B al loro posto. Gli stili del pulsante e del tema scuro sono dentro `gameboy.js`, sempre attivi.
 
 ## Scocca "Game Boy" (verticale)
 
-Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`) e **solo nella visualizzazione Game**. Dalla v56 bordi più sottili (corpo 6 px ai lati, cornice dello schermo 7 px): lo schermo di gioco è più largo (Efuture Bros su un telefono da 412 px: da 362 a 380 px). In orizzontale ogni gioco usa il suo layout, descritto nella sua specifica. Lo script non cambia la logica dei giochi: aggiunge parti decorative e due tastini che premono pulsanti già esistenti.
+Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`) e **solo nella visualizzazione Game**. Dalla v56 bordi più sottili; dalla v60 ancora più sottili (corpo 5 px ai lati, cornice dello schermo 5 px) e comandi più compatti (tastini alti 36 px, A/B da 52 px, scritta EFUTURE GAMES più piccola), così lo spazio va allo schermo del gioco. In orizzontale ogni gioco usa il suo layout, descritto nella sua specifica. Lo script non cambia la logica dei giochi: aggiunge parti decorative e due tastini che premono pulsanti già esistenti.
 
 ### Aspetto
 
 - **Corpo:** la pagina (`#app`) diventa la scocca grigio chiaro (`#e6e3dc` → `#c9c5bd`), larga al massimo 500 px, con l'angolo in basso a destra molto arrotondato. Lo sfondo intorno è `#b7b2a8`.
 - **Cornice dello schermo** (`#4a4e5a`), dall'alto:
-  - riga con led rosso, scritta `ON` e due righe arancio e azzurra;
+  - riga con led rosso, scritta `ON`, due righe arancio e azzurra e, in gara, il tempo del livello (`LIV 1 · 0:45`, rosso negli ultimi 10 s) mandato dall'app;
   - HUD del gioco su una fascia chiara, come il display;
   - schermo del gioco (`#stage`), con l'angolo in basso a destra arrotondato.
 - Sotto lo schermo: scritta **EFUTURE GAMES** in corsivo blu `#004675`.
-- **Fascia comandi:** al posto della croce c'è il joystick (SysAdmin, CoreTech) o la fascia di trascinamento (Timenet, inncloud); al posto di A e B ci sono i tasti del gioco; in basso i due tastini inclinati **ISTRUZIONI** e **AVVIA/PAUSA**.
+- **Fascia comandi:** al posto della croce c'è il joystick (SysAdmin, CoreTech) o la fascia di trascinamento (Timenet, inncloud); al posto di A e B ci sono i tasti del gioco; in basso i due tastini inclinati **MODE** e **AVVIA/PAUSA**.
 - **Griglia dell'altoparlante:** 6 fessure inclinate in basso a destra (non nei giochi con la fascia).
-- Telefoni bassi (altezza ≤ 700 px): cornice e scritta più sottili. Telefoni grandi (≥ 390 × 780 px): joystick e tasti più grandi in SysAdmin e CoreTech.
+- Telefoni bassi (altezza ≤ 700 px): cornice e scritta più sottili. Telefoni grandi (≥ 390 × 780 px): joystick e tasti più grandi in SysAdmin, joystick un po' più grande in CoreTech.
 
 ### Attributi dello script
 
@@ -112,14 +112,14 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
 |---|---|
 | `data-game` | Variante della scocca: `sysadmin`, `joy` (CoreTech) o `strip` (Timenet, inncloud) |
 | `data-a`, `data-b` | Id dei pulsanti da spostare nei tasti A (arancio, in alto) e B (blu, in basso) |
-| `data-select` | Id del pulsante premuto da ISTRUZIONI |
+| `data-select` | Id del pulsante Istruzioni (non più usato dai tastini: le istruzioni restano sulla schermata titolo) |
 | `data-pause` | Id del pulsante pausa |
 | `data-paused` | Id della schermata di pausa |
 | `data-primary` | Selettore del pulsante principale delle schermate |
 
 ### Tastini centrali
 
-- **ISTRUZIONI:** preme il pulsante Istruzioni del gioco. È attivo solo quando quel pulsante è visibile, cioè sulla schermata titolo; altrimenti è sbiadito.
+- **MODE:** cambia la visualizzazione (Normal → Dark → Game). Le istruzioni si aprono dal pulsante Istruzioni della schermata titolo.
 - **AVVIA / PAUSA:** il testo cambia da solo (controllo ogni 0,3 s).
   - Schermata di pausa aperta: scritta PAUSA, il tocco preme il pulsante pausa e il gioco riprende.
   - Una schermata con un pulsante principale visibile (Inizia, Via!, Prossimo livello, Riprova…): scritta AVVIA, il tocco preme il primo visibile.
@@ -136,17 +136,17 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
 
 ### Mappa per gioco
 
-| Gioco | `data-game` | Croce | A | B | ISTRUZIONI | AVVIA / PAUSA |
+| Gioco | `data-game` | Croce | A | B | MODE | AVVIA / PAUSA |
 |---|---|---|---|---|---|---|
-| Efuture Bros | `sysadmin` | Joystick (destra/sinistra, su = salto) | SALTA | MOUSE (+ ANTIVIRUS piccolo sopra) | `btnHow` | Pulsante arancio della schermata, oppure pausa |
-| CoreTech Pac | `joy` | Joystick a 4 direzioni | PAUSA | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
-| Timenet Breakout | `strip` | Fascia di trascinamento | PAUSA | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
-| inncloud Invaders | `strip` | Fascia di trascinamento | SPARA (rosso, più grande) | MUSICA | `btnHow` | Pulsante principale, oppure pausa |
+| Efuture Bros | `sysadmin` | Joystick (destra/sinistra, su = salto) | SALTA | MOUSE (+ ANTIVIRUS piccolo sopra) | Visualizzazione | Pulsante arancio della schermata, oppure pausa |
+| CoreTech Pac | `joy` | Joystick a 4 direzioni | PAUSA | MUSICA | Visualizzazione | Pulsante principale, oppure pausa |
+| Timenet Breakout | `strip` | Fascia di trascinamento | PAUSA | MUSICA | Visualizzazione | Pulsante principale, oppure pausa |
+| inncloud Invaders | `strip` | Fascia di trascinamento | SPARA (rosso, più grande) | MUSICA | Visualizzazione | Pulsante principale, oppure pausa |
 
 Dettagli per gioco:
 - **SysAdmin:** lo schermo è 16:9 e il pulsante pausa dell'HUD è nascosto (la pausa si fa con il tastino). Le schermate (overlay) coprono tutta la console tranne la fila dei tastini, che resta usabile.
-- **CoreTech:** lo schermo ha le proporzioni del labirinto più alto (19:21,6); lo spazio in più va ai comandi.
-- **Timenet e inncloud:** la fascia di trascinamento diventa una pista scura arrotondata alta 62 px, a sinistra di A/B.
+- **CoreTech:** dalla v60 lo schermo prende tutto lo spazio libero e i comandi solo quello che serve (joystick 112-132 px).
+- **Timenet e inncloud:** la fascia di trascinamento diventa una pista scura arrotondata alta 52 px, a sinistra di A/B.
 
 ## Limiti comuni
 
@@ -156,3 +156,15 @@ Dettagli per gioco:
 
 ---
 Ultimo aggiornamento: 08/10/2026 (v28)
+
+## Fine del gioco: fuochi d'artificio
+
+- In gara, quando si superano tutti e 3 i livelli, l'app mostra il riepilogo con il titolo "🎉 Complimenti, hai finito!" e accende per 7 secondi i fuochi d'artificio su tutto lo schermo (`fuochi.js`, `EFGFuochi.start/stop`). Restano i pulsanti Rigioca e Torna ai giochi; i fuochi si spengono quando si tocca uno dei due.
+- Fuori dalla gara (gioco aperto da solo) `gameboy.js` accende gli stessi fuochi quando compare la schermata finale del gioco (`#ov-win`, in Efuture Bros `#ov-victory`) e li spegne quando si chiude. `fuochi.js` viene caricato solo in quel momento.
+- Non bloccano i tocchi. Con "riduci movimento" attivo durano al massimo 2,5 s.
+
+## Barra dell'app durante la gara
+
+- In gara (`?hub=1`) `gameboy.js` dice all'app (`{type:'efg-ui', menu}`) se è aperta una schermata del gioco (`.overlay` visibile: titolo, scheda del livello, pausa, livello completato, fine). Mentre si gioca non ce n'è nessuna e l'app nasconde la sua barra in alto (Torna ai giochi, nome, tempo): il gioco usa tutto lo schermo.
+- Il tempo del livello resta visibile dentro il gioco: l'app lo manda a ogni tick (`{type:'efg-clock', text, warn}`) e `gameboy.js` lo mostra nella riga in alto della scocca (vista Game, in verticale) oppure in una pillola nell'angolo in alto a destra dello schermo del gioco.
+

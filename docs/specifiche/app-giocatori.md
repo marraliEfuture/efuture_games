@@ -16,7 +16,7 @@ Il giocatore si registra con nome ed email e accede con la sola email. I record 
 | `config.js` | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PUBLIC_URL` |
 | `sw.js` | Service worker: cache offline e aggiornamenti |
 | `manifest.webmanifest` | Nome, icone, `display: standalone`, `start_url ./` |
-| `icons/` | Icona dell'app (favicon, apple-touch, 192, 512 e maskable): la "e" arancione di Efuture con i quadratini bianchi, la stessa della testa di Efuture Bros (`games/sysadmin/img/logo-testa.png`), su sfondo blu `#004675`; sotto, la scritta "GAMES" in Press Start 2P a pixel pieni, staccata dalla "e", con fasce dal giallo all'arancione efuture (senza toni rossi) e ombra blu scuro come nei giochi anni '80 (la favicon ha solo la "e") |
+| `icons/` | Icona dell'app: `app-favicon.png`, `app-apple-touch-icon.png`, `app-icon-192.png`, `app-icon-512.png`, `app-icon-maskable-512.png` (nomi cambiati nella v60 perché i telefoni scarichino la nuova icona): la "e" arancione di Efuture con i quadratini bianchi, la stessa della testa di Efuture Bros (`games/sysadmin/img/logo-testa.png`), su sfondo blu `#004675`; sotto, la scritta "GAMES" in Press Start 2P a pixel pieni, staccata dalla "e", con fasce dal giallo all'arancione efuture (senza toni rossi) e ombra blu scuro come nei giochi anni '80 (la favicon ha solo la "e") |
 | `vendor/supabase.js`, `vendor/jsQR.js` | Client Supabase, lettura dei QR |
 
 Ordine degli script in `index.html`: `config.js?v=N`, `vendor/supabase.js`, `backend.js?v=N`, `vendor/jsQR.js`, `hub.js?v=N`. Al `load` della pagina viene registrato `sw.js`.
@@ -135,7 +135,8 @@ Finestra `mAuth` con due schede: **Registrati** e **Accedi**.
   - nome del gioco;
   - orologio del livello;
   - logo.
-- Sotto la barra c'è l'iframe con `games/<id>/index.html?hub=1`. Il parametro `hub=1` dice al gioco di usare le regole di gara.
+- L'iframe con `games/<id>/index.html?hub=1` occupa tutto lo schermo e la barra gli sta sopra. Il parametro `hub=1` dice al gioco di usare le regole di gara.
+- **Mentre si gioca la barra sparisce** (scorre verso l'alto): ricompare quando il gioco mostra una sua schermata (titolo, pausa, tra un livello e l'altro, fine) e con il riepilogo. Il tempo del livello intanto si vede dentro il gioco (vedi `giochi-comune.md`).
 - Con il telefono in orizzontale (altezza ≤ 560 px) la barra si assottiglia.
 
 ### Protocollo postMessage (gioco → app)
@@ -157,7 +158,7 @@ Quando `times` manca, i livelli superati sono 3 se `ok` è vero, altrimenti `lev
 
 ### Risultato (`mResult`)
 
-- **Titolo:** "Tre livelli completati!", "Tempo scaduto" oppure "Vite finite".
+- **Titolo:** "🎉 Complimenti, hai finito!" (con sotto "<gioco> · tutti e 3 i livelli superati" e i fuochi d'artificio per 7 s), "Tempo scaduto" oppure "Vite finite".
 - **Contenuto:**
   - punti in grande;
   - "N livelli superati su 3";

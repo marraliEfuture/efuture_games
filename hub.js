@@ -102,7 +102,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v59' : 'Modalità demo: account e classifica restano su questo telefono. · v59';
+  mn.textContent = remote ? 'Classifica online · v60' : 'Modalità demo: account e classifica restano su questo telefono. · v60';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -198,20 +198,24 @@ function play(g){
   $('playerTitle').textContent = g.name;
   $('playerClock').textContent = '';
   $('frame').src = g.path + '?hub=1';
+  $('playerBar').classList.remove('away');
   $('player').hidden = false; $('mResult').hidden = true;
   document.body.style.overflow = 'hidden';
 }
 function closePlayer(){
+  if (window.EFGFuochi) window.EFGFuochi.stop();
   $('player').hidden = true; $('mResult').hidden = true; $('frame').src = 'about:blank'; playing = null;
   document.body.style.overflow = ''; renderGrid(); loadRanks();
 }
 $('btnBack').addEventListener('click', closePlayer);
 $('rsHome').addEventListener('click', closePlayer);
-$('rsAgain').addEventListener('click', ()=>{ const g = playing; if (g) play(g); });
+$('rsAgain').addEventListener('click', ()=>{ if (window.EFGFuochi) window.EFGFuochi.stop(); const g = playing; if (g) play(g); });
 $('rsRetry').addEventListener('click', ()=>{ $('mResult').hidden = true; try { $('frame').contentWindow.postMessage({ type:'efg-cmd', cmd:'retry' }, '*'); } catch(e){} });
 
 window.addEventListener('message', async e=>{
   const d = e.data;
+  // il gioco dice se c'è una sua schermata aperta: se no si sta giocando e la barra in alto sparisce
+  if (d && d.type === 'efg-ui' && playing && e.source === $('frame').contentWindow){ $('playerBar').classList.toggle('away', !d.menu); return; }
   if (!d || d.type !== 'efg' || !playing || e.source !== $('frame').contentWindow) return;
   if (d.ev === 'start'){ runUsed = 0; $('playerClock').textContent = ''; return; }
   if (d.ev === 'tick'){
@@ -219,6 +223,8 @@ window.addEventListener('message', async e=>{
     const clk = $('playerClock');
     clk.textContent = 'Liv ' + d.level + '/' + LEVELS + ' · ⏱ ' + fmt(left);
     clk.classList.toggle('warn', left <= 10);
+    // il tempo si vede anche dentro il gioco, quando la barra è nascosta
+    try { e.source.postMessage({ type:'efg-clock', text:'LIV ' + d.level + ' · ' + fmt(left), warn: left <= 10 }, '*'); } catch(err){}
     return;
   }
   if (d.ev === 'result') showResult(playing, !!d.ok, d.reason, Number(d.seconds)||0, Number(d.level)||1, Number(d.used)||0, Array.isArray(d.times) ? d.times.map(Number) : null, Array.isArray(d.lives) ? d.lives.map(Number) : null, !!d.retry);
@@ -228,6 +234,7 @@ window.addEventListener('message', async e=>{
 // es. livello 1 finito a 35 s con 2 vite → 1 x 25 x 2 = 50; livello 2 con 20 s e 3 vite → 2 x 20 x 3 = 120.
 // Un livello non finito vale 0; alla fine si sommano i livelli superati.
 async function showResult(g, ok, reason, seconds, level, used, times, lives, retry){
+  $('playerBar').classList.remove('away');   // la barra torna visibile col risultato
   // il gioco consente di riprovare il livello perso (i livelli già superati restano): il punteggio intanto è già salvato
   $('rsRetry').hidden = ok || !retry; $('rsRetry').textContent = 'Riprova livello ' + level;
   if (!times){ const n = ok ? LEVELS : Math.max(0, level - 1); times = Array.from({length:n}, ()=> n ? used / n : 0); }
@@ -237,7 +244,8 @@ async function showResult(g, ok, reason, seconds, level, used, times, lives, ret
   const score = parts.reduce((a, p)=> a + p.pts, 0);
   const res = { l:levels, s:score };
   $('rsIcon').src = g.icon; $('rsGame').textContent = g.name;
-  $('rsTitle').textContent = ok ? 'Tre livelli completati!' : (reason === 'time' ? 'Tempo scaduto' : 'Vite finite');
+  $('rsTitle').textContent = ok ? '🎉 Complimenti, hai finito!' : (reason === 'time' ? 'Tempo scaduto' : 'Vite finite');
+  if (ok) $('rsGame').textContent = g.name + ' · tutti e ' + LEVELS + ' i livelli superati';
   $('rsScore').textContent = score;
   $('rsLevels').textContent = levels + '/' + LEVELS;
   $('rsTime').textContent = fmt(times.reduce((a,b)=>a+b,0));
@@ -254,6 +262,7 @@ async function showResult(g, ok, reason, seconds, level, used, times, lives, ret
     catch(err){ setMsg(msg, 'Non riesco a salvare in classifica: ' + friendly(err), 'err'); }
   }
   $('mResult').hidden = false;
+  if (ok && window.EFGFuochi) window.EFGFuochi.start(7);   // fine del gioco: fuochi d'artificio
 }
 
 /* ================= AUTH (senza password) ================= */

@@ -1,6 +1,6 @@
 // Efuture Games - service worker: tiene i giochi sul telefono per giocare anche con poca rete.
 // Quando aggiorni l'app, cambia il numero di versione qui sotto.
-const CACHE = 'efuture-games-v59';
+const CACHE = 'efuture-games-v60';
 const ASSETS = [
   "./",
   "config.js",
@@ -59,6 +59,7 @@ const ASSETS = [
   "games/timenet/img/delfino.png",
   "games/timenet/index.html",
   "hub.js",
+  "fuochi.js",
   "backend.js",
   "classifica.html",
   "qr/qr-app.png",
@@ -69,11 +70,11 @@ const ASSETS = [
   "fonts/montserrat-latin-800-normal.woff2",
   "fonts/montserrat-latin-700-normal.woff2",
   "fonts/montserrat-latin-500-normal.woff2",
-  "icons/apple-touch-icon.png",
-  "icons/favicon.png",
-  "icons/icon-192.png",
-  "icons/icon-512.png",
-  "icons/icon-maskable-512.png",
+  "icons/app-apple-touch-icon.png",
+  "icons/app-favicon.png",
+  "icons/app-icon-192.png",
+  "icons/app-icon-512.png",
+  "icons/app-icon-maskable-512.png",
   "img/efuture-logo-white.png",
   "img/efuture-logo.png",
   "img/efuture-white.png",
@@ -89,7 +90,7 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));

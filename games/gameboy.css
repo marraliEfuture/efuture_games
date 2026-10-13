@@ -2,7 +2,8 @@
    Solo con il telefono in verticale: la pagina diventa il corpo della console,
    il gioco sta nello schermo con la cornice scura, sotto ci sono la scritta,
    il joystick (o la fascia di trascinamento) al posto della croce, i tasti del
-   gioco al posto di A/B e due tastini centrali. In orizzontale non cambia nulla.
+   gioco al posto di A/B e due tastini centrali (MODE, AVVIA/PAUSA). In orizzontale non cambia nulla.
+   Comandi compatti: lo spazio va allo schermo del gioco.
    Le parti aggiunte (gb-*) le crea gameboy.js. */
 .gb-top,.gb-brand,.gb-grille,.gb-pills,.gb-ab{display:none}
 
@@ -13,7 +14,7 @@
     --gb-shell-lo:#c9c5bd;
     --gb-bezel:#4a4e5a;
     --gb-bezel-hi:#565a67;
-    --gb-bz:7px;               /* spessore della cornice dello schermo (sottile: schermo più largo) */
+    --gb-bz:5px;               /* spessore della cornice dello schermo (sottile: schermo più largo) */
     --gb-lcd:#e9eef2;          /* fascia punteggio dentro la cornice */
     --gb-ink:#004675;          /* scritte sul corpo, blu Efuture */
     --gb-font:'IBM Plex Mono',ui-monospace,Consolas,monospace;
@@ -29,7 +30,7 @@
     overflow:hidden;
     display:flex;
     flex-direction:column;
-    padding:calc(8px + env(safe-area-inset-top,0px)) calc(6px + env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) calc(6px + env(safe-area-inset-left,0px));
+    padding:calc(5px + env(safe-area-inset-top,0px)) calc(5px + env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) calc(5px + env(safe-area-inset-left,0px));
     background:
       radial-gradient(120% 60% at 20% 0%, rgba(255,255,255,.55), rgba(255,255,255,0) 60%),
       linear-gradient(180deg, var(--gb-shell-hi) 0%, var(--gb-shell) 45%, var(--gb-shell-lo) 100%);
@@ -43,7 +44,7 @@
     flex:0 0 auto;
     align-items:center;
     gap:5px;
-    padding:7px 14px 3px;
+    padding:5px 12px 2px;
     background:var(--gb-bezel);
     border-radius:10px 10px 0 0;
     box-shadow:inset 0 1px 0 var(--gb-bezel-hi);
@@ -51,6 +52,8 @@
   .gb-led{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffc2b8 0,#ff4a33 50%,#b3180c 100%);box-shadow:0 0 6px 1px rgba(255,80,50,.7)}
   .gb-on{flex:0 0 auto;font:600 7px/1 var(--gb-font);letter-spacing:.16em;color:#b3b7c2}
   .gb-lines{flex:1 1 auto;height:5px;margin-left:6px;background:linear-gradient(180deg,#f18c22 0 2px,transparent 2px 3px,#6ea8d8 3px 5px)}
+  .gb-top .gb-clock{flex:0 0 auto;margin-left:8px}
+  #stage>.gb-clock{display:none}   /* con la scocca il tempo sta nella riga in alto */
 
   #hud{
     position:relative;
@@ -59,7 +62,7 @@
     flex:0 0 auto;
     min-height:0;
     margin:0;
-    padding:6px calc(var(--gb-bz) + 8px) 7px;
+    padding:4px calc(var(--gb-bz) + 8px) 5px;
     border:0;
     background:var(--gb-bezel);
     gap:8px;
@@ -77,8 +80,8 @@
   #stage{
     z-index:1;
     flex:1 1 auto;
-    margin:0 var(--gb-bz) calc(var(--gb-bz) + 8px);
-    padding:4px;
+    margin:0 var(--gb-bz) calc(var(--gb-bz) + 6px);
+    padding:2px;
     background:var(--gb-bezel);
     border-radius:2px 2px 30px 2px;
     box-shadow:0 0 0 var(--gb-bz) var(--gb-bezel), 0 8px 0 var(--gb-bz) var(--gb-bezel);
@@ -89,17 +92,17 @@
   .gb-brand{
     display:block;
     flex:0 0 auto;
-    padding:0 6px 2px;
+    padding:0 6px 1px;
     font-family:'Trebuchet MS','Segoe UI','Helvetica Neue',Arial,sans-serif;
     font-style:italic;
-    font-size:16px;
-    line-height:1.15;
+    font-size:13px;
+    line-height:1.1;
     letter-spacing:.02em;
     color:var(--gb-ink);
     white-space:nowrap;
   }
   .gb-brand i{font-weight:600}
-  .gb-brand b{font-weight:900;font-size:19px;letter-spacing:.03em}
+  .gb-brand b{font-weight:900;font-size:15px;letter-spacing:.03em}
 
   /* ---------- fascia comandi ---------- */
   #controls{
@@ -111,14 +114,14 @@
   }
   .gb-pills{display:flex;justify-content:center;gap:4px}
   .gb-pill{
-    width:66px;height:54px;
+    width:60px;height:36px;
     margin:0;padding:0;border:0;background:none;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
     cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
     font-family:var(--gb-font);
   }
   .gb-pill i{
-    display:block;width:42px;height:11px;border-radius:6px;
+    display:block;width:36px;height:9px;border-radius:5px;
     background:linear-gradient(180deg,#9a9da6,#6e717b);
     box-shadow:0 0 0 3px rgba(0,0,0,.07),0 0 0 4px rgba(255,255,255,.35),inset 0 1px 0 rgba(255,255,255,.35),0 2px 0 #55585f;
     transform:rotate(-24deg);
@@ -150,7 +153,7 @@
     grid-template-areas:". a" "b .";
     column-gap:8px;
     position:relative;
-    padding:0 2px 14px;
+    padding:0 2px 12px;
   }
   /* incavo inclinato dietro A e B (centri: B 30,68 - A 98,30) */
   .gb-ab::before{
@@ -166,10 +169,10 @@
   }
   .gb-ab .gb-a,.gb-ab .gb-b{
     position:relative;
-    width:60px;height:60px;
+    width:52px;height:52px;
     border-radius:50%;
     font-family:'Press Start 2P',var(--gb-font);
-    font-size:15px;
+    font-size:13px;
     color:#fff;
     cursor:pointer;
     touch-action:manipulation;
@@ -197,9 +200,9 @@
   }
   html[data-gb=strip] #strip{
     grid-area:pad;
-    height:62px;
+    height:52px;
     border:0;
-    border-radius:31px;
+    border-radius:26px;
     padding-inline:10px;
     gap:6px;
     background:linear-gradient(180deg,#5e616b,#3f424b);
@@ -278,10 +281,10 @@
 /* ---------- CoreTech: labirinto, joystick a sinistra, PAUSA/MUSICA come A/B ---------- */
 @media (orientation:portrait){
   html[data-gb=joy] #main{min-height:0}
-  /* schermo alto al massimo quanto il labirinto più alto (19x21): lo spazio in più va ai comandi */
-  html[data-gb=joy] #stage{flex:0 1 auto;min-height:0;aspect-ratio:19/21.6}
+  /* lo schermo prende tutto lo spazio libero, i comandi solo quello che serve */
+  html[data-gb=joy] #stage{flex:1 1 auto;min-height:0}
   html[data-gb=joy] #controls{
-    flex:1 0 auto;
+    flex:0 0 auto;
     align-content:space-evenly;
     display:grid;
     grid-template-columns:auto 1fr;
@@ -290,11 +293,11 @@
     column-gap:8px;
     padding:0 2px;
   }
-  html[data-gb=joy] #joy{grid-area:joy;--joy:clamp(124px,35vw,156px);margin-left:2px}
+  html[data-gb=joy] #joy{grid-area:joy;--joy:clamp(112px,31vw,132px);margin-left:2px}
   html[data-gb=joy] #joy::before{border-color:rgba(0,0,0,.14)}
   html[data-gb=joy] #joyKnob{border-color:#e9e6df}
   html[data-gb=joy] .gb-ab{grid-area:ab;justify-self:end;margin-right:4px}
-  html[data-gb=joy] .gb-pills{grid-area:pills;margin-top:-8px;padding-bottom:2px}
+  html[data-gb=joy] .gb-pills{grid-area:pills;margin-top:-4px;padding-bottom:0}
   html[data-gb=joy] .gb-grille{right:calc(24px + env(safe-area-inset-right,0px));bottom:calc(22px + env(safe-area-inset-bottom,0px))}
   html[data-gb=joy] .gb-grille i{height:30px}
 }
@@ -311,6 +314,5 @@
 @media (orientation:portrait) and (min-width:390px) and (min-height:780px){
   html[data-gb=sysadmin] #controls{--joy:clamp(150px, 38vw, 168px);--knob:clamp(62px, 16vw, 70px)}
   html[data-gb=sysadmin] #actions{transform:scale(1.12);transform-origin:100% 50%}
-  html[data-gb=joy] #joy{--joy:clamp(150px, 38vw, 168px)}
-  html[data-gb=joy] .gb-ab{transform:scale(1.12);transform-origin:100% 50%}
+  html[data-gb=joy] #joy{--joy:clamp(124px, 33vw, 140px)}
 }

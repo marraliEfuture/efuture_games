@@ -1,11 +1,11 @@
 /* Efuture Games - "console portatile" in verticale (vedi gameboy.css).
    Aggiunge solo le parti decorative (led, scritta, griglia altoparlante) e i due
-   tastini centrali ISTRUZIONI / AVVIA-PAUSA; in verticale sposta i tasti indicati
+   tastini centrali MODE / AVVIA-PAUSA; in verticale sposta i tasti indicati
    (data-a / data-b) nella coppia A/B e li rimette al loro posto in orizzontale.
    Non tocca la logica dei giochi: i tastini premono i pulsanti che esistono già.
    Attributi dello <script>:
      data-a, data-b   id dei pulsanti da usare come A e B (facoltativi)
-     data-select      id del pulsante "Istruzioni"
+     data-select      id del pulsante "Istruzioni" (non più usato dai tastini)
      data-pause       id del pulsante pausa
      data-primary     selettore del pulsante principale dentro un overlay visibile
      data-paused      id dell'overlay di pausa */
@@ -18,6 +18,13 @@
     '.gb-view:active{transform:translateY(1px)}',
     '.gb-viewtoast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translate(-50%,-8px);z-index:60;padding:7px 14px;border-radius:999px;background:#0d2b45;color:#fff;font:600 12px/1.3 "IBM Plex Mono",ui-monospace,monospace;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}',
     '.gb-viewtoast.on{opacity:1;transform:translate(-50%,0)}',
+    /* in verticale con la scocca il cambio di visualizzazione è sul tastino MODE */
+    '@media (orientation:portrait){html[data-view=game] .gb-view{display:none}}',
+    /* tempo della gara (lo manda l\'app): nell\'angolo dello schermo, o nella riga della scocca */
+    '.gb-clock{font:8px/1 "Press Start 2P","IBM Plex Mono",monospace;color:#ffb04a;white-space:nowrap;font-variant-numeric:tabular-nums}',
+    '.gb-clock.warn{color:#ff5d56}',
+    '.gb-clock:empty{display:none}',
+    '#stage>.gb-clock{position:absolute;top:4px;right:4px;z-index:4;padding:4px 7px;border-radius:999px;background:rgba(13,43,69,.78);pointer-events:none}',
     /* Dark: stessi giochi, interfaccia scura (il campo di gioco disegnato resta com\'è) */
     'html[data-view=dark]{color-scheme:dark;--bg:#0e1621;--panel:#172230;--panel-2:#1e2b3b;--line:#33465c;--text:#e7eef6;--dim:#a3b6ca;--text-dim:#a3b6ca;--coin:#ffb04a;--ef-yellow:#ffb04a}',
     'html[data-view=dark][data-efg-game=coretech]{--ct-light:#8ab8e6;--navy:#8ac4f0}',
@@ -47,8 +54,8 @@
      La sceglie il giocatore con il pulsante in alto (vale per tutti e 4 i giochi, salvata sul
      telefono in efgView); finché non sceglie vale quella decisa in admin (efgViewDefault,
      scritta dall'app), altrimenti Game. In Light e Dark la scocca è spenta. */
-  var VIEWS = ['game', 'light', 'dark'];
-  var VIEW_ICON = { game:'🎮', light:'☀', dark:'☾' }, VIEW_NAME = { game:'Game', light:'Light', dark:'Dark' };
+  var VIEWS = ['light', 'dark', 'game'];   // ordine del tastino MODE: Normal → Dark → Game
+  var VIEW_ICON = { game:'🎮', light:'☀', dark:'☾' }, VIEW_NAME = { game:'Game', light:'Normal', dark:'Dark' };
   function storeGet(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
   function readView(){
     var v = storeGet('efgView'); if (VIEWS.indexOf(v) >= 0) return v;
@@ -78,21 +85,22 @@
   var pauseEl = $(d.pause);
   if (pauseEl && hud.contains(pauseEl)) pauseEl.parentNode.insertBefore(vbtn, pauseEl); else hud.appendChild(vbtn);
   var vtoast = mk0('div'); vtoast.className = 'gb-viewtoast'; vtoast.setAttribute('role', 'status'); doc.body.appendChild(vtoast);
-  vbtn.addEventListener('click', function(){
+  function nextView(){
     view = VIEWS[(VIEWS.indexOf(view) + 1) % VIEWS.length];
     try { localStorage.setItem('efgView', view); } catch(e){}
     applyView(); relayout();
     vtoast.textContent = VIEW_ICON[view] + ' Visualizzazione ' + VIEW_NAME[view];
     vtoast.classList.add('on'); clearTimeout(vtoast.t); vtoast.t = setTimeout(function(){ vtoast.classList.remove('on'); }, 1400);
     vbtn.blur();
-  });
+  }
+  vbtn.addEventListener('click', nextView);
   ['pointerdown','pointerup','touchstart'].forEach(function(t){ vbtn.addEventListener(t, function(e){ e.stopPropagation(); }); });
   applyView();
 
   function mk(tag, cls, html){ var e = doc.createElement(tag); e.className = cls; if (html) e.innerHTML = html; return e; }
   function shown(el){ return !!el && el.getClientRects().length > 0; }
 
-  var top = mk('div', 'gb-top', '<span class="gb-led"></span><span class="gb-on">ON</span><span class="gb-lines"></span>');
+  var top = mk('div', 'gb-top', '<span class="gb-led"></span><span class="gb-on">ON</span><span class="gb-lines"></span><span class="gb-clock"></span>');
   top.setAttribute('aria-hidden', 'true');
   hud.parentNode.insertBefore(top, hud);
 
@@ -106,10 +114,11 @@
 
   /* tastini centrali */
   var pills = mk('div', 'gb-pills');
-  var bSel = mk('button', 'gb-pill', '<i></i><span>ISTRUZIONI</span>');
+  var bSel = mk('button', 'gb-pill', '<i></i><span>MODE</span>');
   var bStart = mk('button', 'gb-pill', '<i></i><span>PAUSA</span>');
   bSel.type = bStart.type = 'button';
   bSel.id = 'gbSelect'; bStart.id = 'gbStart';
+  bSel.setAttribute('aria-label', 'Cambia visualizzazione: Normal, Dark o Game');
   pills.appendChild(bSel); pills.appendChild(bStart);
   controls.appendChild(pills);
   var lblStart = bStart.querySelector('span');
@@ -131,7 +140,7 @@
     el.addEventListener('contextmenu', function(e){ e.preventDefault(); });
   }
 
-  var selTarget = $(d.select), pauseBtn = $(d.pause), pausedOv = $(d.paused);
+  var pauseBtn = $(d.pause), pausedOv = $(d.paused);
   function primary(){
     if (!d.primary) return null;
     var list = doc.querySelectorAll(d.primary);
@@ -142,18 +151,48 @@
     if (pausedOv && shown(pausedOv)) return 'pause';
     return primary() ? 'go' : 'pause';
   }
-  press(bSel, function(){ if (shown(selTarget)) selTarget.click(); });
+  press(bSel, nextView);
   press(bStart, function(){
     if (startMode() === 'go'){ var p = primary(); if (p) p.click(); }
     else if (pauseBtn) pauseBtn.click();
   });
+  /* all'app (modalità gara): c'è una schermata del gioco aperta (titolo, pausa, tra un livello e l'altro)?
+     Se no si sta giocando e l'app nasconde la sua barra in alto */
+  var inHub = window.parent && window.parent !== window, menuSent = null;
+  function menuOpen(){
+    var ovs = doc.querySelectorAll('.overlay');
+    for (var i = 0; i < ovs.length; i++) if (shown(ovs[i])) return true;
+    return false;
+  }
+  /* fuori dalla gara: fuochi d'artificio sulla schermata finale del gioco (in gara li accende l'app sul risultato) */
+  var winOv = $('ov-win') || $('ov-victory'), winShown = false;
+  function celebrate(){
+    if (window.EFGFuochi){ window.EFGFuochi.start(7); return; }
+    var sc = doc.createElement('script'); sc.src = new URL('../fuochi.js', s.src).href;
+    sc.onload = function(){ if (window.EFGFuochi && shown(winOv)) window.EFGFuochi.start(7); };
+    doc.head.appendChild(sc);
+  }
   function refresh(){
+    if (winOv && !inHub){
+      var w = shown(winOv);
+      if (w && !winShown) celebrate();
+      else if (!w && winShown && window.EFGFuochi) window.EFGFuochi.stop();
+      winShown = w;
+    }
+    if (inHub){ var m = menuOpen(); if (m !== menuSent){ menuSent = m; try { window.parent.postMessage({ type:'efg-ui', menu:m }, '*'); } catch(e){} } }
     if (!pills.getClientRects().length) return;
-    bSel.classList.toggle('off', !shown(selTarget));
     var t = startMode() === 'go' ? 'AVVIA' : 'PAUSA';
     if (lblStart.textContent !== t) lblStart.textContent = t;
   }
   setInterval(refresh, 300); refresh();
+
+  /* tempo della gara mandato dall'app: nella riga in alto della scocca, altrimenti nell'angolo dello schermo */
+  var stageEl = $('stage'), clocks = [top.querySelector('.gb-clock')];
+  if (stageEl){ var ck = mk('span', 'gb-clock'); ck.setAttribute('aria-hidden', 'true'); stageEl.appendChild(ck); clocks.push(ck); }
+  window.addEventListener('message', function(e){
+    var m = e.data; if (!m || m.type !== 'efg-clock' || e.source !== window.parent) return;
+    clocks.forEach(function(c){ c.textContent = m.text || ''; c.classList.toggle('warn', !!m.warn); });
+  });
 
   /* coppia A/B: in verticale i pulsanti indicati vengono spostati qui */
   var ab = null, moves = [];
