@@ -366,8 +366,8 @@
  },
  {
   "data": "2026-10-13",
-  "commit": "dccd960",
-  "versione": "v61",
+  "commit": "d6dbfb1",
+  "versione": "v62",
   "esiti": {
    "codice": {
     "ok": 34,
@@ -400,14 +400,14 @@
     "errore": 0
    }
   },
-  "spazio_kb": 11955.9,
+  "spazio_kb": 12096.8,
   "cartelle_kb": {
-   ".claude": 121.7,
-   "(file principali)": 294.3,
-   "docs": 282.0,
+   ".claude": 122.0,
+   "(file principali)": 298.4,
+   "docs": 283.0,
    "fonts": 120.3,
    "games": 908.8,
-   "icons": 40.6,
+   "icons": 176.1,
    "img": 92.5,
    "qr": 159.6,
    "tutorial": 1334.2,

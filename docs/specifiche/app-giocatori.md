@@ -210,6 +210,7 @@ All'avvio l'app legge `efg_impostazioni` e salva la visualizzazione predefinita 
 
 Si apre con il pulsante **Classifica** (finestra `mBoard`).
 - In cima solo il titolo "Classifica" e la ✕, senza logo efuture (v61).
+- Dalla v62 non c'è più il link "Apri la classifica a schermo intero": dall'app la classifica da proiettare non si apre mai.
 - **Schede:** **Totale** e i 4 giochi. Ogni cambio di scheda ricarica i dati con `Backend.board(id)`, cioè `efg_board`. Non c'è filtro per gruppo.
   Le schede sono staccate dalla prima posizione: 14 px di spazio e una riga sottile sotto (`#bTabs`).
 - **Riga su due livelli:**
@@ -312,3 +313,9 @@ Tema chiaro dalla v25. Variabili in `:root` di `index.html`:
 
 ---
 Ultimo aggiornamento: 07/10/2026 (v27)
+
+## Avvio e schermo intero (v62)
+
+- **App installata:** all'apertura compare per 1,5 s una schermata bianca con l'icona al centro e in basso "Powered by" con il logo efuture (`#splash` in `index.html`, solo in `display-mode: standalone`), poi sfuma nella home. Il manifest ha `background_color` bianco, così la schermata di avvio di Android (icona su bianco, non modificabile dal sito) si lega senza stacco. Su iPhone le immagini `icons/avvio/avvio-LxA.png` (`apple-touch-startup-image`, 10 misure di iPhone in verticale) mostrano la stessa schermata già prima che la pagina si carichi.
+- **App aperta dal browser del telefono (non installata):** al primo tocco la pagina va a schermo intero senza barre del browser (`requestFullscreen`, `hub.js`); se si esce, ci torna al tocco successivo. Solo su dispositivi touch e fuori dall'iframe. Su iPhone Safari non è possibile: serve installare l'app.
+
