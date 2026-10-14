@@ -61,9 +61,9 @@ I labirinti sono disegnati a mano in `MAZES` (`#` muro, `.` monetina, `o` floppy
 
 | Liv. | Nome | Labirinto (colonne × righe) | Monetine | Floppy | Uscita laterale | Bug | Velocità C | Velocità bug | Bug spaventati | Durata patch |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 1 | Rete aziendale | 13 × 13 | 42 | 4 | Riga 8 | 2 | 4,8 | 2,1 | 1,5 | 10,0 s |
-| 2 | Server farm | 17 × 13 | 58 | 4 | Riga 8 | 3 | 5,0 | 2,4 | 1,6 | 9,0 s |
-| 3 | Cloud ibrido | 19 × 15 | 50 | 4 | Riga 8 | 3 | 5,3 | 2,6 | 1,7 | 8,0 s |
+| 1 | Rete aziendale | 13 × 13 | 28 | 4 | Riga 8 | 2 | 4,8 | 2,1 | 1,5 | 10,0 s |
+| 2 | Server farm | 17 × 13 | 38 | 4 | Riga 8 | 3 | 5,0 | 2,4 | 1,6 | 9,0 s |
+| 3 | Cloud ibrido | 19 × 15 | 52 | 4 | Riga 8 | 3 | 5,3 | 2,6 | 1,7 | 8,0 s |
 | 4 | Data center | 19 × 21 | 144 | 4 | Riga 10 | 4 | 6,3 | 4,7 | 2,4 | 4,8 s |
 | 5 | Core di sistema | 19 × 21 | 149 | 4 | Riga 10 | 4 | 6,4 | 5,1 | 2,5 | 3,6 s |
 
@@ -78,6 +78,8 @@ Velocità in caselle al secondo.
 **Livelli 1–3 ancora più facili (v59):**
 - meno monetine (prima 61 / 83 / 85, ora 42 / 58 / 50): restano solo sulle righe lunghe in alto e in basso e sui bordi esterni; i corridoi verticali vicino alla casetta, i collegamenti interni e la riga dell'uscita laterale sono vuoti ma si possono percorrere. Al livello 3 è vuota anche la seconda riga lunga in alto;
 - bug circa il 15% più lenti (prima 2,5 / 2,8 / 3,1; spaventati 1,7 / 1,8 / 2,0). La C ha la stessa velocità di prima.
+
+**Monetine su tutti i percorsi (v79):** nei livelli 1–3 le monetine sono su **tutti** i corridoi raggiungibili, **una casella sì e una no** (anche i corridoi verticali ai lati della casetta e l'anello intorno); restano vuoti solo il tunnel dell'uscita laterale, la casetta, la partenza e l'uscita della casetta. Monetine 28 / 38 / 52 (prima 42 / 58 / 50). Un giro che va sempre alla monetina più vicina, senza bug, finisce il livello in circa 14 s, 17 s e 25 s.
 
 Il livello 3 ha la casetta dei bug sulla riga dell'uscita laterale. I livelli 4 e 5 hanno ciascuno il suo labirinto e non sono cambiati.
 
@@ -111,7 +113,7 @@ Il primo bug parte già fuori dalla casetta; gli altri escono ai tempi indicati.
 **Floppy (patch):** vale 50 punti e per la durata del livello tutti i bug diventano blu e lenti, anche quelli ancora nella casetta (escono subito). Nell'ultimo 1,6 s lampeggiano. Durante la patch l'alternanza dispersione/inseguimento si ferma.
 
 **Collisioni** (distanza meno di circa due terzi di casella):
-- bug spaventato: viene mangiato. Vale 200, 400, 800, 1600 punti per i bug mangiati di fila con la stessa patch. **Al livello 1 il bug mangiato non torna più per tutto il livello**, neanche dopo una vita persa. **Dal livello 2 rinasce:** diventa solo occhi, torna di corsa alla casetta al centro e ne riesce subito come bug normale;
+- bug spaventato: viene mangiato. Vale 200, 400, 800, 1600 punti per i bug mangiati di fila con la stessa patch. **Al livello 1 il bug mangiato non torna più per tutto il livello**, neanche dopo una vita persa. **Dal livello 2 rinasce:** diventa solo occhi, torna di corsa alla casetta al centro e lì **aspetta 3 secondi** (dondola dentro; un floppy mangiato intanto non lo fa uscire), poi **esce piano** (1,6 caselle/s invece di 3,2) e torna bug normale (v79);
 - bug normale: si perde una vita. Animazione di 1,5 s, poi tutti tornano alla partenza (al livello 1 i bug mangiati restano fuori), PRONTI! e si riparte. Le monetine già mangiate restano mangiate.
 
 **Fine del livello:** quando non restano monetine né floppy.

@@ -12,49 +12,50 @@ function efgPost(m){ try { if (window.parent !== window) window.parent.postMessa
 /* ================= DATA ================= */
 // Levels 1-3 (also the app's 3-level competition, 60 s per level) are kept
 // simple (v29, client: "difficili da manovrare"): long straight rows, few
-// turns, no pockets. Side alleys and the ring round the bug house have no
-// coins, so a nearest-coin run clears each level in about 16-22 s.
+// turns, no pockets. From v79 coins sit on every path, one cell yes and one
+// no (side alleys and the ring round the bug house too, never in the side
+// tunnel): a nearest-coin run clears each level in about 14-25 s.
 const MAZES = [
   ["#############",
-   "#o.........o#",
+   "#o. . . . .o#",
    "#.## ### ##.#",
-   "#.....B.....#",
-   "### ##-## ###",
+   "# . . B . . #",
+   "###.##-##.###",
    "### #GGG# ###",
-   "### ##### ###",
+   "###.#####.###",
    "             ",
-   "### ##### ###",
-   "#.....P.....#",
+   "###.#####.###",
+   "# . . P . . #",
    "#.## ### ##.#",
-   "#o.........o#",
+   "#o. . . . .o#",
    "#############"],
   ["#################",
-   "#o.............o#",
-   "#.## ## # ## ##.#",
-   "#.......B.......#",
-   "#### ###-### ####",
+   "#o . . . . . . o#",
+   "# ##.## # ##.## #",
+   "#. . . .B. . . .#",
+   "####.###-###.####",
    "#### ##GGG## ####",
-   "#### ####### ####",
+   "####.#######.####",
    "                 ",
-   "#### ####### ####",
-   "#.......P.......#",
-   "#.## ## # ## ##.#",
-   "#o.............o#",
+   "####.#######.####",
+   "#. . . .P. . . .#",
+   "# ##.## # ##.## #",
+   "#o . . . . . . o#",
    "#################"],
   ["###################",
-   "#o...............o#",
-   "#.### ####### ###.#",
-   "#                 #",
-   "#### ### # ### ####",
-   "#### #   B   # ####",
-   "#### # ##-## # ####",
+   "#o . . . . . . . o#",
+   "# ### ####### ### #",
+   "#. . . . . . . . .#",
+   "####.###.#.###.####",
+   "#### # . B . # ####",
+   "####.#.##-##.#.####",
    "       #GGG#       ",
-   "#### # ##### # ####",
-   "#### #       # ####",
-   "#### ### # ### ####",
-   "#........P........#",
-   "#.### ####### ###.#",
-   "#o...............o#",
+   "####.#.#####.#.####",
+   "#### # . . . # ####",
+   "####.###.#.###.####",
+   "#. . . . P . . . .#",
+   "# ### ####### ### #",
+   "#o . . . . . . . o#",
    "###################"],
   ["###################",
    "#o..#.........#..o#",
@@ -103,6 +104,7 @@ const MAZES = [
 
 let COLS = 19, ROWS = 21;          // set per level: mazes grow from level to level
 let HOUSE_EXIT = {x:9, y:7};       // tile just above the door (the 'B' in the map)
+const REBORN_WAIT = 3, REBORN_EXIT = 1.6;   // bug mangiato (dal livello 2): secondi nella casetta e velocità di uscita
 let HOUSE_IN   = {x:9, y:9};       // centre of the bug house
 let TUNNEL_ROW = -1;               // row that wraps around the screen (every maze has one)
 let TUNNEL_LEN = 1;                // open cells at each end of the tunnel row (bugs slow down there)
@@ -351,7 +353,7 @@ function eatAt(x, y){
     frightTimer = L.frightTime; eatCombo = 0;
     let out = 0;
     for (const b of bugs){   // la patch trasforma TUTTI i bug in fantasmi, anche quelli ancora nella casetta
-      if (b.mode==='eaten') continue;
+      if (b.mode==='eaten' || b.slowExit) continue;   // chi è appena stato mangiato resta ad aspettare nella casetta
       if (b.mode==='house' || b.mode==='exit'){ b.x = HOUSE_EXIT.x; b.y = HOUSE_EXIT.y; b.dir = (out++ % 2) ? DIR.right : DIR.left; b.release = 0; b.goingIn = false; }
       else if (b.mode!=='fright') b.reverse = true;
       b.mode = 'fright';
@@ -384,11 +386,12 @@ function bugDecide(b, x, y){
     return;
   }
   if (b.mode === 'exit' && x===HOUSE_EXIT.x && y===HOUSE_EXIT.y){
-    b.mode = globalMode; b.dir = DIR.left;
+    b.mode = globalMode; b.dir = DIR.left; b.slowExit = false;
   }
   if (b.mode === 'eaten'){
     if (x===HOUSE_EXIT.x && y===HOUSE_EXIT.y) b.goingIn = true;
-    if (b.goingIn && x===HOUSE_IN.x && y===HOUSE_IN.y){ b.goingIn = false; b.mode = 'exit'; b.dir = DIR.up; return; }
+    // rientrato nella casetta: aspetta 3 s (dondola dentro), poi esce piano
+    if (b.goingIn && x===HOUSE_IN.x && y===HOUSE_IN.y){ b.goingIn = false; b.mode = 'house'; b.release = REBORN_WAIT; b.slowExit = true; b.dir = DIR.left; return; }
   }
   if (b.reverse){
     b.reverse = false;
@@ -415,7 +418,7 @@ function bugDecide(b, x, y){
 function bugSpeed(b){
   if (b.mode==='eaten') return 11;
   if (b.mode==='house') return 2.2;
-  if (b.mode==='exit') return 3.2;
+  if (b.mode==='exit') return b.slowExit ? REBORN_EXIT : 3.2;
   const inTunnel = Math.round(b.y)===TUNNEL_ROW && (b.x < TUNNEL_LEN || b.x > COLS-1-TUNNEL_LEN);
   let s = b.mode==='fright' ? L.fright : L.bug;
   // the last few coins make bugs a touch faster, like the arcade
