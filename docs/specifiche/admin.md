@@ -307,6 +307,7 @@ Ci sono due riquadri rossi. Prima di ogni reset il server crea un **backup autom
 
 - La parola di conferma non distingue maiuscole e minuscole e ignora gli spazi agli estremi.
 - Chiama `efg_admin_reset(p_key, 'punti' | 'tutto')`.
+- Con entrambi i reset il server aggiorna il "numero di reset" (`reset_id` in `efg_settings`, da `supabase-reset-sblocchi.sql`): all'apertura successiva l'app di ogni telefono riblocca i 4 giochi e cancella i record salvati sul telefono (vedi app-giocatori › Sblocco).
 - Messaggio: "Fatto: cancellati N record [e M giocatori]. Backup automatico #id…".
 
 ## Formati CSV

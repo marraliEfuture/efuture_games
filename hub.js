@@ -40,6 +40,7 @@ document.addEventListener('keydown', e=>{ if (e.key === 'Escape'){ ['mUnlock','m
 
 /* ================= STATE ================= */
 let unlocked = new Set(store.get('efgUnlocked', []));
+const justUnlocked = new Set();              // sbloccati in questa apertura (restano anche se arriva un reset)
 // best result per game on this device: { l: levels passed (0-3), s: points }
 let bests = store.get('efgBests4', {});
 const better = (a, b) => !b || a.l > b.l || (a.l === b.l && a.s > b.s);
@@ -115,7 +116,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v76' : 'Modalità demo: account e classifica restano su questo telefono. · v76';
+  mn.textContent = remote ? 'Classifica online · v77' : 'Modalità demo: account e classifica restano su questo telefono. · v77';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -132,7 +133,7 @@ async function unlockWith(code){
   const h = await sha256('efg:' + normCode(code));
   const g = GAMES.find(x=>x.hash === h);
   if (!g) return null;
-  unlocked.add(g.id); store.set('efgUnlocked', [...unlocked]); renderGrid();
+  unlocked.add(g.id); justUnlocked.add(g.id); store.set('efgUnlocked', [...unlocked]); renderGrid();
   return g;
 }
 function codeFromText(t){
@@ -518,6 +519,16 @@ $('btnReview').addEventListener('click', ()=>{
 
 /* ================= BOOT ================= */
 renderGrid(); renderDock(); loadGate();
+// reset dall'admin: se il numero di reset è cambiato, i giochi tornano da sbloccare e i record del telefono si cancellano
+// (lo sblocco è salvato solo sul telefono, il reset del server da solo non lo toglierebbe)
+Backend.resetId().then(id=>{
+  if (!id || store.get('efgResetId', null) === id) return;
+  store.set('efgResetId', id);
+  if (unlocked.size === justUnlocked.size && !Object.keys(bests).length) return;
+  unlocked = new Set(justUnlocked); store.set('efgUnlocked', [...unlocked]);
+  bests = {}; store.set('efgBests4', bests);
+  renderGrid(); if (!justUnlocked.size) toast('Nuova gara: sblocca di nuovo i giochi agli stand.', 4200);   // chi arriva da un QR vede il suo «sbloccato!»
+}).catch(()=>{});
 Backend.current().then(u=>{ session = u; renderDock(); loadRanks(); });
 // visualizzazione predefinita dei giochi scelta in admin (Game, Light o Dark): i giochi la leggono da qui
 // finché il giocatore non ne sceglie una con il pulsante in alto nel gioco
