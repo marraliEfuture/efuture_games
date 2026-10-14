@@ -189,7 +189,8 @@ Il drone è lo sprite `DRONE` (11 × 5); il teschio del boss è disegnato in `dr
 | `W`, `H` | costanti | 360 × 600 | Campo logico |
 | `SHIP_Y` | costanti | 548 | Quota della nuvola |
 | `TOP_Y`, `BOSS_TOP_Y` | costanti | 34, 116 | Prima fila della formazione (normale / livello boss) |
-| `FIRE_CD`, `FIRE_CD_X2` | costanti | 0,3 s, 0,18 s | Ricarica minima tra due colpi (normale / doppio colpo) |
+| `FIRE_CD`, `FIRE_CD_X2` | costanti | 0,36 s, 0,2 s | Ritmo del fuoco automatico (normale / doppio colpo) |
+| `LASER_T`, `LASER_W`, `LASER_BOSS` | costanti | 0,35 s, 16, 5 | Durata del raggio, larghezza, danno al boss |
 | `PX` | costanti | 3 | Lato di un pixel degli sprite (sprite 33 × 27) |
 | `DOT_R` | stato | 4,5 | Raggio dei colpi del giocatore |
 | `GAP_Y` / `GAP_X` | stato | 10 / da 2 a 6 | Spazio tra file / tra colonne (calcolato per lasciare 60 px di marcia) |
@@ -251,7 +252,8 @@ function efgEnd(ok, reason)
 | Salta animazione | Qualsiasi tasto | Qualsiasi tocco (anche su SPARA) | `endIntro()` |
 | Audio | – | `#soundBtn` | Inverte `audioOn` e lo salva |
 
-- **Sparo:** `update()` spara se `fireHeld()` o `fireQ > 0`, la ricarica è finita e i colpi in volo sono meno del massimo. Il primo `keydown` di Spazio/↑/Z chiama `pressFire()`; tenendo premuto spara `fireHeld()`.
+- **Sparo (v80):** `update()` spara da solo appena la ricarica (`FIRE_CD` 0,36 s, `FIRE_CD_X2` 0,2 s) è finita e i colpi in volo sono meno del massimo. Il tasto (`#fireBtn`, Spazio/↑/Z, mouse) chiama `pressFire()` (`fireQ` per 0,25 s): se `lasers > 0` parte `fireLaser()`.
+- **Laser:** ogni attaccante ha la sua fila `r`; `killFoe()` aggiunge un laser (`lasers++`) quando nessuno della fila è più vivo (e ne restano altri). `fireLaser()` usa un raggio largo `LASER_W` = 16 dalla nuvola in su: elimina attaccanti (`killFoe`) e codici nella colonna, prende il drone e toglie `LASER_BOSS` = 5 al boss; `laser = {x, t}` lo disegna in `render()` per `LASER_T` = 0,35 s. `refreshLaser()` aggiorna il tasto (classe `ready`, testo, `aria-label`); `loadLevel()` azzera i laser.
 - **Multi-touch:** `drag = { id, sx, start, strip }` segue un solo puntatore per il movimento (gli altri vengono ignorati); `firePtrs` (un `Set` di `pointerId`) tiene i diti su SPARA. Così si può trascinare e sparare insieme.
 - **`#fireBtn`:** `pointerdown` con `stopPropagation()` e `preventDefault()` (non avvia il trascinamento), aggiunge la classe `down`; `lostpointercapture` e `pointerup` la tolgono; menu contestuale bloccato; Invio sul pulsante chiama `pressFire()`.
 - **Mouse:** il tasto sinistro sul campo imposta `mouseFire` e non avvia trascinamenti; il movimento senza clic sposta la nuvola.

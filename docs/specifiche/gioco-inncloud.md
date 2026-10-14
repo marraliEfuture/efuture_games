@@ -2,7 +2,7 @@
 
 ## In breve
 
-Sparatutto nello stile di Space Invaders. Il giocatore guida la nuvola di inncloud lungo il fondo dello schermo; il suo cannone è il pallino rosso della "i" del logo e **spara solo quando il giocatore lo comanda** (tasto **SPARA**, Spazio). Dalla v28 non c'è più il fuoco automatico. Dall'alto scende una formazione di bug, virus e hacker che spara codici verdi. Ci si ripara dietro 4 nuvolette-firewall. All'ultimo livello c'è il boss Ransomware.
+Sparatutto nello stile di Space Invaders. Il giocatore guida la nuvola di inncloud lungo il fondo dello schermo; il suo cannone è il pallino rosso della "i" del logo e dalla v80 **spara da solo**. Ogni **fila** di attaccanti eliminata del tutto sblocca un colpo **LASER**, che si lancia con il tasto (prima SPARA) quando diventa verde. Dall'alto scende una formazione di bug, virus e hacker che spara codici verdi. Ci si ripara dietro 4 nuvolette-firewall. All'ultimo livello c'è il boss Ransomware.
 
 - Modalità libera: 5 livelli, nessun limite di tempo.
 - Modalità gara (`?hub=1`): i primi 3 livelli, 1 minuto e 3 vite ciascuno.
@@ -84,8 +84,8 @@ Campo logico 360 × 600. La nuvola sta a y = 548; le 4 nuvolette-firewall a y = 
 
 **Nuvola (giocatore):**
 - con le frecce si muove a 260 unità/s; trascinando segue il dito con un leggero ritardo; resta tra x = 24 e x = 336;
-- **spara solo a comando** (tasto SPARA, Spazio / ↑ / Z, tasto sinistro del mouse sul campo): un pallino rosso a 520 unità/s. Tra un colpo e l'altro ci sono almeno 0,3 s (prima della v28 il fuoco automatico era ogni 0,34 s), con al massimo 3 colpi in volo;
-- un tocco spara un colpo; se arriva durante la ricarica viene ricordato per 0,25 s e parte appena possibile. Tenendo premuto si spara a raffica, al ritmo massimo consentito;
+- **spara da solo** (v80; dalla v28 alla v79 sparava solo a comando): un pallino rosso a 520 unità/s ogni 0,36 s (0,2 s col doppio colpo), con al massimo 3 colpi in volo (6 col doppio colpo);
+- **LASER:** quando una fila della formazione è eliminata del tutto compare "FILA ELIMINATA · LASER PRONTO" e si guadagna un laser (uno per fila; si azzerano a ogni livello). Il tasto, grigio con il lucchetto e la scritta LASER, diventa **verde** con la scritta **LASER** (e "×N" se ce n'è più di uno) e pulsa. Toccandolo (o Spazio / ↑ / Z, tasto sinistro del mouse sul campo) parte un raggio verde dritto in su dalla nuvola, largo 16: elimina tutti gli attaccanti e i codici nemici in quella colonna, colpisce il drone (doppio colpo) e toglie 5 punti vita al boss. Passa attraverso le nuvolette senza romperle;
 - il pallino sulla nuvola si "ricarica" tra un colpo e l'altro; a inizio livello il primo colpo è pronto dopo 0,25 s;
 - i suoi colpi possono annullare i codici nemici che incontrano;
 - i colpi della nuvola passano attraverso le nuvolette-firewall.
@@ -121,7 +121,7 @@ Campo logico 360 × 600. La nuvola sta a y = 548; le 4 nuvolette-firewall a y = 
 | Musica | – | Pulsante `♪` (in verticale: tasto B) |
 
 - **Fascia di trascinamento** ("Trascina per muoverti · SPARA per colpire"; in verticale solo "Trascina per muoverti", perché la pista è stretta): funziona come un touchpad, spostamento del dito × 1,3.
-- **Tasto SPARA** (`fireBtn`): rotondo, rosso inncloud con la scritta bianca, almeno 76 px (88 px in orizzontale). Risponde al dito appena appoggiato (non al rilascio) e non fa mai partire il trascinamento della nuvola.
+- **Tasto LASER** (`fireBtn`, fino alla v79 SPARA rosso): rotondo, grigio con 🔒 e "LASER" finché non c'è un laser, poi verde con "LASER" che pulsa; almeno 76 px (88 px in orizzontale). Risponde al dito appena appoggiato (non al rilascio) e non fa mai partire il trascinamento della nuvola.
 - **Sul campo:** la nuvola va dove si tocca e segue il dito.
 - **Mouse:** la nuvola segue il puntatore anche senza cliccare.
 - Multi-touch: un dito muove la nuvola (fascia o campo) e intanto un altro può tenere premuto SPARA. Per il movimento si segue un solo dito alla volta.
@@ -129,7 +129,7 @@ Campo logico 360 × 600. La nuvola sta a y = 548; le 4 nuvolette-firewall a y = 
 
 ## Layout
 
-- **Verticale:** scocca "Game Boy" ([giochi-comune.md](giochi-comune.md#scocca-game-boy-verticale)): fascia scura di trascinamento a sinistra, A = **SPARA** (rosso, 76 px, più grande degli altri tasti), B = MUSICA, tastini ISTRUZIONI e AVVIA/PAUSA sotto la fascia. La pausa si fa con il tastino AVVIA/PAUSA (o con `II`, che resta nell'HUD).
+- **Verticale:** scocca "Game Boy" ([giochi-comune.md](giochi-comune.md#scocca-game-boy-verticale)): fascia scura di trascinamento a sinistra, A = **LASER** (grigio, verde quando è pronto; 76 px, più grande degli altri tasti), B = MUSICA, tastini ISTRUZIONI e AVVIA/PAUSA sotto la fascia. La pausa si fa con il tastino AVVIA/PAUSA (o con `II`, che resta nell'HUD).
 - **Orizzontale** (altezza ≤ 560 px): la fascia diventa una colonna verticale di 120 px a sinistra del campo; il tasto SPARA (88 px) sta a destra del campo, centrato in altezza, mai sopra al gioco.
 - Schermi larghi non bassi (computer): SPARA sta a destra della fascia, sotto al campo.
 - Il campo mantiene il rapporto 360:600 e si adatta allo spazio libero (densità fino a 2,5×).

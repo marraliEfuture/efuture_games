@@ -13,7 +13,8 @@ function efgPost(m){ try { if (window.parent !== window) window.parent.postMessa
 const W = 360, H = 600;
 const SHIP_Y = 548;
 const TOP_Y = 34, BOSS_TOP_Y = 116;   // first row of the formation: just below the drone lane (y = 16)
-const FIRE_CD = 0.3, FIRE_CD_X2 = 0.18; // manual fire: shortest time between two shots (normal / double shot)
+const FIRE_CD = 0.36, FIRE_CD_X2 = 0.2; // automatic fire (v80): time between two shots (normal / double shot)
+const LASER_T = 0.35, LASER_W = 16, LASER_BOSS = 5;   // laser: how long the beam stays, width, damage to the boss
 const RED = '#c00000', RED_HI = '#ff3b3b', INK = '#272727', CLOUD = '#ffffff', HACK = '#13a04a';
 const NAVY = '#0d2b45', OUTLINE = '#56718a';   // light theme: text and cloud outline on the pale sky
 const PX = 3;                                   // size of one sprite pixel
@@ -137,6 +138,7 @@ let state = 'title', prevState = null;
 let lvIndex = 0, L = LEVELS[0];
 let score = 0, levelStartScore = 0, lives = 3, levelKills = 0, levelTime = 0;
 let ship = { x:W/2, inv:0, fireCd:0, fireMax:FIRE_CD, dead:0 };
+let lasers = 0, laser = null;   // laser charges (one for every row cleared) and the beam on screen
 const DOT_R = 4.5;                // same size as the dot of the "i"
 let shots = [], ebul = [], parts = [], toasts = [];
 let foes = [], total = 0, fx = 0, fdir = 1, fy = 0, frame = 0, frameT = 0, fireT = 0;
@@ -153,12 +155,13 @@ let GAP_X = 6;
 function loadLevel(i){
   lvIndex = i; L = LEVELS[i];
   foes = [];
+  lasers = 0; laser = null; refreshLaser();   // the laser is earned again in every level
   // the formation must leave room to march sideways: never wider than the field minus ~60px
   GAP_X = Math.max(2, Math.min(6, (W - 60 - L.cols*SPR_W) / Math.max(1, L.cols-1)));
   const gw = L.cols*SPR_W + (L.cols-1)*GAP_X;
   const x0 = (W - gw)/2, y0 = L.boss ? BOSS_TOP_Y : TOP_Y;
   L.rows.forEach((t, r)=>{
-    for (let c=0;c<L.cols;c++) foes.push({ t, x:x0 + c*(SPR_W+GAP_X), y:y0 + r*(SPR_H+GAP_Y), alive:true, c });
+    for (let c=0;c<L.cols;c++) foes.push({ t, x:x0 + c*(SPR_W+GAP_X), y:y0 + r*(SPR_H+GAP_Y), alive:true, c, r });
   });
   total = foes.length; fx = 0; fy = 0; fdir = 1; frame = 0; frameT = 0; fireT = 0;
   shots = []; ebul = []; parts = []; toasts = [];
@@ -213,12 +216,12 @@ function update(dt){
     else if (targetX !== null) ship.x += (targetX - ship.x) * Math.min(1, dt*16);
     ship.x = Math.max(24, Math.min(W-24, ship.x));
     if (ship.inv > 0) ship.inv -= dt;
-    // red shots (the dot of the "i"), only when the player fires: SPARA, Space / ArrowUp / Z, mouse button.
-    // Holding fires again as soon as the cooldown allows; a tap is remembered for a moment.
+    // red shots (the dot of the "i"): automatic since v80, as soon as the cooldown allows.
+    // The button (SPARA, Space / ArrowUp / Z, mouse) now fires the laser, earned by clearing a whole row.
     if (ship.fireCd > 0) ship.fireCd -= dt;
+    if (fireQ > 0 && lasers > 0){ fireQ = 0; fireLaser(); }
     const maxShots = doubleT > 0 ? 6 : 3;
-    if ((fireHeld() || fireQ > 0) && ship.fireCd <= 0 && shots.length < maxShots){
-      fireQ = 0;
+    if (ship.fireCd <= 0 && shots.length < maxShots){
       ship.fireCd = ship.fireMax = doubleT > 0 ? FIRE_CD_X2 : FIRE_CD;
       if (doubleT > 0){ shots.push({x:ship.x-6, y:SHIP_Y-12}); shots.push({x:ship.x+6, y:SHIP_Y-12}); }
       else shots.push({ x:ship.x, y:SHIP_Y-12 });
@@ -317,6 +320,33 @@ function killFoe(f){
   f.alive = false; levelKills++;
   const k = SPRITES[f.t]; score += k.pts;
   const b = foeBox(f); burst(b.x + SPR_W/2, b.y + SPR_H/2, k.color, 12); sfx.kill();
+  // a whole row cleared: one laser more (only while foes are left to hit)
+  if (!foes.some(o => o.r === f.r && o.alive) && foes.some(o => o.alive)){ lasers++; refreshLaser(); toast('FILA ELIMINATA · LASER PRONTO', HACK); }
+}
+/* laser: a green beam straight up from the cloud; it destroys every attacker and code in its column,
+   hits the drone and takes LASER_BOSS points off the boss. It passes through the firewall clouds. */
+function fireLaser(){
+  lasers--; refreshLaser();
+  const x = ship.x, beam = { x:x - LASER_W/2, y:0, w:LASER_W, h:SHIP_Y };
+  laser = { x, t:LASER_T };
+  for (const f of foes) if (f.alive && hit(beam, foeBox(f))) killFoe(f);
+  for (const b of ebul) if (!b.dead && Math.abs(b.x - x) < LASER_W/2 + 3){ b.dead = true; burst(b.x, b.y, HACK, 4); }
+  if (drone && Math.abs(drone.x - x) < 17 + LASER_W/2){
+    const pts = 200; score += pts; burst(drone.x, drone.y, HACK, 18); toast('+' + pts + ' · DOPPIO COLPO', RED);
+    doubleT = 10; drone = null; droneT = 14;
+  }
+  if (boss && boss.hp > 0 && Math.abs(boss.x - x) < 34 + LASER_W/2){
+    boss.hp = Math.max(0, boss.hp - LASER_BOSS); boss.flash = 0.15; score += 25*LASER_BOSS;
+    if (boss.hp <= 0){ score += 2000; for (let i=0;i<5;i++) burst(boss.x + (Math.random()-0.5)*60, boss.y + (Math.random()-0.5)*50, i%2?HACK:'#4f6478', 20); toast('RANSOMWARE SCONFITTO +2000', NAVY); for (const f of foes) f.alive = false; }
+  }
+  sfx.kill();
+}
+function refreshLaser(){
+  const fireBtn = $('fireBtn'), ready = lasers > 0;
+  fireBtn.classList.toggle('ready', ready);
+  fireBtn.setAttribute('aria-disabled', ready ? 'false' : 'true');
+  fireBtn.innerHTML = ready ? 'LASER' + (lasers > 1 ? '<small>×' + lasers + '</small>' : '') : '🔒<small>LASER</small>';
+  fireBtn.setAttribute('aria-label', ready ? 'Laser pronto' + (lasers > 1 ? ' (' + lasers + ')' : '') : 'Laser: elimina una fila intera per sbloccarlo');
 }
 function killShip(){
   if (ship.dead > 0) return;
@@ -325,6 +355,7 @@ function killShip(){
 }
 
 function updateParts(dt){
+  if (laser && (laser.t -= dt) <= 0) laser = null;
   for (const p of parts){ p.x += p.vx*dt; p.y += p.vy*dt; p.vy += (p.g!==undefined?p.g:200)*dt; p.t -= dt; }
   parts = parts.filter(p=>p.t>0);
   for (const t of toasts) t.t -= dt;
@@ -495,8 +526,9 @@ function onUp(e){
 }
 window.addEventListener('pointerup', onUp);
 window.addEventListener('pointercancel', onUp);
-// SPARA: tap = one shot, hold = repeated shots. It never starts a drag of the cloud.
+// LASER (ex SPARA): a tap fires the laser if one is ready. It never starts a drag of the cloud.
 const fireBtn = $('fireBtn');
+refreshLaser();
 fireBtn.addEventListener('pointerdown', e=>{
   e.stopPropagation(); e.preventDefault();
   if (state === 'intro'){ endIntro(); return; }
@@ -667,6 +699,14 @@ function render(){
   for (const b of ebul){ ctx.fillStyle = HACK; ctx.fillText(b.ch, b.x, b.y); ctx.fillStyle='rgba(19,160,74,0.3)'; ctx.fillText(b.ch, b.x, b.y-7); }
   // player shots
   for (const s of shots) drawShot(s.x, s.y, DOT_R);
+  if (laser){   // green beam, fading out
+    const k = laser.t / LASER_T;
+    ctx.save(); ctx.globalAlpha = Math.min(1, k*1.6);
+    ctx.fillStyle = 'rgba(79,212,127,0.35)'; ctx.fillRect(laser.x - LASER_W, 0, LASER_W*2, SHIP_Y - 10);
+    ctx.fillStyle = '#4fd47f'; ctx.fillRect(laser.x - LASER_W/2, 0, LASER_W, SHIP_Y - 10);
+    ctx.fillStyle = '#eafff1'; ctx.fillRect(laser.x - 2, 0, 4, SHIP_Y - 10);
+    ctx.restore();
+  }
   // ship
   if (ship.dead <= 0 && !(ship.inv > 0 && Math.floor(clock*14)%2)) drawShip(ship.x, SHIP_Y, 1, state==='play' ? Math.max(0, Math.min(1, 1 - ship.fireCd/ship.fireMax)) : 1);
   drawParts();
