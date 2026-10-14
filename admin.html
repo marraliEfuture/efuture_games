@@ -321,7 +321,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
       <h2 id="paneTitle">Utenti</h2>
       <section data-pane="players">
         <div class="bar"><span class="grow dim" id="pInfo"></span>
-          <button class="btn" id="pNewAdmin" type="button" title="Crea un amministratore con la sua chiave personale, senza registrarlo nell'app">➕ Nuovo amministratore</button>
+          <button class="btn" id="pNewAdmin" type="button" title="Crea un utente scegliendo il tipo (giocatore, admin o entrambi), senza registrarlo nell'app">➕ Nuovo utente</button>
           <button class="btn ghost" id="pReload" type="button">Aggiorna</button>
           <button class="btn navy" id="pCsv" type="button">Scarica CSV</button></div>
         <form class="rlink" id="rLinkForm" autocomplete="off">
@@ -492,16 +492,16 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 <!-- popup Modifica utente -->
 <div class="pop" id="pNew" hidden role="dialog" aria-modal="true" aria-labelledby="pnT">
   <form class="box" id="pnForm" autocomplete="off">
-    <h3 id="pnT">Nuovo amministratore</h3>
-    <p class="dim" style="margin:0">Crea un amministratore con pieni poteri, come te. Non deve registrarsi nell'app: entra nel pannello con la sua email e la chiave che compare qui sotto. Se l'email è già registrata, quell'utente diventa amministratore e riceve una nuova chiave.</p>
+    <h3 id="pnT">Nuovo utente</h3>
+    <p class="dim" style="margin:0">Crea un utente senza che si registri nell'app e scegli tu il tipo. Un giocatore entra nell'app con la sua email; un admin entra nel pannello con la sua email e la chiave che compare qui sotto, con pieni poteri come te. Se l'email è già registrata, quell'utente prende il tipo scelto.</p>
     <div class="field"><label for="pnEmail">Email</label><input id="pnEmail" type="email" inputmode="email" required></div>
     <div class="field"><label for="pnName">Nome (come compare nell'elenco)</label><input id="pnName" type="text" minlength="2" maxlength="20" required></div>
     <div class="grp2"><b>Tipo</b><div class="opts" id="pnTipo">
-      <button class="btn ghost on" type="button" data-v="admin">🛡️ Solo admin</button><button class="btn ghost" type="button" data-v="admin_giocatore">🎮🛡️ Admin e giocatore</button></div>
+      <button class="btn ghost on" type="button" data-v="giocatore">🎮 Giocatore</button><button class="btn ghost" type="button" data-v="admin_giocatore">🎮🛡️ Admin e giocatore</button><button class="btn ghost" type="button" data-v="admin">🛡️ Solo admin</button></div>
       <div class="small dim" id="pnTipoHelp"></div></div>
     <div class="newkey" id="pnKeyBox" hidden><span>Chiave di <b id="pnWho"></b> (si vede solo ora): copiala e consegnala in modo riservato</span><code id="pnKey"></code><button class="btn ghost" type="button" id="pnCopy">Copia</button></div>
     <div class="msg" id="pnMsg" aria-live="polite"></div>
-    <div class="row2"><button class="btn" id="pnGo" type="submit">Crea e genera la chiave</button><button class="btn ghost" id="pnClose" type="button">Chiudi</button></div>
+    <div class="row2"><button class="btn" id="pnGo" type="submit">Crea utente</button><button class="btn ghost" id="pnClose" type="button">Chiudi</button></div>
   </form>
 </div>
 <div class="pop" id="pEdit" hidden role="dialog" aria-modal="true" aria-labelledby="peT">
@@ -537,10 +537,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=74"></script>
+<script src="config.js?v=75"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="tutorial/tutorials.js?v=74"></script>
+<script src="tutorial/tutorials.js?v=75"></script>
 <script>
 (function(){
 "use strict";
@@ -816,12 +816,12 @@ async function setTipo(p, v){
     'Sì, cambia tipo', v === 'giocatore' && p.chiave)) return;
   act(() => call('efg_admin_set_tipo', { p_email: p.email, p_tipo: v }), 'Tipo cambiato: ' + TIPI[v] + '.');
 }
-// nuovo amministratore: crea l'utente (o rende admin un utente esistente) con una chiave generata qui
-let pnTipo = 'admin';
-const PN_HELP = { admin:'Entra solo nel pannello: non gioca e non compare in classifica (resta nell\'elenco Utenti).', admin_giocatore:'Entra nel pannello e può anche giocare nell\'app (con la stessa email) e comparire in classifica.' };
-function pnSet(v){ pnTipo = v; $('pnTipo').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); $('pnTipoHelp').textContent = PN_HELP[v]; }
+// nuovo utente: crea l'utente del tipo scelto (o cambia il tipo di uno esistente); per gli admin la chiave si genera qui
+let pnTipo = 'giocatore';
+const PN_HELP = { giocatore:'Gioca nell\'app con la sua email e compare in classifica. Non entra nel pannello: niente chiave.', admin:'Entra solo nel pannello: non gioca e non compare in classifica (resta nell\'elenco Utenti).', admin_giocatore:'Entra nel pannello e può anche giocare nell\'app (con la stessa email) e comparire in classifica.' };
+function pnSet(v){ pnTipo = v; $('pnTipo').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); $('pnTipoHelp').textContent = PN_HELP[v]; $('pnGo').textContent = v === 'giocatore' ? 'Crea utente' : 'Crea utente e genera la chiave'; }
 $('pnTipo').addEventListener('click', e => { const b = e.target.closest('button'); if (b) pnSet(b.dataset.v); });
-$('pNewAdmin').onclick = () => { $('pnForm').reset(); pnSet('admin'); $('pnKeyBox').hidden = true; $('pnGo').hidden = false; setMsg($('pnMsg'), ''); $('pNew').hidden = false; $('pnEmail').focus(); };
+$('pNewAdmin').onclick = () => { $('pnForm').reset(); pnSet('giocatore'); $('pnKeyBox').hidden = true; $('pnGo').hidden = false; setMsg($('pnMsg'), ''); $('pNew').hidden = false; $('pnEmail').focus(); };
 $('pnClose').onclick = () => { $('pNew').hidden = true; $('pnKey').textContent = ''; };
 $('pnCopy').onclick = async () => { const ok = await copyText($('pnKey').textContent); setMsg($('pnMsg'), ok ? 'Chiave copiata negli appunti.' : 'Copia non riuscita: selezionala a mano.', ok ? 'ok' : 'err'); };
 $('pnForm').addEventListener('submit', async e => {
@@ -829,16 +829,20 @@ $('pnForm').addEventListener('submit', async e => {
   const email = $('pnEmail').value.trim().toLowerCase(), name = $('pnName').value.trim();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return setMsg($('pnMsg'), 'Email non valida.', 'err');
   if (name.length < 2 || name.length > 20) return setMsg($('pnMsg'), 'Il nome deve avere da 2 a 20 caratteri.', 'err');
-  if (!await ask('Creare l\'amministratore ' + name + '?', name + ' (' + email + ') potrà entrare nel pannello con la sua email e la chiave che compare dopo, e fare tutto quello che fai tu: utenti, backup, reset e chiavi. La chiave si vede una sola volta: copiala e consegnala in modo riservato. L\'operazione viene scritta nel log.', 'Sì, crea')) return;
-  const k = genKey(); setMsg($('pnMsg'), 'Creo…');
+  const adm = pnTipo !== 'giocatore';
+  if (!await ask('Creare ' + name + ' (' + TIPI[pnTipo] + ')?', adm
+      ? name + ' (' + email + ') potrà entrare nel pannello con la sua email e la chiave che compare dopo, e fare tutto quello che fai tu: utenti, backup, reset e chiavi. La chiave si vede una sola volta: copiala e consegnala in modo riservato. L\'operazione viene scritta nel log.'
+      : name + ' (' + email + ') potrà entrare nell\'app con la sua email e giocare. Se l\'email era già di un admin, perde la chiave del pannello. L\'operazione viene scritta nel log.', 'Sì, crea')) return;
+  const k = adm ? genKey() : ''; setMsg($('pnMsg'), 'Creo…');
   try {
     const r = await call('efg_admin_create_user', { p_email: email, p_name: name, p_tipo: pnTipo, p_new: k });
-    $('pnWho').textContent = r.nome || name; $('pnKey').textContent = k; $('pnKeyBox').hidden = false; $('pnGo').hidden = true;
-    setMsg($('pnMsg'), (r.nuovo === false ? 'Utente già registrato: ora è ' : 'Creato: ') + TIPI[pnTipo] + '. Accesso: email ' + email + ' + questa chiave.', 'ok');
+    if (adm){ $('pnWho').textContent = r.nome || name; $('pnKey').textContent = k; $('pnKeyBox').hidden = false; }
+    $('pnGo').hidden = true;
+    setMsg($('pnMsg'), (r.nuovo === false ? 'Utente già registrato: ora è ' : 'Creato: ') + TIPI[pnTipo] + (adm ? '. Accesso al pannello: email ' + email + ' + questa chiave.' : '. Entra nell\'app con l\'email ' + email + '.'), 'ok');
     loadPlayers();
   } catch(err){
     if (err.auth) return onErr(err, $('pnMsg'));
-    setMsg($('pnMsg'), /efg_admin_create_user|PGRST202|does not exist|schema cache/i.test(err.message) ? 'Prima va eseguito supabase-nuovo-admin.sql nel SQL Editor di Supabase.' : 'Errore: ' + err.message, 'err');
+    setMsg($('pnMsg'), /efg_admin_create_user|PGRST202|does not exist|schema cache/i.test(err.message) ? 'Prima va eseguito supabase-nuovo-utente.sql nel SQL Editor di Supabase.' : 'Errore: ' + err.message, 'err');
   }
 });
 // chiave admin personale di un utente: impostata a mano, generata o tolta (salvata solo cifrata nel database)
