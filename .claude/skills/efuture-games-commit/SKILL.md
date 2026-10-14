@@ -41,7 +41,9 @@ Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
    ```
    Scrive `docs/qualita/ultimo.json` e `storico.json`: includili nel commit. Se trova errori o vulnerabilità alte, dillo all'utente prima del commit.
 
-3. **Se è cambiato `supabase.sql`**, ricorda all'utente che va rieseguito nel SQL Editor di Supabase: il push non aggiorna il database.
+3. **Se è cambiato o è nuovo un file `supabase*.sql`**, ricorda all'utente che va eseguito nel SQL Editor di Supabase: il push non aggiorna il database. Ogni volta che gli chiedi di eseguirlo, **rendi il file cliccabile**:
+   - invialo con SendUserFile (se lo strumento c'è), così lo apre con un tocco;
+   - scrivi anche il link al file su GitHub, per esempio `https://github.com/marraliEfuture/efuture_games/blob/main/supabase-nome.sql` (dopo la pubblicazione su main), e il link "raw" per copiarlo tutto: `https://raw.githubusercontent.com/marraliEfuture/efuture_games/main/supabase-nome.sql`.
 
 4. **Commit.** Fai `git add` dei file pertinenti. Il messaggio va in italiano, nello stile dei commit esistenti (`git log --oneline -10`): una riga "Area: cosa cambia per chi usa l'app", poi un corpo breve se serve. Se le modifiche riguardano cose diverse, fai più commit separati.
 
