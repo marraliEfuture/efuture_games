@@ -209,7 +209,7 @@
   var KEYS = {
     coretech: '<kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> o <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> per muovere la C · <kbd>P</kbd> pausa',
     timenet: '<kbd>←</kbd><kbd>→</kbd> o <kbd>A</kbd><kbd>D</kbd> per muovere il delfino · <kbd>Spazio</kbd> per lanciare · <kbd>P</kbd> pausa',
-    inncloud: '<kbd>←</kbd><kbd>→</kbd> o <kbd>A</kbd><kbd>D</kbd> per muoverti · <kbd>Spazio</kbd> per sparare · <kbd>P</kbd> pausa'
+    inncloud: '<kbd>←</kbd><kbd>→</kbd> o <kbd>A</kbd><kbd>D</kbd> per muoverti · <kbd>Spazio</kbd> laser (si spara da soli) · <kbd>P</kbd> pausa'
   };
   if (KEYS[gameId]){ var kh = mk('p', 'gb-keys', KEYS[gameId]); controls.insertBefore(kh, controls.firstChild); }
 

@@ -1,5 +1,5 @@
 {
- "versione": "v79",
+ "versione": "v80",
  "aree": {
   "codice": {
    "titolo": "Codice",
@@ -197,7 +197,7 @@
     {
      "nome": "Versione uguale in tutti i file",
      "esito": "ok",
-     "dettaglio": "v79 ovunque"
+     "dettaglio": "v80 ovunque"
     }
    ],
    "esiti": {
@@ -291,14 +291,14 @@
     {
      "nome": "Peso della pagina: games/inncloud/index.html",
      "esito": "ok",
-     "dettaglio": "153.7 KB con 9 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
-     "valore": 153.7
+     "dettaglio": "157.3 KB con 9 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 157.3
     },
     {
      "nome": "Peso della pagina: games/sysadmin/index.html",
      "esito": "ok",
-     "dettaglio": "233.5 KB con 8 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
-     "valore": 233.5
+     "dettaglio": "236.0 KB con 8 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 236.0
     },
     {
      "nome": "Peso della pagina: games/timenet/index.html",
@@ -319,50 +319,50 @@
     {
      "nome": "Download della cache offline al primo avvio",
      "esito": "ok",
-     "dettaglio": "1616.0 KB scaricati da sw.js per giocare offline",
-     "valore": 1616.0
+     "dettaglio": "1622.1 KB scaricati da sw.js per giocare offline",
+     "valore": 1622.1
     },
     {
      "nome": "Caricamento nel browser: index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 342 ms (DOM pronto in 331 ms) su telefono simulato, file locali, database escluso",
-     "valore": 342
+     "dettaglio": "caricata in 306 ms (DOM pronto in 292 ms) su telefono simulato, file locali, database escluso",
+     "valore": 306
     },
     {
      "nome": "Caricamento nel browser: classifica.html",
      "esito": "ok",
-     "dettaglio": "caricata in 150 ms (DOM pronto in 146 ms) su telefono simulato, file locali, database escluso",
-     "valore": 150
+     "dettaglio": "caricata in 139 ms (DOM pronto in 129 ms) su telefono simulato, file locali, database escluso",
+     "valore": 139
     },
     {
      "nome": "Caricamento nel browser: admin.html",
      "esito": "ok",
-     "dettaglio": "caricata in 109 ms (DOM pronto in 105 ms) su telefono simulato, file locali, database escluso",
-     "valore": 109
+     "dettaglio": "caricata in 124 ms (DOM pronto in 117 ms) su telefono simulato, file locali, database escluso",
+     "valore": 124
     },
     {
      "nome": "Caricamento nel browser: games/sysadmin/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 136 ms (DOM pronto in 126 ms) su telefono simulato, file locali, database escluso",
-     "valore": 136
+     "dettaglio": "caricata in 133 ms (DOM pronto in 129 ms) su telefono simulato, file locali, database escluso",
+     "valore": 133
     },
     {
      "nome": "Caricamento nel browser: games/coretech/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 121 ms (DOM pronto in 112 ms) su telefono simulato, file locali, database escluso",
-     "valore": 121
+     "dettaglio": "caricata in 115 ms (DOM pronto in 107 ms) su telefono simulato, file locali, database escluso",
+     "valore": 115
     },
     {
      "nome": "Caricamento nel browser: games/timenet/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 110 ms (DOM pronto in 102 ms) su telefono simulato, file locali, database escluso",
-     "valore": 110
+     "dettaglio": "caricata in 142 ms (DOM pronto in 139 ms) su telefono simulato, file locali, database escluso",
+     "valore": 142
     },
     {
      "nome": "Caricamento nel browser: games/inncloud/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 106 ms (DOM pronto in 103 ms) su telefono simulato, file locali, database escluso",
-     "valore": 106
+     "dettaglio": "caricata in 85 ms (DOM pronto in 82 ms) su telefono simulato, file locali, database escluso",
+     "valore": 85
     }
    ],
    "esiti": {
@@ -377,8 +377,8 @@
     {
      "nome": "Spazio totale del sito",
      "esito": "ok",
-     "dettaglio": "17.56 MB (limite consigliato GitHub Pages: 1 GB)",
-     "valore": 17979.5
+     "dettaglio": "17.57 MB (limite consigliato GitHub Pages: 1 GB)",
+     "valore": 17988.6
     },
     {
      "nome": "Cartella video",
@@ -395,8 +395,8 @@
     {
      "nome": "Cartella games",
      "esito": "ok",
-     "dettaglio": "913.5 KB",
-     "valore": 913.5
+     "dettaglio": "919.5 KB",
+     "valore": 919.5
     },
     {
      "nome": "Cartella vendor",
@@ -413,8 +413,8 @@
     {
      "nome": "Cartella docs",
      "esito": "ok",
-     "dettaglio": "299.1 KB",
-     "valore": 299.1
+     "dettaglio": "301.3 KB",
+     "valore": 301.3
     },
     {
      "nome": "Cartella icons",
@@ -431,8 +431,8 @@
     {
      "nome": "Cartella .claude",
      "esito": "ok",
-     "dettaglio": "127.4 KB",
-     "valore": 127.4
+     "dettaglio": "128.2 KB",
+     "valore": 128.2
     },
     {
      "nome": "Cartella fonts",
@@ -452,13 +452,13 @@
     "avviso": 0,
     "errore": 0
    },
-   "totale_kb": 17979.5,
+   "totale_kb": 17988.6,
    "cartelle_kb": {
-    ".claude": 127.4,
+    ".claude": 128.2,
     "(file principali)": 355.4,
-    "docs": 299.1,
+    "docs": 301.3,
     "fonts": 120.3,
-    "games": 913.5,
+    "games": 919.5,
     "icons": 189.8,
     "img": 92.5,
     "qr": 159.6,
@@ -566,6 +566,6 @@
    "livello": "Buono"
   }
  },
- "data": "2026-10-14T14:54:46+00:00",
- "commit": "f0bb504"
+ "data": "2026-10-14T15:12:31+00:00",
+ "commit": "183579b"
 }

@@ -141,7 +141,7 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
 | Efuture Bros | `sysadmin` | Joystick (destra/sinistra, su = salto) | SALTA | MOUSE (+ ANTIVIRUS piccolo sopra) | Visualizzazione | Pulsante arancio della schermata, oppure pausa |
 | CoreTech Pac | `joy` | Joystick a 4 direzioni | PAUSA | MUSICA | Visualizzazione | Pulsante principale, oppure pausa |
 | Timenet Breakout | `strip` | Fascia di trascinamento | PAUSA | MUSICA | Visualizzazione | Pulsante principale, oppure pausa |
-| inncloud Invaders | `strip` | Fascia di trascinamento | SPARA (rosso, più grande) | MUSICA | Visualizzazione | Pulsante principale, oppure pausa |
+| inncloud Invaders | `strip` | Fascia di trascinamento | LASER (grigio, verde quando è pronto; più grande) | MUSICA | Visualizzazione | Pulsante principale, oppure pausa |
 
 Dettagli per gioco:
 - **SysAdmin:** lo schermo è 16:9 e il pulsante pausa dell'HUD è nascosto (la pausa si fa con il tastino). Le schermate (overlay) coprono tutta la console tranne la fila dei tastini, che resta usabile.
