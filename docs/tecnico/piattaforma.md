@@ -63,8 +63,9 @@ Efuture Games – CARE Conference Edition è una web app statica (PWA) con 4 gio
 | `fuochi.js` | Fuochi d'artificio di fine gioco (`EFGFuochi`), usati dall'app e da `gameboy.js` |
 | `img/` | Loghi Efuture e icone dei 4 giochi (`g-<id>.png`) |
 | `qr/` | `qr-app.png` / `qr-app.svg` (QR dell'app, usato anche dalla classifica), vecchi QR di sblocco in PNG e `stampa.html` (vecchio foglio di stampa; oggi i QR si generano dall'admin) |
-| `video/` | Video `.mp4` e copertine `.jpg` della sezione "Video utili" dell'admin |
-| `tutorial/` | Immagini dei tutorial a slide dell'admin (`forza4/`, `sheets/`) |
+| `laboratorio.html` | Presentazione "Laboratorio AI" (palco 1920×1080, slide `DECK`), aperta da admin › Laboratorio › Presenta; regia con `BroadcastChannel('efg-lab')`. Non è in `ASSETS` |
+| `video/` | Video `.mp4` e copertine `.jpg` della sezione "Video utili" dell'admin, compresa la presentazione registrata `laboratorio-ai.mp4` |
+| `tutorial/` | Immagini dei tutorial a slide (`forza4/`, `sheets/`) e `tutorials.js` con i testi (`window.EFG_TUTORIALS`), usato dall'admin e da `laboratorio.html` |
 | `supabase*.sql` | Script del database, da eseguire a mano nel SQL Editor di Supabase |
 | `docs/specifiche/` | Specifiche funzionali |
 | `docs/tecnico/` | Documentazione tecnica (questo file e [app.md](app.md)) |

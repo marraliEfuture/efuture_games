@@ -86,8 +86,8 @@ CODICI DI SBLOCCO (uno per gioco)
    con la sola chiave principale (email vuota). Le chiavi non sono nel
    sito: nel database sono salvate solo cifrate. Dal pannello:
    Il menu si apre con il pulsante "Menu" in alto a sinistra: Utenti,
-   Collegamenti (QR, Link), Formazione (Video utili, Tutorial, Skills,
-   FAQ, Documentazione),
+   Collegamenti (QR, Link), Formazione (Video utili, Tutorial, Laboratorio,
+   Skills, FAQ, Documentazione),
    Admin (Qualità, Log, Backup, Chiave, Reset), Logout.
    - Utenti: elenco con simbolo del tipo, nome, email, punti per gioco;
      CSV. Accanto a ogni utente: "Blocca"/"Sblocca" (bloccato non accede,
@@ -127,7 +127,16 @@ CODICI DI SBLOCCO (uno per gioco)
      (frecce, tasti ← → o swipe; schermo intero). I prompt si copiano
      con un clic. Tutorial: "Crea e gioca a Forza 4 con Claude" e il foglio
      "Attività giornaliere" con Claude in Chrome
-     (immagini in tutorial/<nome>/, testi in TUTORIALS dentro admin.html).
+     (immagini in tutorial/<nome>/, testi in tutorial/tutorials.js).
+   - Laboratorio: la scaletta degli interventi dell'evento, in ordine,
+     con minuti e relatore. "Presenta" apre l'intervento: la presentazione
+     "Laboratorio AI" (laboratorio.html) va sul secondo monitor e si
+     avanza con le frecce ← → o il telecomando; i tutorial si aprono nella
+     sezione Tutorial. Quando la presentazione è aperta compare la barra
+     di regia "● In onda" con la slide corrente e i pulsanti Inizio, ← e
+     Avanti →. "▶ Video (mp4)" apre la stessa presentazione registrata
+     (video/laboratorio-ai.mp4, 4 min 42 s). Interventi in LAB_EVENTS
+     dentro admin.html.
    Se perdi la chiave: Supabase > SQL Editor >
      select efg_admin_init('NUOVA-CHIAVE-LUNGA');
    Dopo 8 chiavi sbagliate in 10 minuti il pannello si blocca 10 minuti.

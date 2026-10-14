@@ -28,7 +28,7 @@ I **risultati dei controlli** (codice, database, prestazioni, spazio, vulnerabil
 | Gioco inncloud Invaders | `games/inncloud/` | [gioco-inncloud.md](gioco-inncloud.md) |
 | Parti comuni dei giochi (modalità gara, scocca "Game Boy" in verticale) | `games/gameboy.css`, `games/gameboy.js` | [giochi-comune.md](giochi-comune.md) |
 | Classifica da proiettare (PC / ledwall) | `classifica.html` (+ `backend.js`) | [classifica.md](classifica.md) |
-| Pannello admin | `admin.html` | [admin.md](admin.md) |
+| Pannello admin (con la presentazione del Laboratorio) | `admin.html`, `laboratorio.html`, `tutorial/tutorials.js` | [admin.md](admin.md) |
 | Database Supabase (tabelle, funzioni, file SQL) | `supabase*.sql` | [database.md](database.md) |
 
 ## Architettura in breve
