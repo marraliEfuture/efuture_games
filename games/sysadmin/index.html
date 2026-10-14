@@ -763,10 +763,11 @@ let specialPressedEdge = false;
    LEVEL BUILDING
 ========================================================= */
 // primi 3 livelli: più lunghi e con più bug (circa 35-45 secondi su 60); la notte ha le trappole più pericolose
+// v79: corto, medio, lungo (4400 / 7000 / 8800); bug e trappole in proporzione alla lunghezza
 const LV3 = [
-  { width:6200, bugs:15, fly:2, spikes:2, zappers:1, saws:0, gap:0.16, bugSpeed:60, sawSpeed:90,  zapOn:0.7 },
+  { width:4400, bugs:11, fly:1, spikes:1, zappers:1, saws:0, gap:0.16, bugSpeed:60, sawSpeed:90,  zapOn:0.7 },
   { width:7000, bugs:16, fly:4, spikes:3, zappers:2, saws:2, gap:0.24, bugSpeed:72, sawSpeed:110, zapOn:0.8 },
-  { width:7800, bugs:20, fly:5, spikes:4, zappers:4, saws:3, gap:0.30, bugSpeed:88, sawSpeed:140, zapOn:1.0 },
+  { width:8800, bugs:23, fly:6, spikes:5, zappers:5, saws:3, gap:0.30, bugSpeed:88, sawSpeed:140, zapOn:1.0 },
 ];
 function buildNormalLevel(idx){
   const rand = mulberry32(1000 + idx*37);
