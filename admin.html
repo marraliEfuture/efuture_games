@@ -377,7 +377,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         </div>
         <div class="danger-box" style="margin-top:12px">
           <h3>Cancella tutto</h3>
-          <p>Cancella punteggi <b>e utenti registrati</b> (nomi ed email). Tutti dovranno registrarsi di nuovo.</p>
+          <p>Cancella i punteggi di tutti e <b>gli utenti giocatori</b> (nomi ed email): dovranno registrarsi di nuovo. Gli utenti <b>admin</b> e <b>admin e giocatore</b> restano, con i punti azzerati.</p>
           <div class="bar"><input type="text" id="rConf2" placeholder="Scrivi CANCELLA TUTTO per confermare" style="max-width:300px"><button class="btn danger" id="rAll" type="button">Cancella tutto</button></div>
         </div>
         <div class="msg" id="rMsg" aria-live="polite" style="margin-top:10px"></div>
@@ -537,10 +537,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=77"></script>
+<script src="config.js?v=78"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="tutorial/tutorials.js?v=77"></script>
+<script src="tutorial/tutorials.js?v=78"></script>
 <script>
 (function(){
 "use strict";
@@ -965,7 +965,7 @@ async function doReset(what, input, word){
   try {
     const r = await call('efg_admin_reset', { p_what: what });
     $(input).value = '';
-    setMsg($('rMsg'), 'Fatto: cancellati ' + r.punteggi + ' record' + (what === 'tutto' ? ' e ' + r.giocatori + ' utenti' : '') + '. Backup automatico #' + r.backup + ' (ripristinabile dalla scheda Backup).', 'ok');
+    setMsg($('rMsg'), 'Fatto: cancellati ' + r.punteggi + ' record' + (what === 'tutto' ? ' e ' + r.giocatori + ' giocatori' + (r.admin_tenuti ? ' (tenuti ' + r.admin_tenuti + ' admin)' : '') : '') + '. Backup automatico #' + r.backup + ' (ripristinabile dalla scheda Backup).', 'ok');
     refreshStats();
   } catch(err){ onErr(err, $('rMsg')); }
 }
