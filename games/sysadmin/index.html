@@ -1351,7 +1351,7 @@ const DROPS = [ { kind:'big', at:0.08 }, { kind:'life', at:0.25 }, { kind:'life'
 const DROP_MSG = { big:'Bonus XL dal cielo: prendilo e diventi più grande!', life:'Una vita cade dal cielo: prendila!' };
 const BIG_K = 1.3;   // omino grande: 30% più alto e largo
 // v81: l'oggetto scende più svelto e resta davanti all'omino (anche se corre) finché non tocca terra
-const DROP_FALL = 230, DROP_AHEAD = 150, DROP_CHASE = 450;
+const DROP_FALL = 230, DROP_AHEAD = 150, DROP_CHASE = 450, DROP_MAGNET = 150;   // calamita: vicino all'omino gli va incontro
 function newDrops(done){ return DROPS.map((d, i) => done && done[i] ? { kind:d.kind, at:d.at, state:'gone' } : { kind:d.kind, at:d.at, state:'wait' }); }
 function setBig(on){
   if (!!player.big === on) return;
@@ -1381,6 +1381,11 @@ function updateLife(dt, t){
         else { done(); return; }
       }
     } else if (lf.state === 'ground' && lf.t > 9){ done(); return; }
+    {   // calamita: se l'omino passa vicino (anche saltandoci sopra) l'oggetto gli vola incontro
+      const px = player.x + player.w/2 - LIFE_W/2, py = player.y + player.h/2 - LIFE_H/2;
+      const mx = px - lf.x, my = py - lf.y, md = Math.hypot(mx, my);
+      if (md < DROP_MAGNET && md > 1){ const k = Math.min(1, 600*dt/md); lf.x += mx*k; lf.y += my*k; lf.state = 'fall'; }
+    }
     if ((lf.state === 'fall' || lf.state === 'ground') && aabb(player, { x:lf.x + (lf.state==='fall' ? Math.sin(lf.t*2)*20 : 0), y:lf.y, w:LIFE_W, h:LIFE_H })){
       done();
       if (lf.kind === 'big'){
