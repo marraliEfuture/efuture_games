@@ -71,7 +71,9 @@ Chiusura delle finestre: ✕, tocco sullo sfondo oppure tasto Esc. Fa eccezione 
 2. trasformato con SHA-256 di `"efg:" + codice`;
 3. confrontato con gli `hash` di `GAMES`.
 
-Se l'hash corrisponde a un gioco, quel gioco si sblocca. L'id del gioco va in `efgUnlocked` e resta sbloccato su quel telefono per sempre.
+Se l'hash corrisponde a un gioco, quel gioco si sblocca. L'id del gioco va in `efgUnlocked` e resta sbloccato su quel telefono fino al prossimo reset dell'admin.
+
+**Reset dall'admin.** All'apertura l'app legge `efg_reset_id()`. Se il valore è diverso da quello salvato sul telefono (`efgResetId`, anche se manca), lo salva e, se c'erano giochi sbloccati o record, riblocca i 4 giochi (`efgUnlocked` vuoto) e cancella `efgBests4`, con l'avviso "Nuova gara: sblocca di nuovo i giochi agli stand.". Restano sbloccati i giochi sbloccati in quella stessa apertura (per esempio arrivando da un QR con `?sblocca=`), e in quel caso l'avviso non compare. Se il database non ha la funzione o non c'è ancora stato un reset, non cambia niente.
 
 - Formato dei codici: 3 lettere, trattino, 4 cifre.
 - I codici reali sono in `LEGGIMI.txt` e si ricavano dall'admin (scheda QR). **Non vanno scritti nelle specifiche.**

@@ -68,6 +68,11 @@ const Backend = remote ? {
     try { return one(await rpc('efg_impostazioni', {})); }
     catch(e){ if (/efg_impostazioni|PGRST202|does not exist/i.test(String(e && (e.code + ' ' + e.message)))) return null; throw e; }
   },
+  // numero dell'ultimo reset fatto dall'admin (null se nessuno o se il database non ha ancora la funzione)
+  async resetId(){
+    try { return one(await rpc('efg_reset_id', {})) || null; }
+    catch(e){ if (/efg_reset_id|PGRST202|does not exist/i.test(String(e && (e.code + ' ' + e.message)))) return null; throw e; }
+  },
   // Bonus Recensione: { link, clic, ok, punti } (null se il database non ha ancora le funzioni)
   async review(user){
     try { return one(await rpc('efg_recensione_info', { p_email:user ? user.email : '' })); }
@@ -125,6 +130,7 @@ const Backend = remote ? {
 // demo: il clic sul Bonus Recensione resta su questo dispositivo (nessun admin che lo conferma)
 if (!Backend.remote){
   Backend.settings = async () => null;
+  Backend.resetId = async () => null;
   Backend.review = async user => ({ link:null, clic:!!(user && store.get('efgDemoReview', {})[user.email]), ok:false, punti:200 });
   Backend.reviewClick = async user => { const r = store.get('efgDemoReview', {}); r[user.email] = r[user.email] || new Date().toISOString(); store.set('efgDemoReview', r); return Backend.review(user); };
 }

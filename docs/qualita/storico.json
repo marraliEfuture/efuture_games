@@ -423,8 +423,8 @@
  },
  {
   "data": "2026-10-14",
-  "commit": "8c7bcf3",
-  "versione": "v76",
+  "commit": "d2ea755",
+  "versione": "v77",
   "esiti": {
    "codice": {
     "ok": 39,
@@ -457,11 +457,11 @@
     "errore": 0
    }
   },
-  "spazio_kb": 17968.8,
+  "spazio_kb": 17974.6,
   "cartelle_kb": {
    ".claude": 126.8,
-   "(file principali)": 349.1,
-   "docs": 295.9,
+   "(file principali)": 353.6,
+   "docs": 297.1,
    "fonts": 120.3,
    "games": 913.0,
    "icons": 189.8,
