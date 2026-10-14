@@ -110,6 +110,7 @@ Risposte dell'utente (07/10):
 
 ## In sospeso / da ricordare
 
+- Eseguire `supabase-funzioni-admin.sql` su Supabase: al 14/10 mancavano `efg_admin_me(p_key)`, `efg_admin_set_user_key`, `efg_admin_set_impostazione` (errore impostando la chiave personale). Sul database ci sono anche funzioni vecchie non usate: `efg_admin_me()` senza argomenti, `efg_admin_users`, `efg_admin_set_role`, `efg_admin_delete_user`.
 - Analisi Chrome del 13/10, punto 12: decidere se mettere "Ricomincia livello" nella pausa di tutti i giochi (in gara inciderebbe sul tempo). Punti 11, 14 e 17 lasciati così di proposito (10 livelli fuori gara, logo Timenet scoperto dai mattoncini, Efuture Bros grande su PC).
 - La sezione ChatGPT di `links.json` ha solo il link generico: mancano i link alle chat vere.
 - Le skill sono disponibili solo nelle sessioni aperte sul repository. Per usarle nelle chat di claude.ai vanno caricate a mano (Impostazioni → Capabilities → Skills) e non si aggiornano da sole.
