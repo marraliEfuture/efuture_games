@@ -1347,9 +1347,11 @@ function updateEnemiesAndCombat(dt, t){
 /* ---- oggetti che scendono dal cielo col paracadute (v80), ognuno una sola volta per livello:
    il bonus XL (l'omino diventa più grande e un colpo lo fa solo tornare piccolo) e due vite ---- */
 const LIFE_W = 30, LIFE_H = 28, LIFE_MAX = LIVES_START + 2;
-const DROPS = [ { kind:'big', at:0.15 }, { kind:'life', at:0.3 }, { kind:'life', at:0.62 } ];
+const DROPS = [ { kind:'big', at:0.08 }, { kind:'life', at:0.25 }, { kind:'life', at:0.55 } ];
 const DROP_MSG = { big:'Bonus XL dal cielo: prendilo e diventi più grande!', life:'Una vita cade dal cielo: prendila!' };
 const BIG_K = 1.3;   // omino grande: 30% più alto e largo
+// v81: l'oggetto scende più svelto e resta davanti all'omino (anche se corre) finché non tocca terra
+const DROP_FALL = 230, DROP_AHEAD = 150, DROP_CHASE = 450;
 function newDrops(done){ return DROPS.map((d, i) => done && done[i] ? { kind:d.kind, at:d.at, state:'gone' } : { kind:d.kind, at:d.at, state:'wait' }); }
 function setBig(on){
   if (!!player.big === on) return;
@@ -1362,17 +1364,21 @@ function updateLife(dt, t){
   L.drops.forEach((lf, i) => {
     if (lf.state === 'gone') return;
     if (lf.state === 'wait'){
-      if (player.x > L.width*lf.at && !L.drops.some(o => o.state === 'fall')){ Object.assign(lf, { state:'fall', x:Math.min(player.x + 320, L.width - 700), y:-40, t:0 }); showToast(DROP_MSG[lf.kind]); }
+      if (player.x > L.width*lf.at && !L.drops.some(o => o.state === 'fall')){ Object.assign(lf, { state:'fall', x:Math.min(player.x + 420, L.width - 700), y:-40, t:0 }); showToast(DROP_MSG[lf.kind]); }
       return;
     }
     const done = () => { lf.state = 'gone'; L.dropsDone[i] = true; };
     lf.t += dt;
     if (lf.state === 'fall'){
-      lf.y += 85*dt;
-      const ground = L.segments.some(s => lf.x + LIFE_W/2 > s.x1 && lf.x + LIFE_W/2 < s.x2);
+      lf.y += DROP_FALL*dt;
+      const dx = Math.min(player.x + DROP_AHEAD, L.width - 700) - lf.x;   // segue l'omino restandogli davanti
+      lf.x += Math.max(-DROP_CHASE*dt, Math.min(DROP_CHASE*dt, dx));
       if (lf.y + LIFE_H >= GROUND_Y){
-        if (ground){ lf.y = GROUND_Y - LIFE_H; lf.state = 'ground'; lf.t = 0; }
-        else if (lf.y > VH){ done(); return; }
+        const ground = L.segments.some(s => lf.x + LIFE_W/2 > s.x1 && lf.x + LIFE_W/2 < s.x2);
+        const next = ground ? null : L.segments.find(s => s.x1 > lf.x);   // sopra un burrone: atterra sul tratto dopo
+        if (!ground && next) lf.x = next.x1 + 30;
+        if (ground || next){ lf.y = GROUND_Y - LIFE_H; lf.state = 'ground'; lf.t = 0; }
+        else { done(); return; }
       }
     } else if (lf.state === 'ground' && lf.t > 9){ done(); return; }
     if ((lf.state === 'fall' || lf.state === 'ground') && aabb(player, { x:lf.x + (lf.state==='fall' ? Math.sin(lf.t*2)*20 : 0), y:lf.y, w:LIFE_W, h:LIFE_H })){

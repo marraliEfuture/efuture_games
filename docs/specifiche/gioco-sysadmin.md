@@ -81,11 +81,11 @@ Campo logico 960 × 540, terreno a y = 470. I livelli 1–9 sono generati da un 
 
 **Non solo bug:** in tutti i livelli circa il 30% dei nemici a terra sono **alert** (cartello giallo di pericolo con il punto esclamativo, che cammina) e circa la metà di quelli in volo sono **email spam** (busta con le ali e la scritta SPAM). Si comportano come i bug: si eliminano saltandoci sopra o con il mouse e contano come bug eliminati.
 
-**Dal cielo (v80):** in ogni livello normale scendono col paracadute, ondeggiando, circa 320 px davanti all'omino, **tre oggetti**, uno alla volta e una sola volta ciascuno:
-- al 15% del livello il **bonus XL** (riquadro arancio con la freccia in su e la scritta XL), messaggio "Bonus XL dal cielo: prendilo e diventi più grande!": l'omino diventa **più grande del 30%** ("Sei diventato più grande: un colpo non ti costa una vita!"). Da grande un colpo di bug, trappola o hacker **non toglie una vita**: l'omino torna piccolo ("Sei tornato piccolo!") e lampeggia per un attimo. Cadendo in un burrone invece si perde la vita come sempre. Se è già grande: +300 punti. Torna piccolo anche a ogni nuovo livello o quando il livello riparte;
-- al 30% e al 62% **una vita** (cuore), messaggio "Una vita cade dal cielo: prendila!": +1 vita (fino a 5; se ha già il massimo, +300 punti).
+**Dal cielo (v80, calibrati nella v81):** in ogni livello normale scendono col paracadute **tre oggetti**, uno alla volta e una sola volta ciascuno. Compaiono in alto davanti all'omino, scendono in circa 2 secondi (230 px/s) e mentre scendono **gli restano davanti** (150 px, anche se corre), così arrivano a terra proprio sulla sua strada; se sotto c'è un burrone atterrano all'inizio del tratto dopo:
+- all'8% del livello il **bonus XL** (riquadro arancio con la freccia in su e la scritta XL), messaggio "Bonus XL dal cielo: prendilo e diventi più grande!": l'omino diventa **più grande del 30%** ("Sei diventato più grande: un colpo non ti costa una vita!"). Da grande un colpo di bug, trappola o hacker **non toglie una vita**: l'omino torna piccolo ("Sei tornato piccolo!") e lampeggia per un attimo. Cadendo in un burrone invece si perde la vita come sempre. Se è già grande: +300 punti. Torna piccolo anche a ogni nuovo livello o quando il livello riparte;
+- al 25% e al 55% **una vita** (cuore), messaggio "Una vita cade dal cielo: prendila!": +1 vita (fino a 5; se ha già il massimo, +300 punti).
 
-Se un oggetto tocca terra resta lì per 9 secondi (lampeggia negli ultimi 3) e poi sparisce; se cade in un burrone si perde. Una volta preso o perso non torna, nemmeno se il livello riparte.
+Se un oggetto tocca terra resta lì per 9 secondi (lampeggia negli ultimi 3) e poi sparisce; si perde solo se non c'è più terreno davanti. Una volta preso o perso non torna, nemmeno se il livello riparte.
 
 Nei primi 3 livelli i tratti di terreno sono più ampi (320–600 px) e i bug pattugliano 60–140 px. I numeri sono obiettivi: se un bug o una trappola non trova posto non viene messo (vedi la tabella sotto).
 
