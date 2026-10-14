@@ -58,7 +58,7 @@ async function shot(p, name){ const f = path.join(OUT, name); await p.screenshot
 
 // home + riquadro di installazione
 let [ctx, p] = await page(phone);
-await p.goto(BASE, { waitUntil: 'load' }); await p.waitForTimeout(1500);
+await p.goto(BASE, { waitUntil: 'load' }); await p.waitForTimeout(4200);   // v79: anche nel browser c'è la presentazione (icona, Powered by, esplosione)
 const modal = await p.$('#mInstall:not([hidden])');
 if (modal) {
   await shot(p, '02-installa.png');

@@ -26,6 +26,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 - La pagina classifica.html (proiettore e regia) è solo per admin (13/10).
 - In admin si crea un "Nuovo utente" e il tipo (giocatore, admin, entrambi) lo decide l'admin (14/10).
 - Quando chiedo di eseguire un file SQL su Supabase, il file va sempre reso cliccabile: inviato come file e con il link su GitHub (14/10).
+- Quando l'utente "prepara delle modifiche", Claude le raccoglie in un piano con step e priorità (più domande, con la scelta di default) e non tocca niente finché l'utente non scrive **esegui**.
 - Icona dell'app: solo la "e" di Efuture (quella della testa di Efuture Bros) su sfondo blu, senza la scritta efuture; sotto, "GAMES" in stile arcade anni '80; forma quadrata con angoli stondati (13/10).
 
 - Risposte, commit e testi dell'app in **italiano**. Commit nello stile "Area: cosa cambia per chi usa l'app".
@@ -77,6 +78,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 14/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Rifatte le modifiche preparate in un'altra chat: tutorial in tutorial/tutorials.js, admin › Formazione › Laboratorio (scaletta, Presenta, regia "In onda"), presentazione laboratorio.html (18 slide) e video registrato laboratorio-ai.mp4 (v73). |
 | 14/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Accessi admin: spiegato come dare pieni poteri a un secondo admin (tipo Admin + chiave personale da Utenti › Modifica); pulsante "➕ Nuovo amministratore" in Utenti (v74), poi diventato "➕ Nuovo utente" con il tipo scelto dall'admin e supabase-nuovo-utente.sql (v75); SQL eseguito il 14/10; eseguito anche supabase-funzioni-admin.sql (mancavano 3 funzioni admin; poi rieseguito con efg_admin_auth del progetto, che accetta email + chiave personale). |
 | 14/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Report di sicurezza aggiornato (87/100); corretto id doppio `vMsg` in admin (v76); preparato `supabase-pulizia-funzioni.sql`. Lo sblocco dei giochi restava sui telefoni dopo il reset: ora il reset segna `reset_id` e l'app riblocca i giochi e cancella i record del telefono (v77). «Cancella tutto» toglie solo i giocatori, admin e admin_giocatore restano senza punti (v78). `supabase-reset-sblocchi.sql` eseguito: funziona. Eseguito `supabase-pulizia-funzioni.sql`: tolte tutte e 5 le funzioni vecchie. |
+| 14/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Piano di modifiche eseguito su "esegui" (v79): CoreTech bug mangiati 3 s nella casetta poi escono piano, monetine una sì e una no su tutti i percorsi (liv 1-3); Timenet senza mattoncini da 2 colpi e un dorato in più, sparsi; Efuture Bros livelli gara corto/medio/lungo (4400/7000/8800) con contenuti in proporzione; presentazione anche nel browser (icona app, poi Powered by efuture che esplode); gioco dentro lo spazio sicuro del telefono (tasto MODE raggiungibile a schermo intero). |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 
