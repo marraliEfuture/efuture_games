@@ -303,12 +303,12 @@ Ci sono due riquadri rossi. Prima di ogni reset il server crea un **backup autom
 | Operazione | Conferma da scrivere | Effetto |
 |---|---|---|
 | **Azzera i punti** | `AZZERA` | Cancella tutti i punteggi. I giocatori restano registrati |
-| **Cancella tutto** | `CANCELLA TUTTO` | Cancella punteggi **e giocatori**. Tutti devono registrarsi di nuovo |
+| **Cancella tutto** | `CANCELLA TUTTO` | Cancella tutti i punteggi **e gli utenti di tipo giocatore**, che devono registrarsi di nuovo. Gli utenti `admin` e `admin_giocatore` restano (con chiave e tipo), senza punti. Serve `supabase-reset-sblocchi.sql` |
 
 - La parola di conferma non distingue maiuscole e minuscole e ignora gli spazi agli estremi.
 - Chiama `efg_admin_reset(p_key, 'punti' | 'tutto')`.
 - Con entrambi i reset il server aggiorna il "numero di reset" (`reset_id` in `efg_settings`, da `supabase-reset-sblocchi.sql`): all'apertura successiva l'app di ogni telefono riblocca i 4 giochi e cancella i record salvati sul telefono (vedi app-giocatori › Sblocco).
-- Messaggio: "Fatto: cancellati N record [e M giocatori]. Backup automatico #id…".
+- Messaggio: "Fatto: cancellati N record [e M giocatori (tenuti K admin)]. Backup automatico #id…".
 
 ## Formati CSV
 
