@@ -63,14 +63,14 @@ Campo logico 360 × 600. Il muro occupa tutta la larghezza (bordi di 12 px) e pa
 
 | Liv. | Ora – nome | Frase | Muro (colonne × righe) | Mattoncini | Da 2 colpi | Dorati ★ | Velocità pallone | Larghezza delfino | Raggio pallone | Logo |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 1 | 08:00 Apertura | "12 blocchi: dietro c'è il logo." | 4 × 3 | 12 | 0 | 1 | 430 | 98 | 12,5 | Si scopre a pezzi |
-| 2 | 10:30 Riunione | "20 blocchi. I blu medi: 2 colpi." | 5 × 4 | 20 | 4 | 1 | 365 | 92 | 11 | Si scopre a pezzi |
-| 3 | 13:00 Pausa pranzo | "30 blocchi, angoli da 2 colpi." | 6 × 5 | 30 | 16 | 2 | 395 | 86 | 9,5 | Si scopre a pezzi |
-| 4 | 16:00 Scadenza | "42 blocchi. Il logo appare alla fine." | 7 × 6 | 42 | 26 | 1 | 435 | 80 | 8 | Compare alla fine |
-| 5 | 18:00 Chiusura | "56 blocchi. Ultimo sforzo!" | 8 × 7 | 56 | 44 | 2 | 470 | 74 | 7 | Compare alla fine |
+| 1 | 08:00 Apertura | "12 blocchi: dietro c'è il logo." | 4 × 3 | 12 | 0 | 2 | 430 | 98 | 12,5 | Si scopre a pezzi |
+| 2 | 10:30 Riunione | "20 blocchi. Cerca i 2 dorati ★." | 5 × 4 | 20 | 0 | 2 | 365 | 92 | 11 | Si scopre a pezzi |
+| 3 | 13:00 Pausa pranzo | "30 blocchi e 3 dorati ★." | 6 × 5 | 30 | 0 | 3 | 395 | 86 | 9,5 | Si scopre a pezzi |
+| 4 | 16:00 Scadenza | "42 blocchi. Il logo appare alla fine." | 7 × 6 | 42 | 0 | 2 | 435 | 80 | 8 | Compare alla fine |
+| 5 | 18:00 Chiusura | "56 blocchi. Ultimo sforzo!" | 8 × 7 | 56 | 0 | 3 | 470 | 74 | 7 | Compare alla fine |
 
 - Velocità in unità logiche al secondo; l'altezza dei mattoncini scende da 50 a 21,4 così il muro (alto 150 in tutti i livelli, da y = 28 a 178) copre sempre il logo. Il pannello del logo segue la posizione del muro.
-- I muri sono simmetrici: bordo di mattoncini blu medi da 2 colpi, interno azzurro e blu scuro, dorati al centro.
+- Dalla v79 tutti i mattoncini si rompono con 1 colpo: azzurri e blu scuri alternati, senza i blu medi da 2 colpi. I dorati ★ sono uno in più di prima per livello e sparsi nel muro (righe e colonne diverse, mai attaccati tra loro).
 
 **Tipi di mattoncino:**
 
@@ -78,10 +78,10 @@ Campo logico 360 × 600. Il muro occupa tutta la larghezza (bordi di 12 px) e pa
 |---|---|---|---|
 | Azzurro (`a`) | 1 | 50 | `#46a0d2` |
 | Blu scuro (`b`) | 1 | 50 | `#195087` |
-| Blu medio (`g`) | 2 (crepe visibili) | 100 | `#2d74a8` |
+| Blu medio (`g`) | 2 (crepe visibili) | 100 | `#2d74a8` (dalla v79 non usato nelle mappe) |
 | Dorato ★ (`o`) | 1 | 200, lascia sempre una capsula | `#ffcf4a` |
 
-Il codice prevede anche mattoncini da 3 colpi (`h`) e di acciaio indistruttibili (`x`), oggi non usati nelle mappe.
+Il codice prevede anche mattoncini da 2 colpi (`g`), da 3 colpi (`h`) e di acciaio indistruttibili (`x`), oggi non usati nelle mappe.
 
 ## Meccaniche
 

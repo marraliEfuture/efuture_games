@@ -180,7 +180,7 @@ I livelli sono nell'array `LEVELS` all'inizio di `game.js`. Ogni elemento ha:
 |---|---|---|---|---|
 | `a` | 1 | 50 | `TN_LIGHT` `#46a0d2` | sì |
 | `b` | 1 | 50 | `TN_DARK` `#195087` | sì |
-| `g` | 2 | 100 | `TN_MID` `#2d74a8` | sì |
+| `g` | 2 | 100 | `TN_MID` `#2d74a8` | no (dalla v79) |
 | `h` | 3 | 150 | `#123a66` | no |
 | `x` | `Infinity` (acciaio) | 0 | `#8a9bb0` | no |
 | `o` | 1 | 200, lascia sempre una capsula | `SUN` `#ffcf4a` | sì |
@@ -301,7 +301,7 @@ Dopo ogni modifica ricordarsi di aumentare la versione dell'app (cache del servi
 - Il tempo di gara scorre anche mentre il pallone aspetta il lancio sul delfino.
 - Se `delfino.png` non si carica, il delfino è disegnato in vettoriale; se il logo non si carica, il pannello dietro il muro resta vuoto e l'animazione iniziale non ha i frammenti.
 - `shatterLogo()` usa `getImageData`: se il canvas risulta "sporcato" (pagina aperta da `file://` in alcuni browser) i frammenti non compaiono.
-- I mattoncini `h` e `x` esistono nel codice ma non sono usati nelle mappe; con un mattoncino `x` il livello resta finibile perché `breakable` non lo conta.
+- I mattoncini `g`, `h` e `x` esistono nel codice ma non sono usati nelle mappe (dalla v79 i muri sono solo `a`, `b` e i dorati `o`, sparsi); con un mattoncino `x` il livello resta finibile perché `breakable` non lo conta.
 - `window.efgReport` in `index.html` è codice non usato.
 - Il campo `hop` di `dolphin` non è usato.
 
