@@ -193,6 +193,7 @@ Formato di `efg_backups.data`, che è anche il file JSON scaricato dall'admin. P
 | `supabase-countdown.sql` | Tabella `efg_gate` con la riga 1. Funzioni `efg_gate_state`, `efg_gate_open`, `efg_admin_gate`. Nuova `efg_submit` con il controllo `gara chiusa` (tolleranza 10 s) | Rieseguibile. Se manca, app e classifica funzionano senza countdown e il pulsante Start segnala lo script mancante |
 | `supabase-privacy-utenti.sql` | Toglie `phone` da `efg_players` e dai backup salvati (non si può annullare). Nuove `efg_register`, `efg_admin_players`, `efg_admin_restore`, `efg_admin_delete_player` | Per i database creati prima della v23. Il contenuto è già incluso in `supabase.sql` |
 | `supabase-tipi-utenti.sql` | Colonne `tipo` (`giocatore`, `admin_giocatore`, `admin`), `disabilitato` e `admin_key_hash` (bcrypt della chiave admin personale) in `efg_players`. Nuove `efg_admin_set_tipo` (tornando giocatore toglie la chiave), `efg_admin_set_disabilitato`, `efg_admin_set_user_key`, `efg_admin_me`; aggiornate `efg_admin_players` (tipo, disabilitato, `chiave` sì/no, mai l'hash), `efg_admin_restore`, `efg_admin_auth` (accetta `email` + a capo + `chiave` per le chiavi personali, oltre alla chiave principale), `efg_admin_set_key` (cambia la chiave di chi è collegato), `efg_login`, `efg_submit`, `efg_board`, `efg_board_group` (escludono i disabilitati) | Dalla v35, anche su un database nuovo, dopo `supabase-countdown.sql`; da rieseguire dalla v37 per le chiavi personali. `supabase.sql` non lo contiene |
+| `supabase-nuovo-admin.sql` | Funzione `efg_admin_create_user(p_key, p_email, p_name, p_tipo, p_new)`: un admin collegato crea un utente `admin` o `admin_giocatore` con la chiave personale (salvata con bcrypt), oppure rende admin un utente già registrato. Scrive nel log | Dalla v74, **dopo** `supabase-tipi-utenti.sql`. Rieseguibile |
 | `supabase-recensioni.sql` | Colonne `recensione_clic`, `recensione_ok` (e `tipo`, `disabilitato`, `admin_key_hash` se mancano). Tabella `efg_settings`. Funzioni del Bonus Recensione e delle impostazioni (vedi sopra), `efg_admin_set_recensione`, `efg_admin_set_recensione_link`, `efg_admin_set_impostazione`; aggiornate `efg_admin_players`, `efg_admin_restore`, `efg_board`, `efg_board_group` | Rieseguibile. **Dopo** `supabase-tipi-utenti.sql`: se riesegui quello, riesegui anche questo |
 | `supabase-nickname-unico.sql` | Nuova `efg_register` (rifiuta un nickname già usato: `name taken`), nuova `efg_signup_check`, indice unico `efg_players_name_unique` su `lower(trim(name))` creato solo se non ci sono già doppioni | Dalla v42, anche su un database nuovo, **dopo** `supabase.sql` (che ridefinisce `efg_register` senza il controllo del nickname): rieseguirlo dopo ogni riesecuzione di `supabase.sql` |
 
@@ -203,7 +204,8 @@ Formato di `efg_backups.data`, che è anche il file JSON scaricato dall'admin. P
 4. `supabase-tipi-utenti.sql`;
 5. `supabase-nickname-unico.sql`;
 6. `supabase-recensioni.sql`;
-7. `select efg_admin_init('…');`.
+7. `supabase-nuovo-admin.sql`;
+8. `select efg_admin_init('…');`.
 
 ---
 Ultimo aggiornamento: 07/10/2026 (v27)

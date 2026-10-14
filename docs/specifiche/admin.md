@@ -61,7 +61,8 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
 
 ### Utenti
 
-- Dati da `efg_admin_players`. Testo in alto: "N utenti registrati". Pulsanti **Aggiorna** e **Scarica CSV**.
+- Dati da `efg_admin_players`. Testo in alto: "N utenti registrati". Pulsanti **➕ Nuovo amministratore**, **Aggiorna** e **Scarica CSV**.
+- **➕ Nuovo amministratore** (v74): popup con Email, Nome (2-20 caratteri) e Tipo (**🛡️ Solo admin**, predefinito, oppure **🎮🛡️ Admin e giocatore**). **Crea e genera la chiave** chiede conferma, genera nel browser una chiave casuale `XXXX-XXXX-XXXX-XXXX` e chiama `efg_admin_create_user(p_key, p_email, p_name, p_tipo, p_new)`: crea l'utente senza passare dall'app (se l'email esiste già, l'utente diventa del tipo scelto e riceve la nuova chiave; nome e punteggi restano). La chiave compare **una sola volta** con **Copia**; nel database è salvata solo cifrata. Il nuovo admin entra con la sua email e quella chiave e ha pieni poteri; può cambiarla dalla scheda Chiave. Nel log: "admin: nuovo amministratore" o "admin: utente reso amministratore". Serve `supabase-nuovo-admin.sql`; senza, il popup dice di eseguirlo.
 - **Bonus Recensione** (riquadro sopra la tabella): campo **⭐ Link recensioni Google** (deve iniziare con `https://`; vuoto = il pulsante dell'app apre la ricerca di efuture su Google Maps), campo **Punti** (da 0 a 5000, predefinito 200) e pulsante **Salva**. Chiama `efg_admin_set_recensione_link` e `efg_admin_set_impostazione('recensione_punti')`. Sotto, una riga spiega i colori della colonna ⭐. Il CSV aggiunge le colonne "Clic Bonus Recensione" e "Recensione confermata". Serve `supabase-recensioni.sql`.
 - **Tabella**, ordinata per livelli totali, poi per punti totali:
 
