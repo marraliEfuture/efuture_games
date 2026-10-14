@@ -145,6 +145,26 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 .lqr svg{width:200px;height:auto}
 @media (max-width:700px){ .lrow{grid-template-columns:1fr} }
 /* Tutorial a slide */
+.labhead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.labhead #labSum{white-space:nowrap;font-weight:600}
+.lablist{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.lab{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center;border:1px solid var(--line);border-radius:8px;background:#fff;padding:14px 16px}
+.lab .num{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-family:var(--title);font-weight:800;font-size:18px;color:var(--navy);border:2px solid var(--sky);background:#fff}
+.lab h3{margin:0 0 4px;font-family:var(--title);font-size:16px;color:var(--ink)}
+.lab p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.lab .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.lab .tags span{font-size:12px;padding:3px 8px;border-radius:999px;background:var(--row);color:var(--text)}
+.lab .acts{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.lab .hint{grid-column:2 / -1;font-size:12px;color:var(--muted);margin-top:-4px}
+.lab.first{border-color:var(--brand-orange);background:linear-gradient(135deg,#fff7ee 0%,#fff 60%);box-shadow:0 6px 18px rgba(241,140,34,.14)}
+.lab.first .num{border-color:var(--brand-orange);background:var(--brand-orange);color:#fff}
+.lab.first .tags .ev{background:var(--brand-orange);color:#fff;font-weight:600}
+@media (max-width:640px){.lab{grid-template-columns:auto minmax(0,1fr)}.lab .acts{grid-column:1 / -1;flex-direction:row;flex-wrap:wrap}.lab .hint{grid-column:1 / -1}}
+.regia{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--navy);color:#fff}
+.regia .onair{color:#ff5d56;font-weight:700;letter-spacing:.04em}
+.regia .rslide{font-family:var(--title);font-weight:600;flex:1;min-width:160px}
+.regia .rbtns{display:flex;gap:6px}
+.regia .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
 .tlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .tcard{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
 .tcard img{width:100%;aspect-ratio:12/7;object-fit:cover;display:block;border-bottom:1px solid var(--line)}
@@ -283,6 +303,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <div class="grp">Formazione</div>
         <button class="tab sub" data-tab="videos" type="button">Video utili</button>
         <button class="tab sub" data-tab="tutorials" type="button">Tutorial</button>
+        <button class="tab sub" data-tab="lab" type="button">Laboratorio</button>
         <button class="tab sub" data-tab="skills" type="button">Skills</button>
         <button class="tab sub" data-tab="faq" type="button">FAQ</button>
         <button class="tab sub" data-tab="docs" type="button">Documentazione</button>
@@ -396,6 +417,16 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <div class="msg" id="vMsg" aria-live="polite" style="margin-top:8px"></div>
       </section>
 
+      <section data-pane="lab" hidden>
+        <div class="labhead"><p class="dim" style="margin:0">La scaletta degli interventi da presentare all'evento, in ordine. Tocca <b>Presenta</b> per aprire l'intervento a schermo.</p><span class="dim" id="labSum"></span></div>
+        <div class="regia" id="labRegia" hidden>
+          <span class="onair">● In onda</span><span class="rslide" id="labSlide"></span>
+          <span class="rbtns"><button class="btn ghost" id="labHome" type="button">⟲ Inizio</button><button class="btn ghost" id="labPrev" type="button" aria-label="Slide precedente">←</button><button class="btn" id="labNext" type="button">Avanti →</button></span>
+        </div>
+        <div class="lablist" id="labList"></div>
+        <div class="msg" id="labMsg" aria-live="polite" style="margin-top:8px"></div>
+      </section>
+
       <section data-pane="tutorials" hidden>
         <div id="tuList">
           <p class="dim">Tutorial passo passo, da sfogliare come una presentazione: frecce, tasti ← → della tastiera o swipe sul telefono. I prompt si copiano con un clic.</p>
@@ -490,9 +521,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=72"></script>
+<script src="config.js?v=73"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
+<script src="tutorial/tutorials.js?v=73"></script>
 <script>
 (function(){
 "use strict";
@@ -562,7 +594,9 @@ function projMsg(t){
   m.textContent = t; m.hidden = false;
   clearTimeout(projMsg.t); projMsg.t = setTimeout(() => { m.hidden = true; }, 9000);
 }
-$('btnProj').onclick = async () => {
+/* apre un indirizzo sul secondo monitor (ledwall o proiettore), a tutto schermo dove il browser lo consente;
+   cosa = come chiamare nei messaggi quello che si apre ("La classifica", "La presentazione", "Il video") */
+async function openOnSecond(url, name, cosa){
   const first = !projScreens && 'getScreenDetails' in window;
   if (first) await projLoad(true);           // la prima volta il browser chiede il permesso "Gestione finestre"
   let scr = null;
@@ -573,12 +607,15 @@ $('btnProj').onclick = async () => {
   // 'fullscreen': dove il browser lo consente (Chrome/Edge con "Gestione finestre" e "Schermo intero automatico") si apre già a schermo intero
   const f = scr ? 'popup,fullscreen,left=' + scr.availLeft + ',top=' + scr.availTop + ',width=' + scr.availWidth + ',height=' + scr.availHeight
                 : 'popup,width=1280,height=760';
-  const w = window.open('classifica.html?proietta=1', 'efgLedwall', f);
-  if (!w){ projMsg(first ? 'Permesso concesso: premi di nuovo "Proietta".' : 'Il browser ha bloccato la finestra: consenti i popup per questo sito e riprova.'); return; }
-  if (scr) projMsg('Classifica aperta sul secondo monitor, grande quanto lo schermo. L\'admin resta qui. Se vedi ancora la barra della finestra, clicca una volta sulla classifica.');
-  else if (!('getScreenDetails' in window)) projMsg('Questo browser non sa scegliere il monitor: trascina la finestra della classifica sul secondo schermo e cliccaci sopra (meglio Chrome o Edge).');
-  else projMsg('Non trovo un secondo monitor (o il permesso è negato): trascina la finestra della classifica sull\'altro schermo e cliccaci sopra.');
-};
+  const w = window.open(url, name, f);
+  if (!w){ projMsg(first ? 'Permesso concesso: premi di nuovo.' : 'Il browser ha bloccato la finestra: consenti i popup per questo sito e riprova.'); return null; }
+  const low = cosa.charAt(0).toLowerCase() + cosa.slice(1);
+  if (scr) projMsg(cosa + ' è aperta sul secondo monitor, grande quanto lo schermo. L\'admin resta qui. Se vedi ancora la barra della finestra, clicca una volta sopra.');
+  else if (!('getScreenDetails' in window)) projMsg('Questo browser non sa scegliere il monitor: trascina la finestra con ' + low + ' sul secondo schermo e cliccaci sopra (meglio Chrome o Edge).');
+  else projMsg('Non trovo un secondo monitor (o il permesso è negato): trascina la finestra con ' + low + ' sull\'altro schermo e cliccaci sopra.');
+  return w;
+}
+$('btnProj').onclick = () => openOnSecond('classifica.html?proietta=1', 'efgLedwall', 'La classifica');
 projLoad(false);
 
 async function whoAmI(){
@@ -626,6 +663,7 @@ document.querySelectorAll('.tab[data-tab]').forEach(t => t.onclick = () => {
   if (t.dataset.tab === 'settings') loadSettings();
   if (t.dataset.tab === 'docs') renderDocs();
   if (t.dataset.tab === 'tutorials') renderTutorials();
+  if (t.dataset.tab === 'lab') renderLab();
 });
 
 /* ---------- utenti ---------- */
@@ -1226,37 +1264,7 @@ function renderSkills(){
 }
 
 /* ---------- tutorial a slide ---------- */
-const TUTORIALS = [
-  { id:'forza4', title:'Crea e gioca a Forza 4 con Claude', cover:'tutorial/forza4/win.jpg', desc:'Quattro prompt per creare il gioco e una partita vinta: tutto in meno di 15 minuti.',
-    slides:[
-      { k:'Tutorial', h:'Crea e gioca a Forza 4 con Claude', img:'win.jpg', html:'<p>In meno di <b>15 minuti</b> crei il tuo videogioco con quattro richieste a Claude e lo giochi subito.</p><ul><li>4 prompt per costruire il gioco</li><li>una partita completa contro il computer</li><li>tempo totale: circa 9 minuti</li></ul>' },
-      { k:'Prima di iniziare', h:'Cosa ti serve', img:'chat.jpg', html:'<ul><li>un account Claude (claude.ai)</li><li>un computer o un tablet con il browser</li><li>15 minuti</li></ul><p>Non serve saper programmare: scrivi a Claude cosa vuoi, come lo diresti a una persona.</p>' },
-      { k:'Passo 1', h:'Apri Claude e inizia una nuova chat', img:'chat.jpg', time:'circa 0:20', html:'<p>Vai su <b>claude.ai</b> e premi <b>Nuova chat</b>. Clicca nel riquadro in basso per scrivere.</p>' },
-      { k:'Passo 2 · primo prompt', h:'Chiedi a Claude di creare il gioco', img:'gen.jpg', time:'Claude ci mette circa 1:30', prompt:"Creami un gioco di Forza 4 da giocare nel browser: griglia 7x6, gettoni rossi e gialli, contro il computer oppure in due giocatori.", html:'<p>Scrivi con calma, rileggi e premi invio. Claude scrive il codice: mentre lavora vedi l’avanzamento.</p>' },
-      { k:'Passo 2 · risultato', h:'Il gioco è pronto: versione 1', img:'p1.jpg', html:'<p>A destra compare il gioco (si chiama <b>Artifact</b>): puoi già provarlo. Nella chat resta la scheda della versione.</p>' },
-      { k:'Passo 3 · secondo prompt', h:'Livelli di difficoltà e punteggio', img:'p2.jpg', time:'Claude ci mette circa 1:05', prompt:"Aggiungi tre livelli di difficoltà per il computer (facile, medio e difficile) e un punteggio che conti vittorie e pareggi.", html:'<p>Ogni richiesta migliora il gioco: Claude crea una nuova versione partendo da quella di prima.</p>' },
-      { k:'Passo 4 · terzo prompt', h:'Euro e dollaro sui gettoni', img:'p3.jpg', time:'Claude ci mette circa 0:40', prompt:"Sui gettoni rossi metti il simbolo dell'euro e su quelli gialli il dollaro.", html:'<p>Le modifiche piccole sono le più veloci: meno di un minuto.</p>' },
-      { k:'Passo 5 · quarto prompt', h:'Festa quando vinci', img:'p4.jpg', time:'Claude ci mette circa 1:15', prompt:"Quando vinco fai partire i fuochi d'artificio. Quando vince il computer, fai esplodere i gettoni fuori dallo schermo!", html:'<p>Il gioco è completo. Sono passati circa <b>9 minuti</b>: ne restano 6 per giocare.</p>' },
-      { k:'Passo 6 · gioca', h:'Livello Facile e gettoni al centro', img:'play.jpg', html:'<p>Scegli <b>Contro il computer</b> e il livello <b>Facile</b>. Metti il primo gettone al centro (colonna <b>4</b>), poi accanto: colonne <b>3</b> e <b>5</b>.</p>' },
-      { k:'Passo 7 · la trappola', h:'Tre in fila con due lati liberi', img:'trap.jpg', html:'<p>Con tre gettoni in fila e <b>entrambi i lati liberi</b>, il computer può bloccarne uno solo. Tu chiudi l’altro: qui la colonna <b>6</b>.</p>' },
-      { k:'Fatto', h:'Hai vinto!', img:'win.jpg', html:'<p>Quattro in fila e fuochi d’artificio. Gioco creato e partita vinta in circa <b>9 minuti</b>.</p><p>Con il tempo che resta prova il livello <b>Difficile</b> o sfida un amico in modalità <b>2 giocatori</b>.</p>' },
-      { k:'Idee per continuare', h:'Altri prompt da provare', img:'p4.jpg', prompt:"Aggiungi un pulsante per il tema scuro e fai dire al computer una frase scherzosa quando vince.", html:'<p>Puoi chiedere a Claude qualsiasi modifica: colori, suoni, regole nuove. Una richiesta alla volta, poi prova il risultato.</p>' },
-    ] },
-  { id:'sheets', title:'Foglio "Attività giornaliere" con Claude in Chrome', cover:'tutorial/sheets/foglio.jpg', desc:'Un prompt: Claude crea il foglio in Drive, calcola totale e media e lo invia con Gmail. Circa 4 minuti.',
-    slides:[
-      { k:'Tutorial', h:'Un foglio Google fatto da Claude', img:'foglio.jpg', html:'<p>Con <b>un solo prompt</b> Claude:</p><ul><li>crea il foglio «Attività giornaliere» in Drive</li><li>scrive 8 attività, totale e media</li><li>lo invia al responsabile con Gmail</li></ul><p>Tempo reale: circa <b>4 minuti</b>.</p>' },
-      { k:'Prima di iniziare', h:'Cosa ti serve', img:'drive.jpg', html:'<ul><li>il browser <b>Chrome</b></li><li>l’estensione <b>Claude in Chrome</b></li><li>un account <b>Google</b> con Drive e Gmail</li><li>un account <b>Claude</b></li></ul>' },
-      { k:'Passo 1', h:'Apri Drive e il pannello di Claude', img:'drive.jpg', time:'circa 0:20', html:'<p>Vai su <b>drive.google.com</b> e clicca l’icona di Claude in alto a destra: si apre il pannello.</p>' },
-      { k:'Passo 2 · il prompt', h:'Scrivi cosa vuoi', img:'prompt.jpg', prompt:"Crea in Google Drive un nuovo foglio Google «Attività giornaliere» con le colonne Data, Utente, Descrizione attività, Ora inizio, Ora fine e Durata (min) e inserisci 8 attività di oggi di Luca, Sara e Paolo. In fondo aggiungi una riga TOTALE con la somma delle durate e una riga MEDIA con la media, in grassetto. Salva il file e invialo con Gmail a responsabile@esempio.it (Responsabile di reparto).", html:'<p>Incolla il prompt nel pannello e premi invio. Metti nomi e indirizzo veri al posto di quelli di esempio.</p>' },
-      { k:'Passo 3', h:'Claude crea e compila il foglio', img:'righe.jpg', time:'circa 2 minuti', html:'<p>Crea il file, gli dà il nome e scrive colonne e attività. Il bordo arancione indica che Claude sta lavorando sulla pagina.</p>' },
-      { k:'Passo 4', h:'Totale e media', img:'formule.jpg', time:'circa 35 secondi', html:'<p>In fondo aggiunge <b>TOTALE</b> con =SOMMA(F2:F9) e <b>MEDIA</b> con =MEDIA(F2:F9), in grassetto.</p>' },
-      { k:'Passo 5', h:'Il file è salvato su Drive', img:'salvato.jpg', html:'<p>Fogli Google salva da solo: il file è in <b>Il mio Drive</b>.</p>' },
-      { k:'Passo 6', h:'Claude prepara la mail', img:'mail.jpg', time:'circa 35 secondi', html:'<p>Apre Gmail e scrive destinatario, oggetto, testo e link al foglio.</p>' },
-      { k:'Passo 7 · tocca a te', h:'Controlla e conferma', img:'conferma.jpg', html:'<p>Prima di inviare Claude <b>chiede conferma</b>. Controlla destinatario e testo, poi premi <b>Invia</b>.</p>' },
-      { k:'Fatto', h:'Mail inviata', img:'inviato.jpg', html:'<p>Il responsabile riceve il foglio. Tempo reale: circa <b>4 minuti</b>.</p>' },
-      { k:'Idee per continuare', h:'Altri prompt da provare', img:'foglio.jpg', prompt:"Aggiungi un secondo foglio «Riepilogo» con i minuti totali di ogni utente e un grafico a colonne.", html:'<p>Una richiesta alla volta, poi controlla il risultato.</p>' },
-    ] },
-];
+const TUTORIALS = window.EFG_TUTORIALS || [];   // in tutorial/tutorials.js (usati anche da laboratorio.html)
 let tuDone = false, deckT = null, deckI = 0;
 function renderTutorials(){
   if (tuDone) return; tuDone = true;
@@ -1296,9 +1304,67 @@ document.addEventListener('fullscreenchange', () => { $('dFull').textContent = d
 document.addEventListener('keydown', e => { if (!deckT || $('deck').hidden) return; if (e.key === 'ArrowRight' || e.key === 'PageDown') { goSlide(deckI + 1); e.preventDefault(); } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { goSlide(deckI - 1); e.preventDefault(); } else if (e.key === 'Escape' && !document.fullscreenElement) closeDeck(); });
 { let x0 = null; $('dSlide').addEventListener('pointerdown', e => { x0 = e.clientX; }); $('dSlide').addEventListener('pointerup', e => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) goSlide(deckI + (dx < 0 ? 1 : -1)); }); }
 
+/* ---------- laboratorio: scaletta degli interventi dell'evento ----------
+   Per aggiungere un intervento: una riga in LAB_EVENTS, nell'ordine in cui si presenta.
+   deck = pagina da aprire sul secondo monitor con Presenta; tutorial = id in tutorial/tutorials.js
+   (Presenta apre il tutorial nella sezione Tutorial); video = mp4 da aprire con "▶ Video (mp4)". */
+const LAB_EVENTS = [
+  { title:'Presentazione "Laboratorio AI"', desc:'Claude in Chrome per le operazioni quotidiane (video TheFork), poi «Crea il tuo videogioco!»: video e tutorial di Forza 4.',
+    min:20, who:'Efuture', tags:['Apertura', 'Slide + video'], deck:'laboratorio.html', video:'video/laboratorio-ai.mp4' },
+  { title:'Crea e gioca a Forza 4 con Claude', desc:'Demo dal vivo.', min:15, tutorial:'forza4' },
+  { title:'Foglio "Attività giornaliere" con Claude in Chrome', desc:'', min:5, tutorial:'sheets' },
+  { title:'Efuture Games: i 4 giochi degli stand', desc:'', min:5, who:'Efuture, CoreTech, Timenet, inncloud' },
+  { title:'Classifica e premiazione', desc:'', min:10 },
+];
+let labDone = false, labWin = null;
+const labCh = ('BroadcastChannel' in window) ? new BroadcastChannel('efg-lab') : null;   // regia ↔ presentazione (stesso sito, stesso browser)
+function renderLab(){
+  if (labDone) return; labDone = true;
+  const tot = LAB_EVENTS.reduce((a, e) => a + (e.min || 0), 0);
+  $('labSum').textContent = LAB_EVENTS.length + ' interventi · circa ' + tot + ' min';
+  LAB_EVENTS.forEach((ev, i) => {
+    const c = document.createElement('div'); c.className = 'lab' + (i === 0 ? ' first' : '');
+    c.innerHTML = '<span class="num"></span><div><h3></h3><p></p><div class="tags"></div></div><div class="acts"></div>';
+    c.querySelector('.num').textContent = i + 1; c.querySelector('h3').textContent = ev.title; c.querySelector('p').textContent = ev.desc || ''; if (!ev.desc) c.querySelector('p').remove();
+    const tg = c.querySelector('.tags');
+    const tag = (t, cls) => { const x = document.createElement('span'); x.textContent = t; if (cls) x.className = cls; tg.appendChild(x); };
+    if (i === 0) tag('Evento n. 1', 'ev');
+    (ev.tags || []).forEach(t => tag(t));
+    if (ev.min) tag('⏱ ' + ev.min + ' min'); if (ev.who) tag('🎤 ' + ev.who);
+    const acts = c.querySelector('.acts');
+    const bp = document.createElement('button'); bp.className = 'btn'; bp.type = 'button'; bp.textContent = 'Presenta'; bp.onclick = () => labPresent(ev); acts.appendChild(bp);
+    if (ev.video){ const bv = document.createElement('button'); bv.className = 'btn ghost'; bv.type = 'button'; bv.textContent = '▶ Video (mp4)'; bv.onclick = () => openOnSecond(ev.video, 'efgLabVideo', 'Il video'); acts.appendChild(bv); }
+    if (i === 0){ const h = document.createElement('div'); h.className = 'hint'; h.textContent = '⌨️ Presenta: si va avanti e indietro con le frecce ← → (o il telecomando). Video: la stessa presentazione registrata, 4 min 42 s.'; c.appendChild(h); }
+    $('labList').appendChild(c);
+  });
+}
+async function labPresent(ev){
+  if (ev.deck){ labWin = await openOnSecond(ev.deck, 'efgLab', 'La presentazione'); if (labCh) labCh.postMessage({ type:'ping' }); return; }
+  if (ev.tutorial){
+    const tu = TUTORIALS.find(t => t.id === ev.tutorial);
+    const tab = document.querySelector('.tab[data-tab="tutorials"]'); if (tab) tab.click();
+    if (tu) openDeck(tu); return;
+  }
+  setMsg($('labMsg'), 'Le slide di «' + ev.title + '» non sono ancora pronte.', '');
+}
+// regia: la barra compare quando la presentazione risponde, e comanda avanti / indietro / inizio
+if (labCh){
+  labCh.onmessage = e => {
+    const m = e.data || {};
+    if (m.type === 'state'){ $('labRegia').hidden = false; $('labSlide').textContent = (m.i + 1) + ' / ' + m.n + ' · ' + (m.title || ''); }
+    if (m.type === 'bye') $('labRegia').hidden = true;
+  };
+  $('labNext').onclick = () => labCh.postMessage({ type:'next' });
+  $('labPrev').onclick = () => labCh.postMessage({ type:'prev' });
+  $('labHome').onclick = () => labCh.postMessage({ type:'go', i:0 });
+  labCh.postMessage({ type:'ping' });   // presentazione già aperta in un'altra finestra: la barra compare subito
+}
+
 /* ---------- video utili ---------- */
 // per aggiungere un video: file in video/ (mp4 H.264) + copertina jpg, poi una riga qui
 const VIDEOS = [
+  { title:'Presentazione «Laboratorio AI»', file:'video/laboratorio-ai.mp4', poster:'video/laboratorio-ai.jpg',
+    desc:'La presentazione dell’evento registrata: Claude in Chrome con il video TheFork, poi «Crea il tuo videogioco!» con il video e tutti i passi del tutorial di Forza 4. Per presentarla dal vivo, con le frecce o il telecomando, usa Formazione › Laboratorio › Presenta. 4 minuti e 42 secondi.' },
   { title:'Ordina una cena su The Fork con l’estensione di Claude', file:'video/thefork-claude.mp4', poster:'video/thefork-claude.jpg',
     desc:'Installazione di Claude in Chrome e prompt; poi Claude prende il controllo del mouse e prenota un tavolo per due su TheFork, con il timer del tempo reale. Alla fine la notifica e la mail di conferma sullo smartphone. 78 secondi.' },
   { title:'Crea e gioca a Forza 4 con Claude', file:'video/forza4-claude.mp4', poster:'video/forza4-claude.jpg',

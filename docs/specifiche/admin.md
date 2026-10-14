@@ -53,7 +53,7 @@ Si aggiornano dopo Elimina, Backup, Ripristino e Reset.
 Si apre con il pulsante **☰ Menu** a sinistra nell'intestazione (visibile dopo l'accesso) e scorre da sinistra sopra la pagina. Si chiude con ✕, toccando lo sfondo, con Esc o scegliendo una voce. Il nome della sezione aperta compare come titolo sopra il contenuto. Voci:
 - **Utenti**;
 - **Collegamenti:** QR, Link;
-- **Formazione:** Video utili, Tutorial, Skills, FAQ, Documentazione;
+- **Formazione:** Video utili, Tutorial, Laboratorio, Skills, FAQ, Documentazione;
 - **Admin:** Impostazioni, Qualità, Log, Backup, Chiave, Reset (Reset in rosso);
 - **Logout:** dimentica la chiave e torna al login.
 
@@ -211,6 +211,7 @@ Le skill si usano in una sessione di Claude Code aperta sul repository.
 ### Video utili
 
 Card con il lettore video (`preload="none"`), il titolo, la descrizione e i pulsanti **Apri**, **Copia link** e **Scarica**. Video presenti:
+- Presentazione «Laboratorio AI» (`video/laboratorio-ai.mp4`, 4 min 42 s): la presentazione `laboratorio.html` registrata; per presentarla dal vivo si usa Formazione › Laboratorio › Presenta;
 - The Fork con Claude in Chrome;
 - Forza 4 con Claude;
 - Foglio «Attività giornaliere» con Claude in Chrome.
@@ -234,6 +235,47 @@ Tutorial presenti:
 |---|---|---|
 | `forza4` | Crea e gioca a Forza 4 con Claude | 12 |
 | `sheets` | Foglio "Attività giornaliere" con Claude in Chrome | 11 |
+
+### Laboratorio
+
+*Aggiunto il 14/10/2026, v73.*
+
+- Testo: "La scaletta degli interventi da presentare all'evento, in ordine. Tocca Presenta per aprire l'intervento a schermo."; a destra "N interventi · circa X min".
+- Una card per intervento (`LAB_EVENTS`, in ordine): numero in un cerchio, titolo, descrizione, etichette (⏱ minuti, 🎤 relatore e altre). L'intervento 1 è in risalto: bordo e cerchio arancioni (`--brand-orange`), sfondo sfumato, etichetta "Evento n. 1", e sotto la riga "⌨️ Presenta: si va avanti e indietro con le frecce ← → (o il telecomando). Video: la stessa presentazione registrata, 4 min 42 s."
+- A destra **Presenta** e, per chi ha un video, **▶ Video (mp4)**:
+  - Presenta con `deck`: apre la pagina sul secondo monitor (`openOnSecond`, la stessa funzione di 📺 Proietta);
+  - Presenta con `tutorial`: apre quel tutorial nella sezione Tutorial;
+  - altrimenti: "Le slide di «…» non sono ancora pronte.";
+  - Video (mp4): apre l'mp4 sul secondo monitor.
+- **Barra di regia** (nascosta finché la presentazione non è aperta): "● In onda", slide corrente "n / N · titolo", **⟲ Inizio**, **←**, **Avanti →**. Parla con la presentazione con `BroadcastChannel('efg-lab')`: l'admin manda `next`, `prev`, `go {i}`, `ping`; la presentazione risponde `state {i, n, title}` (e `bye` quando si chiude). Funziona con admin e presentazione nello stesso browser e sullo stesso sito.
+
+Interventi:
+
+| # | Titolo | Min | Presenta |
+|---|---|---|---|
+| 1 | Presentazione "Laboratorio AI" | 20 | `laboratorio.html` (+ video `video/laboratorio-ai.mp4`) |
+| 2 | Crea e gioca a Forza 4 con Claude | 15 | tutorial `forza4` |
+| 3 | Foglio "Attività giornaliere" con Claude in Chrome | 5 | tutorial `sheets` |
+| 4 | Efuture Games: i 4 giochi degli stand | 5 | slide non pronte |
+| 5 | Classifica e premiazione | 10 | slide non pronte |
+
+#### Presentazione laboratorio.html
+
+- Pagina senza accesso, stile PowerPoint: palco fisso 1920×1080 scalato sulla finestra, bande nere ai lati. Font locali Montserrat, Poppins e Press Start 2P; colori navy `#002238`, arancione `#f18c22`, azzurro `#8ad0ff`.
+- Slide (`DECK`, 18 in tutto):
+  1. Copertina "Laboratorio **AI**" (AI arancione) e "CARE CONFERENCE" spaziato in azzurro;
+  2. "CLAUDE IN CHROME" · **Claude, aiutami tu!** · "Installa l'estensione di Claude sul tuo browser e risolvi **operazioni quotidiane.**";
+  3. video `video/thefork-claude.mp4` a tutto schermo, con didascalia che sparisce quando parte;
+  4. grande "?" arancione · "E tu cosa potresti chiedere a Claude per le tue *operazioni quotidiane?*" con gli esempi Prenotare un ristorante, Riordinare le mail, Compilare un foglio, Confrontare offerte;
+  5. "CREA CON CLAUDE" · **Crea il tuo videogioco!** · "4 prompt e il gioco è fatto! Realizza la tua app in meno di 15 minuti." con "GAME ON" pixel in alto a destra;
+  6. video `video/forza4-claude.mp4`;
+  7–18. i 12 passi del tutorial `forza4` (da `tutorial/tutorials.js`): immagine a sinistra su sfondo chiaro, a destra "Tutorial · Forza 4 con Claude", passo, titolo, testo, prompt, ⏱.
+- Slide scure: sfondo navy sfumato, due quadratini bianchi in alto a sinistra, logo `img/efuture-logo-white.png` in basso a sinistra (nei passi del tutorial sulla parte scura). Barra di avanzamento arancione in basso e "n / N" in basso a destra (nascosto sui video).
+- Comandi: → ↓ PagGiù spazio Invio avanti; ← ↑ PagSu indietro; Home/Fine; F schermo intero; K o clic sul video pausa/riprendi. Muovendo il mouse compaiono ← → e "Schermo intero", che spariscono dopo 2,5 s insieme al cursore.
+- I video partono da soli entrando nella slide e si fermano uscendo; se il browser blocca l'audio partono muti con "🔇 Clic per attivare l'audio".
+- Fuori dallo schermo intero compare in alto "Clicca una volta qui per lo schermo intero · frecce o telecomando per avanzare"; un clic attiva lo schermo intero.
+- La slide corrente è nell'indirizzo (`#n`). Con `?rec=1` spariscono comandi e inviti (per registrare il video).
+- Il video `video/laboratorio-ai.mp4` (+ copertina `.jpg`) è la presentazione registrata: slide 1–5 per 5 s, passi del tutorial per 4 s, al posto delle slide 3 e 6 i due mp4 interi con l'audio; H.264 1280×720, crf 26, AAC, faststart.
 
 ### Backup
 
@@ -290,7 +332,7 @@ Il `<AAAAMMGG-HHMM>` nei nomi dei file è in ora UTC (`toISOString`).
 
 ## Come aggiungere contenuti
 
-Tutti gli elenchi sono array nello script di `admin.html`. Dopo la modifica:
+Tutti gli elenchi sono array nello script di `admin.html`, tranne i tutorial, che sono in `tutorial/tutorials.js`. Dopo la modifica:
 - si aumenta la versione dell'app;
 - si aggiorna questa specifica.
 
@@ -298,15 +340,20 @@ Tutti gli elenchi sono array nello script di `admin.html`. Dopo la modifica:
   ```js
   { title:'…', file:'video/nome.mp4', poster:'video/nome.jpg', desc:'… durata.' }
   ```
-- **Tutorial:** si mettono le immagini in `tutorial/<id>/`, poi si aggiunge a `TUTORIALS`:
+- **Tutorial:** si mettono le immagini in `tutorial/<id>/`, poi si aggiunge a `window.EFG_TUTORIALS` in `tutorial/tutorials.js` (lo legge l'admin come `TUTORIALS`, e laboratorio.html per i passi di Forza 4):
   ```js
-  { id:'<id>', title:'…', cover:'tutorial/<id>/copertina.jpg', desc:'…',
+  { id:'<id>', title:'…', short:'titolo breve (facoltativo)', cover:'tutorial/<id>/copertina.jpg', desc:'…',
     slides:[ { k:'Passo 1', h:'Titolo', img:'file.jpg', html:'<p>…</p>', prompt:'(facoltativo)', time:'(facoltativo)' }, … ] }
   ```
   - `img` è relativo a `tutorial/<id>/`;
   - `html` può contenere `<p>`, `<ul>` e `<b>`;
   - `prompt` aggiunge il riquadro con "Copia il prompt";
   - `time` aggiunge l'etichetta ⏱.
+- **Interventi del Laboratorio:** si aggiunge a `LAB_EVENTS`, nell'ordine dell'evento:
+  ```js
+  { title:'…', desc:'…', min:10, who:'relatore', tags:['…'], deck:'pagina.html', tutorial:'<id>', video:'video/nome.mp4' }
+  ```
+  `deck`, `tutorial` e `video` sono facoltativi: senza `deck` né `tutorial`, Presenta dice che le slide non sono pronte. Le slide di `laboratorio.html` sono nell'array `DECK` della pagina.
 - **Skill:** si aggiunge a `SKILLS` la riga `['/nome-skill', 'cosa fa', '“esempio di richiesta”']`. L'elenco deve corrispondere a `.claude/skills/`.
 - **Link:**
   - un link del sito si aggiunge nel gruppo `Sito` di `LINKS`, calcolandolo da `b` (= `PUBLIC_URL`);
