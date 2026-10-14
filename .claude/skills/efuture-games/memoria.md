@@ -25,6 +25,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 - Prima di ogni commit mostrare i mockup; dopo l'ok commit e pubblicazione automatici (13/10).
 - La pagina classifica.html (proiettore e regia) è solo per admin (13/10).
 - In admin si crea un "Nuovo utente" e il tipo (giocatore, admin, entrambi) lo decide l'admin (14/10).
+- Quando chiedo di eseguire un file SQL su Supabase, il file va sempre reso cliccabile: inviato come file e con il link su GitHub (14/10).
 - Icona dell'app: solo la "e" di Efuture (quella della testa di Efuture Bros) su sfondo blu, senza la scritta efuture; sotto, "GAMES" in stile arcade anni '80; forma quadrata con angoli stondati (13/10).
 
 - Risposte, commit e testi dell'app in **italiano**. Commit nello stile "Area: cosa cambia per chi usa l'app".
