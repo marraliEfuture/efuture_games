@@ -1,14 +1,45 @@
 -- ============================================================================
 -- EFUTURE GAMES — funzioni admin mancanti (14/10/2026)
 -- ============================================================================
--- Da eseguire UNA volta nel SQL Editor di Supabase. Aggiunge solo tre funzioni
--- che sul database mancavano (copiate identiche da supabase-tipi-utenti.sql e
--- supabase-recensioni.sql), senza toccare tabelle, dati o altre funzioni:
+-- Da eseguire nel SQL Editor di Supabase. Rimette le funzioni admin del progetto
+-- che sul database mancavano o erano diverse (copiate identiche da
+-- supabase-tipi-utenti.sql e supabase-recensioni.sql), senza toccare tabelle o dati:
+--   efg_admin_auth(p_key)          controllo della chiave: principale oppure email + a capo + chiave
+--                                  personale (sul database c'era una versione che accettava solo la principale)
 --   efg_admin_me(p_key)            chi è collegato al pannello (chiave principale o nome)
 --   efg_admin_set_user_key(...)    imposta, cambia o toglie la chiave personale di un admin
 --   efg_admin_set_impostazione(...) salva le impostazioni (visualizzazione dei giochi, punti del bonus)
--- Rieseguibile senza problemi.
+-- Rieseguibile senza problemi (anche se lo avevi già eseguito).
 -- ============================================================================
+
+create or replace function public.efg_admin_auth(p_key text)
+returns text language plpgsql security definer set search_path = public, extensions as $$
+declare h text; fails int; e text; k text; pl efg_players%rowtype;
+begin
+  select count(*) into fails from efg_log where kind = 'admin: chiave errata' and at > now() - interval '10 minutes';
+  if fails >= 8 then return 'troppi tentativi sbagliati: riprova tra 10 minuti'; end if;
+  perform set_config('efg.admin_email', '', true);
+  if position(E'\n' in coalesce(p_key, '')) > 0 then
+    e := lower(trim(split_part(p_key, E'\n', 1)));
+    k := substr(p_key, position(E'\n' in p_key) + 1);
+    select * into pl from efg_players where email = e;
+    if pl.email is null or pl.admin_key_hash is null or pl.tipo = 'giocatore' or pl.disabilitato
+       or crypt(coalesce(k, ''), pl.admin_key_hash) <> pl.admin_key_hash then
+      insert into efg_log(kind, email) values ('admin: chiave errata', e);
+      return 'email o chiave admin errata';
+    end if;
+    perform set_config('efg.admin_email', e, true);
+    return null;
+  end if;
+  select key_hash into h from efg_admin where id = 1;
+  if h is null then return 'chiave admin non ancora impostata'; end if;
+  if crypt(coalesce(p_key, ''), h) <> h then
+    insert into efg_log(kind) values ('admin: chiave errata');
+    return 'chiave admin errata';
+  end if;
+  return null;
+end $$;
+revoke all on function public.efg_admin_auth(text) from public, anon, authenticated;
 
 create or replace function public.efg_admin_me(p_key text)
 returns jsonb language plpgsql security definer set search_path = public as $$
