@@ -76,6 +76,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Classifica da proiettare accessibile solo agli admin (email + chiave o chiave principale) (v72). |
 | 14/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Rifatte le modifiche preparate in un'altra chat: tutorial in tutorial/tutorials.js, admin › Formazione › Laboratorio (scaletta, Presenta, regia "In onda"), presentazione laboratorio.html (18 slide) e video registrato laboratorio-ai.mp4 (v73). |
 | 14/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Accessi admin: spiegato come dare pieni poteri a un secondo admin (tipo Admin + chiave personale da Utenti › Modifica); pulsante "➕ Nuovo amministratore" in Utenti (v74), poi diventato "➕ Nuovo utente" con il tipo scelto dall'admin e supabase-nuovo-utente.sql (v75); SQL eseguito il 14/10; eseguito anche supabase-funzioni-admin.sql (mancavano 3 funzioni admin; poi rieseguito con efg_admin_auth del progetto, che accetta email + chiave personale). |
+| 14/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Report di sicurezza aggiornato (87/100); corretto id doppio `vMsg` in admin (v76); preparato `supabase-pulizia-funzioni.sql`. Lo sblocco dei giochi restava sui telefoni dopo il reset: ora il reset segna `reset_id` e l'app riblocca i giochi e cancella i record del telefono (v77). «Cancella tutto» toglie solo i giocatori, admin e admin_giocatore restano senza punti (v78). `supabase-reset-sblocchi.sql` eseguito: funziona. |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 
@@ -115,4 +116,5 @@ Risposte dell'utente (07/10):
 - La sezione ChatGPT di `links.json` ha solo il link generico: mancano i link alle chat vere.
 - Le skill sono disponibili solo nelle sessioni aperte sul repository. Per usarle nelle chat di claude.ai vanno caricate a mano (Impostazioni → Capabilities → Skills) e non si aggiornano da sole.
 - Sul database va eseguito `supabase-recensioni.sql` se non già fatto. `supabase-tipi-utenti.sql` risulta eseguito (14/10: tipi utente e chiavi personali visibili in admin).
+- Il reset dall'admin riblocca i giochi su tutti i telefoni alla prossima apertura (`supabase-reset-sblocchi.sql`, eseguito il 14/10). Se si riesegue `supabase.sql`, rieseguire anche questo file.
 - Sblocco e punteggi sono controllati dal telefono: va bene per l'evento, non per premi di valore senza un controllo finale.
