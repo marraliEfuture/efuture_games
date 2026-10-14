@@ -1,5 +1,5 @@
 {
- "versione": "v73",
+ "versione": "v74",
  "aree": {
   "codice": {
    "titolo": "Codice",
@@ -197,7 +197,7 @@
     {
      "nome": "Versione uguale in tutti i file",
      "esito": "ok",
-     "dettaglio": "v73 ovunque"
+     "dettaglio": "v74 ovunque"
     }
    ],
    "esiti": {
@@ -212,7 +212,7 @@
     {
      "nome": "File SQL letti",
      "esito": "ok",
-     "dettaglio": "supabase.sql, supabase-classifica-gruppi.sql, supabase-countdown.sql, supabase-privacy-utenti.sql, supabase-tipi-utenti.sql, supabase-nickname-unico.sql, supabase-recensioni.sql (nell'ordine di esecuzione)"
+     "dettaglio": "supabase.sql, supabase-classifica-gruppi.sql, supabase-countdown.sql, supabase-privacy-utenti.sql, supabase-tipi-utenti.sql, supabase-nickname-unico.sql, supabase-nuovo-admin.sql, supabase-recensioni.sql (nell'ordine di esecuzione)"
     },
     {
      "nome": "RLS attiva su tutte le tabelle",
@@ -222,7 +222,7 @@
     {
      "nome": "search_path fissato nelle funzioni security definer",
      "esito": "ok",
-     "dettaglio": "34 funzioni controllate"
+     "dettaglio": "35 funzioni controllate"
     },
     {
      "nome": "Funzioni admin che controllano la chiave",
@@ -252,7 +252,7 @@
     {
      "nome": "Funzioni del database",
      "esito": "ok",
-     "dettaglio": "34 funzioni efg_*: efg_admin_auth, efg_admin_backup, efg_admin_backup_get, efg_admin_backups, efg_admin_delete_player, efg_admin_gate, efg_admin_init, efg_admin_login, efg_admin_logs, efg_admin_me, efg_admin_players, efg_admin_reset, efg_admin_restore, efg_admin_set_disabilitato, efg_admin_set_impostazione, efg_admin_set_key, efg_admin_set_recensione, efg_admin_set_recensione_link, efg_admin_set_tipo, efg_admin_set_user_key, efg_board, efg_board_group, efg_bonus_recensione, efg_gate_open, efg_gate_state, efg_impostazioni, efg_login, efg_recensione_bonus, efg_recensione_click, efg_recensione_info, efg_register, efg_signup_check, efg_snapshot, efg_submit"
+     "dettaglio": "35 funzioni efg_*: efg_admin_auth, efg_admin_backup, efg_admin_backup_get, efg_admin_backups, efg_admin_create_user, efg_admin_delete_player, efg_admin_gate, efg_admin_init, efg_admin_login, efg_admin_logs, efg_admin_me, efg_admin_players, efg_admin_reset, efg_admin_restore, efg_admin_set_disabilitato, efg_admin_set_impostazione, efg_admin_set_key, efg_admin_set_recensione, efg_admin_set_recensione_link, efg_admin_set_tipo, efg_admin_set_user_key, efg_board, efg_board_group, efg_bonus_recensione, efg_gate_open, efg_gate_state, efg_impostazioni, efg_login, efg_recensione_bonus, efg_recensione_click, efg_recensione_info, efg_register, efg_signup_check, efg_snapshot, efg_submit"
     }
    ],
    "esiti": {
@@ -279,8 +279,8 @@
     {
      "nome": "Peso della pagina: admin.html",
      "esito": "ok",
-     "dettaglio": "361.9 KB con 11 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
-     "valore": 361.9
+     "dettaglio": "366.3 KB con 11 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 366.3
     },
     {
      "nome": "Peso della pagina: games/coretech/index.html",
@@ -325,44 +325,44 @@
     {
      "nome": "Caricamento nel browser: index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 128 ms (DOM pronto in 119 ms) su telefono simulato, file locali, database escluso",
-     "valore": 128
+     "dettaglio": "caricata in 384 ms (DOM pronto in 365 ms) su telefono simulato, file locali, database escluso",
+     "valore": 384
     },
     {
      "nome": "Caricamento nel browser: classifica.html",
      "esito": "ok",
-     "dettaglio": "caricata in 139 ms (DOM pronto in 126 ms) su telefono simulato, file locali, database escluso",
-     "valore": 139
+     "dettaglio": "caricata in 160 ms (DOM pronto in 154 ms) su telefono simulato, file locali, database escluso",
+     "valore": 160
     },
     {
      "nome": "Caricamento nel browser: admin.html",
      "esito": "ok",
-     "dettaglio": "caricata in 98 ms (DOM pronto in 94 ms) su telefono simulato, file locali, database escluso",
-     "valore": 98
+     "dettaglio": "caricata in 105 ms (DOM pronto in 100 ms) su telefono simulato, file locali, database escluso",
+     "valore": 105
     },
     {
      "nome": "Caricamento nel browser: games/sysadmin/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 112 ms (DOM pronto in 108 ms) su telefono simulato, file locali, database escluso",
-     "valore": 112
+     "dettaglio": "caricata in 164 ms (DOM pronto in 154 ms) su telefono simulato, file locali, database escluso",
+     "valore": 164
     },
     {
      "nome": "Caricamento nel browser: games/coretech/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 87 ms (DOM pronto in 83 ms) su telefono simulato, file locali, database escluso",
-     "valore": 87
+     "dettaglio": "caricata in 107 ms (DOM pronto in 100 ms) su telefono simulato, file locali, database escluso",
+     "valore": 107
     },
     {
      "nome": "Caricamento nel browser: games/timenet/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 87 ms (DOM pronto in 81 ms) su telefono simulato, file locali, database escluso",
-     "valore": 87
+     "dettaglio": "caricata in 106 ms (DOM pronto in 103 ms) su telefono simulato, file locali, database escluso",
+     "valore": 106
     },
     {
      "nome": "Caricamento nel browser: games/inncloud/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 85 ms (DOM pronto in 69 ms) su telefono simulato, file locali, database escluso",
-     "valore": 85
+     "dettaglio": "caricata in 84 ms (DOM pronto in 76 ms) su telefono simulato, file locali, database escluso",
+     "valore": 84
     }
    ],
    "esiti": {
@@ -377,8 +377,8 @@
     {
      "nome": "Spazio totale del sito",
      "esito": "ok",
-     "dettaglio": "17.53 MB (limite consigliato GitHub Pages: 1 GB)",
-     "valore": 17949.0
+     "dettaglio": "17.54 MB (limite consigliato GitHub Pages: 1 GB)",
+     "valore": 17958.2
     },
     {
      "nome": "Cartella video",
@@ -407,14 +407,14 @@
     {
      "nome": "Cartella (file principali)",
      "esito": "ok",
-     "dettaglio": "332.8 KB",
-     "valore": 332.8
+     "dettaglio": "340.3 KB",
+     "valore": 340.3
     },
     {
      "nome": "Cartella docs",
      "esito": "ok",
-     "dettaglio": "293.7 KB",
-     "valore": 293.7
+     "dettaglio": "294.9 KB",
+     "valore": 294.9
     },
     {
      "nome": "Cartella icons",
@@ -431,8 +431,8 @@
     {
      "nome": "Cartella .claude",
      "esito": "ok",
-     "dettaglio": "125.5 KB",
-     "valore": 125.5
+     "dettaglio": "125.8 KB",
+     "valore": 125.8
     },
     {
      "nome": "Cartella fonts",
@@ -452,11 +452,11 @@
     "avviso": 0,
     "errore": 0
    },
-   "totale_kb": 17949.0,
+   "totale_kb": 17958.2,
    "cartelle_kb": {
-    ".claude": 125.5,
-    "(file principali)": 332.8,
-    "docs": 293.7,
+    ".claude": 125.8,
+    "(file principali)": 340.3,
+    "docs": 294.9,
     "fonts": 120.3,
     "games": 913.0,
     "icons": 189.8,
@@ -566,6 +566,6 @@
    "livello": "Buono"
   }
  },
- "data": "2026-10-14T09:16:06+00:00",
- "commit": "4436b0d"
+ "data": "2026-10-14T09:33:48+00:00",
+ "commit": "a391875"
 }

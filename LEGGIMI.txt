@@ -94,6 +94,11 @@ CODICI DI SBLOCCO (uno per gioco)
      non salva punti, sparisce dalla classifica) e "Modifica", un popup
      per cambiare il tipo (Giocatore, Admin e giocatore, Solo admin),
      bloccare/sbloccare, fare il reset della chiave admin o eliminarlo.
+     "➕ Nuovo amministratore": email, nome e tipo (Solo admin o Admin e
+     giocatore); il pannello crea l'utente e mostra UNA volta la sua
+     chiave, da consegnare in modo riservato. Entra con email + chiave e
+     ha pieni poteri. Serve supabase-nuovo-admin.sql (una volta, nel SQL
+     Editor di Supabase).
      I giocatori non hanno password: entrano con la sola email.
      Ogni modifica chiede conferma spiegando le conseguenze. Una volta
      sola esegui supabase-tipi-utenti.sql (e rieseguilo se l'avevi gia'

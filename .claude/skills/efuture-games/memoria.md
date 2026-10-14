@@ -73,6 +73,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Comparsa: niente riquadro a tutto schermo; i record della sola classifica generale compaiono dall'ultimo al primo, ognuno in cima alla pila (v71). |
 | 13/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Classifica da proiettare accessibile solo agli admin (email + chiave o chiave principale) (v72). |
 | 14/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Rifatte le modifiche preparate in un'altra chat: tutorial in tutorial/tutorials.js, admin › Formazione › Laboratorio (scaletta, Presenta, regia "In onda"), presentazione laboratorio.html (18 slide) e video registrato laboratorio-ai.mp4 (v73). |
+| 14/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | Accessi admin: spiegato come dare pieni poteri a un secondo admin (tipo Admin + chiave personale da Utenti › Modifica); pulsante "➕ Nuovo amministratore" in Utenti con supabase-nuovo-admin.sql (v74). |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 
@@ -107,8 +108,9 @@ Risposte dell'utente (07/10):
 
 ## In sospeso / da ricordare
 
+- Eseguire `supabase-nuovo-admin.sql` nel SQL Editor di Supabase per attivare "➕ Nuovo amministratore" (v74).
 - Analisi Chrome del 13/10, punto 12: decidere se mettere "Ricomincia livello" nella pausa di tutti i giochi (in gara inciderebbe sul tempo). Punti 11, 14 e 17 lasciati così di proposito (10 livelli fuori gara, logo Timenet scoperto dai mattoncini, Efuture Bros grande su PC).
 - La sezione ChatGPT di `links.json` ha solo il link generico: mancano i link alle chat vere.
 - Le skill sono disponibili solo nelle sessioni aperte sul repository. Per usarle nelle chat di claude.ai vanno caricate a mano (Impostazioni → Capabilities → Skills) e non si aggiornano da sole.
-- Sul database vanno eseguiti `supabase-tipi-utenti.sql` e poi `supabase-recensioni.sql` (al 12/10 tipi-utenti non risultava eseguito: Blocca/Tipo/chiavi personali non funzionano finché non lo è).
+- Sul database va eseguito `supabase-recensioni.sql` se non già fatto. `supabase-tipi-utenti.sql` risulta eseguito (14/10: tipi utente e chiavi personali visibili in admin).
 - Sblocco e punteggi sono controllati dal telefono: va bene per l'evento, non per premi di valore senza un controllo finale.
