@@ -480,8 +480,8 @@
  },
  {
   "data": "2026-10-15",
-  "commit": "f997fe8",
-  "versione": "v89",
+  "commit": "94aabd0",
+  "versione": "v90",
   "esiti": {
    "codice": {
     "ok": 42,
@@ -514,21 +514,21 @@
     "errore": 0
    }
   },
-  "spazio_kb": 45563.6,
+  "spazio_kb": 44328.9,
   "cartelle_kb": {
    ".claude": 156.2,
-   "(file principali)": 425.9,
-   "docs": 315.0,
+   "(file principali)": 425.7,
+   "docs": 315.7,
    "fonts": 120.3,
    "games": 920.5,
    "icons": 189.8,
    "img": 95.1,
-   "presentazioni": 16029.1,
+   "presentazioni": 14732.7,
    "qr": 159.6,
    "supabase-parti": 18.4,
-   "tutorial": 1341.3,
+   "tutorial": 1341.2,
    "vendor": 426.8,
-   "video": 25365.8
+   "video": 25427.1
   },
   "vulnerabilita": {
    "alta": 0,
