@@ -116,7 +116,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v92' : 'Modalità demo: account e classifica restano su questo telefono. · v92';
+  mn.textContent = remote ? 'Classifica online · v93' : 'Modalità demo: account e classifica restano su questo telefono. · v93';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -305,8 +305,8 @@ async function loggedIn(user){
 }
 
 /* ---- campi della registrazione scelti in admin: nascosto, facoltativo o obbligatorio (l'email è sempre obbligatoria) ---- */
-let CAMPI = { nome:'obbligatorio', azienda:'obbligatorio', cellulare:'facoltativo' };
-const FIELD_INPUT = { nome:'sName', azienda:'sCompany', cellulare:'sPhone' };
+let CAMPI = { nome:'obbligatorio', azienda:'obbligatorio', email:'obbligatorio', cellulare:'facoltativo' };
+const FIELD_INPUT = { nome:'sName', azienda:'sCompany', email:'sEmail', cellulare:'sPhone' };
 function applyCampi(c){
   if (c && typeof c === 'object') CAMPI = Object.assign({}, CAMPI, c);
   document.querySelectorAll('#fSignup .field[data-campo]').forEach(f => {
@@ -315,6 +315,7 @@ function applyCampi(c){
     const req = f.querySelector('label > span');   // asterisco o "(facoltativo)": la classe cambia, si cerca per posizione
     req.className = mode === 'obbligatorio' ? 'req' : 'opt'; req.textContent = mode === 'obbligatorio' ? ' *' : ' (facoltativo)';
   });
+  $('sEmailNote').hidden = CAMPI.email !== 'facoltativo';   // email facoltativa: si spiega a cosa serve
   showPreview();
 }
 // anteprima: come si comparirà in classifica
@@ -365,17 +366,17 @@ async function checkSignup(){
 $('fSignup').addEventListener('submit', async e=>{
   e.preventDefault();
   const on = k => CAMPI[k] !== 'nascosto', req = k => CAMPI[k] === 'obbligatorio';
-  const name = on('nome') ? $('sName').value.trim() : '', email = $('sEmail').value.trim();
+  const name = on('nome') ? $('sName').value.trim() : '', email = on('email') ? $('sEmail').value.trim() : '';
   const azienda = on('azienda') ? $('sCompany').value.trim() : '', phone = on('cellulare') ? $('sPhone').value.trim() : '';
   const m = $('sMsg');
   if (on('nome') && (req('nome') || name) && (name.length < 2 || name.length > 40)) return setMsg(m, 'Scrivi nome e cognome (da 2 a 40 caratteri).', 'err');
   if (req('azienda') && !azienda) return setMsg(m, 'Scrivi il nome della tua azienda.', 'err');
-  if (!validEmail(email)) return setMsg(m, 'Scrivi un indirizzo email valido.', 'err');
+  if ((req('email') || email) && !validEmail(email)) return setMsg(m, 'Scrivi un indirizzo email valido.', 'err');
   const digits = phone.replace(/[^0-9]/g, '');
   if ((req('cellulare') || phone) && (digits.length < 6 || digits.length > 15)) return setMsg(m, 'Scrivi un numero di cellulare valido.', 'err');
   if (taken.name || taken.email) return;
   setMsg(m, 'Un attimo…');
-  try { const r = await Backend.signUp({ name: name || azienda || email.split('@')[0], email, azienda, phone }); loggedIn(r.user); }
+  try { const r = await Backend.signUp({ name: name || azienda || (email ? email.split('@')[0] : ''), email, azienda, phone }); loggedIn(r.user); }
   catch(err){
     const t = String(err && err.message || err);
     if (/invalid company/i.test(t)) return setMsg(m, 'Scrivi il nome della tua azienda.', 'err');
