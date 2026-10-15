@@ -53,11 +53,15 @@ h2{font-size:132px}
 .cover h1{font-size:220px;letter-spacing:-6px}
 .cover .care{font-family:var(--title);font-weight:700;font-size:42px;letter-spacing:.6em;color:var(--sky);margin-top:44px;padding-left:.6em}
 
+.cover.thanks .care{font-family:var(--title);font-size:72px;font-weight:700;letter-spacing:-1px;padding-left:0;margin-top:30px;color:#fff}
+
 /* domanda */
 .ask .wrap{text-align:center}
 .ask .q{font-family:var(--title);font-weight:800;font-size:300px;line-height:.9;color:var(--orange)}
 .ask h2{font-size:84px;letter-spacing:-1.5px;margin-top:24px;line-height:1.12}
 .ask .ex{display:flex;justify-content:center;flex-wrap:wrap;gap:22px;margin-top:64px}
+.ask.next .q{font-size:200px}
+.ask.next .ex{margin-top:48px}
 .ask .ex span{font-size:34px;padding:16px 30px;border-radius:999px;border:2px solid rgba(138,208,255,.45);color:#e6f2fb}
 
 /* GAME ON */
@@ -136,6 +140,10 @@ const TID = QS.get('t');
 if (TID) DECK.length = 0;
 const TU = (window.EFG_TUTORIALS || []).find(t => t.id === (TID || 'forza4'));
 if (TU) TU.slides.forEach(s => DECK.push({ title:s.h, tut:s, tuId:TU.id, tuName:TU.short || TU.title }));
+// chiusura (solo nella presentazione completa, non con ?t=<id>)
+if (!TID) DECK.push(
+  { title:'E adesso?', cls:'dark ask next', html:'<div class="wrap"><div class="q">?</div><h2>Ho creato il mio primo videogioco. <span class="o">E adesso?</span></h2><div class="ex"><span>Come posso creare un’applicazione per la mia azienda?</span><span>Con quale scopo?</span><span>Come posso migliorare un processo aziendale?</span><span>Come posso digitalizzare un’operazione di routine?</span></div></div>' + LOGO },
+  { title:'Grazie', cls:'dark cover thanks', html:'<div class="wrap"><h1>Grazie</h1><div class="care">e buona <span class="o">accelerazione…</span></div></div>' + LOGO });
 
 const stage = $('stage'), N = DECK.length;
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));

@@ -1523,7 +1523,7 @@ function renderLab(){
     const bp = document.createElement('button'); bp.className = 'btn'; bp.type = 'button'; bp.textContent = 'Presenta'; bp.onclick = () => labPresent(ev); acts.appendChild(bp);
     if (ev.pptx){ const bd = document.createElement('a'); bd.className = 'btn ghost'; bd.href = ev.pptx; bd.download = ev.pptx.split('/').pop(); bd.textContent = '⬇ PPTX'; bd.title = 'Scarica le slide in PowerPoint'; acts.appendChild(bd); }
     if (ev.video){ const bv = document.createElement('button'); bv.className = 'btn ghost'; bv.type = 'button'; bv.textContent = '▶ Video (mp4)'; bv.onclick = () => openOnSecond(ev.video, 'efgLabVideo', 'Il video'); acts.appendChild(bv); }
-    if (i === 0){ const h = document.createElement('div'); h.className = 'hint'; h.textContent = '⌨️ Presenta: va a schermo intero sul proiettore; si va avanti e indietro dalla regia, con le frecce ← → o il telecomando. Video: la stessa presentazione registrata, 4 min 42 s.'; c.appendChild(h); }
+    if (i === 0){ const h = document.createElement('div'); h.className = 'hint'; h.textContent = '⌨️ Presenta: va a schermo intero sul proiettore; si va avanti e indietro dalla regia, con le frecce ← → o il telecomando. Video: la stessa presentazione registrata, 4 min 52 s.'; c.appendChild(h); }
     $('labList').appendChild(c);
   });
 }

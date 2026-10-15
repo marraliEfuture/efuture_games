@@ -2,7 +2,7 @@
 // Uso:  NODE_PATH=<cartella>/node_modules node pptx_laboratorio.mjs [CARTELLA_DI_USCITA]
 //   (pptxgenjs: npm install --prefix <cartella> pptxgenjs ; Playwright come per l'anteprima)
 // Senza cartella scrive in <repo>/presentazioni/. Crea:
-//   1-laboratorio-ai.pptx          le 18 slide di laboratorio.html come immagini (+ i 2 video)
+//   1-laboratorio-ai.pptx          le 20 slide di laboratorio.html come immagini (+ i 2 video)
 //   2-forza4-claude.pptx           il tutorial Forza 4 (testi modificabili) + video
 //   3-foglio-attivita.pptx         il tutorial del foglio "Attività giornaliere" + video
 //   4-efuture-games.pptx           i 4 giochi degli stand, regole e QR dell'app
