@@ -67,7 +67,12 @@ Stile del sito efuture.it:
 - **Automatica:** ogni 150 s la lista si svuota e si riempie, una riga ogni 2 s, poi resta piena fino al giro successivo. Il ritmo dipende dall'orologio, quindi regia e ledwall sono allineati.
 - **Manuale:** in regia **▶ Prossima posizione** (anche barra spaziatrice o freccia destra) fa comparire il record successivo; a lista piena il tocco successivo la svuota e si ricomincia. Il passo è condiviso tra regia e ledwall con `localStorage` (`efgReveal`).
 
-## Giocatori: categorie (v82)
+## Fase, Top "Tutti" e filtri condivisi tra PC (v85)
+
+- **Fase** (primo gruppo di filtri): **🟢 Live** = solo le classifiche dei 4 giochi, comparsa automatica, top 3, ospiti e sponsor, QR sì; **🏆 Finale** = solo la classifica generale, comparsa manuale, top 10, solo ospiti, QR no, e la comparsa ripartita da zero (classifica vuota, poi una posizione per ogni "Prossima posizione", dalla 10ª alla 1ª). Cambiando a mano un altro filtro la Fase si spegne (`st.fase = ''`); si può riscegliere quando si vuole. Impostazioni in `FASI`.
+- **Top:** 3, 5, 10 e **Tutti** (tutte le righe che manda il database, al massimo 50).
+- **Filtri condivisi:** ogni scelta fatta a mano e ogni "Prossima posizione" vanno nel database (`efg_admin_set_classifica`, con la chiave admin della pagina); ogni 3 secondi tutte le classifiche aperte, anche su altri PC, leggono `efg_classifica_vista()` e applicano lo stato più recente (il tempo `t` lo mette il server). Nella riga di stato: "· 🔗 filtri condivisi"; senza `supabase-classifica-condivisa.sql`: "· filtri solo su questo PC (eseguire supabase-classifica-condivisa.sql)" e le scelte restano tra le finestre dello stesso browser, come prima.
+
 
 Il filtro **Giocatori** ha tre interruttori, **Ospiti · Sponsor · Staff**, che si accendono e spengono (almeno uno resta acceso; tutti e tre = tutti). Predefinito: **Ospiti e Sponsor**. Il valore va a `efg_board_group` come elenco (`ospite,sponsor`); nell'indirizzo `giocatori=ospite,sponsor` (valgono ancora `ospiti`, `efuture` = staff, `tutti`). L'etichetta accanto al titolo dice per esempio "Solo ospiti e sponsor". Le scelte salvate sono in `efgBoardView6`.
 

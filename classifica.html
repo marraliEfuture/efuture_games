@@ -235,6 +235,10 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
 </header>
 <div class="gatebar" id="gateBar" hidden role="status" aria-live="polite"><span id="gateTxt"></span><b id="gateClock"></b></div>
 <div class="controls" id="controls" aria-label="Cosa mostrare">
+  <div class="seg-grp fase"><span class="ttl" id="lbFase">Fase</span>
+    <div class="seg" role="radiogroup" aria-labelledby="lbFase" data-key="fase">
+      <button type="button" role="radio" data-v="live" title="Classifiche dei 4 giochi, comparsa automatica, top 3, ospiti e sponsor, QR">🟢 Live</button><button type="button" role="radio" data-v="finale" title="Solo classifica generale, comparsa manuale, top 10, solo ospiti, senza QR">🏆 Finale</button>
+    </div></div>
   <div class="seg-grp"><span class="ttl" id="lbBoard">Classifica</span>
     <div class="seg" role="radiogroup" aria-labelledby="lbBoard" data-key="board">
       <button type="button" role="radio" data-v="generale">Generale</button><button type="button" role="radio" data-v="giochi">Giochi</button><button type="button" role="radio" data-v="tutti">Entrambi</button>
@@ -246,7 +250,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
     <button class="btn" id="btnNext" type="button" title="Fa comparire la prossima posizione della classifica generale (anche con la barra spaziatrice o la freccia destra)">▶ Prossima posizione</button></div>
   <div class="seg-grp"><span class="ttl" id="lbTop">Top</span>
     <div class="seg" role="radiogroup" aria-labelledby="lbTop" data-key="top">
-      <button type="button" role="radio" data-v="3">3</button><button type="button" role="radio" data-v="5">5</button><button type="button" role="radio" data-v="10">10</button>
+      <button type="button" role="radio" data-v="3">3</button><button type="button" role="radio" data-v="5">5</button><button type="button" role="radio" data-v="10">10</button><button type="button" role="radio" data-v="tutti">Tutti</button>
     </div></div>
   <div class="seg-grp"><span class="ttl" id="lbWho">Giocatori</span>
     <div class="seg" role="radiogroup" aria-labelledby="lbWho" data-key="group">
@@ -299,9 +303,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=84"></script>
+<script src="config.js?v=85"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=84"></script>
+<script src="backend.js?v=85"></script>
 <script>
 (function(){
 "use strict";
@@ -432,10 +436,15 @@ function normGroup(v){
   return !list.length ? null : list.length === CATS.length ? 'tutti' : list.join(',');
 }
 const groupList = g => g === 'tutti' ? CATS : g.split(',');
-const OPTS = { board:['generale','giochi','tutti'], vis:['statica','manuale','auto'], top:['3','5','10'], group:{ includes: v => normGroup(v) === v && v != null }, qr:['si','no'] };
+const OPTS = { board:['generale','giochi','tutti'], vis:['statica','manuale','auto'], top:['3','5','10','tutti'], fase:['live','finale',''], group:{ includes: v => normGroup(v) === v && v != null }, qr:['si','no'] };
 // predefinito (proiettore): i 4 giochi più la generale a comparsa automatica, ospiti e sponsor (niente staff), QR visibile
-const DEF  = { board:'tutti', vis:'auto', top:'5', group:'ospite,sponsor', qr:'si' };
-const URLK = { board:'classifica', vis:'visualizzazione', top:'top', group:'giocatori', qr:'qr' };
+const DEF  = { board:'tutti', vis:'auto', top:'5', group:'ospite,sponsor', qr:'si', fase:'' };
+/* Fase: due impostazioni pronte. Se poi si cambia un filtro a mano, la fase si spegne. */
+const FASI = {
+  live:   { board:'giochi',   vis:'auto',    top:'3',  group:'ospite,sponsor', qr:'si' },
+  finale: { board:'generale', vis:'manuale', top:'10', group:'ospite',         qr:'no' },
+};
+const URLK = { board:'classifica', vis:'visualizzazione', top:'top', group:'giocatori', qr:'qr', fase:'fase' };
 const VKEY = 'efgBoardView6';   // chiave nuova: le scelte salvate con le versioni precedenti non valgono più (v82: categorie)
 const saved = store.get(VKEY, {});
 const st = {};
@@ -488,8 +497,9 @@ const reveal = (() => {
     apply();
   }
   function next(){
-    const m = store.get(KEY, { n:0 }).n || 0;
-    store.set(KEY, { n: m >= maxRows() ? 0 : m + 1, t: Date.now() }); apply();
+    const m = store.get(KEY, { n:0 }).n || 0, n = m >= maxRows() ? 0 : m + 1;
+    store.set(KEY, { n, t: Date.now() }); apply();
+    share.pushReveal({ n });   // anche il proiettore su un altro PC fa comparire la posizione
   }
   window.addEventListener('storage', e => { if (e.key === KEY && st.vis === 'manuale') apply(); });
   return { mode, next, apply, refresh(){ last = null; apply(); } };
@@ -504,7 +514,7 @@ const view = {
   apply(){
     const t = st.board !== 'giochi', g = st.board !== 'generale';
     document.documentElement.classList.toggle('gen-manuale', st.vis === 'manuale');
-    TOP_GAME = parseInt(st.top, 10);
+    TOP_GAME = st.top === 'tutti' ? 50 : parseInt(st.top, 10);   // "Tutti" = tutte le righe che manda il database (al massimo 50)
     $('secTotal').hidden = !t; $('games').hidden = !g;
     $('qrBig').hidden = st.qr === 'no'; $('main').classList.toggle('no-qr', st.qr === 'no');
     $('main').classList.toggle('only-total', t && !g);
@@ -517,26 +527,33 @@ const view = {
     const NAMES = { ospite:'ospiti', sponsor:'sponsor', staff:'staff' };
     const label = st.group === 'tutti' ? '' : 'Solo ' + groupList(st.group).map(c => NAMES[c]).join(' e ');
     $('whoTag').hidden = !label; $('whoTag').textContent = label;
-    document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · livelli, poi punti' + (label ? ' · ' + label.toLowerCase() : ''));
+    document.querySelectorAll('.games .sub').forEach(x => x.textContent = (st.top === 'tutti' ? 'Tutti' : 'Top ' + TOP_GAME) + ' · livelli, poi punti' + (label ? ' · ' + label.toLowerCase() : ''));
     store.set(VKEY, st);
     reveal.mode();
   }
 };
+function redraw(){ Object.keys(rowsByKey).forEach(k => delete rowsByKey[k]); document.querySelectorAll('main ol').forEach(o => o.innerHTML = ''); refresh(); }
 function choose(key, v){
+  if (key === 'fase'){   // Live / Finale: imposta tutti i filtri insieme (anche se la fase era già scelta)
+    if (!FASI[v]) return;
+    Object.assign(st, FASI[v], { fase:v });
+    if (v === 'finale'){ store.set('efgReveal', { n:0, t:Date.now() }); share.pushReveal({ n:0 }); }   // la finale parte dalla classifica vuota
+    view.apply(); redraw(); share.push(); return;
+  }
   if (key === 'group'){   // Ospiti / Sponsor / Staff si accendono e spengono; almeno una resta accesa
     const now = groupList(st.group), list = now.includes(v) ? now.filter(c => c !== v) : now.concat(v);
     v = normGroup(list.join(',')); if (!v) return;
   }
   if (st[key] === v) return;
-  st[key] = v; view.apply();
-  if (key === 'group' || key === 'top'){   // ridisegna le liste senza animazioni
-    Object.keys(rowsByKey).forEach(k => delete rowsByKey[k]); document.querySelectorAll('main ol').forEach(o => o.innerHTML = ''); refresh();
-  }
+  st[key] = v; st.fase = '';   // un filtro cambiato a mano spegne la fase
+  view.apply();
+  if (key === 'group' || key === 'top') redraw();   // ridisegna le liste senza animazioni
+  share.push();
 }
 document.querySelectorAll('.seg').forEach(seg => {
   seg.addEventListener('click', e => { const b = e.target.closest('button'); if (b) choose(seg.dataset.key, b.dataset.v); });
   seg.addEventListener('keydown', e => {   // frecce sinistra/destra come in un gruppo di opzioni
-    if ((e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') || seg.dataset.key === 'group') return;   // le categorie si scelgono col tocco o Invio
+    if ((e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') || seg.dataset.key === 'group' || seg.dataset.key === 'fase') return;   // le categorie si scelgono col tocco o Invio
     const list = OPTS[seg.dataset.key], i = list.indexOf(st[seg.dataset.key]);
     const v = list[(i + (e.key === 'ArrowRight' ? 1 : list.length - 1)) % list.length];
     choose(seg.dataset.key, v); seg.querySelector('[data-v="' + v + '"]').focus(); e.preventDefault();
@@ -547,15 +564,52 @@ view.apply();
 const setRegia = () => document.documentElement.classList.toggle('regia', !document.documentElement.classList.contains('proj') && !document.fullscreenElement);
 document.addEventListener('fullscreenchange', setRegia); setRegia();
 // regia e ledwall nello stesso browser: le scelte fatte in una finestra arrivano subito anche all'altra
+// scelte arrivate da un'altra finestra (stesso browser) o da un altro PC (database): si applicano senza rimandarle
+function adopt(n){
+  if (!n || typeof n !== 'object') return;
+  const before = st.group + '|' + st.top; let changed = false;
+  for (const k in OPTS) if (n[k] !== undefined && OPTS[k].includes(n[k]) && st[k] !== n[k]){ st[k] = n[k]; changed = true; }   // group: solo valori già normalizzati
+  if (!changed) return;
+  view.apply();
+  if (st.group + '|' + st.top !== before) redraw();
+}
 window.addEventListener('storage', e => {
   if (e.key !== VKEY || !e.newValue) return;
   let n; try { n = JSON.parse(e.newValue); } catch(err){ return; }
-  const before = st.group + '|' + st.top; let changed = false;
-  for (const k in OPTS) if (OPTS[k].includes(n[k]) && st[k] !== n[k]){ st[k] = n[k]; changed = true; }   // group: solo valori già normalizzati
-  if (!changed) return;
-  view.apply();
-  if (st.group + '|' + st.top !== before){ Object.keys(rowsByKey).forEach(k => delete rowsByKey[k]); document.querySelectorAll('main ol').forEach(o => o.innerHTML = ''); refresh(); }
+  adopt(n);
 });
+/* ---------- filtri condivisi tra PC (supabase-classifica-condivisa.sql) ----------
+   Ogni scelta fatta a mano (e ogni "Prossima posizione") va nel database con la chiave admin;
+   ogni 3 secondi la pagina legge lo stato condiviso e applica quello più recente.
+   Il tempo "t" lo mette il server, così gli orologi dei PC non contano. */
+const share = (() => {
+  const C = window.EFG_CONFIG || {}; let sb = null, lastV = 0, lastR = 0, ok = null, missing = false, pushT = 0;
+  const key = () => { try { return sessionStorage.getItem('efgAdminKey') || ''; } catch(e){ return ''; } };
+  const client = () => sb || (sb = (B.remote && window.supabase) ? window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY, { auth:{ persistSession:false } }) : null);
+  const isMissing = err => /efg_classifica_vista|efg_admin_set_classifica|PGRST202|does not exist/i.test(String(err && (err.code + ' ' + err.message)));
+  function keep(d){ if (d && d.vista && d.vista.t > lastV) lastV = d.vista.t; if (d && d.reveal && d.reveal.t > lastR) lastR = d.reveal.t; }
+  async function send(vista, rev){
+    const c = client(); if (!c || !key()) return;
+    const { data, error } = await c.rpc('efg_admin_set_classifica', { p_key:key(), p_vista:vista, p_reveal:rev });
+    if (error){ ok = false; missing = isMissing(error); return; }
+    if (data && data.errore){ ok = false; return; }
+    ok = true; missing = false; keep(data);
+  }
+  function push(){ clearTimeout(pushT); pushT = setTimeout(() => { const v = {}; for (const k in OPTS) v[k] = st[k]; send(v, null).catch(() => {}); }, 250); }
+  function pushReveal(r){ send(null, r).catch(() => {}); }
+  async function poll(){
+    const c = client(); if (!c || document.hidden) return;
+    try {
+      const { data, error } = await c.rpc('efg_classifica_vista');
+      if (error){ ok = false; missing = isMissing(error); return; }
+      const d = Array.isArray(data) ? data[0] : data; ok = true; missing = false;
+      if (d && d.vista && d.vista.t > lastV){ lastV = d.vista.t; adopt(d.vista); }
+      if (d && d.reveal && d.reveal.t > lastR){ lastR = d.reveal.t; store.set('efgReveal', { n:d.reveal.n || 0, t:d.reveal.t }); reveal.refresh(); }
+    } catch(e){}
+  }
+  return { push, pushReveal, poll, note(){ return ok ? ' · 🔗 filtri condivisi' : missing ? ' · filtri solo su questo PC (eseguire supabase-classifica-condivisa.sql)' : ''; } };
+})();
+setInterval(share.poll, 3000); share.poll();   // all'apertura vale lo stato condiviso, se c'è
 
 let timer = 0;
 async function refresh(){
@@ -568,7 +622,7 @@ async function refresh(){
     const t = new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
     $('status').textContent = boards.some(b => b.filtroMancante)
       ? '⚠ Filtro Giocatori non attivo: eseguire supabase-classifica-gruppi.sql su Supabase (mostro tutti) · ' + t
-      : 'Live · aggiornata alle ' + t;
+      : 'Live · aggiornata alle ' + t + share.note();
     $('dot').classList.remove('off');
   } catch(e){
     console.warn('classifica', e);

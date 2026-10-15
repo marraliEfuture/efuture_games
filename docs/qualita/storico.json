@@ -480,8 +480,8 @@
  },
  {
   "data": "2026-10-15",
-  "commit": "5eccd85",
-  "versione": "v84",
+  "commit": "cdd999c",
+  "versione": "v85",
   "esiti": {
    "codice": {
     "ok": 39,
@@ -514,11 +514,11 @@
     "errore": 0
    }
   },
-  "spazio_kb": 29481.6,
+  "spazio_kb": 29490.5,
   "cartelle_kb": {
-   ".claude": 130.0,
-   "(file principali)": 405.9,
-   "docs": 308.3,
+   ".claude": 130.4,
+   "(file principali)": 413.0,
+   "docs": 309.7,
    "fonts": 120.3,
    "games": 920.5,
    "icons": 189.8,
