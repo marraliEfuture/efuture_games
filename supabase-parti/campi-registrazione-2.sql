@@ -1,6 +1,10 @@
 -- EFUTURE GAMES — supabase-campi-registrazione.sql, PARTE 2 DI 8
 -- Esegui le parti in ordine, una alla volta (ognuna si può rieseguire). Ultima riga di questa parte: "-- fine parte 2".
 
+-- utenti già registrati (una volta sola: tocca solo chi è ancora Ospite o senza azienda)
+update public.efg_players set azienda = 'Efuture'
+ where coalesce(trim(azienda), '') = '' and lower(trim(email)) ~ '@([a-z0-9-]+\.)*efuture\.it$';
+
 update public.efg_players set categoria = 'staff' where categoria = 'ospite' and efg_is_efuture(email, azienda);
 
 -- nome e azienda insieme unici (al posto del solo nome)

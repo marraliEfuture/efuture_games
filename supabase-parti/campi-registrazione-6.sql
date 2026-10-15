@@ -7,6 +7,8 @@ language sql immutable as $$
   select case when coalesce(trim(p_azienda), '') = '' then p_name else trim(p_azienda) || ' - ' || p_name end;
 $$;
 
+revoke all on function public.efg_nome_classifica(text,text) from public, anon, authenticated;
+
 drop function if exists public.efg_board(text);
 
 create function public.efg_board(p_game text)
@@ -38,6 +40,4 @@ language sql stable security definer set search_path = public as $$
   order by levels desc, score desc, max(s.updated_at) asc
   limit 50;
 $$;
-
-revoke all on function public.efg_board(text), public.efg_board_group(text, text) from public;
 -- fine parte 6

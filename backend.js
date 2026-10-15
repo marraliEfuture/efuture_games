@@ -21,17 +21,25 @@ async function rpc(fn, args){
   return data;
 }
 const one = d => Array.isArray(d) ? d[0] : d;
+const missing = e => /PGRST202|does not exist|Could not find the function/i.test(String(e && (e.code + ' ' + e.message)));
 
 const Backend = remote ? {
   remote:true,
   async current(){ return store.get('efgSessionLive', null); },
   // nickname o email già usati? null se il database non ha ancora la funzione
-  async checkSignup({ name, email }){
-    try { return one(await rpc('efg_signup_check', { p_email:normEmail(email), p_name:String(name||'').trim() })); }
-    catch(e){ if (/efg_signup_check|PGRST202|does not exist/i.test(String(e && (e.code + ' ' + e.message)))) return null; throw e; }
+  // nome (con l'azienda) o email già usati? null se il database non ha ancora la funzione
+  async checkSignup({ name, email, azienda }){
+    const a = { p_email:normEmail(email), p_name:String(name||'').trim() };
+    try { return one(await rpc('efg_signup_check', Object.assign({ p_azienda:String(azienda||'').trim() }, a))); }
+    catch(e){ if (!missing(e)) throw e; }
+    try { return one(await rpc('efg_signup_check', a)); }   // database senza supabase-campi-registrazione.sql
+    catch(e){ if (missing(e)) return null; throw e; }
   },
-  async signUp({ name, email }){
-    const r = one(await rpc('efg_register', { p_email:normEmail(email), p_name:name }));
+  // azienda e cellulare (supabase-campi-registrazione.sql); con il database vecchio si registra senza
+  async signUp({ name, email, azienda, phone }){
+    let r;
+    try { r = one(await rpc('efg_register', { p_email:normEmail(email), p_name:name, p_azienda:String(azienda||'').trim(), p_phone:String(phone||'').trim() || null })); }
+    catch(e){ if (!missing(e)) throw e; r = one(await rpc('efg_register', { p_email:normEmail(email), p_name:name })); }
     const u = { id:r.pid, email:normEmail(email), nickname:r.name };
     store.set('efgSessionLive', u); return { user:u };
   },
@@ -42,6 +50,12 @@ const Backend = remote ? {
     store.set('efgSessionLive', u); return { user:u };
   },
   async signOut(){ store.set('efgSessionLive', null); },
+  // nome, azienda e se manca l'azienda obbligatoria (null se il database non ha ancora la funzione)
+  async profile(user){
+    try { return one(await rpc('efg_profilo', { p_email:user.email })); }
+    catch(e){ if (missing(e)) return null; throw e; }
+  },
+  async setCompany(user, azienda){ return one(await rpc('efg_set_azienda', { p_email:user.email, p_azienda:String(azienda||'').trim() })); },
   async submit(user, game, score, levels){ return !!(await rpc('efg_submit', { p_email:user.email, p_game:game, p_score:score, p_levels:levels })); },
   // game: 'all' (somma dei 4 giochi) oppure l'id del gioco → [{pid, name, levels, score, games, bonus}] ordinati
   // nella generale "bonus" sono i punti del Bonus Recensione già compresi in score
@@ -87,16 +101,15 @@ const Backend = remote ? {
 } : {
   remote:false,
   async current(){ return store.get('efgSession3', null); },
-  async checkSignup({ name, email }){
-    const users = store.get('efgDemoUsers3', {}), n = String(name||'').trim().toLowerCase();
-    return { nome_usato: !!n && Object.values(users).some(u => String(u.name).trim().toLowerCase() === n), email_usata: !!users[normEmail(email)] };
+  async checkSignup({ name, email, azienda }){
+    const users = store.get('efgDemoUsers3', {}), n = String(name||'').trim().toLowerCase(), a = String(azienda||'').trim().toLowerCase();
+    return { nome_usato: !!n && Object.values(users).some(u => String(u.name).trim().toLowerCase() === n && String(u.azienda||'').trim().toLowerCase() === a), email_usata: !!users[normEmail(email)] };
   },
-  async signUp({ name, email }){
+  async signUp({ name, email, azienda }){
     const users = store.get('efgDemoUsers3', {}); const key = normEmail(email);
     if (users[key]) throw new Error('already registered');
-    const n = String(name).trim().toLowerCase();
-    if (Object.values(users).some(u => String(u.name).trim().toLowerCase() === n)) throw new Error('name taken');
-    users[key] = { pid:'local-'+Date.now().toString(36), email:key, name };
+    if ((await this.checkSignup({ name, email:'', azienda })).nome_usato) throw new Error('name taken');
+    users[key] = { pid:'local-'+Date.now().toString(36), email:key, name, azienda:String(azienda||'').trim() };
     store.set('efgDemoUsers3', users);
     const u = { id:users[key].pid, email:key, nickname:name }; store.set('efgSession3', u); return { user:u };
   },
@@ -120,7 +133,7 @@ const Backend = remote ? {
       if (group === 'efuture' && !isEf(r.email)) continue;
       if (group === 'ospiti' && isEf(r.email)) continue;
       const u = users[r.email]; if (!u) continue;
-      const t = tot[r.email] = tot[r.email] || { pid:u.pid, name:u.name, levels:0, score:0, games:0 };
+      const t = tot[r.email] = tot[r.email] || { pid:u.pid, name:(u.azienda ? u.azienda + ' - ' : '') + u.name, azienda:u.azienda || null, nome:u.name, levels:0, score:0, games:0 };
       t.score += r.score; t.levels += r.levels || 0; if ((r.levels||0) > 0) t.games++;
     }
     return Object.values(tot).sort((a,b)=>b.levels-a.levels || b.score-a.score).slice(0,50);
@@ -131,6 +144,7 @@ const Backend = remote ? {
 if (!Backend.remote){
   Backend.settings = async () => null;
   Backend.resetId = async () => null;
+  Backend.profile = async () => null;
   Backend.review = async user => ({ link:null, clic:!!(user && store.get('efgDemoReview', {})[user.email]), ok:false, punti:200 });
   Backend.reviewClick = async user => { const r = store.get('efgDemoReview', {}); r[user.email] = r[user.email] || new Date().toISOString(); store.set('efgDemoReview', r); return Backend.review(user); };
 }

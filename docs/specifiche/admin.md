@@ -61,6 +61,8 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
 
 ### Utenti
 
+- **Categorie (v82):** sopra la tabella i filtri **Tutti · Staff · Sponsor · Ospiti** con il numero di utenti; in tabella le colonne **Categoria** (tendina colorata: Staff blu, Sponsor arancio, Ospite verde, salva subito con `efg_admin_set_categoria`), **Azienda** e **Email · cellulare** (il cellulare sotto l'email, con 📱). Il CSV ha in più Azienda, Cellulare e Categoria.
+
 - Dati da `efg_admin_players`. Testo in alto: "N utenti registrati". Pulsanti **➕ Nuovo utente**, **Aggiorna** e **Scarica CSV**.
 - **➕ Nuovo utente** (v75): popup con Email, Nome (2-20 caratteri) e Tipo scelto dall'admin: **🎮 Giocatore** (predefinito), **🎮🛡️ Admin e giocatore** o **🛡️ Solo admin**, con una riga che spiega il tipo. **Crea utente** chiede conferma e chiama `efg_admin_create_user(p_key, p_email, p_name, p_tipo, p_new)`: crea l'utente senza passare dall'app; se l'email esiste già, l'utente prende il tipo scelto (nome, blocco e punteggi restano). Per i tipi admin il pulsante diventa **Crea utente e genera la chiave**: il browser genera una chiave casuale `XXXX-XXXX-XXXX-XXXX` che compare **una sola volta** con **Copia** (nel database solo cifrata); l'admin entra con email + chiave, ha pieni poteri e può cambiarla dalla scheda Chiave. Un giocatore non ha chiave (se era admin la perde). Nel log: "admin: nuovo utente" o "admin: tipo utente". Serve `supabase-nuovo-utente.sql`; senza, il popup dice di eseguirlo.
 - **Bonus Recensione** (riquadro sopra la tabella): campo **⭐ Link recensioni Google** (deve iniziare con `https://`; vuoto = il pulsante dell'app apre la ricerca di efuture su Google Maps), campo **Punti** (da 0 a 5000, predefinito 200) e pulsante **Salva**. Chiama `efg_admin_set_recensione_link` e `efg_admin_set_impostazione('recensione_punti')`. Sotto, una riga spiega i colori della colonna ⭐. Il CSV aggiunge le colonne "Clic Bonus Recensione" e "Recensione confermata". Serve `supabase-recensioni.sql`.
@@ -98,6 +100,10 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
 - **🎮 Visualizzazione dei giochi:** tre scelte, quella attiva evidenziata: **🎮 Game** (scocca Game Boy in verticale, predefinita), **☀ Normal** (chiaro, gioco a tutta larghezza; nel database `light`), **☾ Dark** (scuro, gioco a tutta larghezza). È la visualizzazione con cui si aprono i giochi per chi non ne ha ancora scelta una con il pulsante in alto nel gioco. Chiama `efg_admin_set_impostazione(p_key, 'vista_default', …)`; nel log "admin: impostazione". L'app la legge all'avvio (`efg_impostazioni`), quindi vale dalla prossima apertura dell'app.
 - **⭐ Bonus Recensione:** rimanda a Utenti, dove si impostano link e punti.
 - Serve `supabase-recensioni.sql`: senza, compare l'avviso di eseguirlo.
+
+### Campi della registrazione (Impostazioni, v82)
+
+In cima a Impostazioni una tabella con una riga per campo (Nome e cognome, Azienda, Email, Cellulare) e tre scelte: 🚫 Non visibile, ◻️ Facoltativo, ✳️ Obbligatorio. Il clic salva subito (`efg_admin_set_impostazione('campi_registrazione', JSON)`), "Salvato: vale dalla prossima registrazione.". L'email è fissa su Obbligatorio. Nome e azienda non possono essere entrambi non visibili. Senza `supabase-campi-registrazione.sql` compare "Per salvarli esegui prima supabase-campi-registrazione.sql…".
 
 ### Qualità
 

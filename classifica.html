@@ -93,6 +93,14 @@ ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px
 li{display:grid;grid-template-columns:2.1em minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:.5em .8em;border-radius:4px;background:var(--row);font-size:clamp(13px,1vw,17px);transition:background .6s}
 li .r{font-family:var(--title);font-weight:700;font-size:.85em;width:2.1em;height:2.1em;border-radius:50%;display:grid;place-items:center;color:var(--muted);background:#fff;border:1px solid var(--line)}
 li .n{font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* caselle dei giochi: l'azienda su una riga piccola sopra al nome (Azienda - Nome senza tagli) */
+li .n .az{display:block;font-size:.68em;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#c26a0a;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+li .n .nm{display:block;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+/* nelle caselle strette dei 4 giochi: livelli sotto al nome, nome e azienda vanno a capo invece di essere tagliati */
+#games li{grid-template-columns:2.1em minmax(0,1fr) auto;grid-template-areas:"r n s" "r lv s";row-gap:3px}
+#games li .r{grid-area:r}#games li .n{grid-area:n}#games li .s{grid-area:s}#games li .lv{grid-area:lv;justify-self:start}
+#games li .n,#games li .n .az,#games li .n .nm{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+#list-all li .n{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.2}   /* generale: Azienda - Nome per intero, al massimo su due righe */
 li .s{font-family:var(--title);font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
 li .lv{font-family:var(--title);font-weight:700;font-size:.72em;color:var(--navy);background:#e3f3ff;border-radius:3px;padding:.25em .55em;white-space:nowrap}
 .total li .lv{background:rgba(138,208,255,.18);color:var(--sky)}
@@ -242,7 +250,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
     </div></div>
   <div class="seg-grp"><span class="ttl" id="lbWho">Giocatori</span>
     <div class="seg" role="radiogroup" aria-labelledby="lbWho" data-key="group">
-      <button type="button" role="radio" data-v="ospiti">Ospiti</button><button type="button" role="radio" data-v="efuture">Efuture</button><button type="button" role="radio" data-v="tutti">Tutti</button>
+      <button type="button" role="checkbox" data-v="ospite">Ospiti</button><button type="button" role="checkbox" data-v="sponsor">Sponsor</button><button type="button" role="checkbox" data-v="staff">Staff</button>
     </div></div>
   <div class="seg-grp"><span class="ttl" id="lbQr">QR</span>
     <div class="seg" role="radiogroup" aria-labelledby="lbQr" data-key="qr">
@@ -291,9 +299,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=81"></script>
+<script src="config.js?v=82"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=81"></script>
+<script src="backend.js?v=82"></script>
 <script>
 (function(){
 "use strict";
@@ -381,7 +389,10 @@ function render(key, rows, top){
     }
     const li = e.li;
     li.querySelector('.r').textContent = i + 1;
-    li.querySelector('.n').textContent = r.name;
+    const nEl = li.querySelector('.n');
+    if (key !== 'all' && r.azienda && r.nome){ nEl.innerHTML = '<span class="az"></span><span class="nm"></span>'; nEl.firstChild.textContent = r.azienda; nEl.lastChild.textContent = r.nome; }
+    else nEl.textContent = r.name;
+    nEl.title = r.name;
     li.querySelector('.lv').textContent = (key === 'all' ? (r.games || 0) + '/4 giochi · ' + (r.levels || 0) + '/12 liv' + (r.bonus ? ' · ⭐ +' + r.bonus + ' bonus' : '') : (r.levels || 0) + '/3 liv');
     li.querySelector('.s b').textContent = r.score;
     const changed = !firstTime && (isNew || e.sig !== sig);
@@ -408,18 +419,29 @@ function render(key, rows, top){
    Visualizzazione dei record della classifica generale (i 4 giochi restano statici): statica, a comparsa
    manuale o a comparsa automatica (le righe compaiono dall'ultima alla prima; ogni nuova va in cima alla pila).
    Le scelte restano su questo schermo; si possono anche fissare dall'indirizzo:
-   classifica.html?classifica=generale|giochi|tutti&visualizzazione=statica|manuale|auto&top=3|5|10&giocatori=ospiti|efuture|tutti&qr=si|no */
+   classifica.html?classifica=generale|giochi|tutti&visualizzazione=statica|manuale|auto&top=3|5|10&giocatori=ospite,sponsor,staff|tutti&qr=si|no
+   Giocatori: categorie scelte in admin (Staff, Sponsor, Ospiti), anche più insieme; i vecchi 'ospiti' ed 'efuture' valgono ancora. */
 const store = { get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
                 set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
-const OPTS = { board:['generale','giochi','tutti'], vis:['statica','manuale','auto'], top:['3','5','10'], group:['ospiti','efuture','tutti'], qr:['si','no'] };
-// predefinito (ospiti al proiettore): i 4 giochi più la generale a comparsa automatica, solo ospiti, QR visibile
-const DEF  = { board:'tutti', vis:'auto', top:'5', group:'ospiti', qr:'si' };
+const CATS = ['ospite', 'sponsor', 'staff'];
+// categorie scelte, nell'ordine di CATS, separate da virgola; tutte e tre = 'tutti'. Nessuna non si può: torna il predefinito.
+function normGroup(v){
+  if (v == null) return null;
+  const s = String(v).replace(/\s/g, '').replace('ospiti', 'ospite').replace('efuture', 'staff');
+  const list = s === 'tutti' ? CATS : CATS.filter(c => s.split(',').includes(c));
+  return !list.length ? null : list.length === CATS.length ? 'tutti' : list.join(',');
+}
+const groupList = g => g === 'tutti' ? CATS : g.split(',');
+const OPTS = { board:['generale','giochi','tutti'], vis:['statica','manuale','auto'], top:['3','5','10'], group:{ includes: v => normGroup(v) === v && v != null }, qr:['si','no'] };
+// predefinito (proiettore): i 4 giochi più la generale a comparsa automatica, ospiti e sponsor (niente staff), QR visibile
+const DEF  = { board:'tutti', vis:'auto', top:'5', group:'ospite,sponsor', qr:'si' };
 const URLK = { board:'classifica', vis:'visualizzazione', top:'top', group:'giocatori', qr:'qr' };
-const VKEY = 'efgBoardView5';   // chiave nuova: le scelte salvate con la versione precedente non valgono più
+const VKEY = 'efgBoardView6';   // chiave nuova: le scelte salvate con le versioni precedenti non valgono più (v82: categorie)
 const saved = store.get(VKEY, {});
 const st = {};
 for (const k in OPTS){
   let v = Q.get(URLK[k]); if (k === 'qr' && (v === '1' || v === '0')) v = v === '1' ? 'si' : 'no';
+  if (k === 'group'){ st.group = normGroup(v) || normGroup(saved.group) || DEF.group; continue; }
   st[k] = OPTS[k].includes(v) ? v : (OPTS[k].includes(saved[k]) ? saved[k] : DEF[k]);
 }
 /* ---------- comparsa dei record (dall'ultimo al primo) ----------
@@ -488,9 +510,12 @@ const view = {
     $('main').classList.toggle('only-total', t && !g);
     $('main').classList.toggle('only-games', g && !t);
     document.querySelectorAll('.seg').forEach(seg => seg.querySelectorAll('button').forEach(b => {
-      const on = b.dataset.v === st[seg.dataset.key]; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1;
+      const multi = seg.dataset.key === 'group';
+      const on = multi ? groupList(st.group).includes(b.dataset.v) : b.dataset.v === st[seg.dataset.key];
+      b.setAttribute('aria-checked', on); b.tabIndex = (on || multi) ? 0 : -1;
     }));
-    const label = st.group === 'efuture' ? 'Solo utenti Efuture' : st.group === 'ospiti' ? 'Solo ospiti' : '';
+    const NAMES = { ospite:'ospiti', sponsor:'sponsor', staff:'staff' };
+    const label = st.group === 'tutti' ? '' : 'Solo ' + groupList(st.group).map(c => NAMES[c]).join(' e ');
     $('whoTag').hidden = !label; $('whoTag').textContent = label;
     document.querySelectorAll('.games .sub').forEach(x => x.textContent = 'Top ' + TOP_GAME + ' · livelli, poi punti' + (label ? ' · ' + label.toLowerCase() : ''));
     store.set(VKEY, st);
@@ -498,6 +523,10 @@ const view = {
   }
 };
 function choose(key, v){
+  if (key === 'group'){   // Ospiti / Sponsor / Staff si accendono e spengono; almeno una resta accesa
+    const now = groupList(st.group), list = now.includes(v) ? now.filter(c => c !== v) : now.concat(v);
+    v = normGroup(list.join(',')); if (!v) return;
+  }
   if (st[key] === v) return;
   st[key] = v; view.apply();
   if (key === 'group' || key === 'top'){   // ridisegna le liste senza animazioni
@@ -507,7 +536,7 @@ function choose(key, v){
 document.querySelectorAll('.seg').forEach(seg => {
   seg.addEventListener('click', e => { const b = e.target.closest('button'); if (b) choose(seg.dataset.key, b.dataset.v); });
   seg.addEventListener('keydown', e => {   // frecce sinistra/destra come in un gruppo di opzioni
-    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    if ((e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') || seg.dataset.key === 'group') return;   // le categorie si scelgono col tocco o Invio
     const list = OPTS[seg.dataset.key], i = list.indexOf(st[seg.dataset.key]);
     const v = list[(i + (e.key === 'ArrowRight' ? 1 : list.length - 1)) % list.length];
     choose(seg.dataset.key, v); seg.querySelector('[data-v="' + v + '"]').focus(); e.preventDefault();
@@ -522,7 +551,7 @@ window.addEventListener('storage', e => {
   if (e.key !== VKEY || !e.newValue) return;
   let n; try { n = JSON.parse(e.newValue); } catch(err){ return; }
   const before = st.group + '|' + st.top; let changed = false;
-  for (const k in OPTS) if (OPTS[k].includes(n[k]) && st[k] !== n[k]){ st[k] = n[k]; changed = true; }
+  for (const k in OPTS) if (OPTS[k].includes(n[k]) && st[k] !== n[k]){ st[k] = n[k]; changed = true; }   // group: solo valori già normalizzati
   if (!changed) return;
   view.apply();
   if (st.group + '|' + st.top !== before){ Object.keys(rowsByKey).forEach(k => delete rowsByKey[k]); document.querySelectorAll('main ol').forEach(o => o.innerHTML = ''); refresh(); }

@@ -38,7 +38,6 @@ drop trigger if exists efg_players_efuture on public.efg_players;
 create trigger efg_players_efuture before insert or update of azienda on public.efg_players
   for each row execute function public.efg_players_efuture();
 
--- utenti già registrati (una volta sola: tocca solo chi è ancora Ospite o senza azienda)
-update public.efg_players set azienda = 'Efuture'
- where coalesce(trim(azienda), '') = '' and lower(trim(email)) ~ '@([a-z0-9-]+\.)*efuture\.it$';
+-- funzioni d'aiuto: le usano solo le altre funzioni del database, non l'app
+revoke all on function public.efg_is_efuture(text,text), public.efg_players_efuture() from public, anon, authenticated;
 -- fine parte 1

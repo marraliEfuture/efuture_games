@@ -67,6 +67,12 @@ Stile del sito efuture.it:
 - **Automatica:** ogni 150 s la lista si svuota e si riempie, una riga ogni 2 s, poi resta piena fino al giro successivo. Il ritmo dipende dall'orologio, quindi regia e ledwall sono allineati.
 - **Manuale:** in regia **▶ Prossima posizione** (anche barra spaziatrice o freccia destra) fa comparire il record successivo; a lista piena il tocco successivo la svuota e si ricomincia. Il passo è condiviso tra regia e ledwall con `localStorage` (`efgReveal`).
 
+## Giocatori: categorie (v82)
+
+Il filtro **Giocatori** ha tre interruttori, **Ospiti · Sponsor · Staff**, che si accendono e spengono (almeno uno resta acceso; tutti e tre = tutti). Predefinito: **Ospiti e Sponsor**. Il valore va a `efg_board_group` come elenco (`ospite,sponsor`); nell'indirizzo `giocatori=ospite,sponsor` (valgono ancora `ospiti`, `efuture` = staff, `tutti`). L'etichetta accanto al titolo dice per esempio "Solo ospiti e sponsor". Le scelte salvate sono in `efgBoardView6`.
+
+**Nomi:** sempre **Azienda - Nome**. Nella generale su una riga (a capo se serve); nelle caselle dei 4 giochi l'azienda è una riga piccola arancione sopra al nome e i livelli vanno sotto, così niente viene tagliato.
+
 ## Dati, ordine e aggiornamento
 
 - A ogni aggiornamento la pagina chiede in parallelo 5 classifiche: `all` e i 4 giochi. Ognuna restituisce al massimo 50 righe `{pid, name, levels, score, games}`. Le email non arrivano mai alla pagina.

@@ -1,6 +1,8 @@
 -- EFUTURE GAMES — supabase-campi-registrazione.sql, PARTE 7 DI 8
 -- Esegui le parti in ordine, una alla volta (ognuna si può rieseguire). Ultima riga di questa parte: "-- fine parte 7".
 
+revoke all on function public.efg_board(text), public.efg_board_group(text, text) from public;
+
 grant execute on function public.efg_board(text), public.efg_board_group(text, text) to anon, authenticated;
 
 -- 6. admin: elenco utenti, categoria, ripristino

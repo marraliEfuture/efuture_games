@@ -51,6 +51,8 @@ end $$;
 drop trigger if exists efg_players_efuture on public.efg_players;
 create trigger efg_players_efuture before insert or update of azienda on public.efg_players
   for each row execute function public.efg_players_efuture();
+-- funzioni d'aiuto: le usano solo le altre funzioni del database, non l'app
+revoke all on function public.efg_is_efuture(text,text), public.efg_players_efuture() from public, anon, authenticated;
 
 -- utenti già registrati (una volta sola: tocca solo chi è ancora Ospite o senza azienda)
 update public.efg_players set azienda = 'Efuture'
@@ -187,6 +189,7 @@ create or replace function public.efg_nome_classifica(p_name text, p_azienda tex
 language sql immutable as $$
   select case when coalesce(trim(p_azienda), '') = '' then p_name else trim(p_azienda) || ' - ' || p_name end;
 $$;
+revoke all on function public.efg_nome_classifica(text,text) from public, anon, authenticated;
 drop function if exists public.efg_board(text);
 create function public.efg_board(p_game text)
 returns table (pid uuid, name text, levels integer, score integer, games integer, azienda text, nome text)
