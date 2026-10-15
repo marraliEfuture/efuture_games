@@ -53,11 +53,15 @@ h2{font-size:132px}
 .cover h1{font-size:220px;letter-spacing:-6px}
 .cover .care{font-family:var(--title);font-weight:700;font-size:42px;letter-spacing:.6em;color:var(--sky);margin-top:44px;padding-left:.6em}
 
+.cover.thanks .care{font-family:var(--title);font-size:72px;font-weight:700;letter-spacing:-1px;padding-left:0;margin-top:30px;color:#fff}
+
 /* domanda */
 .ask .wrap{text-align:center}
 .ask .q{font-family:var(--title);font-weight:800;font-size:300px;line-height:.9;color:var(--orange)}
 .ask h2{font-size:84px;letter-spacing:-1.5px;margin-top:24px;line-height:1.12}
 .ask .ex{display:flex;justify-content:center;flex-wrap:wrap;gap:22px;margin-top:64px}
+.ask.next .q{font-size:200px}
+.ask.next .ex{margin-top:48px}
 .ask .ex span{font-size:34px;padding:16px 30px;border-radius:999px;border:2px solid rgba(138,208,255,.45);color:#e6f2fb}
 
 /* GAME ON */
@@ -111,7 +115,7 @@ body.rec .nav,body.rec #fs,body.rec #hint{display:none!important}
 <button id="fs" type="button">Schermo intero</button>
 <div id="hint" role="button" tabindex="0">Clicca una volta qui per lo schermo intero · frecce o telecomando per avanzare</div>
 
-<script src="tutorial/tutorials.js?v=90"></script>
+<script src="tutorial/tutorials.js?v=91"></script>
 <script>
 (function(){
 "use strict";
@@ -127,7 +131,7 @@ const DECK = [
   { title:'Laboratorio AI', cls:'dark cover', html:'<div class="wrap"><h1>Laboratorio <span class="o">AI</span></h1><div class="care">CARE CONFERENCE</div></div>' + LOGO },
   { title:'Claude, aiutami tu!', cls:'dark', html:'<div class="wrap"><p class="kicker">CLAUDE IN CHROME</p><h2>Claude, aiutami tu!</h2><p class="desc">Installa l\'estensione di Claude sul tuo browser e risolvi <b>operazioni quotidiane.</b></p></div>' + LOGO },
   { title:'Video: prenota con TheFork', video:'video/thefork-claude.mp4', poster:'video/thefork-claude.jpg', cap:'Claude in Chrome prenota un tavolo su TheFork' },
-  { title:'E tu cosa potresti chiedere?', cls:'dark ask', html:'<div class="wrap"><div class="q">?</div><h2>E tu cosa potresti chiedere a Claude per le tue <span class="o">operazioni quotidiane?</span></h2><div class="ex"><span>Prenotare un ristorante</span><span>Invia una mail</span><span>Compila un foglio di calcolo</span><span>Confrontare offerte</span><span>Organizza una trasferta</span></div></div>' + LOGO },
+  { title:'E tu cosa potresti chiedere?', cls:'dark ask', html:'<div class="wrap"><div class="q">?</div><h2>E tu cosa potresti chiedere a Claude per le tue <span class="o">operazioni quotidiane?</span></h2><div class="ex"><span>Prenotare un ristorante</span><span>Inviare una mail</span><span>Compilare un foglio di calcolo</span><span>Confrontare offerte</span><span>Organizzare una trasferta</span></div></div>' + LOGO },
   { title:'Crea il tuo videogioco!', cls:'dark', html:'<div class="gameon">GAME ON</div><div class="wrap"><p class="kicker">CREA CON CLAUDE</p><h2>Crea il tuo videogioco!</h2><p class="desc">4 prompt e il gioco è fatto! Realizza la tua app in meno di 15 minuti.</p></div>' + LOGO },
   { title:'Video: Forza 4 con Claude', video:'video/forza4-claude.mp4', poster:'video/forza4-claude.jpg', cap:'Crea e gioca con Claude' },
 ];
@@ -136,6 +140,10 @@ const TID = QS.get('t');
 if (TID) DECK.length = 0;
 const TU = (window.EFG_TUTORIALS || []).find(t => t.id === (TID || 'forza4'));
 if (TU) TU.slides.forEach(s => DECK.push({ title:s.h, tut:s, tuId:TU.id, tuName:TU.short || TU.title }));
+// chiusura (solo nella presentazione completa, non con ?t=<id>)
+if (!TID) DECK.push(
+  { title:'E adesso?', cls:'dark ask next', html:'<div class="wrap"><div class="q">?</div><h2>Ho creato il mio primo videogioco. <span class="o">E adesso?</span></h2><div class="ex"><span>Come posso creare un’applicazione per la mia azienda?</span><span>Con quale scopo?</span><span>Come posso migliorare un processo aziendale?</span><span>Come posso digitalizzare un’operazione di routine?</span></div></div>' + LOGO },
+  { title:'Grazie', cls:'dark cover thanks', html:'<div class="wrap"><h1>Grazie</h1><div class="care">e buona <span class="o">accelerazione…</span></div></div>' + LOGO });
 
 const stage = $('stage'), N = DECK.length;
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));

@@ -143,7 +143,7 @@ CODICI DI SBLOCCO (uno per gioco)
      mostra la slide corrente con Inizio, ←, Avanti →, ⏯ Video e
      ✕ Chiudi; il focus resta sul proiettore, così il puntatore laser o il
      telecomando muovono le slide (funzionano anche le frecce ← →). "▶ Video (mp4)" apre la stessa presentazione registrata
-     (video/laboratorio-ai.mp4, 4 min 42 s). Interventi in LAB_EVENTS
+     (video/laboratorio-ai.mp4, 4 min 52 s). Interventi in LAB_EVENTS
      dentro admin.html.
    Se perdi la chiave: Supabase > SQL Editor >
      select efg_admin_init('NUOVA-CHIAVE-LUNGA');

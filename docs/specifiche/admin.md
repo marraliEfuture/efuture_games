@@ -223,7 +223,7 @@ Le skill si usano in una sessione di Claude Code aperta sul repository.
 ### Video utili
 
 Card con il lettore video (`preload="none"`), il titolo, la descrizione e i pulsanti **Apri**, **Copia link** e **Scarica**. Video presenti:
-- Presentazione «Laboratorio AI» (`video/laboratorio-ai.mp4`, 4 min 42 s): la presentazione `laboratorio.html` registrata; per presentarla dal vivo si usa Formazione › Laboratorio › Presenta;
+- Presentazione «Laboratorio AI» (`video/laboratorio-ai.mp4`, 4 min 52 s): la presentazione `laboratorio.html` registrata; per presentarla dal vivo si usa Formazione › Laboratorio › Presenta;
 - The Fork con Claude in Chrome;
 - Forza 4 con Claude;
 - Foglio «Attività giornaliere» con Claude in Chrome.
@@ -253,7 +253,7 @@ Tutorial presenti:
 *Aggiunto il 14/10/2026, v73.*
 
 - Testo: "La scaletta degli interventi da presentare all'evento, in ordine. Tocca **Presenta**: l'intervento va a schermo intero sul proiettore e qui resta la regia."; a destra "N interventi · circa X min".
-- Una card per intervento (`LAB_EVENTS`, in ordine): numero in un cerchio, titolo, descrizione, etichette (⏱ minuti, 🎤 relatore e altre). L'intervento 1 è in risalto: bordo e cerchio arancioni (`--brand-orange`), sfondo sfumato, etichetta "Evento n. 1", e sotto la riga "⌨️ Presenta: va a schermo intero sul proiettore; si va avanti e indietro dalla regia, con le frecce ← → o il telecomando. Video: la stessa presentazione registrata, 4 min 42 s."
+- Una card per intervento (`LAB_EVENTS`, in ordine): numero in un cerchio, titolo, descrizione, etichette (⏱ minuti, 🎤 relatore e altre). L'intervento 1 è in risalto: bordo e cerchio arancioni (`--brand-orange`), sfondo sfumato, etichetta "Evento n. 1", e sotto la riga "⌨️ Presenta: va a schermo intero sul proiettore; si va avanti e indietro dalla regia, con le frecce ← → o il telecomando. Video: la stessa presentazione registrata, 4 min 52 s."
 - A destra **Presenta** e, per chi ha un video, **▶ Video (mp4)**:
   - Presenta con `deck` o `tutorial` (v88, `labProj`): **l'admin resta dov'è** e fa da regia. La presentazione va nella finestra `proiettore.html` sul secondo monitor (Window Management API per trovare lo schermo): la prima volta Presenta la apre lì (popup grande quanto lo schermo, nome `efgLabProj`); poi le manda `{ type:'show', url }` con `postMessage(…, { delegate:'fullscreen' })` (Capability Delegation), così il proiettore carica la presentazione e va a schermo intero **senza clic sul proiettore**. L'url è `deck` + `?embed=1`, oppure per un tutorial `laboratorio.html?embed=1&t=<id>` (solo i passi di quel tutorial). Il proiettore risponde `{ type:'fs', ok }` e l'admin mostra "La presentazione è a schermo intero sul proiettore…" oppure "Il proiettore è pronto sull'altro schermo: premi di nuovo «Presenta» per lo schermo intero" (aprire la finestra consuma il clic, quindi la prima volta può servire un secondo Presenta). Le sessioni successive: un clic, la finestra resta aperta e cambia solo la presentazione. **Focus sul proiettore (v89):** dopo ogni Presenta e ogni pulsante della barra di regia l'admin chiama `projWin.focus()` e manda `{ type:'focus' }` (con il permesso delegato: se il proiettore era uscito dallo schermo intero ci torna); il proiettore mette il focus dentro l'iframe della presentazione, così il puntatore laser o il telecomando (frecce, PagSu/PagGiù) muovono le slide direttamente. Se il focus torna sull'admin, le stesse frecce vengono comunque inoltrate. La prima volta il browser chiede il permesso "Gestione finestre": dopo "Permesso concesso: premi di nuovo «Presenta»". Popup bloccati: messaggio per consentirli.
   - **Un solo monitor** (o browser senza Window Management API) — `labFull`: questa finestra va a schermo intero con la presentazione in `#labStage` (iframe `#labFrame`); Esc chiude. Se c'è un secondo schermo `labFull` userebbe `requestFullscreen({ screen })` e aprirebbe la regia `admin.html?regia=lab` (entra da sola con la chiave della scheda, apre Laboratorio, titolo "Regia · …"), ma dalla v88 si usa `labProj`, che non sposta la scheda dell'admin;
@@ -278,7 +278,7 @@ In `presentazioni/`, 16:9 (13,33 × 7,5 in), tema "Efuture" (blu notte `002238`,
 
 | File | Contenuto |
 |---|---|
-| `1-laboratorio-ai.pptx` | Le 18 slide di `laboratorio.html` come immagini 1920×1080; le slide 3 e 6 contengono i video TheFork e Forza 4 |
+| `1-laboratorio-ai.pptx` | Le 20 slide di `laboratorio.html` come immagini 1920×1080; le slide 3 e 6 contengono i video TheFork e Forza 4 |
 | `2-forza4-claude.pptx` | Tutorial `forza4` con testi modificabili (layout immagine a sinistra, testo a destra, prompt e tempo) + video |
 | `3-foglio-attivita.pptx` | Tutorial `sheets`, come sopra + video |
 | `4-efuture-games.pptx` | Copertina, regole (3 livelli · 1 minuto · 3 vite, formula dei punti, sblocco agli stand), una slide per gioco con schermata di gioco, QR dell'app |
@@ -297,14 +297,17 @@ Si rifanno tutti con `.claude/skills/efuture-games-admin/scripts/pptx_laboratori
 
 - Parametri: `?rec=1` nasconde comandi e inviti (registrazione del video); `?embed=1` (dentro l'admin, già a schermo intero) nasconde comandi e inviti, non chiede lo schermo intero al clic ma fa partire i video; `?t=<id>` mostra solo i passi di quel tutorial di `tutorial/tutorials.js`.
 - Pagina senza accesso, stile PowerPoint: palco fisso 1920×1080 scalato sulla finestra, bande nere ai lati. Font locali Montserrat, Poppins e Press Start 2P; colori navy `#002238`, arancione `#f18c22`, azzurro `#8ad0ff`.
-- Slide (`DECK`, 18 in tutto):
+- Slide (`DECK`, 20 in tutto):
   1. Copertina "Laboratorio **AI**" (AI arancione) e "CARE CONFERENCE" spaziato in azzurro;
   2. "CLAUDE IN CHROME" · **Claude, aiutami tu!** · "Installa l'estensione di Claude sul tuo browser e risolvi **operazioni quotidiane.**";
   3. video `video/thefork-claude.mp4` a tutto schermo, con didascalia che sparisce quando parte;
-  4. grande "?" arancione · "E tu cosa potresti chiedere a Claude per le tue *operazioni quotidiane?*" con gli esempi Prenotare un ristorante, Invia una mail, Compila un foglio di calcolo, Confrontare offerte, Organizza una trasferta (v90);
+  4. grande "?" arancione · "E tu cosa potresti chiedere a Claude per le tue *operazioni quotidiane?*" con gli esempi Prenotare un ristorante, Inviare una mail, Compilare un foglio di calcolo, Confrontare offerte, Organizzare una trasferta (v90);
   5. "CREA CON CLAUDE" · **Crea il tuo videogioco!** · "4 prompt e il gioco è fatto! Realizza la tua app in meno di 15 minuti." con "GAME ON" pixel in alto a destra;
   6. video `video/forza4-claude.mp4`;
   7–18. i 12 passi del tutorial `forza4` (da `tutorial/tutorials.js`): immagine a sinistra su sfondo chiaro, a destra "Tutorial · Forza 4 con Claude", passo, titolo, testo, prompt, ⏱.
+  19. (v91) grande "?" arancione · "Ho creato il mio primo videogioco. *E adesso?*" con le domande Come posso creare un’applicazione per la mia azienda?, Con quale scopo?, Come posso migliorare un processo aziendale?, Come posso digitalizzare un’operazione di routine?;
+  20. (v91) "**Grazie**" grande e sotto "e buona *accelerazione…*" (accelerazione arancione).
+  Le slide 19 e 20 ci sono solo nella presentazione completa, non con `?t=<id>`. Nel video sono 5 s ciascuna.
 - Slide scure: sfondo navy sfumato, due quadratini bianchi in alto a sinistra, logo `img/efuture-logo-white.png` in basso a sinistra (nei passi del tutorial sulla parte scura). Barra di avanzamento arancione in basso e "n / N" in basso a destra (nascosto sui video).
 - Comandi: → ↓ PagGiù spazio Invio avanti; ← ↑ PagSu indietro; Home/Fine; F schermo intero; K o clic sul video pausa/riprendi. Muovendo il mouse compaiono ← → e "Schermo intero", che spariscono dopo 2,5 s insieme al cursore.
 - I video partono da soli entrando nella slide e si fermano uscendo; se il browser blocca l'audio partono muti con "🔇 Clic per attivare l'audio".
