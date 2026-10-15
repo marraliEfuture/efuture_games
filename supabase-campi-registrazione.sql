@@ -126,6 +126,7 @@ declare e text := lower(trim(p_email)); c jsonb := efg_campi();
 begin
   if e !~* '^[^@\s]+@[^@\s]+\.[^@\s]+$' then raise exception 'invalid email'; end if;
   if c->>'azienda' = 'nascosto' then a := null; end if;
+  if a is null and e ~ '@([a-z0-9-]+\.)*efuture\.it$' then a := 'Efuture'; end if;   -- email di Efuture: l'azienda c'è già
   if c->>'cellulare' = 'nascosto' then tel := null; end if;
   if c->>'nome' = 'nascosto' and n = '' then n := coalesce(a, split_part(e, '@', 1)); end if;
   if char_length(n) not between 2 and 40 then raise exception 'invalid name'; end if;
