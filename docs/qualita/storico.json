@@ -480,7 +480,7 @@
  },
  {
   "data": "2026-10-15",
-  "commit": "7149e20",
+  "commit": "5eccd85",
   "versione": "v84",
   "esiti": {
    "codice": {
@@ -514,15 +514,15 @@
     "errore": 0
    }
   },
-  "spazio_kb": 29476.8,
+  "spazio_kb": 29481.6,
   "cartelle_kb": {
    ".claude": 130.0,
-   "(file principali)": 404.0,
-   "docs": 307.9,
+   "(file principali)": 405.9,
+   "docs": 308.3,
    "fonts": 120.3,
    "games": 920.5,
    "icons": 189.8,
-   "img": 92.5,
+   "img": 95.1,
    "qr": 159.6,
    "supabase-parti": 18.4,
    "tutorial": 1341.3,

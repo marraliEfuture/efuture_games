@@ -124,6 +124,12 @@ tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 #pCats{display:inline-flex;gap:6px;flex-wrap:wrap}
 #pCats button{padding:6px 12px;font-size:12px}
 .subtel{display:block;font-size:11px;color:var(--muted,#5b7085)}
+/* icona della categoria in tabella (cliccabile) e nei pulsanti di Modifica */
+.caticon{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:18px;line-height:1;padding:0;cursor:pointer;vertical-align:middle}
+.caticon img{width:20px;height:20px;display:block}
+.caticon.staff{background:#eef4fb;border-color:#9fbbe0}.caticon.sponsor{background:#fff6e6;border-color:#e8c48a}.caticon.ospite{background:#ecf8f0;border-color:#9fd3b2}
+span.caticon{width:26px;height:26px;font-size:15px;cursor:inherit}span.caticon img{width:16px;height:16px}
+button.caticon:hover{box-shadow:0 0 0 3px rgba(61,127,176,.18)}
 /* Modifica utente › Dati: etichette a sinistra, campi a destra (una colonna sul telefono) */
 .dati .dgrid{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 10px;align-items:center;margin:6px 0}
 .dati .dgrid input{font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:4px;min-width:0}
@@ -556,6 +562,8 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
       <div class="small">Cambiando l'email i punteggi restano suoi; nell'app dovrà accedere con l'email nuova.</div>
       <div class="opts"><button class="btn" type="submit">Salva dati</button></div>
     </form>
+    <div class="grp2" id="peCatBox"><b>Categoria</b><div class="opts" id="peCat"></div></div>
+    <div class="grp2"><b>Dettaglio di gioco</b><div class="tablewrap"><table id="peGames" class="small"></table></div></div>
     <div class="grp2"><b>Tipo</b><div class="opts" id="peTipo"></div></div>
     <div class="grp2" id="peKeyBox"><b>Chiave admin personale (la password del pannello)</b>
       <div class="small" id="peKeyState"></div>
@@ -737,12 +745,12 @@ async function loadPlayers(){
   try { players = await call('efg_admin_players') || []; } catch(err){ return onErr(err, $('pInfo')); }
   if (!$('rLink').value && document.activeElement !== $('rLink')) loadReviewLink();
   $('pInfo').textContent = players.length + ' utenti registrati';
-  const det = p => Object.keys(GAMES).map(g => { const x = p.dettaglio && p.dettaglio[g]; return x ? GAMES[g] + ' ' + x.livelli + '/3 · ' + x.punti : null; }).filter(Boolean).join(' — ');
   renderCats();
   const sorted = players.filter(p => catFilter === 'tutti' || catOf(p) === catFilter).sort((a, b) => b.livelli - a.livelli || b.punti - a.punti);
-  fillTable($('pTable'), ['#', 'Tipo', 'Categoria', '⭐', 'Azienda', 'Nome', 'Email · cellulare', 'Registrato', 'Giochi sbloccati', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
-    sorted.map((p, i) => [i + 1, tipoIco(p), catSelect(p), reviewStar(p), p.azienda || '', nameCell(p), contactCell(p), fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), actions(p)]),
-    [null, null, null, null, null, null, null, 'small', 'num', 'num', 'num', 'small', null]);
+  // il dettaglio per gioco e la scelta della categoria sono in Modifica (anche cliccando l'icona della categoria)
+  fillTable($('pTable'), ['#', 'Tipo', 'Categoria', '⭐', 'Azienda', 'Nome', 'Email · cellulare', 'Registrato', 'Giochi sbloccati', 'Livelli', 'Punti', ''],
+    sorted.map((p, i) => [i + 1, tipoIco(p), catIcon(p), reviewStar(p), p.azienda || '', nameCell(p), contactCell(p), fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, actions(p)]),
+    [null, null, null, null, null, null, null, 'small', 'num', 'num', 'num', null]);
   $('pTable').querySelectorAll('tbody tr').forEach((tr, i) => { if (sorted[i] && sorted[i].disabilitato) tr.classList.add('off'); });
 }
 // categoria (serve supabase-campi-registrazione.sql): Staff, Sponsor, Ospite; filtro sopra la tabella e scelta riga per riga
@@ -756,14 +764,17 @@ function renderCats(){
     b.setAttribute('aria-pressed', catFilter === k); b.onclick = () => { catFilter = k; loadPlayers(); }; box.appendChild(b);
   });
 }
-function catSelect(p){
-  const s = document.createElement('select'); s.className = 'cat ' + catOf(p); s.setAttribute('aria-label', 'Categoria di ' + p.name);
-  Object.keys(CATS).forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = CATS[k]; o.selected = k === catOf(p); s.appendChild(o); });
-  s.onchange = async () => {
-    try { await call('efg_admin_set_categoria', { p_email: p.email, p_categoria: s.value }); p.categoria = s.value; s.className = 'cat ' + s.value; renderCats(); $('pInfo').textContent = players.length + ' utenti registrati · ' + p.name + ': ' + CATS[s.value]; }
-    catch(err){ s.value = catOf(p); if (/efg_admin_set_categoria|PGRST202|does not exist/i.test(String(err && err.message))) $('pInfo').textContent = 'Prima esegui supabase-campi-registrazione.sql nel SQL Editor di Supabase.'; else onErr(err, $('pInfo')); }
-  };
-  return s;
+// icona della categoria: Staff = la «e» di efuture, Sponsor = stretta di mano, Ospite = impiegato/a
+const CAT_ICO = { staff:'<img src="img/efuture-e.png" alt="">', sponsor:'🤝', ospite:'🧑‍💼' };
+function catIcon(p){
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'caticon ' + catOf(p); b.innerHTML = CAT_ICO[catOf(p)];
+  b.title = CATS[catOf(p)] + ' · clic per cambiare'; b.setAttribute('aria-label', 'Categoria di ' + p.name + ': ' + CATS[catOf(p)] + '. Cambia');
+  b.onclick = () => openEdit(p, 'peCatBox'); return b;
+}
+async function setCat(p, v){
+  try { await call('efg_admin_set_categoria', { p_email: p.email, p_categoria: v }); await loadPlayers();
+    const np = players.find(x => x.email === p.email); if (np){ editing = np; fillEdit(); } setMsg($('peMsg'), 'Categoria: ' + CATS[v] + '.', 'ok'); }
+  catch(err){ if (/efg_admin_set_categoria|PGRST202|does not exist/i.test(String(err && err.message))) setMsg($('peMsg'), 'Prima esegui supabase-campi-registrazione.sql nel SQL Editor di Supabase.', 'err'); else if (err.auth) logout(err.message); else setMsg($('peMsg'), 'Errore: ' + err.message, 'err'); }
 }
 function contactCell(p){ const d = document.createElement('span'); d.textContent = p.email; if (p.cellulare){ const t = document.createElement('span'); t.className = 'subtel'; t.textContent = '📱 ' + p.cellulare; d.appendChild(t); } return d; }
 // tipo di utente (serve supabase-tipi-utenti.sql): simbolo in tabella, si cambia da Modifica
@@ -883,12 +894,21 @@ const needSql = err => /efg_admin_set_tipo|efg_admin_set_disabilitato|efg_admin_
 
 // popup Modifica: Tipo, Disabilita/Riabilita, Elimina
 let editing = null;
-function openEdit(p){ editing = p; $('peMsg').textContent = ''; $('peMsg').className = 'msg'; fillEdit(); $('pEdit').hidden = false; }
+function openEdit(p, focusId){ editing = p; $('peMsg').textContent = ''; $('peMsg').className = 'msg'; fillEdit(); $('pEdit').hidden = false;
+  if (focusId){ const el = $(focusId); el.scrollIntoView({ block:'center' }); const b = el.querySelector('.opt.on'); if (b) b.focus(); } }
 function closeEdit(){ $('pEdit').hidden = true; editing = null; }
 $('peClose').onclick = closeEdit;
 $('pEdit').addEventListener('click', e => { if (e.target === $('pEdit')) closeEdit(); });
 function fillEdit(){
   const p = editing; $('peT').textContent = 'Modifica ' + p.name; $('peWho').textContent = p.email + (p.disabilitato ? ' · bloccato' : '');
+  const cat = $('peCat'); cat.innerHTML = '';
+  for (const [v, t] of Object.entries(CATS)){
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'opt' + (catOf(p) === v ? ' on' : ''); b.setAttribute('aria-pressed', catOf(p) === v);
+    b.innerHTML = '<span class="caticon ' + v + '">' + CAT_ICO[v] + '</span>'; b.append(' ' + t); b.onclick = () => { if (catOf(p) !== v) setCat(p, v); };
+    cat.appendChild(b);
+  }
+  fillTable($('peGames'), ['Gioco', 'Livelli', 'Punti', 'Ultimo record'], Object.keys(GAMES).map(g => { const x = p.dettaglio && p.dettaglio[g];
+    return [GAMES[g], x ? x.livelli + '/3' : '—', x ? x.punti : '—', x && x.quando ? fmtDate(x.quando) : '—']; }), [null, 'num', 'num', 'small']);
   $('peName').value = p.name || ''; $('peAz').value = p.azienda || ''; $('peMail').value = p.email || ''; $('peTel').value = p.cellulare || '';
   const box = $('peTipo'); box.innerHTML = '';
   for (const [v, t] of Object.entries(TIPI)){
