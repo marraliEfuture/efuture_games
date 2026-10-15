@@ -301,7 +301,7 @@ Si rifanno tutti con `.claude/skills/efuture-games-admin/scripts/pptx_laboratori
   1. Copertina "Laboratorio **AI**" (AI arancione) e "CARE CONFERENCE" spaziato in azzurro;
   2. "CLAUDE IN CHROME" · **Claude, aiutami tu!** · "Installa l'estensione di Claude sul tuo browser e risolvi **operazioni quotidiane.**";
   3. video `video/thefork-claude.mp4` a tutto schermo, con didascalia che sparisce quando parte;
-  4. grande "?" arancione · "E tu cosa potresti chiedere a Claude per le tue *operazioni quotidiane?*" con gli esempi Prenotare un ristorante, Invia una mail, Compila un foglio di calcolo, Confrontare offerte, Organizza una trasferta (v90);
+  4. grande "?" arancione · "E tu cosa potresti chiedere a Claude per le tue *operazioni quotidiane?*" con gli esempi Prenotare un ristorante, Inviare una mail, Compilare un foglio di calcolo, Confrontare offerte, Organizzare una trasferta (v90);
   5. "CREA CON CLAUDE" · **Crea il tuo videogioco!** · "4 prompt e il gioco è fatto! Realizza la tua app in meno di 15 minuti." con "GAME ON" pixel in alto a destra;
   6. video `video/forza4-claude.mp4`;
   7–18. i 12 passi del tutorial `forza4` (da `tutorial/tutorials.js`): immagine a sinistra su sfondo chiaro, a destra "Tutorial · Forza 4 con Claude", passo, titolo, testo, prompt, ⏱.
