@@ -116,7 +116,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v82' : 'Modalità demo: account e classifica restano su questo telefono. · v82';
+  mn.textContent = remote ? 'Classifica online · v83' : 'Modalità demo: account e classifica restano su questo telefono. · v83';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -312,7 +312,7 @@ function applyCampi(c){
   document.querySelectorAll('#fSignup .field[data-campo]').forEach(f => {
     const k = f.dataset.campo, mode = CAMPI[k] || 'facoltativo', inp = $(FIELD_INPUT[k]);
     f.hidden = mode === 'nascosto'; inp.required = mode === 'obbligatorio';
-    const req = f.querySelector('.req');
+    const req = f.querySelector('label > span');   // asterisco o "(facoltativo)": la classe cambia, si cerca per posizione
     req.className = mode === 'obbligatorio' ? 'req' : 'opt'; req.textContent = mode === 'obbligatorio' ? ' *' : ' (facoltativo)';
   });
   showPreview();
@@ -582,6 +582,8 @@ Backend.current().then(u=>{ session = u; renderDock(); loadRanks(); askCompany()
 applyCampi();
 Backend.settings().then(st=>{
   if (st && st.campi) applyCampi(st.campi);
+  // schermata dei giochi scelta in admin; ricordata sul telefono per la prossima apertura (niente salti)
+  if (st && /^(ora|alto|lista|fisso)$/.test(st.home_layout)){ document.documentElement.setAttribute('data-home', st.home_layout); try { localStorage.setItem('efgHomeLayout', st.home_layout); } catch(e){} }
   try { if (st && /^(game|light|dark)$/.test(st.vista_default)) localStorage.setItem('efgViewDefault', st.vista_default); } catch(e){}
 }).catch(()=>{});
 })();
