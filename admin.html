@@ -182,6 +182,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 .lab .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .lab .tags span{font-size:12px;padding:3px 8px;border-radius:999px;background:var(--row);color:var(--text)}
 .lab .acts{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.lab .acts a.btn{text-decoration:none;text-align:center}
 .lab .hint{grid-column:2 / -1;font-size:12px;color:var(--muted);margin-top:-4px}
 .lab.first{border-color:var(--brand-orange);background:linear-gradient(135deg,#fff7ee 0%,#fff 60%);box-shadow:0 6px 18px rgba(241,140,34,.14)}
 .lab.first .num{border-color:var(--brand-orange);background:var(--brand-orange);color:#fff}
@@ -593,10 +594,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=85"></script>
+<script src="config.js?v=86"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="tutorial/tutorials.js?v=85"></script>
+<script src="tutorial/tutorials.js?v=86"></script>
 <script>
 (function(){
 "use strict";
@@ -1486,14 +1487,15 @@ document.addEventListener('keydown', e => { if (!deckT || $('deck').hidden) retu
 /* ---------- laboratorio: scaletta degli interventi dell'evento ----------
    Per aggiungere un intervento: una riga in LAB_EVENTS, nell'ordine in cui si presenta.
    deck = pagina da aprire sul secondo monitor con Presenta; tutorial = id in tutorial/tutorials.js
-   (Presenta apre il tutorial nella sezione Tutorial); video = mp4 da aprire con "▶ Video (mp4)". */
+   (Presenta apre il tutorial nella sezione Tutorial); video = mp4 da aprire con "▶ Video (mp4)";
+   pptx = PowerPoint da scaricare (presentazioni/, si rifanno con .claude/skills/efuture-games-admin/scripts/pptx_laboratorio.mjs). */
 const LAB_EVENTS = [
   { title:'Presentazione "Laboratorio AI"', desc:'Claude in Chrome per le operazioni quotidiane (video TheFork), poi «Crea il tuo videogioco!»: video e tutorial di Forza 4.',
-    min:20, who:'Efuture', tags:['Apertura', 'Slide + video'], deck:'laboratorio.html', video:'video/laboratorio-ai.mp4' },
-  { title:'Crea e gioca a Forza 4 con Claude', desc:'Demo dal vivo.', min:15, tutorial:'forza4' },
-  { title:'Foglio "Attività giornaliere" con Claude in Chrome', desc:'', min:5, tutorial:'sheets' },
-  { title:'Efuture Games: i 4 giochi degli stand', desc:'', min:5, who:'Efuture, CoreTech, Timenet, inncloud' },
-  { title:'Classifica e premiazione', desc:'', min:10 },
+    min:20, who:'Efuture', tags:['Apertura', 'Slide + video'], deck:'laboratorio.html', video:'video/laboratorio-ai.mp4', pptx:'presentazioni/1-laboratorio-ai.pptx' },
+  { title:'Crea e gioca a Forza 4 con Claude', desc:'Demo dal vivo.', min:15, tutorial:'forza4', pptx:'presentazioni/2-forza4-claude.pptx' },
+  { title:'Foglio "Attività giornaliere" con Claude in Chrome', desc:'', min:5, tutorial:'sheets', pptx:'presentazioni/3-foglio-attivita.pptx' },
+  { title:'Efuture Games: i 4 giochi degli stand', desc:'', min:5, who:'Efuture, CoreTech, Timenet, inncloud', pptx:'presentazioni/4-efuture-games.pptx' },
+  { title:'Classifica e premiazione', desc:'', min:10, pptx:'presentazioni/5-classifica-premiazione.pptx' },
 ];
 let labDone = false, labWin = null;
 const labCh = ('BroadcastChannel' in window) ? new BroadcastChannel('efg-lab') : null;   // regia ↔ presentazione (stesso sito, stesso browser)
@@ -1512,6 +1514,7 @@ function renderLab(){
     if (ev.min) tag('⏱ ' + ev.min + ' min'); if (ev.who) tag('🎤 ' + ev.who);
     const acts = c.querySelector('.acts');
     const bp = document.createElement('button'); bp.className = 'btn'; bp.type = 'button'; bp.textContent = 'Presenta'; bp.onclick = () => labPresent(ev); acts.appendChild(bp);
+    if (ev.pptx){ const bd = document.createElement('a'); bd.className = 'btn ghost'; bd.href = ev.pptx; bd.download = ev.pptx.split('/').pop(); bd.textContent = '⬇ PPTX'; bd.title = 'Scarica le slide in PowerPoint'; acts.appendChild(bd); }
     if (ev.video){ const bv = document.createElement('button'); bv.className = 'btn ghost'; bv.type = 'button'; bv.textContent = '▶ Video (mp4)'; bv.onclick = () => openOnSecond(ev.video, 'efgLabVideo', 'Il video'); acts.appendChild(bv); }
     if (i === 0){ const h = document.createElement('div'); h.className = 'hint'; h.textContent = '⌨️ Presenta: si va avanti e indietro con le frecce ← → (o il telecomando). Video: la stessa presentazione registrata, 4 min 42 s.'; c.appendChild(h); }
     $('labList').appendChild(c);

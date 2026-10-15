@@ -46,6 +46,12 @@ Questa skill funziona sia in Claude Code sia nelle chat di claude.ai.
 - **Mai mostrare** la chiave admin, i codici di sblocco o i dati veri dei giocatori.
 - **Specifica:** aggiorna `docs/specifiche/admin.md` nello stesso commit. Se cambia qualcosa che vede l'organizzatore, aggiorna anche la sezione admin di `LEGGIMI.txt`.
 - **Nuova skill:** se nasce una skill nuova, aggiungila all'array `SKILLS` di `admin.html` (sezione Skills).
+- **PowerPoint del Laboratorio** (`presentazioni/*.pptx`): dopo aver cambiato un tutorial o le slide di `laboratorio.html`, rifalli con
+  ```
+  npm install --prefix <scratchpad>/pptx pptxgenjs
+  NODE_PATH=<scratchpad>/pptx/node_modules node <skill>/scripts/pptx_laboratorio.mjs
+  ```
+  (senza cartella scrive in `<repo>/presentazioni/`). Prima di salvare mostra all'utente le anteprime delle slide.
 - **Prova sempre** prima di salvare: rilancia `anteprima_admin.mjs`, guarda le schermate della sezione toccata e controlla che non ci siano errori JavaScript. Per provare un comportamento (per esempio un menu a tendina che chiama il server), puoi aggiungere risposte al database finto dello script.
 - **Salvataggio:** usa la skill `efuture-games-commit`. Quando cambia `admin.html` va aumentata la versione dell'app; pubblicare su main solo se l'utente lo chiede.
 
