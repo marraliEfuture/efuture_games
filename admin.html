@@ -419,7 +419,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         <table id="cfTable"><thead><tr><th>Campo</th><th>Tipo</th><th>Nota</th></tr></thead><tbody>
           <tr data-f="nome"><th scope="row">Nome e cognome</th><td><div class="cf"></div></td><td class="dim">Si vede in classifica</td></tr>
           <tr data-f="azienda"><th scope="row">Azienda</th><td><div class="cf"></div></td><td class="dim">Si vede in classifica, prima del nome</td></tr>
-          <tr data-f="email"><th scope="row">Email</th><td><div class="cf"></div></td><td class="dim">Sempre obbligatoria: serve per accedere</td></tr>
+          <tr data-f="email"><th scope="row">Email</th><td><div class="cf"></div></td><td class="dim">Serve per accedere da un altro telefono. Chi si registra senza email gioca solo dal telefono con cui si è registrato</td></tr>
           <tr data-f="cellulare"><th scope="row">Cellulare</th><td><div class="cf"></div></td><td class="dim">Lo vedono solo gli admin (e il CSV), mai in classifica</td></tr>
         </tbody></table>
         <div class="msg" id="cfMsg" aria-live="polite" style="margin:8px 0 22px"></div>
@@ -597,10 +597,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=92"></script>
+<script src="config.js?v=93"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="tutorial/tutorials.js?v=92"></script>
+<script src="tutorial/tutorials.js?v=93"></script>
 <script>
 (function(){
 "use strict";
@@ -784,7 +784,9 @@ async function setCat(p, v){
     const np = players.find(x => x.email === p.email); if (np){ editing = np; fillEdit(); } setMsg($('peMsg'), 'Categoria: ' + CATS[v] + '.', 'ok'); }
   catch(err){ if (/efg_admin_set_categoria|PGRST202|does not exist/i.test(String(err && err.message))) setMsg($('peMsg'), 'Prima esegui supabase-campi-registrazione.sql nel SQL Editor di Supabase.', 'err'); else if (err.auth) logout(err.message); else setMsg($('peMsg'), 'Errore: ' + err.message, 'err'); }
 }
-function contactCell(p){ const d = document.createElement('span'); d.textContent = p.email; if (p.cellulare){ const t = document.createElement('span'); t.className = 'subtel'; t.textContent = '📱 ' + p.cellulare; d.appendChild(t); } return d; }
+// chi si è registrato senza email ha un identificativo interno …@senza-email.invalid: non si mostra
+const NOMAIL = /@senza-email\.invalid$/i, mailOf = e => NOMAIL.test(e || '') ? '' : (e || '');
+function contactCell(p){ const d = document.createElement('span'); d.textContent = mailOf(p.email) || '✉️ senza email'; if (!mailOf(p.email)) d.className = 'dim'; if (p.cellulare){ const t = document.createElement('span'); t.className = 'subtel'; t.textContent = '📱 ' + p.cellulare; d.appendChild(t); } return d; }
 // tipo di utente (serve supabase-tipi-utenti.sql): simbolo in tabella, si cambia da Modifica
 const TIPI = { giocatore:'Giocatore', admin_giocatore:'Admin e giocatore', admin:'Solo admin' };
 const TIPO_ICO = { giocatore:'🎮', admin_giocatore:'🎮🛡️', admin:'🛡️' };   // prima il joystick, poi lo scudo
@@ -837,25 +839,26 @@ $('rLinkForm').addEventListener('submit', async e => {
 });
 /* visualizzazione predefinita dei giochi */
 function showViewDef(v){ $('vDef').querySelectorAll('.opt').forEach(b => { const on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); }
-/* campi della registrazione: nome, azienda e cellulare non visibili, facoltativi o obbligatori; l'email sempre obbligatoria */
+/* campi della registrazione: nome, azienda, email e cellulare non visibili, facoltativi o obbligatori (email: supabase-email-facoltativa.sql) */
 const CF_OPTS = [['nascosto', '🚫 Non visibile'], ['facoltativo', '◻️ Facoltativo'], ['obbligatorio', '✳️ Obbligatorio']];
-let CAMPI = { nome:'obbligatorio', azienda:'obbligatorio', cellulare:'facoltativo' };
+let CAMPI = { nome:'obbligatorio', azienda:'obbligatorio', email:'obbligatorio', cellulare:'facoltativo' };
 function showCampi(c){
-  if (c) CAMPI = { nome:c.nome || 'obbligatorio', azienda:c.azienda || 'obbligatorio', cellulare:c.cellulare || 'facoltativo' };
+  if (c) CAMPI = { nome:c.nome || 'obbligatorio', azienda:c.azienda || 'obbligatorio', email:c.email || 'obbligatorio', cellulare:c.cellulare || 'facoltativo' };
   document.querySelectorAll('#cfTable tbody tr').forEach(tr => {
-    const f = tr.dataset.f, box = tr.querySelector('.cf'), cur = f === 'email' ? 'obbligatorio' : CAMPI[f];
+    const f = tr.dataset.f, box = tr.querySelector('.cf'), cur = CAMPI[f];
     box.innerHTML = ''; box.setAttribute('role', 'radiogroup'); box.setAttribute('aria-label', tr.querySelector('th').textContent);
     CF_OPTS.forEach(([v, l]) => { const b = document.createElement('button'); b.type = 'button'; b.dataset.v = v; b.textContent = l; b.setAttribute('role', 'radio');
-      b.classList.toggle('on', v === cur); b.setAttribute('aria-checked', v === cur); if (f === 'email' && v !== cur) b.disabled = true; box.appendChild(b); });
+      b.classList.toggle('on', v === cur); b.setAttribute('aria-checked', v === cur); box.appendChild(b); });
   });
 }
 $('cfTable').addEventListener('click', async e => {
   const b = e.target.closest('.cf button'); if (!b || b.disabled || b.classList.contains('on')) return;
-  const f = b.closest('tr').dataset.f; if (f === 'email') return;
+  const f = b.closest('tr').dataset.f;
   const next = Object.assign({}, CAMPI, { [f]: b.dataset.v });
+  if (next.email === 'obbligatorio') delete next.email;   // predefinito: non si salva (così funziona anche col database senza supabase-email-facoltativa.sql)
   if (next.nome === 'nascosto' && next.azienda === 'nascosto') return setMsg($('cfMsg'), 'Almeno uno tra nome e azienda deve restare visibile: serve per la classifica.', 'err');
   try { const st = await call('efg_admin_set_impostazione', { p_nome: 'campi_registrazione', p_valore: JSON.stringify(next) }); showCampi(st && st.campi || next); setMsg($('cfMsg'), 'Salvato: vale dalla prossima registrazione.', 'ok'); }
-  catch(err){ if (/campi|impostazione sconosciuta|PGRST202|does not exist/i.test(String(err && err.message))) setMsg($('cfMsg'), 'Prima esegui supabase-campi-registrazione.sql nel SQL Editor di Supabase.', 'err'); else onErr(err, $('cfMsg')); }
+  catch(err){ if (/campi|impostazione sconosciuta|PGRST202|does not exist/i.test(String(err && err.message))) setMsg($('cfMsg'), 'Prima esegui ' + (next.email ? 'supabase-email-facoltativa.sql' : 'supabase-campi-registrazione.sql') + ' nel SQL Editor di Supabase.', 'err'); else onErr(err, $('cfMsg')); }
 });
 /* schermata dei giochi (home dell'app): ora, alto, lista, fisso */
 function showHome(v){ $('hDef').querySelectorAll('.opt').forEach(b => { const on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); }
@@ -908,7 +911,7 @@ function closeEdit(){ $('pEdit').hidden = true; editing = null; }
 $('peClose').onclick = closeEdit;
 $('pEdit').addEventListener('click', e => { if (e.target === $('pEdit')) closeEdit(); });
 function fillEdit(){
-  const p = editing; $('peT').textContent = 'Modifica ' + p.name; $('peWho').textContent = p.email + (p.disabilitato ? ' · bloccato' : '');
+  const p = editing; $('peT').textContent = 'Modifica ' + p.name; $('peWho').textContent = (mailOf(p.email) || 'senza email') + (p.disabilitato ? ' · bloccato' : '');
   const cat = $('peCat'); cat.innerHTML = '';
   for (const [v, t] of Object.entries(CATS)){
     const b = document.createElement('button'); b.type = 'button'; b.className = 'opt' + (catOf(p) === v ? ' on' : ''); b.setAttribute('aria-pressed', catOf(p) === v);
@@ -917,7 +920,7 @@ function fillEdit(){
   }
   fillTable($('peGames'), ['Gioco', 'Livelli', 'Punti', 'Ultimo record'], Object.keys(GAMES).map(g => { const x = p.dettaglio && p.dettaglio[g];
     return [GAMES[g], x ? x.livelli + '/3' : '—', x ? x.punti : '—', x && x.quando ? fmtDate(x.quando) : '—']; }), [null, 'num', 'num', 'small']);
-  $('peName').value = p.name || ''; $('peAz').value = p.azienda || ''; $('peMail').value = p.email || ''; $('peTel').value = p.cellulare || '';
+  $('peName').value = p.name || ''; $('peAz').value = p.azienda || ''; $('peMail').value = mailOf(p.email); $('peTel').value = p.cellulare || '';
   const box = $('peTipo'); box.innerHTML = '';
   for (const [v, t] of Object.entries(TIPI)){
     const b = document.createElement('button'); b.type = 'button'; b.className = 'opt' + (tipoOf(p) === v ? ' on' : '');
@@ -1032,7 +1035,7 @@ async function toggleBlock(p, fromPopup){
 $('peDis').onclick = () => toggleBlock(editing, true);
 $('peDel').onclick = async () => {
   const p = editing;
-  if (!await ask('Eliminare ' + p.name + '?', p.name + ' (' + p.email + ') e tutti i suoi punteggi vengono cancellati dal database e spariscono dalla classifica. Il log resta. Potrà registrarsi di nuovo con la stessa email, ma ripartirà da zero. Non si può annullare (si recupera solo da un backup).', 'Sì, elimina', true)) return;
+  if (!await ask('Eliminare ' + p.name + '?', p.name + (mailOf(p.email) ? ' (' + p.email + ')' : '') + ' e tutti i suoi punteggi vengono cancellati dal database e spariscono dalla classifica. Il log resta. Potrà registrarsi di nuovo con la stessa email, ma ripartirà da zero. Non si può annullare (si recupera solo da un backup).', 'Sì, elimina', true)) return;
   try { const r = await call('efg_admin_delete_player', { p_email: p.email }); closeEdit(); await loadPlayers(); $('pInfo').textContent += ' · eliminato ' + r.nome; refreshStats(); }
   catch(err){ if (err.auth) logout(err.message); else setMsg($('peMsg'), 'Errore: ' + err.message, 'err'); }
 };
@@ -1040,7 +1043,7 @@ $('pReload').onclick = loadPlayers;
 $('pCsv').onclick = () => {
   const head = ['Azienda', 'Nome', 'Email', 'Cellulare', 'Categoria', 'Tipo', 'Bloccato', 'Registrato', 'Giochi sbloccati', 'Livelli totali', 'Punti totali', 'Clic Bonus Recensione', 'Recensione confermata'];
   Object.values(GAMES).forEach(n => head.push(n + ' livelli', n + ' punti'));
-  const rows = players.map(p => { const r = [p.azienda || '', p.name, p.email, p.cellulare || '', CATS[catOf(p)], TIPI[tipoOf(p)], p.disabilitato ? 'sì' : 'no', fmtDate(p.created_at), p.giochi, p.livelli, p.punti, p.recensione_clic ? fmtDate(p.recensione_clic) : '', p.recensione_ok ? fmtDate(p.recensione_ok) : ''];
+  const rows = players.map(p => { const r = [p.azienda || '', p.name, mailOf(p.email), p.cellulare || '', CATS[catOf(p)], TIPI[tipoOf(p)], p.disabilitato ? 'sì' : 'no', fmtDate(p.created_at), p.giochi, p.livelli, p.punti, p.recensione_clic ? fmtDate(p.recensione_clic) : '', p.recensione_ok ? fmtDate(p.recensione_ok) : ''];
     Object.keys(GAMES).forEach(g => { const x = p.dettaglio && p.dettaglio[g]; r.push(x ? x.livelli : '', x ? x.punti : ''); }); return r; });
   download('efuture-games-utenti-' + stamp() + '.csv', toCsv(head, rows), 'text/csv;charset=utf-8');
 };
@@ -1060,14 +1063,14 @@ async function loadLogs(){
   catch(err){ return onErr(err, $('logMsg')); }
   fillTable($('lTable'), ['Quando', 'Evento', 'Email', 'Gioco', 'Dettagli'],
     logs.map(l => { const t = document.createElement('span'); t.className = 'tag' + (/errata/.test(l.kind) ? ' err' : l.kind.startsWith('admin') ? ' admin' : ''); t.textContent = l.kind;
-      return [fmtDate(l.at), t, l.email || '', l.game ? (GAMES[l.game] || l.game) : '', describe(l)]; }),
+      return [fmtDate(l.at), t, mailOf(l.email), l.game ? (GAMES[l.game] || l.game) : '', describe(l)]; }),
     ['small', null, null, null, 'small']);
 }
 function stopAuto(){ clearInterval(autoT); autoT = 0; const c = $('lAuto'); if (c) c.checked = false; }
 $('lReload').onclick = loadLogs; $('lKind').onchange = loadLogs; $('lLimit').onchange = loadLogs;
 $('lAuto').onchange = e => { clearInterval(autoT); autoT = e.target.checked ? setInterval(() => { if (!$('dash').hidden) loadLogs(); }, 15000) : 0; };
 $('lCsv').onclick = () => download('efuture-games-log-' + stamp() + '.csv',
-  toCsv(['Quando', 'Evento', 'Email', 'Gioco', 'Dettagli'], logs.map(l => [fmtDate(l.at), l.kind, l.email || '', l.game || '', describe(l)])), 'text/csv;charset=utf-8');
+  toCsv(['Quando', 'Evento', 'Email', 'Gioco', 'Dettagli'], logs.map(l => [fmtDate(l.at), l.kind, mailOf(l.email), l.game || '', describe(l)])), 'text/csv;charset=utf-8');
 
 /* ---------- backup ---------- */
 async function loadBackups(){

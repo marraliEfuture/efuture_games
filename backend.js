@@ -40,7 +40,7 @@ const Backend = remote ? {
     let r;
     try { r = one(await rpc('efg_register', { p_email:normEmail(email), p_name:name, p_azienda:String(azienda||'').trim(), p_phone:String(phone||'').trim() || null })); }
     catch(e){ if (!missing(e)) throw e; r = one(await rpc('efg_register', { p_email:normEmail(email), p_name:name })); }
-    const u = { id:r.pid, email:normEmail(email), nickname:r.name };
+    const u = { id:r.pid, email:r.email || normEmail(email), nickname:r.name };   // senza email: il server dà un identificativo interno
     store.set('efgSessionLive', u); return { user:u };
   },
   async signIn(email){
@@ -106,7 +106,7 @@ const Backend = remote ? {
     return { nome_usato: !!n && Object.values(users).some(u => String(u.name).trim().toLowerCase() === n && String(u.azienda||'').trim().toLowerCase() === a), email_usata: !!users[normEmail(email)] };
   },
   async signUp({ name, email, azienda }){
-    const users = store.get('efgDemoUsers3', {}); const key = normEmail(email);
+    const users = store.get('efgDemoUsers3', {}); const key = normEmail(email) || ('demo' + Date.now().toString(36) + '@senza-email.invalid');
     if (users[key]) throw new Error('already registered');
     if ((await this.checkSignup({ name, email:'', azienda })).nome_usato) throw new Error('name taken');
     users[key] = { pid:'local-'+Date.now().toString(36), email:key, name, azienda:String(azienda||'').trim() };

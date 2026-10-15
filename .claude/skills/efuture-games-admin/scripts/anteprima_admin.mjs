@@ -2,7 +2,7 @@
 // Apre admin.html in Chromium, entra con una chiave qualsiasi e salva una schermata
 // per ogni sezione del menu (PC), il menu aperto, il popup Modifica e la sezione Utenti su telefono.
 // Uso: node anteprima_admin.mjs <cartella di uscita> [sezione ...]
-// Sezioni: players quality log backup reset key links videos tutorials lab skills qr
+// Sezioni: players quality log backup reset key links videos tutorials lab skills qr settings
 // Il repository è EFG_REPO, altrimenti quello che contiene la skill, altrimenti la cartella corrente.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,7 +19,7 @@ const REPO = process.env.EFG_REPO || (() => {
   return process.cwd();
 })();
 const OUT = path.resolve(process.argv[2] || 'anteprima-admin');
-const ALL = ['players', 'quality', 'log', 'backup', 'reset', 'key', 'links', 'videos', 'tutorials', 'lab', 'skills', 'qr'];
+const ALL = ['players', 'quality', 'log', 'backup', 'reset', 'key', 'links', 'videos', 'tutorials', 'lab', 'skills', 'qr', 'settings'];
 const WANT = process.argv.slice(3).length ? process.argv.slice(3) : ALL;
 fs.mkdirSync(OUT, { recursive: true });
 
@@ -30,7 +30,8 @@ const players = [
   {name:'Anna', email:'anna@esempio.it', created_at:iso(300), tipo:'giocatore', giochi:3, livelli:7, punti:820, dettaglio:{sysadmin:{livelli:3,punti:400}, coretech:{livelli:2,punti:300}, timenet:{livelli:2,punti:120}}},
   {name:'Bruno', email:'bruno@esempio.it', created_at:iso(200), tipo:'giocatore', disabilitato:true, giochi:1, livelli:2, punti:150, dettaglio:{inncloud:{livelli:2,punti:150}}},
   {name:'Marta', email:'marta@efuture.it', created_at:iso(100), tipo:'admin_giocatore', chiave:true, giochi:2, livelli:4, punti:410, dettaglio:{coretech:{livelli:3,punti:310}, timenet:{livelli:1,punti:100}}},
-  {name:'Luca', email:'luca@efuture.it', created_at:iso(50), tipo:'admin', giochi:0, livelli:0, punti:0, dettaglio:null}];
+  {name:'Luca', email:'luca@efuture.it', created_at:iso(50), tipo:'admin', giochi:0, livelli:0, punti:0, dettaglio:null},
+  {name:'Giulia', azienda:'Beta', email:'0f3a9c@senza-email.invalid', created_at:iso(20), tipo:'giocatore', giochi:1, livelli:2, punti:180, dettaglio:{timenet:{livelli:2,punti:180}}}];
 const logs = [
   {id:3, at:iso(5), kind:'partita', email:'anna@esempio.it', game:'coretech', detail:{livelli:2, punti:300, record:true}},
   {id:2, at:iso(20), kind:'accesso', email:'bruno@esempio.it', detail:{esito:'ok'}},
