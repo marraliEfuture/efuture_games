@@ -1,5 +1,5 @@
 {
- "versione": "v82",
+ "versione": "v83",
  "aree": {
   "codice": {
    "titolo": "Codice",
@@ -147,7 +147,7 @@
     {
      "nome": "Script nella pagina: index.html",
      "esito": "ok",
-     "dettaglio": "3 script senza errori"
+     "dettaglio": "4 script senza errori"
     },
     {
      "nome": "Id duplicati: index.html",
@@ -197,7 +197,7 @@
     {
      "nome": "Versione uguale in tutti i file",
      "esito": "ok",
-     "dettaglio": "v82 ovunque"
+     "dettaglio": "v83 ovunque"
     }
    ],
    "esiti": {
@@ -212,7 +212,7 @@
     {
      "nome": "File SQL letti",
      "esito": "ok",
-     "dettaglio": "supabase.sql, supabase-classifica-gruppi.sql, supabase-countdown.sql, supabase-privacy-utenti.sql, supabase-tipi-utenti.sql, supabase-nickname-unico.sql, supabase-campi-registrazione.sql, supabase-funzioni-admin.sql, supabase-nuovo-utente.sql, supabase-pulizia-funzioni.sql, supabase-recensioni.sql, supabase-reset-sblocchi.sql (nell'ordine di esecuzione)"
+     "dettaglio": "supabase.sql, supabase-classifica-gruppi.sql, supabase-countdown.sql, supabase-privacy-utenti.sql, supabase-tipi-utenti.sql, supabase-nickname-unico.sql, supabase-campi-registrazione.sql, supabase-funzioni-admin.sql, supabase-home-layout.sql, supabase-nuovo-utente.sql, supabase-pulizia-funzioni.sql, supabase-recensioni.sql, supabase-reset-sblocchi.sql (nell'ordine di esecuzione)"
     },
     {
      "nome": "RLS attiva su tutte le tabelle",
@@ -267,8 +267,8 @@
     {
      "nome": "Peso della pagina: index.html",
      "esito": "ok",
-     "dettaglio": "679.3 KB con 25 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
-     "valore": 679.3
+     "dettaglio": "681.2 KB con 25 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 681.2
     },
     {
      "nome": "Peso della pagina: classifica.html",
@@ -279,8 +279,8 @@
     {
      "nome": "Peso della pagina: admin.html",
      "esito": "ok",
-     "dettaglio": "374.3 KB con 11 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
-     "valore": 374.3
+     "dettaglio": "376.2 KB con 11 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 376.2
     },
     {
      "nome": "Peso della pagina: games/coretech/index.html",
@@ -319,20 +319,20 @@
     {
      "nome": "Download della cache offline al primo avvio",
      "esito": "ok",
-     "dettaglio": "1632.7 KB scaricati da sw.js per giocare offline",
-     "valore": 1632.7
+     "dettaglio": "1634.7 KB scaricati da sw.js per giocare offline",
+     "valore": 1634.7
     },
     {
      "nome": "Caricamento nel browser: index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 156 ms (DOM pronto in 126 ms) su telefono simulato, file locali, database escluso",
-     "valore": 156
+     "dettaglio": "caricata in 143 ms (DOM pronto in 125 ms) su telefono simulato, file locali, database escluso",
+     "valore": 143
     },
     {
      "nome": "Caricamento nel browser: classifica.html",
      "esito": "ok",
-     "dettaglio": "caricata in 117 ms (DOM pronto in 104 ms) su telefono simulato, file locali, database escluso",
-     "valore": 117
+     "dettaglio": "caricata in 125 ms (DOM pronto in 106 ms) su telefono simulato, file locali, database escluso",
+     "valore": 125
     },
     {
      "nome": "Caricamento nel browser: admin.html",
@@ -343,25 +343,25 @@
     {
      "nome": "Caricamento nel browser: games/sysadmin/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 179 ms (DOM pronto in 161 ms) su telefono simulato, file locali, database escluso",
-     "valore": 179
+     "dettaglio": "caricata in 113 ms (DOM pronto in 109 ms) su telefono simulato, file locali, database escluso",
+     "valore": 113
     },
     {
      "nome": "Caricamento nel browser: games/coretech/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 117 ms (DOM pronto in 111 ms) su telefono simulato, file locali, database escluso",
-     "valore": 117
+     "dettaglio": "caricata in 92 ms (DOM pronto in 87 ms) su telefono simulato, file locali, database escluso",
+     "valore": 92
     },
     {
      "nome": "Caricamento nel browser: games/timenet/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 101 ms (DOM pronto in 89 ms) su telefono simulato, file locali, database escluso",
-     "valore": 101
+     "dettaglio": "caricata in 84 ms (DOM pronto in 79 ms) su telefono simulato, file locali, database escluso",
+     "valore": 84
     },
     {
      "nome": "Caricamento nel browser: games/inncloud/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 70 ms (DOM pronto in 65 ms) su telefono simulato, file locali, database escluso",
+     "dettaglio": "caricata in 70 ms (DOM pronto in 66 ms) su telefono simulato, file locali, database escluso",
      "valore": 70
     }
    ],
@@ -377,8 +377,8 @@
     {
      "nome": "Spazio totale del sito",
      "esito": "ok",
-     "dettaglio": "17.62 MB (limite consigliato GitHub Pages: 1 GB)",
-     "valore": 18047.6
+     "dettaglio": "17.63 MB (limite consigliato GitHub Pages: 1 GB)",
+     "valore": 18057.3
     },
     {
      "nome": "Cartella video",
@@ -407,14 +407,14 @@
     {
      "nome": "Cartella (file principali)",
      "esito": "ok",
-     "dettaglio": "390.3 KB",
-     "valore": 390.3
+     "dettaglio": "397.6 KB",
+     "valore": 397.6
     },
     {
      "nome": "Cartella docs",
      "esito": "ok",
-     "dettaglio": "305.8 KB",
-     "valore": 305.8
+     "dettaglio": "307.1 KB",
+     "valore": 307.1
     },
     {
      "nome": "Cartella icons",
@@ -431,8 +431,8 @@
     {
      "nome": "Cartella .claude",
      "esito": "ok",
-     "dettaglio": "128.8 KB",
-     "valore": 128.8
+     "dettaglio": "129.7 KB",
+     "valore": 129.7
     },
     {
      "nome": "Cartella fonts",
@@ -449,8 +449,8 @@
     {
      "nome": "Cartella supabase-parti",
      "esito": "ok",
-     "dettaglio": "18.1 KB",
-     "valore": 18.1
+     "dettaglio": "18.4 KB",
+     "valore": 18.4
     }
    ],
    "esiti": {
@@ -458,17 +458,17 @@
     "avviso": 0,
     "errore": 0
    },
-   "totale_kb": 18047.6,
+   "totale_kb": 18057.3,
    "cartelle_kb": {
-    ".claude": 128.8,
-    "(file principali)": 390.3,
-    "docs": 305.8,
+    ".claude": 129.7,
+    "(file principali)": 397.6,
+    "docs": 307.1,
     "fonts": 120.3,
     "games": 920.5,
     "icons": 189.8,
     "img": 92.5,
     "qr": 159.6,
-    "supabase-parti": 18.1,
+    "supabase-parti": 18.4,
     "tutorial": 1341.3,
     "vendor": 426.8,
     "video": 13953.9
@@ -573,6 +573,6 @@
    "livello": "Buono"
   }
  },
- "data": "2026-10-15T09:23:30+00:00",
- "commit": "670bf76"
+ "data": "2026-10-15T09:34:37+00:00",
+ "commit": "b4748f9"
 }

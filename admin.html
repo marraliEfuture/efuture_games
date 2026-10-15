@@ -106,8 +106,8 @@ tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 .pop .opt{background:#fff;border:1px solid var(--line);border-radius:4px;padding:8px 10px;cursor:pointer;font-weight:600;color:var(--ink);display:inline-flex;gap:6px;align-items:center}
 .pop .opt.on{border-color:var(--sky);background:#eaf6ff;cursor:default}
 #vDef{display:flex;flex-wrap:wrap;gap:6px}
-#vDef .opt{background:#fff;border:1px solid var(--line);border-radius:4px;padding:10px 12px;cursor:pointer;font-weight:600;color:var(--ink)}
-#vDef .opt.on{border-color:var(--sky);background:#eaf6ff;box-shadow:inset 0 0 0 1px var(--sky)}
+#hDef .opt,#vDef .opt{background:#fff;border:1px solid var(--line);border-radius:4px;padding:10px 12px;cursor:pointer;font-weight:600;color:var(--ink)}
+#hDef .opt.on,#vDef .opt.on{border-color:var(--sky);background:#eaf6ff;box-shadow:inset 0 0 0 1px var(--sky)}
 /* campi della registrazione: una riga per campo, tre scelte */
 #cfTable{border-collapse:collapse;width:100%;max-width:920px;background:#fff;border:1px solid var(--line);border-radius:6px}
 #cfTable th,#cfTable td{padding:9px 12px;text-align:left;border-top:1px solid var(--line);vertical-align:middle}
@@ -409,6 +409,15 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
           <tr data-f="cellulare"><th scope="row">Cellulare</th><td><div class="cf"></div></td><td class="dim">Lo vedono solo gli admin (e il CSV), mai in classifica</td></tr>
         </tbody></table>
         <div class="msg" id="cfMsg" aria-live="polite" style="margin:8px 0 22px"></div>
+        <h3 style="margin:0;font-family:var(--title)">🏠 Schermata dei giochi</h3>
+        <p class="dim" style="margin:4px 0 10px">Come appare nell'app la schermata con i 4 giochi e il pulsante Bonus Recensione. Vale per tutti i telefoni dalla prossima apertura dell'app.</p>
+        <div class="opts" id="hDef" role="radiogroup" aria-label="Schermata dei giochi" style="display:flex;flex-wrap:wrap;gap:8px">
+          <button class="opt" type="button" role="radio" data-v="ora">1 · Griglia 2×2, bonus sotto</button>
+          <button class="opt" type="button" role="radio" data-v="alto">2 · Bonus in alto</button>
+          <button class="opt" type="button" role="radio" data-v="lista">3 · Giochi in lista (predefinita)</button>
+          <button class="opt" type="button" role="radio" data-v="fisso">4 · Bonus sempre visibile in basso</button>
+        </div>
+        <div class="msg" id="hMsg" aria-live="polite" style="margin:8px 0 22px"></div>
         <h3 style="margin:0;font-family:var(--title)">🎮 Visualizzazione dei giochi</h3>
         <p class="dim" style="margin:4px 0 10px">Come si aprono i 4 giochi sui telefoni. Ogni giocatore può cambiarla con il pulsante in alto nel gioco: la sua scelta resta sul suo telefono. Questa vale per chi non ha ancora scelto.</p>
         <div class="opts" id="vDef" role="radiogroup" aria-label="Visualizzazione predefinita">
@@ -562,10 +571,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=82"></script>
+<script src="config.js?v=83"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="tutorial/tutorials.js?v=82"></script>
+<script src="tutorial/tutorials.js?v=83"></script>
 <script>
 (function(){
 "use strict";
@@ -815,8 +824,16 @@ $('cfTable').addEventListener('click', async e => {
   try { const st = await call('efg_admin_set_impostazione', { p_nome: 'campi_registrazione', p_valore: JSON.stringify(next) }); showCampi(st && st.campi || next); setMsg($('cfMsg'), 'Salvato: vale dalla prossima registrazione.', 'ok'); }
   catch(err){ if (/campi|impostazione sconosciuta|PGRST202|does not exist/i.test(String(err && err.message))) setMsg($('cfMsg'), 'Prima esegui supabase-campi-registrazione.sql nel SQL Editor di Supabase.', 'err'); else onErr(err, $('cfMsg')); }
 });
+/* schermata dei giochi (home dell'app): ora, alto, lista, fisso */
+function showHome(v){ $('hDef').querySelectorAll('.opt').forEach(b => { const on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); }
+$('hDef').addEventListener('click', async e => {
+  const b = e.target.closest('.opt'); if (!b || b.classList.contains('on')) return;
+  try { const st = await call('efg_admin_set_impostazione', { p_nome: 'home_layout', p_valore: b.dataset.v }); showHome(st.home_layout || b.dataset.v); setMsg($('hMsg'), 'Salvato: i telefoni vedono «' + b.textContent.replace(' (predefinita)', '') + '» dalla prossima apertura dell\'app.', 'ok'); }
+  catch(err){ if (/schermata|impostazione sconosciuta|PGRST202|does not exist/i.test(String(err && err.message))) setMsg($('hMsg'), 'Prima esegui supabase-home-layout.sql nel SQL Editor di Supabase.', 'err'); else onErr(err, $('hMsg')); }
+});
 async function loadSettings(){
   const st = await readSettings();
+  showHome((st && st.home_layout) || 'lista');
   showCampi(st && st.campi);
   if (st && st.vista_default !== undefined && !st.campi) setMsg($('cfMsg'), 'Per salvarli esegui prima supabase-campi-registrazione.sql nel SQL Editor di Supabase.', 'err');
   showViewDef((st && st.vista_default) || 'game');

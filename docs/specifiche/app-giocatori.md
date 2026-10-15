@@ -36,6 +36,8 @@ Ogni voce contiene anche `hash`, l'impronta del codice di sblocco (vedi [Sblocco
 
 ## Home
 
+**Schermata scelta in admin (v83):** `html[data-home]` vale `ora`, `alto`, `lista` (predefinita) o `fisso`. Lista: un gioco per riga (icona a sinistra; nome, "In classifica" e record al centro; Gioca o Da sbloccare a destra) e sotto il Bonus Recensione. Alto: il Bonus Recensione in un riquadro giallo sopra ai giochi. Fisso: il riquadro del bonus resta in basso mentre si scorre. La scelta arriva da `efg_impostazioni().home_layout` ed è ricordata in `efgHomeLayout`, così all'apertura successiva non c'è il salto.
+
 Dall'alto in basso:
 
 1. **Intestazione:**

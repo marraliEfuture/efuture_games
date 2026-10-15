@@ -32,6 +32,7 @@ language sql stable security definer set search_path = public as $$
     'vista_default', coalesce((select value from efg_settings where key = 'vista_default'), 'game'),
     'recensione_punti', efg_bonus_recensione(),
     'recensione_link', (select value from efg_settings where key = 'recensione_link'),
-    'campi', efg_campi());
+    'campi', efg_campi(),
+    'home_layout', coalesce((select value from efg_settings where key = 'home_layout'), 'lista'));
 $$;
 -- fine parte 2

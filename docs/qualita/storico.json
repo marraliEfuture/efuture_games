@@ -480,8 +480,8 @@
  },
  {
   "data": "2026-10-15",
-  "commit": "670bf76",
-  "versione": "v82",
+  "commit": "b4748f9",
+  "versione": "v83",
   "esiti": {
    "codice": {
     "ok": 39,
@@ -514,17 +514,17 @@
     "errore": 0
    }
   },
-  "spazio_kb": 18047.6,
+  "spazio_kb": 18057.3,
   "cartelle_kb": {
-   ".claude": 128.8,
-   "(file principali)": 390.3,
-   "docs": 305.8,
+   ".claude": 129.7,
+   "(file principali)": 397.6,
+   "docs": 307.1,
    "fonts": 120.3,
    "games": 920.5,
    "icons": 189.8,
    "img": 92.5,
    "qr": 159.6,
-   "supabase-parti": 18.1,
+   "supabase-parti": 18.4,
    "tutorial": 1341.3,
    "vendor": 426.8,
    "video": 13953.9

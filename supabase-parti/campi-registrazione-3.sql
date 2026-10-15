@@ -11,6 +11,8 @@ begin
   elsif p_nome = 'recensione_punti' then
     if v !~ '^[0-9]+$' or v::int > 5000 then return jsonb_build_object('errore', 'i punti devono essere un numero da 0 a 5000'); end if;
     v := (v::int)::text;
+  elsif p_nome = 'home_layout' then
+    if v not in ('ora', 'alto', 'lista', 'fisso') then return jsonb_build_object('errore', 'schermata non valida'); end if;
   elsif p_nome = 'campi_registrazione' then
     begin j := v::jsonb; exception when others then return jsonb_build_object('errore', 'campi non validi'); end;
     if jsonb_typeof(j) <> 'object' then return jsonb_build_object('errore', 'campi non validi'); end if;

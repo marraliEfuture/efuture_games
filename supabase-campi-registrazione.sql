@@ -83,7 +83,8 @@ language sql stable security definer set search_path = public as $$
     'vista_default', coalesce((select value from efg_settings where key = 'vista_default'), 'game'),
     'recensione_punti', efg_bonus_recensione(),
     'recensione_link', (select value from efg_settings where key = 'recensione_link'),
-    'campi', efg_campi());
+    'campi', efg_campi(),
+    'home_layout', coalesce((select value from efg_settings where key = 'home_layout'), 'lista'));
 $$;
 
 create or replace function public.efg_admin_set_impostazione(p_key text, p_nome text, p_valore text)
@@ -96,6 +97,8 @@ begin
   elsif p_nome = 'recensione_punti' then
     if v !~ '^[0-9]+$' or v::int > 5000 then return jsonb_build_object('errore', 'i punti devono essere un numero da 0 a 5000'); end if;
     v := (v::int)::text;
+  elsif p_nome = 'home_layout' then
+    if v not in ('ora', 'alto', 'lista', 'fisso') then return jsonb_build_object('errore', 'schermata non valida'); end if;
   elsif p_nome = 'campi_registrazione' then
     begin j := v::jsonb; exception when others then return jsonb_build_object('errore', 'campi non validi'); end;
     if jsonb_typeof(j) <> 'object' then return jsonb_build_object('errore', 'campi non validi'); end if;
