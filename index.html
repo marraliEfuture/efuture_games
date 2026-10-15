@@ -171,6 +171,12 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 .board li:nth-child(1) .r{background:#ffd166;color:#3a2a00}.board li:nth-child(2) .r{background:#d9e2ec;color:#1d2b3a}.board li:nth-child(3) .r{background:#e0a36b;color:#3a1f05}
 .board li .who{min-width:0;display:flex;flex-direction:column;gap:2px}
 .board li .n{font-size:16px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Azienda - Nome: l'azienda su una riga piccola sopra al nome, così si leggono entrambi per intero */
+.board li .n .az{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#b25d07;overflow:hidden;text-overflow:ellipsis}
+.board li .n .nm{display:block;overflow:hidden;text-overflow:ellipsis}
+.field .req{color:#c0392b;font-weight:700}
+.field .opt{color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0}
+.fnote{margin:2px 0 0;font-size:12px;line-height:1.45;color:var(--dim)}
 .board li .d{font-size:12px;color:var(--dim)}
 .board li .s{font-size:18px;font-weight:600;color:#c56a0c;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
 .board li .s small{font-size:12px;color:var(--dim);font-weight:400;margin-left:3px}
@@ -336,8 +342,12 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
     <div class="tabs" id="aTabs"><button class="tab on" id="tabSignup" type="button">Registrati</button><button class="tab" id="tabLogin" type="button">Accedi</button></div>
 
     <form id="fSignup" style="display:flex;flex-direction:column;gap:10px" autocomplete="on">
-      <div class="field"><label for="sName">Nome (visibile in classifica)</label><input id="sName" name="name" minlength="2" maxlength="20" required autocomplete="nickname" aria-describedby="sNameErr"><div class="ferr" id="sNameErr" aria-live="polite" hidden>Nickname già utilizzato</div></div>
-      <div class="field"><label for="sEmail">Email</label><input id="sEmail" name="email" type="email" required autocomplete="email" aria-describedby="sEmailErr"><div class="ferr" id="sEmailErr" aria-live="polite" hidden>Indirizzo email già utilizzato</div></div>
+      <!-- campi scelti in admin (Impostazioni › Campi della registrazione): non visibile, facoltativo o obbligatorio -->
+      <div class="field" data-campo="nome"><label for="sName">Nome e cognome<span class="req"></span></label><input id="sName" name="name" minlength="2" maxlength="40" required autocomplete="name" aria-describedby="sNameErr"><div class="ferr" id="sNameErr" aria-live="polite" hidden>Nome già utilizzato in questa azienda</div></div>
+      <div class="field" data-campo="azienda"><label for="sCompany">Azienda<span class="req"></span></label><input id="sCompany" name="organization" maxlength="40" required autocomplete="organization"></div>
+      <div class="field"><label for="sEmail">Email<span class="req"> *</span></label><input id="sEmail" name="email" type="email" required autocomplete="email" aria-describedby="sEmailErr"><div class="ferr" id="sEmailErr" aria-live="polite" hidden>Indirizzo email già utilizzato</div></div>
+      <div class="field" data-campo="cellulare"><label for="sPhone">Cellulare<span class="req"></span></label><input id="sPhone" name="tel" type="tel" inputmode="tel" maxlength="20" autocomplete="tel" placeholder="Es. 333 123 4567" aria-describedby="sPhoneNote"><div class="fnote" id="sPhoneNote">Lo vedono solo gli organizzatori: non compare in classifica.</div></div>
+      <p class="fnote" id="sPreview" hidden></p>
       <button class="btn" id="sGo" type="submit" style="max-width:none">Registrati e gioca</button>
       <div class="msg" id="sMsg" aria-live="polite"></div>
     </form>
@@ -353,6 +363,19 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 </div>
 
 <!-- leaderboard -->
+<!-- utenti registrati prima che si chiedesse l'azienda: la si chiede al primo accesso -->
+<div class="modal" id="mCompany" hidden role="dialog" aria-modal="true" aria-labelledby="cTitle">
+  <div class="sheet">
+    <div class="head"><h2 id="cTitle">La tua azienda</h2><button class="close" data-close aria-label="Chiudi">✕</button></div>
+    <form id="fCompany" style="display:flex;flex-direction:column;gap:10px" autocomplete="on">
+      <p style="margin:0">In classifica ora compare anche l'azienda: <b id="cPreview"></b>.</p>
+      <div class="field"><label for="cCompany">Azienda<span class="req"> *</span></label><input id="cCompany" maxlength="40" required autocomplete="organization"></div>
+      <button class="btn" type="submit" style="max-width:none">Salva</button>
+      <div class="msg" id="cMsg" aria-live="polite"></div>
+    </form>
+  </div>
+</div>
+
 <div class="modal" id="mBoard" hidden role="dialog" aria-modal="true" aria-labelledby="bTitle">
   <div class="sheet">
     <div class="head"><h2 id="bTitle">Classifica</h2><button class="close" data-close aria-label="Chiudi">✕</button></div>
@@ -421,12 +444,12 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=81"></script>
+<script src="config.js?v=82"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=81"></script>
+<script src="backend.js?v=82"></script>
 <script src="vendor/jsQR.js"></script>
-<script src="fuochi.js?v=81"></script>
-<script src="hub.js?v=81"></script>
+<script src="fuochi.js?v=82"></script>
+<script src="hub.js?v=82"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });

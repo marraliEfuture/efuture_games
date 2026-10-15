@@ -108,6 +108,22 @@ tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 #vDef{display:flex;flex-wrap:wrap;gap:6px}
 #vDef .opt{background:#fff;border:1px solid var(--line);border-radius:4px;padding:10px 12px;cursor:pointer;font-weight:600;color:var(--ink)}
 #vDef .opt.on{border-color:var(--sky);background:#eaf6ff;box-shadow:inset 0 0 0 1px var(--sky)}
+/* campi della registrazione: una riga per campo, tre scelte */
+#cfTable{border-collapse:collapse;width:100%;max-width:920px;background:#fff;border:1px solid var(--line);border-radius:6px}
+#cfTable th,#cfTable td{padding:9px 12px;text-align:left;border-top:1px solid var(--line);vertical-align:middle}
+#cfTable thead th{border-top:0;background:var(--panel-2,#f2f7fc);font-size:12px}
+#cfTable .cf{display:flex;flex-wrap:wrap;gap:6px}
+#cfTable .cf button{background:#fff;border:1px solid var(--line);border-radius:4px;padding:7px 10px;cursor:pointer;font:inherit;font-weight:600;color:var(--ink)}
+#cfTable .cf button.on{border-color:var(--sky);background:#eaf6ff;box-shadow:inset 0 0 0 1px var(--sky)}
+#cfTable .cf button:disabled{opacity:.35;cursor:not-allowed}
+/* categorie degli utenti: Staff, Sponsor, Ospite */
+.cat{font:inherit;font-size:12px;font-weight:700;padding:5px 8px;min-width:104px;border-radius:999px;border:1px solid;cursor:pointer}
+.cat.staff{background:#e8f0fb;color:#1d4f86;border-color:#9fbbe0}
+.cat.sponsor{background:#fff3df;color:#8a5000;border-color:#e8c48a}
+.cat.ospite{background:#e9f7ee;color:#1f6b3d;border-color:#9fd3b2}
+#pCats{display:inline-flex;gap:6px;flex-wrap:wrap}
+#pCats button{padding:6px 12px;font-size:12px}
+.subtel{display:block;font-size:11px;color:var(--muted,#5b7085)}
 .pop .row2{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 .pop p{margin:0;font-size:14px;line-height:1.55;color:var(--text)}
 .keyform{display:flex;flex-direction:column;gap:8px}
@@ -320,7 +336,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
     <div class="card">
       <h2 id="paneTitle">Utenti</h2>
       <section data-pane="players">
-        <div class="bar"><span class="grow dim" id="pInfo"></span>
+        <div class="bar"><span class="grow dim" id="pInfo"></span><span id="pCats" role="group" aria-label="Filtra per categoria"></span>
           <button class="btn" id="pNewAdmin" type="button" title="Crea un utente scegliendo il tipo (giocatore, admin o entrambi), senza registrarlo nell'app">➕ Nuovo utente</button>
           <button class="btn ghost" id="pReload" type="button">Aggiorna</button>
           <button class="btn navy" id="pCsv" type="button">Scarica CSV</button></div>
@@ -384,6 +400,15 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
       </section>
 
       <section data-pane="settings" hidden>
+        <h3 style="margin:0;font-family:var(--title)">📝 Campi della registrazione</h3>
+        <p class="dim" style="margin:4px 0 10px">Cosa chiedere a chi si registra nell'app. In classifica (generale e giochi) ognuno compare come <b>Azienda - Nome</b>. Vale dalla prossima registrazione; a chi è già registrato senza azienda l'app la chiede al prossimo accesso, se è obbligatoria.</p>
+        <table id="cfTable"><thead><tr><th>Campo</th><th>Tipo</th><th>Nota</th></tr></thead><tbody>
+          <tr data-f="nome"><th scope="row">Nome e cognome</th><td><div class="cf"></div></td><td class="dim">Si vede in classifica</td></tr>
+          <tr data-f="azienda"><th scope="row">Azienda</th><td><div class="cf"></div></td><td class="dim">Si vede in classifica, prima del nome</td></tr>
+          <tr data-f="email"><th scope="row">Email</th><td><div class="cf"></div></td><td class="dim">Sempre obbligatoria: serve per accedere</td></tr>
+          <tr data-f="cellulare"><th scope="row">Cellulare</th><td><div class="cf"></div></td><td class="dim">Lo vedono solo gli admin (e il CSV), mai in classifica</td></tr>
+        </tbody></table>
+        <div class="msg" id="cfMsg" aria-live="polite" style="margin:8px 0 22px"></div>
         <h3 style="margin:0;font-family:var(--title)">🎮 Visualizzazione dei giochi</h3>
         <p class="dim" style="margin:4px 0 10px">Come si aprono i 4 giochi sui telefoni. Ogni giocatore può cambiarla con il pulsante in alto nel gioco: la sua scelta resta sul suo telefono. Questa vale per chi non ha ancora scelto.</p>
         <div class="opts" id="vDef" role="radiogroup" aria-label="Visualizzazione predefinita">
@@ -537,10 +562,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=81"></script>
+<script src="config.js?v=82"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="tutorial/tutorials.js?v=81"></script>
+<script src="tutorial/tutorials.js?v=82"></script>
 <script>
 (function(){
 "use strict";
@@ -690,12 +715,34 @@ async function loadPlayers(){
   if (!$('rLink').value && document.activeElement !== $('rLink')) loadReviewLink();
   $('pInfo').textContent = players.length + ' utenti registrati';
   const det = p => Object.keys(GAMES).map(g => { const x = p.dettaglio && p.dettaglio[g]; return x ? GAMES[g] + ' ' + x.livelli + '/3 · ' + x.punti : null; }).filter(Boolean).join(' — ');
-  const sorted = players.slice().sort((a, b) => b.livelli - a.livelli || b.punti - a.punti);
-  fillTable($('pTable'), ['#', 'Tipo', '⭐', 'Nome', 'Email', 'Registrato', 'Giochi sbloccati', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
-    sorted.map((p, i) => [i + 1, tipoIco(p), reviewStar(p), nameCell(p), p.email, fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), actions(p)]),
-    [null, null, null, null, null, 'small', 'num', 'num', 'num', 'small', null]);
+  renderCats();
+  const sorted = players.filter(p => catFilter === 'tutti' || catOf(p) === catFilter).sort((a, b) => b.livelli - a.livelli || b.punti - a.punti);
+  fillTable($('pTable'), ['#', 'Tipo', 'Categoria', '⭐', 'Azienda', 'Nome', 'Email · cellulare', 'Registrato', 'Giochi sbloccati', 'Livelli', 'Punti', 'Dettaglio per gioco', ''],
+    sorted.map((p, i) => [i + 1, tipoIco(p), catSelect(p), reviewStar(p), p.azienda || '', nameCell(p), contactCell(p), fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, det(p), actions(p)]),
+    [null, null, null, null, null, null, null, 'small', 'num', 'num', 'num', 'small', null]);
   $('pTable').querySelectorAll('tbody tr').forEach((tr, i) => { if (sorted[i] && sorted[i].disabilitato) tr.classList.add('off'); });
 }
+// categoria (serve supabase-campi-registrazione.sql): Staff, Sponsor, Ospite; filtro sopra la tabella e scelta riga per riga
+const CATS = { staff:'Staff', sponsor:'Sponsor', ospite:'Ospite' }, CATS_PL = { staff:'Staff', sponsor:'Sponsor', ospite:'Ospiti' };
+let catFilter = 'tutti';
+const catOf = p => CATS[p.categoria] ? p.categoria : 'ospite';
+function renderCats(){
+  const box = $('pCats'); box.innerHTML = '';
+  [['tutti', 'Tutti', players.length]].concat(Object.keys(CATS).map(k => [k, CATS_PL[k], players.filter(p => catOf(p) === k).length])).forEach(([k, l, n]) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'btn ' + (catFilter === k ? 'navy' : 'ghost'); b.textContent = l + ' · ' + n;
+    b.setAttribute('aria-pressed', catFilter === k); b.onclick = () => { catFilter = k; loadPlayers(); }; box.appendChild(b);
+  });
+}
+function catSelect(p){
+  const s = document.createElement('select'); s.className = 'cat ' + catOf(p); s.setAttribute('aria-label', 'Categoria di ' + p.name);
+  Object.keys(CATS).forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = CATS[k]; o.selected = k === catOf(p); s.appendChild(o); });
+  s.onchange = async () => {
+    try { await call('efg_admin_set_categoria', { p_email: p.email, p_categoria: s.value }); p.categoria = s.value; s.className = 'cat ' + s.value; renderCats(); $('pInfo').textContent = players.length + ' utenti registrati · ' + p.name + ': ' + CATS[s.value]; }
+    catch(err){ s.value = catOf(p); if (/efg_admin_set_categoria|PGRST202|does not exist/i.test(String(err && err.message))) $('pInfo').textContent = 'Prima esegui supabase-campi-registrazione.sql nel SQL Editor di Supabase.'; else onErr(err, $('pInfo')); }
+  };
+  return s;
+}
+function contactCell(p){ const d = document.createElement('span'); d.textContent = p.email; if (p.cellulare){ const t = document.createElement('span'); t.className = 'subtel'; t.textContent = '📱 ' + p.cellulare; d.appendChild(t); } return d; }
 // tipo di utente (serve supabase-tipi-utenti.sql): simbolo in tabella, si cambia da Modifica
 const TIPI = { giocatore:'Giocatore', admin_giocatore:'Admin e giocatore', admin:'Solo admin' };
 const TIPO_ICO = { giocatore:'🎮', admin_giocatore:'🎮🛡️', admin:'🛡️' };   // prima il joystick, poi lo scudo
@@ -748,8 +795,30 @@ $('rLinkForm').addEventListener('submit', async e => {
 });
 /* visualizzazione predefinita dei giochi */
 function showViewDef(v){ $('vDef').querySelectorAll('.opt').forEach(b => { const on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); }
+/* campi della registrazione: nome, azienda e cellulare non visibili, facoltativi o obbligatori; l'email sempre obbligatoria */
+const CF_OPTS = [['nascosto', '🚫 Non visibile'], ['facoltativo', '◻️ Facoltativo'], ['obbligatorio', '✳️ Obbligatorio']];
+let CAMPI = { nome:'obbligatorio', azienda:'obbligatorio', cellulare:'facoltativo' };
+function showCampi(c){
+  if (c) CAMPI = { nome:c.nome || 'obbligatorio', azienda:c.azienda || 'obbligatorio', cellulare:c.cellulare || 'facoltativo' };
+  document.querySelectorAll('#cfTable tbody tr').forEach(tr => {
+    const f = tr.dataset.f, box = tr.querySelector('.cf'), cur = f === 'email' ? 'obbligatorio' : CAMPI[f];
+    box.innerHTML = ''; box.setAttribute('role', 'radiogroup'); box.setAttribute('aria-label', tr.querySelector('th').textContent);
+    CF_OPTS.forEach(([v, l]) => { const b = document.createElement('button'); b.type = 'button'; b.dataset.v = v; b.textContent = l; b.setAttribute('role', 'radio');
+      b.classList.toggle('on', v === cur); b.setAttribute('aria-checked', v === cur); if (f === 'email' && v !== cur) b.disabled = true; box.appendChild(b); });
+  });
+}
+$('cfTable').addEventListener('click', async e => {
+  const b = e.target.closest('.cf button'); if (!b || b.disabled || b.classList.contains('on')) return;
+  const f = b.closest('tr').dataset.f; if (f === 'email') return;
+  const next = Object.assign({}, CAMPI, { [f]: b.dataset.v });
+  if (next.nome === 'nascosto' && next.azienda === 'nascosto') return setMsg($('cfMsg'), 'Almeno uno tra nome e azienda deve restare visibile: serve per la classifica.', 'err');
+  try { const st = await call('efg_admin_set_impostazione', { p_nome: 'campi_registrazione', p_valore: JSON.stringify(next) }); showCampi(st && st.campi || next); setMsg($('cfMsg'), 'Salvato: vale dalla prossima registrazione.', 'ok'); }
+  catch(err){ if (/campi|impostazione sconosciuta|PGRST202|does not exist/i.test(String(err && err.message))) setMsg($('cfMsg'), 'Prima esegui supabase-campi-registrazione.sql nel SQL Editor di Supabase.', 'err'); else onErr(err, $('cfMsg')); }
+});
 async function loadSettings(){
   const st = await readSettings();
+  showCampi(st && st.campi);
+  if (st && st.vista_default !== undefined && !st.campi) setMsg($('cfMsg'), 'Per salvarli esegui prima supabase-campi-registrazione.sql nel SQL Editor di Supabase.', 'err');
   showViewDef((st && st.vista_default) || 'game');
   if (!st || st.vista_default === undefined) setMsg($('vMsg'), 'Per salvarla esegui prima supabase-recensioni.sql nel SQL Editor di Supabase.', 'err');
 }
@@ -896,9 +965,9 @@ $('peDel').onclick = async () => {
 };
 $('pReload').onclick = loadPlayers;
 $('pCsv').onclick = () => {
-  const head = ['Nome', 'Email', 'Tipo', 'Bloccato', 'Registrato', 'Giochi sbloccati', 'Livelli totali', 'Punti totali', 'Clic Bonus Recensione', 'Recensione confermata'];
+  const head = ['Azienda', 'Nome', 'Email', 'Cellulare', 'Categoria', 'Tipo', 'Bloccato', 'Registrato', 'Giochi sbloccati', 'Livelli totali', 'Punti totali', 'Clic Bonus Recensione', 'Recensione confermata'];
   Object.values(GAMES).forEach(n => head.push(n + ' livelli', n + ' punti'));
-  const rows = players.map(p => { const r = [p.name, p.email, TIPI[tipoOf(p)], p.disabilitato ? 'sì' : 'no', fmtDate(p.created_at), p.giochi, p.livelli, p.punti, p.recensione_clic ? fmtDate(p.recensione_clic) : '', p.recensione_ok ? fmtDate(p.recensione_ok) : ''];
+  const rows = players.map(p => { const r = [p.azienda || '', p.name, p.email, p.cellulare || '', CATS[catOf(p)], TIPI[tipoOf(p)], p.disabilitato ? 'sì' : 'no', fmtDate(p.created_at), p.giochi, p.livelli, p.punti, p.recensione_clic ? fmtDate(p.recensione_clic) : '', p.recensione_ok ? fmtDate(p.recensione_ok) : ''];
     Object.keys(GAMES).forEach(g => { const x = p.dettaglio && p.dettaglio[g]; r.push(x ? x.livelli : '', x ? x.punti : ''); }); return r; });
   download('efuture-games-utenti-' + stamp() + '.csv', toCsv(head, rows), 'text/csv;charset=utf-8');
 };

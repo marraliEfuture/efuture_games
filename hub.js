@@ -36,7 +36,7 @@ $('btnHelp').addEventListener('click', ()=>openModal('mHelp'));
 document.querySelectorAll('.modal').forEach(m=>{
   m.addEventListener('click', e=>{ if ((e.target === m && m.id !== 'mResult') || e.target.closest('[data-close]')){ m.hidden = true; if (m.id === 'mUnlock') stopCam(); } });
 });
-document.addEventListener('keydown', e=>{ if (e.key === 'Escape'){ ['mUnlock','mAuth','mBoard','mInstall','mHelp','mExit'].forEach(id=>$(id).hidden = true); stopCam(); } });
+document.addEventListener('keydown', e=>{ if (e.key === 'Escape'){ ['mUnlock','mAuth','mCompany','mBoard','mInstall','mHelp','mExit'].forEach(id=>$(id).hidden = true); stopCam(); } });
 
 /* ================= STATE ================= */
 let unlocked = new Set(store.get('efgUnlocked', []));
@@ -116,7 +116,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v81' : 'Modalità demo: account e classifica restano su questo telefono. · v81';
+  mn.textContent = remote ? 'Classifica online · v82' : 'Modalità demo: account e classifica restano su questo telefono. · v82';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -301,8 +301,46 @@ const validEmail = e => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
 
 async function loggedIn(user){
   session = user; $('mAuth').hidden = true; renderDock(); toast('Benvenuto, ' + session.nickname + '!');
-  loadRanks();
+  loadRanks(); askCompany();
 }
+
+/* ---- campi della registrazione scelti in admin: nascosto, facoltativo o obbligatorio (l'email è sempre obbligatoria) ---- */
+let CAMPI = { nome:'obbligatorio', azienda:'obbligatorio', cellulare:'facoltativo' };
+const FIELD_INPUT = { nome:'sName', azienda:'sCompany', cellulare:'sPhone' };
+function applyCampi(c){
+  if (c && typeof c === 'object') CAMPI = Object.assign({}, CAMPI, c);
+  document.querySelectorAll('#fSignup .field[data-campo]').forEach(f => {
+    const k = f.dataset.campo, mode = CAMPI[k] || 'facoltativo', inp = $(FIELD_INPUT[k]);
+    f.hidden = mode === 'nascosto'; inp.required = mode === 'obbligatorio';
+    const req = f.querySelector('.req');
+    req.className = mode === 'obbligatorio' ? 'req' : 'opt'; req.textContent = mode === 'obbligatorio' ? ' *' : ' (facoltativo)';
+  });
+  showPreview();
+}
+// anteprima: come si comparirà in classifica
+function boardName(nome, azienda){ return (azienda ? azienda + ' - ' : '') + nome; }
+function showPreview(){
+  const n = CAMPI.nome === 'nascosto' ? '' : $('sName').value.trim(), a = CAMPI.azienda === 'nascosto' ? '' : $('sCompany').value.trim();
+  const p = $('sPreview'); p.hidden = !n;
+  if (n){ p.textContent = 'In classifica comparirai come '; const b = document.createElement('b'); b.textContent = boardName(n, a); p.append(b, '.'); }
+}
+
+/* ---- chi si era registrato senza azienda: gliela chiediamo (se in admin è obbligatoria) ---- */
+async function askCompany(){
+  const me = session; if (!me || !Backend.profile) return;
+  let pr = null; try { pr = await Backend.profile(me); } catch(e){}
+  if (session !== me || !pr || !pr.manca_azienda) return;
+  $('cPreview').textContent = boardName(pr.nome || me.nickname, 'Azienda'); setMsg($('cMsg'), ''); $('cCompany').value = '';
+  openModal('mCompany');
+}
+$('cCompany').addEventListener('input', ()=>{ $('cPreview').textContent = boardName(session ? session.nickname : '', $('cCompany').value.trim() || 'Azienda'); });
+$('fCompany').addEventListener('submit', async e=>{
+  e.preventDefault(); const m = $('cMsg'), a = $('cCompany').value.trim();
+  if (!a) return setMsg(m, 'Scrivi il nome della tua azienda.', 'err');
+  setMsg(m, 'Un attimo…');
+  try { await Backend.setCompany(session, a); $('mCompany').hidden = true; toast('Grazie! In classifica compari come ' + boardName(session.nickname, a) + '.'); loadRanks(); }
+  catch(err){ setMsg(m, /name taken/i.test(String(err && err.message)) ? 'In questa azienda c\'è già qualcuno con il tuo nome: scrivila in modo diverso.' : friendly(err), 'err'); }
+});
 // nickname ed email devono essere nuovi: finché uno dei due è già usato non ci si registra
 const taken = { name:false, email:false };
 function markTaken(field, on){
@@ -316,26 +354,33 @@ async function checkSignup(){
   const name = $('sName').value.trim(), email = $('sEmail').value.trim(), seq = ++checkSeq;
   const n = name.length >= 2 ? name : '', em = validEmail(email) ? email : '';
   if (!n && !em){ markTaken('name', false); markTaken('email', false); return; }
-  let r = null; try { r = await Backend.checkSignup({ name:n, email:em }); } catch(e){}
+  let r = null; try { r = await Backend.checkSignup({ name:n, email:em, azienda:$('sCompany').value.trim() }); } catch(e){}
   if (seq !== checkSeq || !r) return;   // risposta vecchia, o controllo non disponibile: decide la registrazione
   markTaken('name', n && r.nome_usato); markTaken('email', em && r.email_usata);
 }
-['sName','sEmail'].forEach(id => $(id).addEventListener('input', ()=>{
-  markTaken(id === 'sName' ? 'name' : 'email', false); setMsg($('sMsg'), '');
+['sName','sEmail','sCompany'].forEach(id => $(id).addEventListener('input', ()=>{
+  markTaken(id === 'sEmail' ? 'email' : 'name', false); setMsg($('sMsg'), ''); showPreview();
   clearTimeout(checkTimer); checkTimer = setTimeout(checkSignup, 400);
 }));
 $('fSignup').addEventListener('submit', async e=>{
   e.preventDefault();
-  const name = $('sName').value.trim(), email = $('sEmail').value.trim();
+  const on = k => CAMPI[k] !== 'nascosto', req = k => CAMPI[k] === 'obbligatorio';
+  const name = on('nome') ? $('sName').value.trim() : '', email = $('sEmail').value.trim();
+  const azienda = on('azienda') ? $('sCompany').value.trim() : '', phone = on('cellulare') ? $('sPhone').value.trim() : '';
   const m = $('sMsg');
-  if (name.length < 2 || name.length > 20) return setMsg(m, 'Il nome deve avere da 2 a 20 caratteri.', 'err');
+  if (on('nome') && (req('nome') || name) && (name.length < 2 || name.length > 40)) return setMsg(m, 'Scrivi nome e cognome (da 2 a 40 caratteri).', 'err');
+  if (req('azienda') && !azienda) return setMsg(m, 'Scrivi il nome della tua azienda.', 'err');
   if (!validEmail(email)) return setMsg(m, 'Scrivi un indirizzo email valido.', 'err');
+  const digits = phone.replace(/[^0-9]/g, '');
+  if ((req('cellulare') || phone) && (digits.length < 6 || digits.length > 15)) return setMsg(m, 'Scrivi un numero di cellulare valido.', 'err');
   if (taken.name || taken.email) return;
   setMsg(m, 'Un attimo…');
-  try { const r = await Backend.signUp({ name, email }); loggedIn(r.user); }
+  try { const r = await Backend.signUp({ name: name || azienda || email.split('@')[0], email, azienda, phone }); loggedIn(r.user); }
   catch(err){
     const t = String(err && err.message || err);
-    if (/name taken|efg_players_name_unique/i.test(t)){ markTaken('name', true); return setMsg(m, ''); }
+    if (/invalid company/i.test(t)) return setMsg(m, 'Scrivi il nome della tua azienda.', 'err');
+    if (/invalid phone/i.test(t)) return setMsg(m, 'Scrivi un numero di cellulare valido.', 'err');
+    if (/name taken|efg_players_name_unique|efg_players_nome_azienda_unique/i.test(t)){ markTaken('name', true); return setMsg(m, ''); }
     if (/already registered|duplicate/i.test(t)){ markTaken('email', true); return setMsg(m, ''); }
     setMsg(m, friendly(err), 'err');
   }
@@ -371,7 +416,9 @@ async function loadBoard(){
     const li = document.createElement('li'); if (session && r.pid === session.id) li.className = 'me';
     const a = document.createElement('span'); a.className = 'r'; a.textContent = i+1;
     const w = document.createElement('span'); w.className = 'who';
-    const n = document.createElement('span'); n.className = 'n'; n.textContent = r.name;
+    const n = document.createElement('span'); n.className = 'n';
+    if (r.azienda && r.nome){ const az = document.createElement('span'); az.className = 'az'; az.textContent = r.azienda; const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = r.nome; n.append(az, nm); n.title = r.name; }
+    else n.textContent = r.name;
     const d = document.createElement('span'); d.className = 'd';
     d.textContent = (boardTab === 'all' ? (r.games||0) + '/' + GAMES.length + ' giochi · ' + (r.levels||0) + '/' + LEVELS*GAMES.length : (r.levels||0) + '/' + LEVELS) + ' livelli' + (r.bonus ? ' · ⭐ +' + r.bonus + ' bonus' : '');
     w.append(n, d);
@@ -507,7 +554,7 @@ function renderReview(){
   $('btnReview').textContent = review.ok ? '✅ Bonus Recensione ottenuto' : '⭐ Bonus Recensione';
   $('btnReview').disabled = !!review.ok;   // ottenuto: solo un'etichetta, non si clicca più
   txt.innerHTML = review.ok ? 'Grazie! I tuoi <b>+' + pt + ' punti</b> si sommano ai tuoi record nella classifica generale.'
-    : review.clic ? 'Grazie! Quando confermiamo la tua recensione su Google ricevi <b>+' + pt + ' punti</b> nella classifica generale.'
+    : review.clic ? 'Lascia la tua recensione a Efuture e riceverai <b>' + pt + ' punti bonus</b>.'
     : 'Lascia una recensione a efuture su Google: quando la confermiamo ricevi <b>+' + pt + ' punti</b> nella classifica generale.';
 }
 $('btnReview').addEventListener('click', ()=>{
@@ -529,8 +576,12 @@ Backend.resetId().then(id=>{
   bests = {}; store.set('efgBests4', bests);
   renderGrid(); if (!justUnlocked.size) toast('Nuova gara: sblocca di nuovo i giochi agli stand.', 4200);   // chi arriva da un QR vede il suo «sbloccato!»
 }).catch(()=>{});
-Backend.current().then(u=>{ session = u; renderDock(); loadRanks(); });
+Backend.current().then(u=>{ session = u; renderDock(); loadRanks(); askCompany(); });
 // visualizzazione predefinita dei giochi scelta in admin (Game, Light o Dark): i giochi la leggono da qui
 // finché il giocatore non ne sceglie una con il pulsante in alto nel gioco
-Backend.settings().then(st=>{ try { if (st && /^(game|light|dark)$/.test(st.vista_default)) localStorage.setItem('efgViewDefault', st.vista_default); } catch(e){} }).catch(()=>{});
+applyCampi();
+Backend.settings().then(st=>{
+  if (st && st.campi) applyCampi(st.campi);
+  try { if (st && /^(game|light|dark)$/.test(st.vista_default)) localStorage.setItem('efgViewDefault', st.vista_default); } catch(e){}
+}).catch(()=>{});
 })();

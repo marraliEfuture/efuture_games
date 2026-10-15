@@ -121,6 +121,14 @@ Finestra `mAuth` con due schede: **Registrati** e **Accedi**.
   Resta finché non si preme **Esci**, che cancella solo la sessione: record locali e sblocchi restano.
 - **Al login o alla registrazione:** toast "Benvenuto, *nome*!". Dalla v66 l'app **non** rimanda più al server i record del telefono: dopo un azzeramento dall'admin riporterebbe in classifica i punti vecchi (e senza accesso non si può giocare).
 
+### Nome, azienda e categoria (v82)
+
+- **Registrazione:** Nome e cognome, Azienda, Email, Cellulare. Per nome, azienda e cellulare l'admin sceglie in Impostazioni › Campi della registrazione se sono non visibili, facoltativi o obbligatori (di base: nome e azienda obbligatori, cellulare facoltativo); l'email è sempre obbligatoria. Gli obbligatori hanno l'asterisco rosso, i facoltativi la scritta "(facoltativo)". Sotto c'è l'anteprima "In classifica comparirai come **Azienda - Nome**". Sotto il cellulare: "Lo vedono solo gli organizzatori: non compare in classifica."
+- Nome e azienda insieme non possono ripetersi (due "Marco Rossi" di aziende diverse vanno bene): "Nome già utilizzato in questa azienda". Nome fino a 40 caratteri, azienda fino a 40.
+- **Chi era registrato senza azienda** (se è obbligatoria): all'apertura dell'app, o dopo l'accesso, compare la finestra "La tua azienda" (`mCompany`) con l'anteprima del nome in classifica; si salva con `efg_set_azienda`, solo se l'azienda era vuota. Si può chiudere: ricompare alla volta dopo.
+- **Categoria** (Staff, Sponsor, Ospite) la decide l'admin; chi ha l'email @efuture.it o scrive l'azienda "efuture" è Staff in automatico, con l'azienda scritta "Efuture".
+- Con il database senza `supabase-campi-registrazione.sql` l'app registra come prima (solo nome ed email).
+
 ## Gara
 
 **Regole** (costanti in `hub.js`: `LEVELS = 3`, `LEVEL_SECONDS = 60`):
@@ -201,7 +209,7 @@ Il server rifiuta i punteggi a gara chiusa, con una tolleranza di 10 s (vedi [da
 ## Bonus Recensione
 
 - In home, sotto i giochi, chi ha fatto l'accesso vede il pulsante giallo **⭐ Bonus Recensione** con la spiegazione dei punti. Il tocco apre subito la pagina delle recensioni Google di efuture (il link scelto in admin, altrimenti la ricerca su Google Maps) e registra il clic (`efg_recensione_click`).
-- Dopo il clic: "Grazie! Quando confermiamo la tua recensione su Google ricevi +N punti…". Quando l'admin la conferma il pulsante diventa verde, **✅ Bonus Recensione ottenuto**, e il testo dice "I tuoi +N punti si sommano ai tuoi record nella classifica generale".
+- Dopo il clic: "Lascia la tua recensione a Efuture e riceverai N punti bonus." (N = punti scelti in admin, di base 200). Quando l'admin la conferma il pulsante diventa verde, **✅ Bonus Recensione ottenuto**, e il testo dice "I tuoi +N punti si sommano ai tuoi record nella classifica generale".
 - Nella classifica generale (app e schermo) chi ha il bonus ha l'etichetta **⭐ +N bonus**; la nota dice "Totale = somma dei 4 giochi + ⭐ bonus recensione".
 - Senza `supabase-recensioni.sql` il pulsante non compare.
 
@@ -210,6 +218,8 @@ Il server rifiuta i punteggi a gara chiusa, con una tolleranza di 10 s (vedi [da
 All'avvio l'app legge `efg_impostazioni` e salva la visualizzazione predefinita scelta in admin in `efgViewDefault`; i giochi la usano finché il giocatore non ne sceglie una con il pulsante in alto nel gioco (vedi [giochi-comune.md](giochi-comune.md#visualizzazione-game-light-dark)).
 
 ## Classifica in app
+
+Ogni riga mostra **Azienda - Nome**: l'azienda su una riga piccola arancione sopra al nome, così non si tagliano (chi non ha l'azienda compare con il solo nome).
 
 Si apre con il pulsante **Classifica** (finestra `mBoard`).
 - In cima solo il titolo "Classifica" e la ✕, senza logo efuture (v61).
