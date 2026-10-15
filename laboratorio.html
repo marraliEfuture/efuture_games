@@ -39,7 +39,6 @@ body.idle,body.idle *{cursor:none!important}
 
 /* slide scure */
 .dark{background:radial-gradient(120% 90% at 85% 0%,var(--navy2) 0%,var(--navy) 55%,#001522 100%)}
-.dark::before{content:"";position:absolute;left:96px;top:84px;width:26px;height:26px;background:#fff;box-shadow:34px 34px 0 #fff;opacity:.95}
 .dark .logo{position:absolute;left:96px;bottom:70px;height:46px;width:auto}
 .wrap{position:absolute;left:180px;right:180px;top:50%;transform:translateY(-50%)}
 .kicker{font-family:var(--title);font-weight:700;font-size:30px;letter-spacing:.32em;color:var(--sky);margin:0 0 26px}
@@ -86,12 +85,12 @@ h2{font-size:132px}
 .tut .prompt{border-left:6px solid var(--orange);background:rgba(255,255,255,.07);padding:20px 26px;border-radius:8px;font-size:27px;line-height:1.45;font-style:italic;color:#fff}
 .tut .time{align-self:flex-start;font-size:26px;padding:8px 18px;border-radius:999px;background:rgba(241,140,34,.18);color:#ffd2a1}
 .tut .logo{left:1140px}
-.tut::before{left:1140px}   /* quadratini e logo sulla parte scura, a destra dell'immagine */
 
 /* barra di avanzamento e numero */
 #bar{position:absolute;left:0;bottom:0;height:10px;background:var(--orange);transition:width .4s ease;z-index:5}
 #cnt{position:absolute;right:70px;bottom:44px;font:600 28px var(--title);color:rgba(255,255,255,.75);z-index:5}
 #stage.isvid #cnt{display:none}
+#cnt{display:none}   /* niente numero di pagina sulle slide */
 
 /* comandi a comparsa (fuori dal palco, nella finestra) */
 .nav{position:fixed;top:50%;transform:translateY(-50%);width:64px;height:64px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:30px;cursor:pointer;z-index:20;transition:opacity .3s}
@@ -112,7 +111,7 @@ body.rec .nav,body.rec #fs,body.rec #hint{display:none!important}
 <button id="fs" type="button">Schermo intero</button>
 <div id="hint" role="button" tabindex="0">Clicca una volta qui per lo schermo intero · frecce o telecomando per avanzare</div>
 
-<script src="tutorial/tutorials.js?v=89"></script>
+<script src="tutorial/tutorials.js?v=90"></script>
 <script>
 (function(){
 "use strict";
@@ -128,9 +127,9 @@ const DECK = [
   { title:'Laboratorio AI', cls:'dark cover', html:'<div class="wrap"><h1>Laboratorio <span class="o">AI</span></h1><div class="care">CARE CONFERENCE</div></div>' + LOGO },
   { title:'Claude, aiutami tu!', cls:'dark', html:'<div class="wrap"><p class="kicker">CLAUDE IN CHROME</p><h2>Claude, aiutami tu!</h2><p class="desc">Installa l\'estensione di Claude sul tuo browser e risolvi <b>operazioni quotidiane.</b></p></div>' + LOGO },
   { title:'Video: prenota con TheFork', video:'video/thefork-claude.mp4', poster:'video/thefork-claude.jpg', cap:'Claude in Chrome prenota un tavolo su TheFork' },
-  { title:'E tu cosa potresti chiedere?', cls:'dark ask', html:'<div class="wrap"><div class="q">?</div><h2>E tu cosa potresti chiedere a Claude per le tue <span class="o">operazioni quotidiane?</span></h2><div class="ex"><span>Prenotare un ristorante</span><span>Riordinare le mail</span><span>Compilare un foglio</span><span>Confrontare offerte</span></div></div>' + LOGO },
+  { title:'E tu cosa potresti chiedere?', cls:'dark ask', html:'<div class="wrap"><div class="q">?</div><h2>E tu cosa potresti chiedere a Claude per le tue <span class="o">operazioni quotidiane?</span></h2><div class="ex"><span>Prenotare un ristorante</span><span>Invia una mail</span><span>Compila un foglio di calcolo</span><span>Confrontare offerte</span><span>Organizza una trasferta</span></div></div>' + LOGO },
   { title:'Crea il tuo videogioco!', cls:'dark', html:'<div class="gameon">GAME ON</div><div class="wrap"><p class="kicker">CREA CON CLAUDE</p><h2>Crea il tuo videogioco!</h2><p class="desc">4 prompt e il gioco è fatto! Realizza la tua app in meno di 15 minuti.</p></div>' + LOGO },
-  { title:'Video: Forza 4 con Claude', video:'video/forza4-claude.mp4', poster:'video/forza4-claude.jpg', cap:'Crea e gioca a Forza 4 con Claude' },
+  { title:'Video: Forza 4 con Claude', video:'video/forza4-claude.mp4', poster:'video/forza4-claude.jpg', cap:'Crea e gioca con Claude' },
 ];
 // tutti i passi del tutorial Forza 4 (tutorial/tutorials.js); con ?t=<id> solo i passi di quel tutorial
 const TID = QS.get('t');

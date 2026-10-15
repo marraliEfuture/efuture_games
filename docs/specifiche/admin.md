@@ -245,7 +245,7 @@ Tutorial presenti:
 
 | id | Titolo | Slide |
 |---|---|---|
-| `forza4` | Crea e gioca a Forza 4 con Claude | 12 |
+| `forza4` | Crea e gioca con Claude | 12 |
 | `sheets` | Foglio "Attività giornaliere" con Claude in Chrome | 11 |
 
 ### Laboratorio
@@ -267,7 +267,7 @@ Interventi:
 | # | Titolo | Min | Presenta |
 |---|---|---|---|
 | 1 | Presentazione "Laboratorio AI" | 20 | `laboratorio.html` (+ video `video/laboratorio-ai.mp4`) |
-| 2 | Crea e gioca a Forza 4 con Claude | 15 | tutorial `forza4` |
+| 2 | Crea e gioca con Claude | 15 | tutorial `forza4` |
 | 3 | Foglio "Attività giornaliere" con Claude in Chrome | 5 | tutorial `sheets` |
 | 4 | Efuture Games: i 4 giochi degli stand | 5 | slide non pronte (c'è il PPTX) |
 | 5 | Classifica e premiazione | 10 | slide non pronte (c'è il PPTX) |
@@ -301,7 +301,7 @@ Si rifanno tutti con `.claude/skills/efuture-games-admin/scripts/pptx_laboratori
   1. Copertina "Laboratorio **AI**" (AI arancione) e "CARE CONFERENCE" spaziato in azzurro;
   2. "CLAUDE IN CHROME" · **Claude, aiutami tu!** · "Installa l'estensione di Claude sul tuo browser e risolvi **operazioni quotidiane.**";
   3. video `video/thefork-claude.mp4` a tutto schermo, con didascalia che sparisce quando parte;
-  4. grande "?" arancione · "E tu cosa potresti chiedere a Claude per le tue *operazioni quotidiane?*" con gli esempi Prenotare un ristorante, Riordinare le mail, Compilare un foglio, Confrontare offerte;
+  4. grande "?" arancione · "E tu cosa potresti chiedere a Claude per le tue *operazioni quotidiane?*" con gli esempi Prenotare un ristorante, Invia una mail, Compila un foglio di calcolo, Confrontare offerte, Organizza una trasferta (v90);
   5. "CREA CON CLAUDE" · **Crea il tuo videogioco!** · "4 prompt e il gioco è fatto! Realizza la tua app in meno di 15 minuti." con "GAME ON" pixel in alto a destra;
   6. video `video/forza4-claude.mp4`;
   7–18. i 12 passi del tutorial `forza4` (da `tutorial/tutorials.js`): immagine a sinistra su sfondo chiaro, a destra "Tutorial · Forza 4 con Claude", passo, titolo, testo, prompt, ⏱.
@@ -310,6 +310,8 @@ Si rifanno tutti con `.claude/skills/efuture-games-admin/scripts/pptx_laboratori
 - I video partono da soli entrando nella slide e si fermano uscendo; se il browser blocca l'audio partono muti con "🔇 Clic per attivare l'audio".
 - Fuori dallo schermo intero compare in alto "Clicca una volta qui per lo schermo intero · frecce o telecomando per avanzare"; un clic attiva lo schermo intero.
 - La slide corrente è nell'indirizzo (`#n`). Con `?rec=1` spariscono comandi e inviti (per registrare il video).
+- Il numero di pagina (`#cnt`) è nascosto su tutte le slide (v90); resta la barra arancione di avanzamento.
+- Testi dei passi del tutorial (v90): pagina 7 «Crea un gioco con l’AI» (… richieste a Claude (o ChatGPT, ecc.) e gioca subito), pagina 10 prompt «Creami un gioco come Forza 4 …», pagina 14 «Scatena un evento», 15 «Prova subito il tuo gioco!», 16 «Ricorda le regole…»; la didascalia del video Forza 4 è «Crea e gioca con Claude»; tolti i due quadratini bianchi decorativi in alto a sinistra da tutte le slide. Rifatti `video/laboratorio-ai.mp4` (stesse durate, slide nuove) e la scheda iniziale di `video/forza4-claude.mp4` (+ copertina): «Crea e gioca con Claude».
 - Il video `video/laboratorio-ai.mp4` (+ copertina `.jpg`) è la presentazione registrata: slide 1–5 per 5 s, passi del tutorial per 4 s, al posto delle slide 3 e 6 i due mp4 interi con l'audio; H.264 1280×720, crf 26, AAC, faststart.
 
 ### Backup

@@ -130,7 +130,7 @@ CODICI DI SBLOCCO (uno per gioco)
      con cosa fa ognuna e un esempio di richiesta.
    - Tutorial: guide passo passo da sfogliare come una presentazione
      (frecce, tasti ← → o swipe; schermo intero). I prompt si copiano
-     con un clic. Tutorial: "Crea e gioca a Forza 4 con Claude" e il foglio
+     con un clic. Tutorial: "Crea e gioca con Claude" (Forza 4) e il foglio
      "Attività giornaliere" con Claude in Chrome
      (immagini in tutorial/<nome>/, testi in tutorial/tutorials.js).
    - Laboratorio: la scaletta degli interventi dell'evento, in ordine,
