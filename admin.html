@@ -191,7 +191,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 .regia{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--navy);color:#fff}
 .regia .onair{color:#ff5d56;font-weight:700;letter-spacing:.04em}
 .regia .rslide{font-family:var(--title);font-weight:600;flex:1;min-width:160px}
-.regia .rbtns{display:flex;gap:6px}
+.regia .rbtns{display:flex;gap:6px;flex-wrap:wrap}
+#labStage{position:fixed;inset:0;z-index:200;background:#000}
+#labStage[hidden]{display:none}
+#labStage iframe{width:100%;height:100%;border:0;display:block;background:#000}
 .regia .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
 .tlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .tcard{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
@@ -465,10 +468,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
       </section>
 
       <section data-pane="lab" hidden>
-        <div class="labhead"><p class="dim" style="margin:0">La scaletta degli interventi da presentare all'evento, in ordine. Tocca <b>Presenta</b> per aprire l'intervento a schermo.</p><span class="dim" id="labSum"></span></div>
+        <div class="labhead"><p class="dim" style="margin:0">La scaletta degli interventi da presentare all'evento, in ordine. Tocca <b>Presenta</b>: l'intervento va a schermo intero sul proiettore e qui resta la regia.</p><span class="dim" id="labSum"></span></div>
         <div class="regia" id="labRegia" hidden>
           <span class="onair">● In onda</span><span class="rslide" id="labSlide"></span>
-          <span class="rbtns"><button class="btn ghost" id="labHome" type="button">⟲ Inizio</button><button class="btn ghost" id="labPrev" type="button" aria-label="Slide precedente">←</button><button class="btn" id="labNext" type="button">Avanti →</button></span>
+          <span class="rbtns"><button class="btn ghost" id="labHome" type="button">⟲ Inizio</button><button class="btn ghost" id="labPrev" type="button" aria-label="Slide precedente">←</button><button class="btn" id="labNext" type="button">Avanti →</button><button class="btn ghost" id="labPlay" type="button" title="Avvia o mette in pausa il video della slide">⏯ Video</button><button class="btn ghost" id="labStop" type="button" title="Chiude la presentazione sul proiettore">✕ Chiudi</button></span>
         </div>
         <div class="lablist" id="labList"></div>
         <div class="msg" id="labMsg" aria-live="polite" style="margin-top:8px"></div>
@@ -647,6 +650,10 @@ async function enter(){
   const st = await call('efg_admin_login');
   $('fLogin').hidden = true; $('dash').hidden = false; $('hRight').hidden = false; $('menuBtn').hidden = false;
   renderStats(st); loadPlayers(); whoAmI();
+  if (new URLSearchParams(location.search).get('regia') === 'lab'){   // finestra di regia aperta da Laboratorio › Presenta
+    const t = document.querySelector('.tab[data-tab="lab"]'); if (t) t.click();
+    if (!/^Regia/.test(document.title)) document.title = 'Regia · ' + document.title;
+  }
 }
 // chi è collegato (serve supabase-tipi-utenti.sql; senza, si presume la chiave principale)
 let ME = { principale: true };
@@ -1497,7 +1504,7 @@ const LAB_EVENTS = [
   { title:'Efuture Games: i 4 giochi degli stand', desc:'', min:5, who:'Efuture, CoreTech, Timenet, inncloud', pptx:'presentazioni/4-efuture-games.pptx' },
   { title:'Classifica e premiazione', desc:'', min:10, pptx:'presentazioni/5-classifica-premiazione.pptx' },
 ];
-let labDone = false, labWin = null;
+let labDone = false;
 const labCh = ('BroadcastChannel' in window) ? new BroadcastChannel('efg-lab') : null;   // regia ↔ presentazione (stesso sito, stesso browser)
 function renderLab(){
   if (labDone) return; labDone = true;
@@ -1516,26 +1523,64 @@ function renderLab(){
     const bp = document.createElement('button'); bp.className = 'btn'; bp.type = 'button'; bp.textContent = 'Presenta'; bp.onclick = () => labPresent(ev); acts.appendChild(bp);
     if (ev.pptx){ const bd = document.createElement('a'); bd.className = 'btn ghost'; bd.href = ev.pptx; bd.download = ev.pptx.split('/').pop(); bd.textContent = '⬇ PPTX'; bd.title = 'Scarica le slide in PowerPoint'; acts.appendChild(bd); }
     if (ev.video){ const bv = document.createElement('button'); bv.className = 'btn ghost'; bv.type = 'button'; bv.textContent = '▶ Video (mp4)'; bv.onclick = () => openOnSecond(ev.video, 'efgLabVideo', 'Il video'); acts.appendChild(bv); }
-    if (i === 0){ const h = document.createElement('div'); h.className = 'hint'; h.textContent = '⌨️ Presenta: si va avanti e indietro con le frecce ← → (o il telecomando). Video: la stessa presentazione registrata, 4 min 42 s.'; c.appendChild(h); }
+    if (i === 0){ const h = document.createElement('div'); h.className = 'hint'; h.textContent = '⌨️ Presenta: va a schermo intero sul proiettore; si va avanti e indietro dalla regia, con le frecce ← → o il telecomando. Video: la stessa presentazione registrata, 4 min 42 s.'; c.appendChild(h); }
     $('labList').appendChild(c);
   });
 }
 async function labPresent(ev){
-  if (ev.deck){ labWin = await openOnSecond(ev.deck, 'efgLab', 'La presentazione'); if (labCh) labCh.postMessage({ type:'ping' }); return; }
-  if (ev.tutorial){
-    const tu = TUTORIALS.find(t => t.id === ev.tutorial);
-    const tab = document.querySelector('.tab[data-tab="tutorials"]'); if (tab) tab.click();
-    if (tu) openDeck(tu); return;
+  if (ev.deck || ev.tutorial){   // deck = laboratorio.html; tutorial = gli stessi passi, presentati da laboratorio.html?t=<id>
+    const u = new URL(ev.deck || 'laboratorio.html', location.href); u.searchParams.set('embed', '1'); if (!ev.deck) u.searchParams.set('t', ev.tutorial);
+    return labFull(u.pathname + u.search);
   }
   setMsg($('labMsg'), 'Le slide di «' + ev.title + '» non sono ancora pronte.', '');
 }
+/* Presenta: QUESTA finestra va a schermo intero sul secondo monitor (proiettore) con la presentazione dentro,
+   e nello stesso clic si apre la regia (admin.html?regia=lab) qui sul primo monitor, come 📺 Proietta della classifica.
+   Serve Chrome o Edge con il permesso "Gestione finestre" (chiesto la prima volta). Sul proiettore non si tocca niente:
+   avanti/indietro dalla regia, con le frecce o il telecomando; ✕ Chiudi (o Esc sul proiettore) chiude. */
+async function labFull(url){
+  const stage = $('labStage');
+  if (!stage.requestFullscreen){ setMsg($('labMsg'), 'Questo browser non consente lo schermo intero: usa Chrome o Edge.', 'err'); return; }
+  const asked = !projScreens && 'getScreenDetails' in window;
+  if (asked){ await projLoad(true); if (projScreens){ projMsg('Permesso concesso: premi di nuovo «Presenta».'); return; } }
+  let scr = null;
+  if (projScreens && projScreens.screens.length > 1){
+    const o = projScreens.screens.filter(s => s !== projScreens.currentScreen);
+    scr = o.find(s => !s.isPrimary) || o[0] || null;
+  }
+  const here = { left: window.screenX, top: window.screenY, width: window.outerWidth, height: window.outerHeight };   // dove resta la regia
+  $('labFrame').src = url; stage.hidden = false;
+  try {
+    await stage.requestFullscreen(scr ? { screen: scr, navigationUI: 'hide' } : { navigationUI: 'hide' });
+  } catch (e) {
+    labStageOff(); projMsg('Il browser non ha concesso lo schermo intero: premi di nuovo «Presenta».'); return;
+  }
+  $('labFrame').focus();
+  if (scr){
+    const w = window.open('admin.html?regia=lab', 'efgLabRegia', 'popup,left=' + here.left + ',top=' + here.top + ',width=' + here.width + ',height=' + here.height);
+    if (!w) projMsg('La presentazione è sul proiettore, ma il browser ha bloccato la finestra di regia: consenti i popup per questo sito. Intanto si comanda con le frecce o il telecomando; Esc chiude.');
+  } else projMsg('getScreenDetails' in window
+    ? 'Non trovo un secondo monitor: la presentazione è a schermo intero qui. Frecce o telecomando per avanzare, Esc per chiudere.'
+    : 'Questo browser non sa scegliere il monitor: la presentazione è a schermo intero qui (meglio Chrome o Edge). Esc per chiudere.');
+}
+function labStageOff(){ const st = $('labStage'); if (st.hidden) return; st.hidden = true; $('labFrame').src = 'about:blank'; }
+document.addEventListener('fullscreenchange', () => { if (document.fullscreenElement !== $('labStage')) labStageOff(); });
 // regia: la barra compare quando la presentazione risponde, e comanda avanti / indietro / inizio
 if (labCh){
   labCh.onmessage = e => {
     const m = e.data || {};
     if (m.type === 'state'){ $('labRegia').hidden = false; $('labSlide').textContent = (m.i + 1) + ' / ' + m.n + ' · ' + (m.title || ''); }
     if (m.type === 'bye') $('labRegia').hidden = true;
+    if (m.type === 'stop' && document.fullscreenElement === $('labStage')) document.exitFullscreen().catch(() => {});   // ✕ Chiudi dalla regia
   };
+  $('labStop').onclick = () => { labCh.postMessage({ type:'stop' }); if (document.fullscreenElement === $('labStage')) document.exitFullscreen().catch(() => {}); $('labRegia').hidden = true; };
+  $('labPlay').onclick = () => labCh.postMessage({ type:'play' });
+  // telecomando o frecce nella regia: comandano la presentazione sul proiettore
+  document.addEventListener('keydown', e => {
+    if ($('labRegia').hidden || !$('deck').hidden || /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '')) return;
+    if (['ArrowRight', 'PageDown'].includes(e.key)){ e.preventDefault(); labCh.postMessage({ type:'next' }); }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)){ e.preventDefault(); labCh.postMessage({ type:'prev' }); }
+  });
   $('labNext').onclick = () => labCh.postMessage({ type:'next' });
   $('labPrev').onclick = () => labCh.postMessage({ type:'prev' });
   $('labHome').onclick = () => labCh.postMessage({ type:'go', i:0 });
@@ -1666,5 +1711,7 @@ if (KEY) enter().catch(err => logout(err.auth ? err.message : ''));
   ['peKeySet', 'peKeyCancel'].forEach(id => { const b = document.getElementById(id); if (b) b.addEventListener('click', hideAll); });
 })();
 </script>
+<!-- Presenta: la presentazione a schermo intero sul proiettore (vedi labFull) -->
+<div id="labStage" hidden><iframe id="labFrame" title="Presentazione" allow="autoplay; fullscreen"></iframe></div>
 </body>
 </html>

@@ -134,12 +134,13 @@ CODICI DI SBLOCCO (uno per gioco)
      "Attività giornaliere" con Claude in Chrome
      (immagini in tutorial/<nome>/, testi in tutorial/tutorials.js).
    - Laboratorio: la scaletta degli interventi dell'evento, in ordine,
-     con minuti e relatore. "Presenta" apre l'intervento: la presentazione
-     "Laboratorio AI" (laboratorio.html) va sul secondo monitor e si
-     avanza con le frecce ← → o il telecomando; i tutorial si aprono nella
-     sezione Tutorial. Quando la presentazione è aperta compare la barra
-     di regia "● In onda" con la slide corrente e i pulsanti Inizio, ← e
-     Avanti →. "▶ Video (mp4)" apre la stessa presentazione registrata
+     con minuti e relatore. "Presenta" mette l'intervento (presentazione
+     "Laboratorio AI" o tutorial) a schermo intero sul secondo monitor,
+     senza toccare niente sul proiettore, e apre qui la finestra di regia
+     (serve Chrome o Edge; la prima volta chiede il permesso "Gestione
+     finestre" e va premuto di nuovo). Nella regia la barra "● In onda"
+     mostra la slide corrente con Inizio, ←, Avanti →, ⏯ Video e
+     ✕ Chiudi; si avanza anche con le frecce ← → o il telecomando. "▶ Video (mp4)" apre la stessa presentazione registrata
      (video/laboratorio-ai.mp4, 4 min 42 s). Interventi in LAB_EVENTS
      dentro admin.html.
    Se perdi la chiave: Supabase > SQL Editor >

@@ -252,15 +252,14 @@ Tutorial presenti:
 
 *Aggiunto il 14/10/2026, v73.*
 
-- Testo: "La scaletta degli interventi da presentare all'evento, in ordine. Tocca Presenta per aprire l'intervento a schermo."; a destra "N interventi · circa X min".
-- Una card per intervento (`LAB_EVENTS`, in ordine): numero in un cerchio, titolo, descrizione, etichette (⏱ minuti, 🎤 relatore e altre). L'intervento 1 è in risalto: bordo e cerchio arancioni (`--brand-orange`), sfondo sfumato, etichetta "Evento n. 1", e sotto la riga "⌨️ Presenta: si va avanti e indietro con le frecce ← → (o il telecomando). Video: la stessa presentazione registrata, 4 min 42 s."
+- Testo: "La scaletta degli interventi da presentare all'evento, in ordine. Tocca **Presenta**: l'intervento va a schermo intero sul proiettore e qui resta la regia."; a destra "N interventi · circa X min".
+- Una card per intervento (`LAB_EVENTS`, in ordine): numero in un cerchio, titolo, descrizione, etichette (⏱ minuti, 🎤 relatore e altre). L'intervento 1 è in risalto: bordo e cerchio arancioni (`--brand-orange`), sfondo sfumato, etichetta "Evento n. 1", e sotto la riga "⌨️ Presenta: va a schermo intero sul proiettore; si va avanti e indietro dalla regia, con le frecce ← → o il telecomando. Video: la stessa presentazione registrata, 4 min 42 s."
 - A destra **Presenta** e, per chi ha un video, **▶ Video (mp4)**:
-  - Presenta con `deck`: apre la pagina sul secondo monitor (`openOnSecond`, la stessa funzione di 📺 Proietta);
-  - Presenta con `tutorial`: apre quel tutorial nella sezione Tutorial;
+  - Presenta con `deck` o `tutorial` (v87, `labFull`): **questa finestra** va a schermo intero sul secondo monitor (Window Management API, `requestFullscreen({ screen })` su `#labStage`) con dentro un iframe `#labFrame` della presentazione: `deck` + `?embed=1`, oppure per un tutorial `laboratorio.html?embed=1&t=<id>` (solo i passi di quel tutorial). Nello stesso clic si apre sul primo monitor, dove era l'admin, la finestra di regia `admin.html?regia=lab` (popup; entra da sola perché eredita la chiave della scheda, apre Laboratorio e ha il titolo "Regia · …"). Sul proiettore non serve nessun clic. La prima volta il browser chiede il permesso "Gestione finestre": dopo "Permesso concesso: premi di nuovo «Presenta»". Senza secondo monitor o senza l'API: schermo intero su questo monitor e un messaggio. Popup bloccati: la presentazione resta sul proiettore e un messaggio chiede di consentire i popup. Uscendo dallo schermo intero (Esc o ✕ Chiudi) l'iframe torna vuoto e lo stage si nasconde;
   - altrimenti: "Le slide di «…» non sono ancora pronte.";
   - Video (mp4): apre l'mp4 sul secondo monitor;
   - **⬇ PPTX** (v86, per chi ha `pptx`): scarica il PowerPoint della sessione da `presentazioni/` (link con `download`).
-- **Barra di regia** (nascosta finché la presentazione non è aperta): "● In onda", slide corrente "n / N · titolo", **⟲ Inizio**, **←**, **Avanti →**. Parla con la presentazione con `BroadcastChannel('efg-lab')`: l'admin manda `next`, `prev`, `go {i}`, `ping`; la presentazione risponde `state {i, n, title}` (e `bye` quando si chiude). Funziona con admin e presentazione nello stesso browser e sullo stesso sito.
+- **Barra di regia** (nascosta finché la presentazione non è aperta): "● In onda", slide corrente "n / N · titolo", **⟲ Inizio**, **←**, **Avanti →**, **⏯ Video** (avvia o mette in pausa il video della slide) e **✕ Chiudi** (chiude lo schermo intero sul proiettore). Con la barra visibile, le frecce ← → e PagSu/PagGiù del telecomando nella finestra di regia comandano la presentazione. Parla con la presentazione con `BroadcastChannel('efg-lab')`: l'admin manda `next`, `prev`, `go {i}`, `ping`, `play`, `stop` (`stop` lo riceve la finestra a schermo intero, che esce); la presentazione risponde `state {i, n, title}` (e `bye` quando si chiude). Funziona con admin e presentazione nello stesso browser e sullo stesso sito.
 
 Interventi:
 
@@ -288,6 +287,7 @@ Si rifanno tutti con `.claude/skills/efuture-games-admin/scripts/pptx_laboratori
 
 #### Presentazione laboratorio.html
 
+- Parametri: `?rec=1` nasconde comandi e inviti (registrazione del video); `?embed=1` (dentro l'admin, già a schermo intero) nasconde comandi e inviti, non chiede lo schermo intero al clic ma fa partire i video; `?t=<id>` mostra solo i passi di quel tutorial di `tutorial/tutorials.js`.
 - Pagina senza accesso, stile PowerPoint: palco fisso 1920×1080 scalato sulla finestra, bande nere ai lati. Font locali Montserrat, Poppins e Press Start 2P; colori navy `#002238`, arancione `#f18c22`, azzurro `#8ad0ff`.
 - Slide (`DECK`, 18 in tutto):
   1. Copertina "Laboratorio **AI**" (AI arancione) e "CARE CONFERENCE" spaziato in azzurro;
