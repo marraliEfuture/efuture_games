@@ -258,7 +258,8 @@ Tutorial presenti:
   - Presenta con `deck`: apre la pagina sul secondo monitor (`openOnSecond`, la stessa funzione di 📺 Proietta);
   - Presenta con `tutorial`: apre quel tutorial nella sezione Tutorial;
   - altrimenti: "Le slide di «…» non sono ancora pronte.";
-  - Video (mp4): apre l'mp4 sul secondo monitor.
+  - Video (mp4): apre l'mp4 sul secondo monitor;
+  - **⬇ PPTX** (v86, per chi ha `pptx`): scarica il PowerPoint della sessione da `presentazioni/` (link con `download`).
 - **Barra di regia** (nascosta finché la presentazione non è aperta): "● In onda", slide corrente "n / N · titolo", **⟲ Inizio**, **←**, **Avanti →**. Parla con la presentazione con `BroadcastChannel('efg-lab')`: l'admin manda `next`, `prev`, `go {i}`, `ping`; la presentazione risponde `state {i, n, title}` (e `bye` quando si chiude). Funziona con admin e presentazione nello stesso browser e sullo stesso sito.
 
 Interventi:
@@ -268,8 +269,22 @@ Interventi:
 | 1 | Presentazione "Laboratorio AI" | 20 | `laboratorio.html` (+ video `video/laboratorio-ai.mp4`) |
 | 2 | Crea e gioca a Forza 4 con Claude | 15 | tutorial `forza4` |
 | 3 | Foglio "Attività giornaliere" con Claude in Chrome | 5 | tutorial `sheets` |
-| 4 | Efuture Games: i 4 giochi degli stand | 5 | slide non pronte |
-| 5 | Classifica e premiazione | 10 | slide non pronte |
+| 4 | Efuture Games: i 4 giochi degli stand | 5 | slide non pronte (c'è il PPTX) |
+| 5 | Classifica e premiazione | 10 | slide non pronte (c'è il PPTX) |
+
+#### PowerPoint delle sessioni (v86)
+
+In `presentazioni/`, 16:9 (13,33 × 7,5 in), tema "Efuture" (blu notte `002238`, arancio `F18C22`, azzurro `8AD0FF`, font Calibri), note per il relatore in ogni slide:
+
+| File | Contenuto |
+|---|---|
+| `1-laboratorio-ai.pptx` | Le 18 slide di `laboratorio.html` come immagini 1920×1080; le slide 3 e 6 contengono i video TheFork e Forza 4 |
+| `2-forza4-claude.pptx` | Tutorial `forza4` con testi modificabili (layout immagine a sinistra, testo a destra, prompt e tempo) + video |
+| `3-foglio-attivita.pptx` | Tutorial `sheets`, come sopra + video |
+| `4-efuture-games.pptx` | Copertina, regole (3 livelli · 1 minuto · 3 vite, formula dei punti, sblocco agli stand), una slide per gioco con schermata di gioco, QR dell'app |
+| `5-classifica-premiazione.pptx` | Le due classifiche, le fasi Live e Finale, conto alla rovescia, podio con "Nome Cognome / Azienda" da compilare, ringraziamenti |
+
+Si rifanno tutti con `.claude/skills/efuture-games-admin/scripts/pptx_laboratorio.mjs` (serve `pptxgenjs`, vedi la skill efuture-games-admin): prende i testi da `tutorial/tutorials.js` e fa al momento gli screenshot di `laboratorio.html` e dei 4 giochi.
 
 #### Presentazione laboratorio.html
 
@@ -364,9 +379,9 @@ Tutti gli elenchi sono array nello script di `admin.html`, tranne i tutorial, ch
   - `time` aggiunge l'etichetta ⏱.
 - **Interventi del Laboratorio:** si aggiunge a `LAB_EVENTS`, nell'ordine dell'evento:
   ```js
-  { title:'…', desc:'…', min:10, who:'relatore', tags:['…'], deck:'pagina.html', tutorial:'<id>', video:'video/nome.mp4' }
+  { title:'…', desc:'…', min:10, who:'relatore', tags:['…'], deck:'pagina.html', tutorial:'<id>', video:'video/nome.mp4', pptx:'presentazioni/nome.pptx' }
   ```
-  `deck`, `tutorial` e `video` sono facoltativi: senza `deck` né `tutorial`, Presenta dice che le slide non sono pronte. Le slide di `laboratorio.html` sono nell'array `DECK` della pagina.
+  `deck`, `tutorial`, `video` e `pptx` sono facoltativi: senza `deck` né `tutorial`, Presenta dice che le slide non sono pronte. Le slide di `laboratorio.html` sono nell'array `DECK` della pagina.
 - **Skill:** si aggiunge a `SKILLS` la riga `['/nome-skill', 'cosa fa', '“esempio di richiesta”']`. L'elenco deve corrispondere a `.claude/skills/`.
 - **Link:**
   - un link del sito si aggiunge nel gruppo `Sito` di `LINKS`, calcolandolo da `b` (= `PUBLIC_URL`);
