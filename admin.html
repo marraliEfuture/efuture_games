@@ -597,10 +597,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=87"></script>
+<script src="config.js?v=88"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="tutorial/tutorials.js?v=87"></script>
+<script src="tutorial/tutorials.js?v=88"></script>
 <script>
 (function(){
 "use strict";
@@ -1530,11 +1530,45 @@ function renderLab(){
 async function labPresent(ev){
   if (ev.deck || ev.tutorial){   // deck = laboratorio.html; tutorial = gli stessi passi, presentati da laboratorio.html?t=<id>
     const u = new URL(ev.deck || 'laboratorio.html', location.href); u.searchParams.set('embed', '1'); if (!ev.deck) u.searchParams.set('t', ev.tutorial);
-    return labFull(u.pathname + u.search);
+    return labProj(u.pathname + u.search);
   }
   setMsg($('labMsg'), 'Le slide di «' + ev.title + '» non sono ancora pronte.', '');
 }
-/* Presenta: QUESTA finestra va a schermo intero sul secondo monitor (proiettore) con la presentazione dentro,
+/* Presenta (v88): l'admin resta qui e fa da regia. Sul secondo monitor c'è la finestra proiettore.html:
+   la prima volta Presenta la apre lì, poi le manda la presentazione insieme al permesso di andare a schermo intero
+   (Capability Delegation: postMessage con delegate:'fullscreen'), così sul proiettore non si clicca niente.
+   Aprire la finestra consuma il clic: se il browser non concede lo schermo intero subito, basta premere di nuovo Presenta.
+   Un solo monitor: la presentazione va a schermo intero qui (labFull). */
+let projWin = null, projUrl = '';
+async function labProj(url){
+  const asked = !projScreens && 'getScreenDetails' in window;
+  if (asked){ await projLoad(true); if (projScreens){ projMsg('Permesso concesso: premi di nuovo «Presenta».'); return; } }
+  let scr = null;
+  if (projScreens && projScreens.screens.length > 1){
+    const o = projScreens.screens.filter(s => s !== projScreens.currentScreen);
+    scr = o.find(s => !s.isPrimary) || o[0] || null;
+  }
+  if (projWin && !projWin.closed){ projUrl = url; return labSend(); }
+  if (!scr) return labFull(url);
+  projUrl = url;
+  projWin = window.open('proiettore.html?u=' + encodeURIComponent(url), 'efgLabProj', 'popup,left=' + scr.availLeft + ',top=' + scr.availTop + ',width=' + scr.availWidth + ',height=' + scr.availHeight);
+  if (!projWin){ projMsg('Il browser ha bloccato la finestra del proiettore: consenti i popup per questo sito e premi di nuovo «Presenta».'); return; }
+  projMsg('Proiettore aperto sull\'altro schermo.');
+}
+function labSend(){
+  if (!projWin || projWin.closed) return;
+  const m = { type:'show', url: projUrl };
+  try { projWin.postMessage(m, { targetOrigin: location.origin, delegate: 'fullscreen' }); }   // passa al proiettore il permesso di schermo intero
+  catch (e) { projWin.postMessage(m, location.origin); }   // niente clic da passare (es. finestra appena aperta): ci prova lo stesso
+}
+addEventListener('message', e => {
+  if (e.origin !== location.origin || !projWin || e.source !== projWin) return;
+  const m = e.data || {};
+  if (m.type === 'pronto') labSend();   // finestra appena aperta: prova subito lo schermo intero
+  if (m.type === 'fs') projMsg(m.ok ? 'La presentazione è a schermo intero sul proiettore. Comandi qui: barra di regia, frecce o telecomando.'
+                                    : 'Il proiettore è pronto sull\'altro schermo: premi di nuovo «Presenta» per lo schermo intero.');
+});
+/* Un solo monitor (o vecchio modo): QUESTA finestra va a schermo intero sul secondo monitor (proiettore) con la presentazione dentro,
    e nello stesso clic si apre la regia (admin.html?regia=lab) qui sul primo monitor, come 📺 Proietta della classifica.
    Serve Chrome o Edge con il permesso "Gestione finestre" (chiesto la prima volta). Sul proiettore non si tocca niente:
    avanti/indietro dalla regia, con le frecce o il telecomando; ✕ Chiudi (o Esc sul proiettore) chiude. */
@@ -1573,7 +1607,7 @@ if (labCh){
     if (m.type === 'bye') $('labRegia').hidden = true;
     if (m.type === 'stop' && document.fullscreenElement === $('labStage')) document.exitFullscreen().catch(() => {});   // ✕ Chiudi dalla regia
   };
-  $('labStop').onclick = () => { labCh.postMessage({ type:'stop' }); if (document.fullscreenElement === $('labStage')) document.exitFullscreen().catch(() => {}); $('labRegia').hidden = true; };
+  $('labStop').onclick = () => { labCh.postMessage({ type:'stop' }); if (projWin && !projWin.closed) projWin.close(); projWin = null; if (document.fullscreenElement === $('labStage')) document.exitFullscreen().catch(() => {}); $('labRegia').hidden = true; };
   $('labPlay').onclick = () => labCh.postMessage({ type:'play' });
   // telecomando o frecce nella regia: comandano la presentazione sul proiettore
   document.addEventListener('keydown', e => {

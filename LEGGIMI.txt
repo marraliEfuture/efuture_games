@@ -136,9 +136,10 @@ CODICI DI SBLOCCO (uno per gioco)
    - Laboratorio: la scaletta degli interventi dell'evento, in ordine,
      con minuti e relatore. "Presenta" mette l'intervento (presentazione
      "Laboratorio AI" o tutorial) a schermo intero sul secondo monitor,
-     senza toccare niente sul proiettore, e apre qui la finestra di regia
-     (serve Chrome o Edge; la prima volta chiede il permesso "Gestione
-     finestre" e va premuto di nuovo). Nella regia la barra "● In onda"
+     senza toccare niente sul proiettore; l'admin resta al suo posto e fa
+     da regia (serve Chrome o Edge; la prima volta chiede il permesso
+     "Gestione finestre" e, appena aperto il proiettore, può servire
+     premere Presenta una seconda volta). Nella regia la barra "● In onda"
      mostra la slide corrente con Inizio, ←, Avanti →, ⏯ Video e
      ✕ Chiudi; si avanza anche con le frecce ← → o il telecomando. "▶ Video (mp4)" apre la stessa presentazione registrata
      (video/laboratorio-ai.mp4, 4 min 42 s). Interventi in LAB_EVENTS
