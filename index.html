@@ -26,6 +26,7 @@
 <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/avvio/avvio-1125x2436.png">
 <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="icons/avvio/avvio-750x1334.png">
 <!-- app installata: schermata di avvio bianca con l'icona e "Powered by efuture" (vedi #splash); nel browser: prima l'icona dell'app, poi "Powered by efuture" -->
+<script>try{document.documentElement.setAttribute('data-home',localStorage.getItem('efgHomeLayout')||'lista')}catch(e){document.documentElement.setAttribute('data-home','lista')}</script>
 <script>try{if((window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true){document.documentElement.classList.add('splash');if(/Android/i.test(navigator.userAgent))document.documentElement.classList.add('splash-and')}else if(window.top===window){document.documentElement.classList.add('splash','splash-web')}}catch(e){}</script>
 <style>
 /* schermata di avvio dell'app installata: icona al centro, "Powered by efuture" in basso */
@@ -204,6 +205,19 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 .review.ok .btn{background:#e6f6ec;border-color:#9ed5b2;color:#1f6b3d;box-shadow:none;cursor:default;font-size:9px;padding:9px 12px}
 .review p{margin:0;font-size:12.5px;line-height:1.5;color:var(--dim)}
 .review p b{color:var(--text)}
+/* schermata dei giochi scelta in admin (Impostazioni › Schermata dei giochi): html[data-home]
+   ora = 2×2 con il bonus sotto · alto = bonus in un riquadro sopra ai giochi · lista = un gioco per riga (predefinita) · fisso = bonus sempre visibile in basso */
+html[data-home=alto] main{display:flex;flex-direction:column}
+html[data-home=alto] #review{order:-1;gap:6px;background:linear-gradient(135deg,#fff6d6,#ffe9a8);border:1px solid #f0c94a;border-radius:14px;padding:10px 12px;margin:0 0 12px}
+html[data-home=lista] .grid{grid-template-columns:1fr;gap:8px}
+html[data-home=lista] .game{display:grid;grid-template-columns:52px minmax(0,1fr) auto;grid-template-areas:"img name state" "img rank state" "img best state";column-gap:12px;row-gap:2px;align-items:center;padding:10px 12px;text-align:left}
+html[data-home=lista] .game img{grid-area:img;width:52px;height:52px;align-self:center}
+html[data-home=lista] .game .name{grid-area:name;min-height:0}
+html[data-home=lista] .game .state{grid-area:state}
+html[data-home=lista] .game .rank{grid-area:rank;font-size:11px}
+html[data-home=lista] .game .best{grid-area:best;font-size:11px}
+html[data-home=lista] #review{margin-top:12px}
+html[data-home=fisso] #review{position:sticky;bottom:8px;z-index:5;margin-top:12px;background:var(--panel);border:1px solid #f0c94a;border-radius:16px;padding:10px;box-shadow:0 8px 24px rgba(13,43,69,.18)}
 .rules b{color:var(--text)}
 .linkbtn{background:none;border:none;color:var(--ef-orange);font-size:12.5px;text-decoration:underline;cursor:pointer;padding:4px 0;align-self:flex-start}
 .cam{position:relative;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:1/1;width:100%;max-width:100%}
@@ -444,12 +458,12 @@ main{flex:1;padding:8px 16px 16px;width:100%;max-width:560px;margin:0 auto;displ
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=82"></script>
+<script src="config.js?v=83"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=82"></script>
+<script src="backend.js?v=83"></script>
 <script src="vendor/jsQR.js"></script>
-<script src="fuochi.js?v=82"></script>
-<script src="hub.js?v=82"></script>
+<script src="fuochi.js?v=83"></script>
+<script src="hub.js?v=83"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });

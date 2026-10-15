@@ -103,6 +103,8 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
 
 ### Campi della registrazione (Impostazioni, v82)
 
+**Schermata dei giochi (v83):** sotto i campi, quattro scelte per la home dell'app con il pulsante Bonus Recensione: 1 · Griglia 2×2 con il bonus sotto, 2 · Bonus in alto (riquadro giallo sopra ai giochi), 3 · Giochi in lista (predefinita), 4 · Bonus sempre visibile in basso. Il clic salva subito (`efg_admin_set_impostazione('home_layout', 'ora'|'alto'|'lista'|'fisso')`); vale dalla prossima apertura dell'app. Serve `supabase-home-layout.sql`.
+
 In cima a Impostazioni una tabella con una riga per campo (Nome e cognome, Azienda, Email, Cellulare) e tre scelte: 🚫 Non visibile, ◻️ Facoltativo, ✳️ Obbligatorio. Il clic salva subito (`efg_admin_set_impostazione('campi_registrazione', JSON)`), "Salvato: vale dalla prossima registrazione.". L'email è fissa su Obbligatorio. Nome e azienda non possono essere entrambi non visibili. Senza `supabase-campi-registrazione.sql` compare "Per salvarli esegui prima supabase-campi-registrazione.sql…".
 
 ### Qualità
