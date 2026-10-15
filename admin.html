@@ -124,6 +124,10 @@ tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 #pCats{display:inline-flex;gap:6px;flex-wrap:wrap}
 #pCats button{padding:6px 12px;font-size:12px}
 .subtel{display:block;font-size:11px;color:var(--muted,#5b7085)}
+/* Modifica utente › Dati: etichette a sinistra, campi a destra (una colonna sul telefono) */
+.dati .dgrid{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 10px;align-items:center;margin:6px 0}
+.dati .dgrid input{font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:4px;min-width:0}
+@media (max-width:520px){ .dati .dgrid{grid-template-columns:1fr} }
 .pop .row2{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 .pop p{margin:0;font-size:14px;line-height:1.55;color:var(--text)}
 .keyform{display:flex;flex-direction:column;gap:8px}
@@ -542,6 +546,16 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
   <div class="box">
     <h3 id="peT">Modifica utente</h3>
     <div class="who" id="peWho"></div>
+    <form class="grp2 dati" id="peDati" autocomplete="off"><b>Dati</b>
+      <div class="dgrid">
+        <label for="peName">Nome e cognome</label><input id="peName" maxlength="40" required>
+        <label for="peAz">Azienda</label><input id="peAz" maxlength="40">
+        <label for="peMail">Email</label><input id="peMail" type="email" required>
+        <label for="peTel">Cellulare</label><input id="peTel" type="tel" maxlength="20">
+      </div>
+      <div class="small">Cambiando l'email i punteggi restano suoi; nell'app dovrà accedere con l'email nuova.</div>
+      <div class="opts"><button class="btn" type="submit">Salva dati</button></div>
+    </form>
     <div class="grp2"><b>Tipo</b><div class="opts" id="peTipo"></div></div>
     <div class="grp2" id="peKeyBox"><b>Chiave admin personale (la password del pannello)</b>
       <div class="small" id="peKeyState"></div>
@@ -571,10 +585,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=83"></script>
+<script src="config.js?v=84"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="tutorial/tutorials.js?v=83"></script>
+<script src="tutorial/tutorials.js?v=84"></script>
 <script>
 (function(){
 "use strict";
@@ -875,6 +889,7 @@ $('peClose').onclick = closeEdit;
 $('pEdit').addEventListener('click', e => { if (e.target === $('pEdit')) closeEdit(); });
 function fillEdit(){
   const p = editing; $('peT').textContent = 'Modifica ' + p.name; $('peWho').textContent = p.email + (p.disabilitato ? ' · bloccato' : '');
+  $('peName').value = p.name || ''; $('peAz').value = p.azienda || ''; $('peMail').value = p.email || ''; $('peTel').value = p.cellulare || '';
   const box = $('peTipo'); box.innerHTML = '';
   for (const [v, t] of Object.entries(TIPI)){
     const b = document.createElement('button'); b.type = 'button'; b.className = 'opt' + (tipoOf(p) === v ? ' on' : '');
@@ -887,6 +902,19 @@ function fillEdit(){
   $('peKeyState').textContent = p.chiave ? '🔑 Impostata: entra nel pannello con ' + p.email + ' e la sua chiave.' : 'Non impostata: per ora non può entrare nel pannello.';
   $('peKeySet').textContent = p.chiave ? '🔑 Modifica' : '🔑 Imposta'; $('peKeyDel').hidden = !p.chiave;
 }
+// dati dell'utente (serve supabase-modifica-utente.sql): nome, azienda, email, cellulare
+$('peDati').addEventListener('submit', async e => {
+  e.preventDefault(); const p = editing; if (!p) return;
+  const v = { p_email: p.email, p_name: $('peName').value.trim(), p_azienda: $('peAz').value.trim(), p_new_email: $('peMail').value.trim(), p_cellulare: $('peTel').value.trim() };
+  try {
+    const r = await call('efg_admin_set_dati', v);
+    await loadPlayers(); const np = players.find(x => x.email === (r && r.email || v.p_new_email.toLowerCase()));
+    if (np){ editing = np; fillEdit(); } setMsg($('peMsg'), 'Dati salvati.', 'ok');
+  } catch(err){
+    if (/efg_admin_set_dati|PGRST202|does not exist/i.test(String(err && err.message))) setMsg($('peMsg'), 'Prima esegui supabase-modifica-utente.sql nel SQL Editor di Supabase.', 'err');
+    else if (err.auth) logout(err.message); else setMsg($('peMsg'), 'Non salvato: ' + err.message + '.', 'err');
+  }
+});
 async function act(fn, done){
   try { await fn(); await loadPlayers(); const p = players.find(x => x.email === editing.email); if (p){ editing = p; fillEdit(); } setMsg($('peMsg'), done, 'ok'); refreshStats(); }
   catch(err){ if (needSql(err)) setMsg($('peMsg'), 'Prima esegui supabase-tipi-utenti.sql nel SQL Editor di Supabase.', 'err'); else if (err.auth) logout(err.message); else setMsg($('peMsg'), 'Errore: ' + err.message, 'err'); }
@@ -1494,6 +1522,8 @@ if (labCh){
 /* ---------- video utili ---------- */
 // per aggiungere un video: file in video/ (mp4 H.264) + copertina jpg, poi una riga qui
 const VIDEOS = [
+  { title:'Tutorial RCM² per ISO 9001, 27001, 27017, 27018, GDPR e NIS2', file:'video/tutorial-rcm2-am-solutions.mp4', poster:'video/tutorial-rcm2-am-solutions.jpg',
+    desc:'Tutorial pratico sul caso AM Solutions Srl (eCRF SaaS per la ricerca clinica): organigramma, dipendenti, valutazione ENISA, questionario NIS2 ai fornitori, piano di trattamento, formazione e azioni correttive. Slide senza audio, 13 minuti e 36 secondi.' },
   { title:'Presentazione «Laboratorio AI»', file:'video/laboratorio-ai.mp4', poster:'video/laboratorio-ai.jpg',
     desc:'La presentazione dell’evento registrata: Claude in Chrome con il video TheFork, poi «Crea il tuo videogioco!» con il video e tutti i passi del tutorial di Forza 4. Per presentarla dal vivo, con le frecce o il telecomando, usa Formazione › Laboratorio › Presenta. 4 minuti e 42 secondi.' },
   { title:'Ordina una cena su The Fork con l’estensione di Claude', file:'video/thefork-claude.mp4', poster:'video/thefork-claude.jpg',

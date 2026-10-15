@@ -61,6 +61,8 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
 
 ### Utenti
 
+- **Modifica › Dati (v84):** in cima alla finestra Modifica i campi Nome e cognome, Azienda, Email e Cellulare, già compilati, e **Salva dati** (`efg_admin_set_dati`). Controlli: nome 2-40 caratteri, azienda fino a 40, email valida e non già usata, cellulare valido, nome + azienda non già di un altro utente; gli errori compaiono sotto ("Non salvato: …"). Cambiando l'email i punteggi restano dell'utente (chiave esterna `on update cascade`) e nell'app si accede con l'email nuova. Il log registra cosa è cambiato (il cellulare solo come "cambiato"). Serve `supabase-modifica-utente.sql`.
+
 - **Categorie (v82):** sopra la tabella i filtri **Tutti · Staff · Sponsor · Ospiti** con il numero di utenti; in tabella le colonne **Categoria** (tendina colorata: Staff blu, Sponsor arancio, Ospite verde, salva subito con `efg_admin_set_categoria`), **Azienda** e **Email · cellulare** (il cellulare sotto l'email, con 📱). Il CSV ha in più Azienda, Cellulare e Categoria.
 
 - Dati da `efg_admin_players`. Testo in alto: "N utenti registrati". Pulsanti **➕ Nuovo utente**, **Aggiorna** e **Scarica CSV**.
