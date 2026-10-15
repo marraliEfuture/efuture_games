@@ -141,7 +141,8 @@ CODICI DI SBLOCCO (uno per gioco)
      "Gestione finestre" e, appena aperto il proiettore, può servire
      premere Presenta una seconda volta). Nella regia la barra "● In onda"
      mostra la slide corrente con Inizio, ←, Avanti →, ⏯ Video e
-     ✕ Chiudi; si avanza anche con le frecce ← → o il telecomando. "▶ Video (mp4)" apre la stessa presentazione registrata
+     ✕ Chiudi; il focus resta sul proiettore, così il puntatore laser o il
+     telecomando muovono le slide (funzionano anche le frecce ← →). "▶ Video (mp4)" apre la stessa presentazione registrata
      (video/laboratorio-ai.mp4, 4 min 42 s). Interventi in LAB_EVENTS
      dentro admin.html.
    Se perdi la chiave: Supabase > SQL Editor >
