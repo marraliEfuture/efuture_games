@@ -12,7 +12,9 @@
      admin › Formazione › Laboratorio › Presenta. Palco fisso 1920×1080 scalato sulla finestra.
      Comandi: → ↓ PagGiù spazio Invio avanti · ← ↑ PagSu indietro · Home/Fine · F schermo intero
      · K o clic sul video = pausa/riprendi. La regia dell'admin comanda via BroadcastChannel('efg-lab').
-     ?rec=1 nasconde comandi e inviti (per registrare il video della presentazione). -->
+     ?rec=1 nasconde comandi e inviti (per registrare il video della presentazione).
+     ?embed=1: dentro l'admin, già a schermo intero sul proiettore (niente comandi, video che partono da soli).
+     ?t=<id>: solo i passi di quel tutorial (tutorial/tutorials.js). -->
 <style>
 @font-face{font-family:'Montserrat';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/montserrat-latin-500-normal.woff2) format('woff2');}
 @font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/montserrat-latin-700-normal.woff2) format('woff2');}
@@ -110,13 +112,15 @@ body.rec .nav,body.rec #fs,body.rec #hint{display:none!important}
 <button id="fs" type="button">Schermo intero</button>
 <div id="hint" role="button" tabindex="0">Clicca una volta qui per lo schermo intero · frecce o telecomando per avanzare</div>
 
-<script src="tutorial/tutorials.js?v=86"></script>
+<script src="tutorial/tutorials.js?v=87"></script>
 <script>
 (function(){
 "use strict";
 const $ = id => document.getElementById(id);
-const REC = new URLSearchParams(location.search).get('rec') === '1';
-if (REC) document.body.classList.add('rec');
+const QS = new URLSearchParams(location.search);
+const REC = QS.get('rec') === '1';
+const EMB = QS.get('embed') === '1';   // dentro l'admin, già a schermo intero sul proiettore: niente comandi né clic per lo schermo intero
+if (REC || EMB) document.body.classList.add('rec');
 const LOGO = '<img class="logo" src="img/efuture-logo-white.png" alt="efuture">';
 
 /* ---------- le slide ---------- */
@@ -128,8 +132,10 @@ const DECK = [
   { title:'Crea il tuo videogioco!', cls:'dark', html:'<div class="gameon">GAME ON</div><div class="wrap"><p class="kicker">CREA CON CLAUDE</p><h2>Crea il tuo videogioco!</h2><p class="desc">4 prompt e il gioco è fatto! Realizza la tua app in meno di 15 minuti.</p></div>' + LOGO },
   { title:'Video: Forza 4 con Claude', video:'video/forza4-claude.mp4', poster:'video/forza4-claude.jpg', cap:'Crea e gioca a Forza 4 con Claude' },
 ];
-// tutti i passi del tutorial Forza 4 (tutorial/tutorials.js)
-const TU = (window.EFG_TUTORIALS || []).find(t => t.id === 'forza4');
+// tutti i passi del tutorial Forza 4 (tutorial/tutorials.js); con ?t=<id> solo i passi di quel tutorial
+const TID = QS.get('t');
+if (TID) DECK.length = 0;
+const TU = (window.EFG_TUTORIALS || []).find(t => t.id === (TID || 'forza4'));
 if (TU) TU.slides.forEach(s => DECK.push({ title:s.h, tut:s, tuId:TU.id, tuName:TU.short || TU.title }));
 
 const stage = $('stage'), N = DECK.length;
@@ -213,7 +219,7 @@ $('next').onclick = e => { e.stopPropagation(); next(); };
 $('prev').onclick = e => { e.stopPropagation(); prev(); };
 $('fs').onclick = e => { e.stopPropagation(); full(); };
 $('hint').onclick = e => { e.stopPropagation(); full(); };
-document.addEventListener('click', () => { if (!document.fullscreenElement && !REC) full(); });   // un clic: schermo intero
+document.addEventListener('click', () => { if (!document.fullscreenElement && !REC && !EMB) full(); });   // un clic: schermo intero
 document.addEventListener('fullscreenchange', () => {
   document.body.classList.toggle('fs', !!document.fullscreenElement);
   $('fs').textContent = document.fullscreenElement ? 'Esci da schermo intero' : 'Schermo intero';
@@ -231,6 +237,7 @@ if (ch){
     const m = e.data || {};
     if (m.type === 'next') next(); else if (m.type === 'prev') prev();
     else if (m.type === 'go') go(m.i | 0); else if (m.type === 'ping') tell();
+    else if (m.type === 'play'){ const d = DECK[cur]; if (d.v){ d.v.paused ? play(d.el) : d.v.pause(); } }
   };
   addEventListener('pagehide', () => ch.postMessage({ type:'bye' }));
 }
