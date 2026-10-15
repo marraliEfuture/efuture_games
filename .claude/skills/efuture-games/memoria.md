@@ -124,5 +124,5 @@ Risposte dell'utente (07/10):
 - Le skill sono disponibili solo nelle sessioni aperte sul repository. Per usarle nelle chat di claude.ai vanno caricate a mano (Impostazioni → Capabilities → Skills) e non si aggiornano da sole.
 - Sul database va eseguito `supabase-recensioni.sql` se non già fatto. `supabase-tipi-utenti.sql` risulta eseguito (14/10: tipi utente e chiavi personali visibili in admin).
 - Il reset dall'admin riblocca i giochi su tutti i telefoni alla prossima apertura (`supabase-reset-sblocchi.sql`, eseguito il 14/10). Se si riesegue `supabase.sql`, rieseguire anche questo file.
-- Da eseguire in Supabase: `supabase-home-layout.sql`, `supabase-modifica-utente.sql` e `supabase-classifica-condivisa.sql` (15/10). `supabase-campi-registrazione.sql` eseguito il 15/10 (per incollare file lunghi usare "Copy raw file" su GitHub).
+- Da eseguire in Supabase: `supabase-home-layout.sql`, `supabase-modifica-utente.sql` (15/10). `supabase-classifica-condivisa.sql` eseguito il 15/10. `supabase-campi-registrazione.sql` eseguito il 15/10 (per incollare file lunghi usare "Copy raw file" su GitHub).
 - Sblocco e punteggi sono controllati dal telefono: va bene per l'evento, non per premi di valore senza un controllo finale.
