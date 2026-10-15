@@ -83,6 +83,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 14/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | v81: Efuture Bros, bonus XL e vite scendono in 2 s davanti all'omino, con calamita (prima arrivavano troppo tardi rispetto alla sua velocità). Nei video di prova tenere acceso il server locale, altrimenti l'omino compare con la testa di riserva. |
 | 15/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | v82: registrazione con Nome e cognome, Azienda, Email, Cellulare (campi scelti in Admin › Impostazioni); classifiche sempre Azienda - Nome; categorie Staff/Sponsor/Ospite in Admin › Utenti (Staff automatico per @efuture.it o azienda efuture); proiettore filtrato di base su ospiti e sponsor. Testo dopo il clic sul Bonus Recensione cambiato. Proposte 4 opzioni per la home col Bonus Recensione (in attesa di scelta). |
 | 15/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | v83: schermata dei giochi configurabile in Admin › Impostazioni (4 opzioni, predefinita Giochi in lista); corretto un errore della v82 per cui l'app non applicava i campi scelti in admin. |
+| 15/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | v84: in Admin › Utenti › Modifica si correggono nome, azienda, email e cellulare; video "Tutorial RCM² AM Solutions" (efuture) in Formazione › Video e come artifact privato https://claude.ai/artifact/FVS1VJUpg1QMcQeGdEvupX. |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 
@@ -122,5 +123,5 @@ Risposte dell'utente (07/10):
 - Le skill sono disponibili solo nelle sessioni aperte sul repository. Per usarle nelle chat di claude.ai vanno caricate a mano (Impostazioni → Capabilities → Skills) e non si aggiornano da sole.
 - Sul database va eseguito `supabase-recensioni.sql` se non già fatto. `supabase-tipi-utenti.sql` risulta eseguito (14/10: tipi utente e chiavi personali visibili in admin).
 - Il reset dall'admin riblocca i giochi su tutti i telefoni alla prossima apertura (`supabase-reset-sblocchi.sql`, eseguito il 14/10). Se si riesegue `supabase.sql`, rieseguire anche questo file.
-- Da eseguire in Supabase: `supabase-home-layout.sql` (15/10). `supabase-campi-registrazione.sql` eseguito il 15/10 (per incollare file lunghi usare "Copy raw file" su GitHub).
+- Da eseguire in Supabase: `supabase-home-layout.sql` e `supabase-modifica-utente.sql` (15/10). `supabase-campi-registrazione.sql` eseguito il 15/10 (per incollare file lunghi usare "Copy raw file" su GitHub).
 - Sblocco e punteggi sono controllati dal telefono: va bene per l'evento, non per premi di valore senza un controllo finale.
