@@ -87,7 +87,8 @@ input[type=text],input[type=email],input[type=password],select{width:100%;paddin
 .ttype{font-size:18px;line-height:1;cursor:default;white-space:nowrap}
 tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 .offtag{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;color:var(--danger);border:1px solid var(--danger);border-radius:3px;padding:0 5px;vertical-align:1px}
-.btn.edit{background:#fff;color:var(--navy);border:1px solid var(--navy);padding:4px 10px;font-size:12px}
+.btn.edit{background:#fff;color:var(--navy);border:1px solid var(--navy);padding:0;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px}
+.btn.edit:hover{background:#eaf6ff}
 .acts{display:flex;gap:6px;flex-wrap:nowrap}
 .rstar{background:none;border:0;padding:2px;font-size:24px;line-height:1;cursor:pointer;text-shadow:0 1px 0 rgba(0,0,0,.18)}
 .rstar.y{color:#f5b301}.rstar.g{color:#1f9d5c}
@@ -126,6 +127,8 @@ tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 .cdesc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:340px;font-size:13px}
 .ctipo{white-space:nowrap;font-size:13px}
 .ulink{background:none;border:0;padding:0;font:inherit;font-size:12px;color:var(--navy);cursor:pointer;text-decoration:underline;text-align:left}
+.pecont{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.pecont .ulink{font-size:13px}
 .ulink:disabled{cursor:default;text-decoration:none;color:var(--muted)}
 .cint{white-space:nowrap;font-weight:600;font-size:12px;padding:3px 8px;border-radius:999px;background:#eef2f6}
 .cint.medio{background:#fff4d6}
@@ -578,7 +581,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
     <h3 id="ctT">Nuovo contatto</h3>
     <div class="who" id="ctWho"></div>
     <div class="dati"><div class="dgrid">
-      <label for="ctUser">Utente</label><div><input id="ctUser" list="ctUserList" placeholder="Cerca tra gli utenti registrati (facoltativo)" style="width:100%" autocomplete="off"><datalist id="ctUserList"></datalist><div class="small dim" id="ctUserHelp"></div></div>
+      <label for="ctUser">Utente</label><div><input id="ctUser" list="ctUserList" placeholder="Cerca tra gli utenti registrati (facoltativo)" style="width:100%" autocomplete="off"><datalist id="ctUserList"></datalist><div class="small dim" id="ctUserHelp"></div><button class="btn ghost" id="ctMkUser" type="button" hidden style="margin-top:6px;padding:5px 10px;font-size:12px">👤 Crea utente da questo contatto</button></div>
       <label for="ctNome">Nome e cognome *</label><input id="ctNome" maxlength="80" required>
       <label for="ctAz">Azienda</label><input id="ctAz" maxlength="80">
       <label for="ctTel">Telefono</label><input id="ctTel" type="tel" inputmode="tel" maxlength="20" placeholder="Es. 333 123 4567">
@@ -610,6 +613,9 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
     </form>
     <div class="grp2" id="peCatBox"><b>Categoria</b><div class="opts" id="peCat"></div></div>
     <div class="grp2"><b>Dettaglio di gioco</b><div class="tablewrap"><table id="peGames" class="small"></table></div></div>
+    <div class="grp2" id="peContBox"><b>Contatti</b><div id="peContList" class="pecont"></div>
+      <div class="opts"><button class="btn ghost" id="peContNew" type="button">➕ Nuovo contatto</button></div>
+      <div class="opts" id="peContLinkRow"><select id="peContSel" aria-label="Contatto da collegare" style="flex:1;min-width:0"></select><button class="btn ghost" id="peContLink" type="button">🔗 Collega</button></div></div>
     <div class="grp2"><b>Tipo</b><div class="opts" id="peTipo"></div></div>
     <div class="grp2" id="peKeyBox"><b>Chiave admin personale (la password del pannello)</b>
       <div class="small" id="peKeyState"></div>
@@ -639,10 +645,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=97"></script>
+<script src="config.js?v=98"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="tutorial/tutorials.js?v=97"></script>
+<script src="tutorial/tutorials.js?v=98"></script>
 <script>
 (function(){
 "use strict";
@@ -924,7 +930,10 @@ $('vDef').addEventListener('click', async e => {
   catch(err){ if (needRevSql(err)) setMsg($('vMsg'), 'Prima esegui supabase-recensioni.sql nel SQL Editor di Supabase.', 'err'); else onErr(err, $('vMsg')); }
 });
 function nameCell(p){ const d = document.createElement('span'); d.textContent = p.name; if (p.disabilitato){ const t = document.createElement('span'); t.className = 'offtag'; t.textContent = 'bloccato'; d.appendChild(t); } return d; }
-function editBtn(p){ const b = document.createElement('button'); b.type = 'button'; b.className = 'btn edit'; b.textContent = 'Modifica'; b.onclick = () => openEdit(p); return b; }
+// pulsante Modifica: una matita (Utenti, Contatti)
+const PENCIL = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+function pencilBtn(label, fn){ const b = document.createElement('button'); b.type = 'button'; b.className = 'btn edit'; b.innerHTML = PENCIL; b.title = 'Modifica'; b.setAttribute('aria-label', label); b.onclick = fn; return b; }
+function editBtn(p){ return pencilBtn('Modifica ' + p.name, () => openEdit(p)); }
 // in tabella: Modifica e, subito accanto, Blocca / Sblocca
 function actions(p){
   const box = document.createElement('div'); box.className = 'acts';
@@ -948,7 +957,7 @@ const needSql = err => /efg_admin_set_tipo|efg_admin_set_disabilitato|efg_admin_
 
 // popup Modifica: Tipo, Disabilita/Riabilita, Elimina
 let editing = null;
-function openEdit(p, focusId){ editing = p; $('peMsg').textContent = ''; $('peMsg').className = 'msg'; fillEdit(); $('pEdit').hidden = false;
+function openEdit(p, focusId){ editing = p; $('peMsg').textContent = ''; $('peMsg').className = 'msg'; fillEdit(); $('pEdit').hidden = false; renderUserContacts();
   if (focusId){ const el = $(focusId); el.scrollIntoView({ block:'center' }); const b = el.querySelector('.opt.on'); if (b) b.focus(); } }
 function closeEdit(){ $('pEdit').hidden = true; editing = null; }
 $('peClose').onclick = closeEdit;
@@ -1043,7 +1052,7 @@ function renderContacts(){
     const d = document.createElement('span'); d.className = 'cdesc'; d.textContent = c.descrizione || ''; d.title = c.descrizione || '';
     const g = document.createElement('span'); g.className = 'cint ' + c.interesse; g.textContent = INT[c.interesse] || c.interesse;
     const sv = document.createElement('span'); if (c.servizio){ sv.className = 'tag'; sv.textContent = c.servizio; }
-    const b = document.createElement('button'); b.className = 'btn edit'; b.type = 'button'; b.textContent = 'Modifica'; b.onclick = () => openContact(c);
+    const b = pencilBtn('Modifica il contatto di ' + c.nome, () => openContact(c));
     const nm = document.createElement('span'); nm.textContent = c.nome;
     if (c.utente){ const u = document.createElement('span'); u.className = 'subtel';
       if (c.utente.email){ const p = players.find(x => x.email === c.utente.email); const lk = document.createElement('button'); lk.type = 'button'; lk.className = 'ulink';
@@ -1087,10 +1096,59 @@ function openContact(c){
   if (c){ $('ctNome').value = c.nome || ''; $('ctAz').value = c.azienda || ''; $('ctTel').value = c.telefono || ''; $('ctMail').value = c.email || ''; $('ctServ').value = c.servizio || ''; $('ctDesc').value = c.descrizione || ''; }
   const cu = c && c.utente && c.utente.email ? players.find(p => p.email === c.utente.email) : null; $('ctUser').value = cu ? userLabel(cu) : '';
   ctSet(c ? c.interesse : 'base'); ctTipoSet(c && c.tipo || 'richiesta'); ctServHelp(); ctUserHelp();
-  if (c && c.utente && !c.utente.email) $('ctUserHelp').textContent = 'L\'utente collegato non c\'è più: scegline un altro o lascia vuoto.'; $('ctDel').hidden = !c; $('pCont').hidden = false; $('ctNome').focus();
+  if (c && c.utente && !c.utente.email) $('ctUserHelp').textContent = 'L\'utente collegato non c\'è più: scegline un altro o lascia vuoto.';
+  $('ctMkUser').hidden = !c || !!(c.utente && c.utente.email); $('ctDel').hidden = !c; $('pCont').hidden = false; $('ctNome').focus();
 }
 $('cNew').onclick = () => openContact(null);
-$('ctClose').onclick = () => { $('pCont').hidden = true; };
+// tornare all'utente da cui si è aperto il contatto (Utenti › Modifica › Contatti)
+let ctBack = null;
+function ctDone(){ $('pCont').hidden = true; const e = ctBack; ctBack = null; if (e){ const p = players.find(x => x.email === e); if (p) openEdit(p); } }
+$('ctClose').onclick = ctDone;
+/* Utenti › Modifica › Contatti: i contatti collegati a questo utente, un nuovo contatto già collegato, collega un contatto esistente */
+let contactsReady = false;
+async function renderUserContacts(){
+  const p = editing; if (!p) return;
+  if (!contactsReady){ $('peContList').textContent = 'Carico i contatti…'; await loadContacts(); contactsReady = true; if (editing !== p) return; }
+  const box = $('peContList'); box.innerHTML = '';
+  if ($('cMsg').classList.contains('err')){ box.textContent = $('cMsg').textContent; $('peContLinkRow').hidden = true; $('peContNew').hidden = true; return; }
+  $('peContNew').hidden = false;
+  const mine = contacts.filter(c => c.utente && c.utente.email === p.email);
+  if (!mine.length) box.innerHTML = '<span class="small dim">Nessun contatto collegato.</span>';
+  mine.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'ulink';
+    b.textContent = (TIPO_C[c.tipo] || '') + ' · ' + fmtDate(c.creato).slice(0, 10) + (c.servizio ? ' · ' + c.servizio : '') + ' · ' + (INT[c.interesse] || '') + (c.descrizione ? ' — ' + c.descrizione.slice(0, 60) + (c.descrizione.length > 60 ? '…' : '') : '');
+    b.onclick = () => { ctBack = p.email; closeEdit(); openContact(c); }; box.appendChild(b); });
+  const free = contacts.filter(c => !c.utente || !c.utente.email), sel = $('peContSel'); sel.innerHTML = '';
+  $('peContLinkRow').hidden = !free.length;
+  const o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Collega un contatto già inserito…'; sel.appendChild(o0);
+  free.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.nome + (c.azienda ? ' · ' + c.azienda : '') + (c.servizio ? ' · ' + c.servizio : '') + ' · ' + fmtDate(c.creato).slice(0, 10); sel.appendChild(o); });
+}
+$('peContLink').onclick = async () => {
+  const p = editing, id = Number($('peContSel').value); if (!p || !id) return setMsg($('peMsg'), 'Scegli il contatto da collegare.', 'err');
+  try { await call('efg_admin_contatto_utente', { p_id: id, p_utente: p.email }); await loadContacts(); renderUserContacts(); setMsg($('peMsg'), 'Contatto collegato a ' + p.name + '.', 'ok'); }
+  catch(err){ onErr(err, $('peMsg')); }
+};
+$('peContNew').onclick = () => {
+  const p = editing; if (!p) return; ctBack = p.email; closeEdit(); openContact(null);
+  $('ctUser').value = userLabel(p); $('ctUser').dispatchEvent(new Event('input'));   // collegato e con i suoi dati
+};
+/* Contatti › Modifica › 👤 Crea utente: un giocatore con i dati del contatto, già collegato (supabase-utente-da-contatto.sql) */
+$('ctMkUser').onclick = async () => {
+  const c = ctEditing; if (!c) return;
+  if (!await ask('Creare un utente da ' + c.nome + '?', 'Nasce un giocatore con nome, azienda, email e cellulare di questo contatto (i dati già salvati) e il contatto gli viene collegato. ' + (c.email ? 'Potrà entrare nell\'app con ' + c.email + '.' : 'Il contatto non ha email: per entrare nell\'app dovrai aggiungergliela in Utenti › Modifica.'), 'Sì, crea utente')) return;
+  const m = $('ctMsg'); setMsg(m, 'Creo l\'utente…');
+  try { await call('efg_admin_utente_da_contatto', { p_id: c.id }); await loadPlayers(); await loadContacts(); const nc = contacts.find(x => x.id === c.id); if (nc) openContact(nc); setMsg($('ctMsg'), 'Utente creato e collegato: ' + c.nome + '.', 'ok'); }
+  catch(err){
+    const t = String(err && err.message);
+    if (/email già registrata/.test(t)){
+      const p = players.find(x => x.email === String(c.email || '').toLowerCase());
+      if (p && await ask('Email già registrata', c.email + ' è già di ' + p.name + '. Collegare il contatto a questo utente?', 'Sì, collega')){
+        try { await call('efg_admin_contatto_utente', { p_id: c.id, p_utente: p.email }); await loadContacts(); const nc = contacts.find(x => x.id === c.id); if (nc) openContact(nc); setMsg($('ctMsg'), 'Contatto collegato a ' + p.name + '.', 'ok'); }
+        catch(e2){ onErr(e2, $('ctMsg')); }
+      } else setMsg(m, 'Email già registrata: l\'utente esiste già.', 'err');
+    } else if (/efg_admin_utente_da_contatto|PGRST202|does not exist|Could not find/i.test(t)) setMsg(m, 'Prima esegui supabase-utente-da-contatto.sql nel SQL Editor di Supabase.', 'err');
+    else onErr(err, m);
+  }
+};
 $('ctForm').addEventListener('submit', async e => {
   e.preventDefault(); const m = $('ctMsg');
   const v = { p_id: ctEditing ? ctEditing.id : null, p_nome: $('ctNome').value.trim(), p_azienda: $('ctAz').value.trim(), p_telefono: $('ctTel').value.trim(), p_email: $('ctMail').value.trim(),
@@ -1105,13 +1163,13 @@ $('ctForm').addEventListener('submit', async e => {
       try { await call('efg_admin_contatto_utente', { p_id: r.id, p_utente: next }); }
       catch(err){ await loadContacts(); return setMsg(m, /efg_admin_contatto_utente|PGRST202|does not exist|Could not find/i.test(String(err && err.message)) ? 'Contatto salvato, ma per collegare l\'utente esegui prima supabase-contatti-utente.sql nel SQL Editor di Supabase.' : 'Contatto salvato, ma il collegamento all\'utente non è riuscito: ' + err.message, 'err'); }
     }
-    $('pCont').hidden = true; await loadContacts(); setMsg($('cMsg'), (ctEditing ? 'Contatto aggiornato: ' : 'Contatto salvato: ') + v.p_nome + '.', 'ok'); }
+    await loadContacts(); setMsg($('cMsg'), (ctEditing ? 'Contatto aggiornato: ' : 'Contatto salvato: ') + v.p_nome + '.', 'ok'); const back = ctBack; ctDone(); if (back) setMsg($('peMsg'), (ctEditing ? 'Contatto aggiornato.' : 'Contatto salvato e collegato.'), 'ok'); }
   catch(err){ if (/efg_admin_contatto_salva|PGRST202|does not exist|Could not find/i.test(String(err && err.message))) setMsg(m, 'Prima esegui supabase-contatti.sql nel SQL Editor di Supabase.', 'err'); else onErr(err, m); }
 });
 $('ctDel').onclick = async () => {
   const c = ctEditing; if (!c) return;
   if (!await ask('Eliminare il contatto di ' + c.nome + '?', 'Il contatto viene cancellato dal database. Non si può annullare.', 'Sì, elimina', true)) return;
-  try { await call('efg_admin_contatto_elimina', { p_id: c.id }); $('pCont').hidden = true; await loadContacts(); setMsg($('cMsg'), 'Contatto eliminato: ' + c.nome + '.', 'ok'); }
+  try { await call('efg_admin_contatto_elimina', { p_id: c.id }); await loadContacts(); ctDone(); setMsg($('cMsg'), 'Contatto eliminato: ' + c.nome + '.', 'ok'); }
   catch(err){ onErr(err, $('ctMsg')); }
 };
 $('cCsv').onclick = () => download('efuture-games-contatti-' + stamp() + '.csv',
