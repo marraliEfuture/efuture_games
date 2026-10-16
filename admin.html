@@ -87,6 +87,10 @@ input[type=text],input[type=email],input[type=password],select{width:100%;paddin
 .ttype{font-size:18px;line-height:1;cursor:default;white-space:nowrap}
 tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 .offtag{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;color:var(--danger);border:1px solid var(--danger);border-radius:3px;padding:0 5px;vertical-align:1px}
+.sorth{background:none;border:0;padding:0;font:inherit;font-weight:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.sorth .arr{font-size:10px;color:var(--muted)}
+th[aria-sort=ascending] .arr,th[aria-sort=descending] .arr{color:var(--orange,#f18c22)}
+.sorth:hover{text-decoration:underline}
 .btn.edit{background:#fff;color:var(--navy);border:1px solid var(--navy);padding:0;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px}
 .btn.edit:hover{background:#eaf6ff}
 .acts{display:flex;gap:6px;flex-wrap:nowrap}
@@ -646,10 +650,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=99"></script>
+<script src="config.js?v=100"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="tutorial/tutorials.js?v=99"></script>
+<script src="tutorial/tutorials.js?v=100"></script>
 <script>
 (function(){
 "use strict";
@@ -803,12 +807,39 @@ async function loadPlayers(){
   try { players = await call('efg_admin_players') || []; } catch(err){ return onErr(err, $('pInfo')); }
   if (!$('rLink').value && document.activeElement !== $('rLink')) loadReviewLink();
   $('pInfo').textContent = players.length + ' utenti registrati';
-  renderCats();
-  const sorted = players.filter(p => catFilter === 'tutti' || catOf(p) === catFilter).sort((a, b) => b.livelli - a.livelli || b.punti - a.punti);
+  renderCats(); renderPlayers();
+}
+/* ordinamento della tabella Utenti: clic sul nome della colonna (di nuovo = verso opposto). Predefinito: Registrato, dal più recente */
+const P_SORT = [null, p => ['admin', 'admin_giocatore', 'giocatore'].indexOf(tipoOf(p)), p => ['staff', 'sponsor', 'ospite'].indexOf(catOf(p)),
+  p => p.recensione_ok ? 2 : p.recensione_clic ? 1 : 0, p => p.azienda || '', p => p.name || '', p => mailOf(p.email), p => p.created_at || '',
+  p => p.giochi || 0, p => p.livelli || 0, p => p.punti || 0, null];
+let pSort = { i: 7, dir: -1, desc: [3, 7, 8, 9, 10] };   // desc = colonne che partono dal valore più alto (recensione, data, numeri)
+function sortRows(list, keyFn, dir){
+  return list.map((p, n) => [p, keyFn(p), n]).sort((a, b) => {
+    const x = a[1], y = b[1], ex = x === '' || x == null, ey = y === '' || y == null;
+    if (ex !== ey) return ex ? 1 : -1;   // vuoti sempre in fondo
+    const c = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'it', { sensitivity:'base', numeric:true });
+    return c * dir || a[2] - b[2];
+  }).map(r => r[0]);
+}
+// rende cliccabili le intestazioni (pulsante con freccia ▲▼ e aria-sort)
+function sortableHead(tbl, keys, st, onChange){
+  tbl.querySelectorAll('thead th').forEach((th, i) => {
+    if (!keys[i]) return;
+    const label = th.textContent, b = document.createElement('button'); b.type = 'button'; b.className = 'sorth';
+    b.textContent = label; const ar = document.createElement('span'); ar.className = 'arr'; ar.textContent = st.i === i ? (st.dir > 0 ? '▲' : '▼') : '↕'; b.appendChild(ar);
+    b.title = 'Ordina per ' + (label === '⭐' ? 'recensione' : label.toLowerCase()); th.textContent = ''; th.appendChild(b);
+    th.setAttribute('aria-sort', st.i === i ? (st.dir > 0 ? 'ascending' : 'descending') : 'none');
+    b.onclick = () => { if (st.i === i) st.dir = -st.dir; else { st.i = i; st.dir = st.desc && st.desc.includes(i) ? -1 : 1; } onChange(); };
+  });
+}
+function renderPlayers(){
+  const sorted = sortRows(players.filter(p => catFilter === 'tutti' || catOf(p) === catFilter), P_SORT[pSort.i], pSort.dir);
   // il dettaglio per gioco e la scelta della categoria sono in Modifica (anche cliccando l'icona della categoria)
   fillTable($('pTable'), ['#', 'Tipo', 'Categoria', '⭐', 'Azienda', 'Nome', 'Email · cellulare', 'Registrato', 'Giochi sbloccati', 'Livelli', 'Punti', ''],
     sorted.map((p, i) => [i + 1, tipoIco(p), catIcon(p), reviewStar(p), p.azienda || '', nameCell(p), contactCell(p), fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, actions(p)]),
     [null, null, null, null, null, null, null, 'small', 'num', 'num', 'num', null]);
+  sortableHead($('pTable'), P_SORT, pSort, renderPlayers);
   $('pTable').querySelectorAll('tbody tr').forEach((tr, i) => { if (sorted[i] && sorted[i].disabilitato) tr.classList.add('off'); });
 }
 // categoria (serve supabase-campi-registrazione.sql): Staff, Sponsor, Ospite; filtro sopra la tabella e scelta riga per riga
@@ -819,7 +850,7 @@ function renderCats(){
   const box = $('pCats'); box.innerHTML = '';
   [['tutti', 'Tutti', players.length]].concat(Object.keys(CATS).map(k => [k, CATS_PL[k], players.filter(p => catOf(p) === k).length])).forEach(([k, l, n]) => {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'btn ' + (catFilter === k ? 'navy' : 'ghost'); b.textContent = l + ' · ' + n;
-    b.setAttribute('aria-pressed', catFilter === k); b.onclick = () => { catFilter = k; loadPlayers(); }; box.appendChild(b);
+    b.setAttribute('aria-pressed', catFilter === k); b.onclick = () => { catFilter = k; renderCats(); renderPlayers(); }; box.appendChild(b);
   });
 }
 // icona della categoria: Staff = la «e» di efuture, Sponsor = stretta di mano, Ospite = impiegato/a
@@ -1033,6 +1064,10 @@ let contacts = [], services = [], cFilter = 'tutti', ctEditing = null, ctInt = '
 // utente collegato al contatto (supabase-contatti-utente.sql): si sceglie tra gli utenti dell'elenco Utenti
 const userLabel = p => (p.azienda ? p.azienda + ' - ' : '') + p.name + ' · ' + (mailOf(p.email) || 'senza email');
 const userOf = v => players.find(p => userLabel(p) === v) || null;
+// ordinamento come in Utenti: predefinito Data, dalla più recente
+const C_SORT = [c => c.creato || '', c => (TIPO_C[c.tipo] || '').replace(/^\S+ /, ''), c => c.nome || '', c => c.azienda || '', c => c.email || c.telefono || '',
+  c => c.servizio || '', c => c.descrizione || '', c => ({ alto:3, medio:2, base:1 })[c.interesse] || 0, null];
+let cSort = { i: 0, dir: -1, desc: [0, 7] };
 async function loadContacts(){
   setMsg($('cMsg'), '');
   try { const r = await call('efg_admin_contatti') || {}; contacts = r.contatti || []; services = r.servizi || []; }
@@ -1050,7 +1085,8 @@ function renderContacts(){
     b.setAttribute('aria-pressed', cFilter === k); b.onclick = () => { cFilter = k; renderContacts(); }; box.appendChild(b);
   });
   const q = $('cSearch').value.trim().toLowerCase();
-  const list = contacts.filter(c => (cFilter === 'tutti' || c.interesse === cFilter) && (!q || [c.nome, c.azienda, c.servizio, c.email, c.descrizione, TIPO_C[c.tipo], c.utente && c.utente.nome].some(v => String(v || '').toLowerCase().includes(q))));
+  const list0 = contacts.filter(c => (cFilter === 'tutti' || c.interesse === cFilter) && (!q || [c.nome, c.azienda, c.servizio, c.email, c.descrizione, TIPO_C[c.tipo], c.utente && c.utente.nome].some(v => String(v || '').toLowerCase().includes(q))));
+  const list = sortRows(list0, C_SORT[cSort.i], cSort.dir);
   $('cInfo').textContent = contacts.length === 1 ? '1 contatto registrato' : contacts.length + ' contatti registrati';
   fillTable($('cTable'), ['Data', 'Tipo', 'Nome', 'Azienda', 'Email · telefono', 'Servizio', 'Descrizione', 'Interesse', ''], list.map(c => {
     const who = document.createElement('span'); who.textContent = c.email || ''; if (c.telefono){ const t = document.createElement('span'); t.className = 'subtel'; t.textContent = '📞 ' + c.telefono; who.appendChild(t); }
@@ -1067,6 +1103,7 @@ function renderContacts(){
     const tp = document.createElement('span'); tp.className = 'ctipo'; tp.textContent = TIPO_C[c.tipo] || TIPO_C.richiesta;
     return [fmtDate(c.creato).slice(0, 17), tp, nm, c.azienda || '', who, sv, d, g, b];
   }), ['small', '', '', '', '', '', '', '', '']);
+  sortableHead($('cTable'), C_SORT, cSort, renderContacts);
 }
 $('cSearch').addEventListener('input', renderContacts);
 function ctSet(v){ ctInt = v; $('ctInt').querySelectorAll('button').forEach(b => { const on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); }
