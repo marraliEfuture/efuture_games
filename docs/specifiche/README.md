@@ -91,6 +91,7 @@ I file SQL **non si applicano con il push**: vanno incollati ed eseguiti a mano 
 | `supabase-campi-registrazione.sql` | Azienda, cellulare, categoria; campi della registrazione scelti in admin; classifiche "Azienda - Nome" | Rieseguibile |
 | `supabase-home-layout.sql` | Schermata dei giochi scelta in admin (`home_layout`) | Rieseguibile |
 | `supabase-modifica-utente.sql` | Correzione di nome, azienda, email e cellulare dall'admin | Rieseguibile |
+| `supabase-bonus-recensione.sql` | Punti del Bonus Recensione davvero modificabili dall'admin | Rieseguibile |
 | `supabase-utente-da-contatto.sql` | Creare un utente da un contatto | Rieseguibile |
 | `supabase-contatti-utente.sql` | Contatti collegati a un utente registrato | Rieseguibile |
 | `supabase-contatti.sql` | Admin › Contatti (feedback, richieste, segnalazioni) e contatti nei backup | Rieseguibile |

@@ -913,6 +913,8 @@ $('rLinkForm').addEventListener('submit', async e => {
   try {
     const r = await call('efg_admin_set_recensione_link', { p_link: $('rLink').value }); $('rLink').value = r.link || '';
     const st = await call('efg_admin_set_impostazione', { p_nome: 'recensione_punti', p_valore: String(pts) }); showReviewPts(st.recensione_punti);
+    // il database con la prima versione di efg_bonus_recensione() risponde sempre 200: lo si dice invece di "Salvato"
+    if (Number(st.recensione_punti) !== pts){ $('rPts').value = st.recensione_punti; loadPlayers(); return setMsg($('rLinkMsg'), 'Il database usa ancora i punti fissi (' + st.recensione_punti + '): esegui supabase-bonus-recensione.sql nel SQL Editor di Supabase, poi salva di nuovo.', 'err'); }
     setMsg($('rLinkMsg'), 'Salvato: ' + (r.link ? 'link' : 'ricerca su Google Maps') + ' · ' + st.recensione_punti + ' punti.', 'ok');
     loadPlayers();
   }
