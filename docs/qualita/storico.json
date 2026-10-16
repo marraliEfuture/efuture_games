@@ -536,5 +536,64 @@
    "bassa": 1
   },
   "sicurezza": 87
+ },
+ {
+  "data": "2026-10-16",
+  "commit": "ae296db",
+  "versione": "v94",
+  "esiti": {
+   "codice": {
+    "ok": 42,
+    "avviso": 0,
+    "errore": 0
+   },
+   "db": {
+    "ok": 9,
+    "avviso": 0,
+    "errore": 0
+   },
+   "prestazioni": {
+    "ok": 16,
+    "avviso": 1,
+    "errore": 0
+   },
+   "spazio": {
+    "ok": 14,
+    "avviso": 0,
+    "errore": 0
+   },
+   "vulnerabilita": {
+    "ok": 7,
+    "avviso": 2,
+    "errore": 0
+   },
+   "sicurezza": {
+    "ok": 2,
+    "avviso": 2,
+    "errore": 0
+   }
+  },
+  "spazio_kb": 46562.0,
+  "cartelle_kb": {
+   ".claude": 156.5,
+   "(file principali)": 434.2,
+   "docs": 318.1,
+   "fonts": 120.3,
+   "games": 920.5,
+   "icons": 189.8,
+   "img": 95.1,
+   "presentazioni": 14867.9,
+   "qr": 159.6,
+   "supabase-parti": 18.4,
+   "tutorial": 1341.2,
+   "vendor": 426.8,
+   "video": 27513.7
+  },
+  "vulnerabilita": {
+   "alta": 0,
+   "media": 1,
+   "bassa": 1
+  },
+  "sicurezza": 87
  }
 ]
