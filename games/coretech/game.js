@@ -642,7 +642,12 @@ stage.addEventListener('pointermove', e=>{
   if (!joy || !knob) return;
   const DEAD = 0.30, HYST = 1.2;
   const marks = { up:$('jmU'), right:$('jmR'), down:$('jmD'), left:$('jmL') };
-  let pid = null, cx = 0, cy = 0, rad = 1, cur = null, kdx = 0, kdy = 0;
+  let pid = null, tid = null, cx = 0, cy = 0, rad = 1, cur = null, kdx = 0, kdy = 0;
+  // v103 (iPhone: "ogni tanto il joystick si blocca"): su iOS il rilascio del dito a volte non arriva come
+  // pointerup/pointercancel; il joystick restava "tenuto" e ignorava i tocchi dopo. Ora il dito si segue con
+  // gli eventi touch (gli stessi di iOS), un nuovo tocco riprende sempre il joystick e si rilascia anche
+  // quando il dito non c'è più nell'elenco dei tocchi, se l'app va in secondo piano o perde il focus.
+  const TOUCH = 'ontouchstart' in window;
   function mark(n){
     if (n === cur) return;
     if (cur && marks[cur]) marks[cur].classList.remove('on');
@@ -680,7 +685,7 @@ stage.addEventListener('pointermove', e=>{
     const n = choose();
     if (n !== cur || force){ mark(n); setDesired(DIR[n]); }
   }
-  joyTick = function(){ if (pid !== null && cur) apply(false); };
+  joyTick = function(){ if ((pid !== null || tid !== null) && cur) apply(false); };
   function move(e){
     let dx = e.clientX - cx, dy = e.clientY - cy;
     const d = Math.hypot(dx, dy);
@@ -692,24 +697,39 @@ stage.addEventListener('pointermove', e=>{
     apply(false);
     if (cur === was && cur && desired !== DIR[cur]) setDesired(DIR[cur]);   // re-buffer after the turn was taken or expired
   }
-  function release(e){
-    if (pid === null || (e && e.pointerId !== pid)) return;
-    try { joy.releasePointerCapture(pid); } catch(_){}
-    pid = null; joy.classList.remove('drag');
+  function end(){
+    if (pid !== null){ try { joy.releasePointerCapture(pid); } catch(_){} }
+    pid = tid = null; joy.classList.remove('drag');
     knob.style.transform = ''; mark(null);   // spring back; the buffered turn stays
   }
-  joy.addEventListener('pointerdown', e=>{
-    e.preventDefault();
-    if (state === 'intro'){ endIntro(); return; }
-    if (pid !== null) return;
-    pid = e.pointerId;
-    try { joy.setPointerCapture(pid); } catch(_){}
+  function release(e){ if (pid !== null && (!e || e.pointerId === pid)) end(); }
+  function begin(p){
     const r = joy.getBoundingClientRect();
     cx = r.left + r.width/2; cy = r.top + r.height/2;
     rad = Math.max(10, (r.width - knob.offsetWidth)/2);
     joy.classList.add('drag');
-    move(e);
+    move(p);
+  }
+  joy.addEventListener('pointerdown', e=>{
+    if (TOUCH && e.pointerType === 'touch') return;   // il dito lo seguono gli eventi touch qui sotto
+    e.preventDefault();
+    if (state === 'intro'){ endIntro(); return; }
+    end();   // un "tenuto" rimasto appeso non blocca più il nuovo tocco
+    pid = e.pointerId;
+    try { joy.setPointerCapture(pid); } catch(_){}
+    begin(e);
   });
+  joy.addEventListener('touchstart', e=>{
+    if (e.cancelable) e.preventDefault();
+    if (state === 'intro'){ endIntro(); return; }
+    const t = e.changedTouches[0]; if (!t) return;
+    end(); tid = t.identifier; begin(t);
+  }, {passive:false});
+  const ourTouch = list => { for (let i = 0; i < list.length; i++) if (list[i].identifier === tid) return list[i]; return null; };
+  window.addEventListener('touchmove', e=>{ if (tid === null) return; const t = ourTouch(e.changedTouches); if (t) move(t); }, {passive:true});
+  ['touchend','touchcancel'].forEach(t=>window.addEventListener(t, e=>{ if (tid !== null && !ourTouch(e.touches)) end(); }));
+  window.addEventListener('blur', end);
+  document.addEventListener('visibilitychange', ()=>{ if (document.hidden) end(); });
   joy.addEventListener('pointermove', e=>{ if (e.pointerId === pid){ e.preventDefault(); move(e); } });
   ['pointerup','pointercancel','lostpointercapture'].forEach(t=>joy.addEventListener(t, release));
   ['contextmenu','selectstart','dragstart'].forEach(t=>joy.addEventListener(t, e=>e.preventDefault()));

@@ -118,6 +118,7 @@ Risposte dell'utente (07/10):
 - Ogni step si pubblica su main appena pronto, per provarlo sul telefono.
 
 ## In sospeso / da ricordare
+- 16/10 v103: segnalato "il joystick ogni tanto si blocca, solo su iPhone" (Efuture Bros e CoreTech Pac). Corretto seguendo il dito con gli eventi touch e sbloccando sempre al nuovo tocco; non provato su un iPhone vero: chiedere all'utente se il problema si ripresenta.
 
 - Analisi Chrome del 13/10, punto 12: decidere se mettere "Ricomincia livello" nella pausa di tutti i giochi (in gara inciderebbe sul tempo). Punti 11, 14 e 17 lasciati così di proposito (10 livelli fuori gara, logo Timenet scoperto dai mattoncini, Efuture Bros grande su PC).
 - La sezione ChatGPT di `links.json` ha solo il link generico: mancano i link alle chat vere.
