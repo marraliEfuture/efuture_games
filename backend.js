@@ -127,7 +127,7 @@ const Backend = remote ? {
   async exists(user){ return !!store.get('efgDemoUsers3', {})[normEmail(user.email)]; },
   async submit(user, game, score, levels){
     const rows = store.get('efgDemoScores4', {}); const k = user.email + '|' + game; const o = rows[k];
-    if (o && (o.levels > levels || (o.levels === levels && o.score >= score))) return false;
+    if (o && (o.score > score || (o.score === score && o.levels >= levels))) return false;   // prima i punti, poi i livelli
     rows[k] = { email:user.email, game, score, levels }; store.set('efgDemoScores4', rows); return true;
   },
   async board(game, group){
@@ -142,7 +142,7 @@ const Backend = remote ? {
       const t = tot[r.email] = tot[r.email] || { pid:u.pid, name:(u.azienda ? u.azienda + ' - ' : '') + u.name, azienda:u.azienda || null, nome:u.name, categoria:cat, levels:0, score:0, games:0 };
       t.score += r.score; t.levels += r.levels || 0; if ((r.levels||0) > 0) t.games++;
     }
-    return Object.values(tot).sort((a,b)=>b.levels-a.levels || b.score-a.score).slice(0,50);
+    return Object.values(tot).sort((a,b)=>b.score-a.score || b.levels-a.levels || b.games-a.games).slice(0,50);   // punti, poi livelli, poi giochi
   },
 };
 

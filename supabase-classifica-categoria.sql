@@ -6,6 +6,7 @@
 -- (quella scelta in Admin › Utenti); in home la posizione è quella nella propria categoria.
 --  1. efg_profilo: restituisce anche la categoria (staff, sponsor, ospite).
 --  2. efg_board / efg_board_group: ogni riga ha anche la categoria (nella Generale si vede accanto al nome).
+--     Ordine (v104): prima i punti, a parità i livelli, poi i giochi, poi chi ci è arrivato prima.
 --     Per il resto uguali a prima (classifica.html continua a funzionare).
 -- ============================================================================
 
@@ -30,7 +31,7 @@ language sql stable security definer set search_path = public as $$
   from efg_scores s join efg_players p on p.email = s.email
   where (p_game = 'all' or s.game = p_game) and not p.disabilitato
   group by p.pid, p.name, p.azienda, p.recensione_ok, p.categoria
-  order by levels desc, score desc, max(s.updated_at) asc
+  order by score desc, levels desc, games desc, max(s.updated_at) asc
   limit 50;
 $$;
 drop function if exists public.efg_board_group(text, text);
@@ -45,7 +46,7 @@ language sql stable security definer set search_path = public as $$
     and (coalesce(p_group, 'tutti') = 'tutti'
          or p.categoria = any (string_to_array(replace(replace(replace(coalesce(p_group, ''), ' ', ''), 'ospiti', 'ospite'), 'efuture', 'staff'), ',')))
   group by p.pid, p.name, p.azienda, p.recensione_ok, p.categoria
-  order by levels desc, score desc, max(s.updated_at) asc
+  order by score desc, levels desc, games desc, max(s.updated_at) asc
   limit 50;
 $$;
 revoke all on function public.efg_board(text), public.efg_board_group(text, text) from public;

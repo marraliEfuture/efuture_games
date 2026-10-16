@@ -266,7 +266,7 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   <div class="boards" id="boards">
   <div class="games" id="games"></div>
   <section class="panel total" id="secTotal" aria-labelledby="tTotal">
-    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale<span class="who-tag" id="whoTag" hidden></span></h2><div class="sub">Somma dei record nei 4 giochi + bonus recensione · livelli, poi punti</div></div></div>
+    <div class="ph special"><div><h2 id="tTotal"><mark>Classifica</mark> generale<span class="who-tag" id="whoTag" hidden></span></h2><div class="sub">Somma dei record nei 4 giochi + bonus recensione · punti, poi livelli</div></div></div>
     <ol id="list-all"></ol>
   </section>
   </div>
@@ -303,9 +303,9 @@ footer{background:var(--ink);color:#fff;display:flex;align-items:center;gap:clam
   </div>
 </div>
 
-<script src="config.js?v=103"></script>
+<script src="config.js?v=104"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=103"></script>
+<script src="backend.js?v=104"></script>
 <script>
 (function(){
 "use strict";
@@ -361,7 +361,7 @@ $('demoNote').hidden = B.remote;
 // game panels
 for (const g of GAMES){
   const sec = document.createElement('section'); sec.className = 'panel'; sec.setAttribute('aria-label', g.name);
-  sec.innerHTML = '<div class="ph"><img alt=""><div><h2></h2><div class="sub">Top ' + TOP_GAME + ' · livelli, poi punti</div></div></div><ol></ol>';
+  sec.innerHTML = '<div class="ph"><img alt=""><div><h2></h2><div class="sub">Top ' + TOP_GAME + ' · punti, poi livelli</div></div></div><ol></ol>';
   sec.querySelector('img').src = g.icon; sec.querySelector('h2').textContent = g.name;
   sec.querySelector('ol').id = 'list-' + g.id;
   $('games').appendChild(sec);
@@ -373,7 +373,8 @@ const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)
 const rowsByKey = {};   // board key -> Map(pid -> {li, sig})
 function render(key, rows, top){
   const ol = $('list-' + key);
-  rows = rows.slice().sort((x, y) => (Number(y.levels) || 0) - (Number(x.levels) || 0) || (Number(y.score) || 0) - (Number(x.score) || 0)).slice(0, top);   // prima i livelli, poi i punti
+  const num = v => Number(v) || 0;
+  rows = rows.slice().sort((x, y) => num(y.score) - num(x.score) || num(y.levels) - num(x.levels) || num(y.games) - num(x.games)).slice(0, top);   // prima i punti, poi i livelli, poi i giochi
   const firstTime = !rowsByKey[key];
   const map = rowsByKey[key] = rowsByKey[key] || new Map();
   if (!rows.length){ map.clear(); ol.innerHTML = ''; const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Ancora nessun punteggio. Sarai il primo?'; ol.appendChild(li); return; }
@@ -527,7 +528,7 @@ const view = {
     const NAMES = { ospite:'ospiti', sponsor:'sponsor', staff:'staff' };
     const label = st.group === 'tutti' ? '' : 'Solo ' + groupList(st.group).map(c => NAMES[c]).join(' e ');
     $('whoTag').hidden = !label; $('whoTag').textContent = label;
-    document.querySelectorAll('.games .sub').forEach(x => x.textContent = (st.top === 'tutti' ? 'Tutti' : 'Top ' + TOP_GAME) + ' · livelli, poi punti' + (label ? ' · ' + label.toLowerCase() : ''));
+    document.querySelectorAll('.games .sub').forEach(x => x.textContent = (st.top === 'tutti' ? 'Tutti' : 'Top ' + TOP_GAME) + ' · punti, poi livelli' + (label ? ' · ' + label.toLowerCase() : ''));
     store.set(VKEY, st);
     reveal.mode();
   }

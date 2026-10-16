@@ -650,10 +650,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=103"></script>
+<script src="config.js?v=104"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="tutorial/tutorials.js?v=103"></script>
+<script src="tutorial/tutorials.js?v=104"></script>
 <script>
 (function(){
 "use strict";
@@ -812,7 +812,7 @@ async function loadPlayers(){
 /* ordinamento della tabella Utenti: clic sul nome della colonna (di nuovo = verso opposto). Predefinito: Registrato, dal più recente */
 const P_SORT = [null, p => ['admin', 'admin_giocatore', 'giocatore'].indexOf(tipoOf(p)), p => ['staff', 'sponsor', 'ospite'].indexOf(catOf(p)),
   p => p.recensione_ok ? 2 : p.recensione_clic ? 1 : 0, p => p.azienda || '', p => p.name || '', p => mailOf(p.email), p => p.created_at || '',
-  p => p.giochi || 0, p => p.livelli || 0, p => p.punti || 0, null];
+  p => p.giochi || 0, p => p.livelli || 0, p => (p.punti || 0) * 1000 + (p.livelli || 0) * 10 + (p.giochi || 0), null];   // Punti: a parità livelli, poi giochi (come la classifica, v104)
 let pSort = { i: 7, dir: -1, desc: [3, 7, 8, 9, 10] };   // desc = colonne che partono dal valore più alto (recensione, data, numeri)
 function sortRows(list, keyFn, dir){
   return list.map((p, n) => [p, keyFn(p), n]).sort((a, b) => {
@@ -1600,7 +1600,7 @@ const FAQ = [
   ]],
   ['Punti e classifica', [
     ['Come si calcolano i punti?', 'Ogni livello superato vale: numero del livello × secondi che avanzano sul suo minuto × vite rimaste. Il punteggio della partita è la somma dei livelli superati. Esempio: livello 2 finito con 20 secondi avanzati e 3 vite = 2 × 20 × 3 = 120 punti.'],
-    ['Come funziona la classifica?', 'Contano prima i livelli superati, poi i punti; a parità, chi ha fatto il record prima. C’è una classifica per ogni gioco e il Totale, che somma i record dei 4 giochi. Si vede nell’app (pulsante Classifica, dopo l’accesso) e sullo schermo dell’evento.'],
+    ['Come funziona la classifica?', 'Contano prima i punti; a parità di punti i livelli superati, poi i giochi in cui si è superato almeno un livello, poi chi ha fatto il record prima. C’è una classifica per ogni gioco e il Totale, che somma i record dei 4 giochi. Si vede nell’app (pulsante Classifica, dopo l’accesso) e sullo schermo dell’evento.'],
     ['Dove vedo la mia posizione?', 'Dopo l’accesso, nella home, sotto ogni gioco compare "In classifica: N°".'],
     ['Ho giocato prima di registrarmi: perdo il record?', 'No: il record resta sul telefono e viene inviato alla classifica appena ti registri o accedi.'],
   ]],

@@ -60,7 +60,7 @@ Dall'alto in basso:
 **Istruzioni** (finestra `mHelp`): spiega che i giochi si sbloccano con il QR e richiama le regole:
 - 3 livelli per gioco, 1 minuto ciascuno;
 - punti = livello × secondi avanzati × vite;
-- contano prima i livelli, poi i punti.
+- contano prima i punti, a parità i livelli (v104).
 
 I comandi di ogni gioco sono nelle Istruzioni del gioco stesso.
 
@@ -236,7 +236,7 @@ Si apre con il pulsante **Classifica** (finestra `mBoard`).
   - nome grande e, sotto, il dettaglio: `G/4 giochi · L/12 livelli` nel Totale, `L/3 livelli` nei giochi;
   - punti a destra.
 - La riga del giocatore collegato è evidenziata, confrontando il `pid`.
-- **Ordine:** quello del server, cioè livelli, poi punti, poi chi ha fatto il record prima. Massimo 50 righe.
+- **Ordine (v104):** quello del server, cioè punti, poi livelli, poi giochi con almeno un livello, poi chi ha fatto il record prima. Massimo 50 righe.
 - **Messaggi:**
   - "Carico la classifica…";
   - "Ancora nessun punteggio. Gioca e sii il primo!";
