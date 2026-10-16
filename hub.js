@@ -43,7 +43,8 @@ let unlocked = new Set(store.get('efgUnlocked', []));
 const justUnlocked = new Set();              // sbloccati in questa apertura (restano anche se arriva un reset)
 // best result per game on this device: { l: levels passed (0-3), s: points }
 let bests = store.get('efgBests4', {});
-const better = (a, b) => !b || a.l > b.l || (a.l === b.l && a.s > b.s);
+// record: contano prima i punti, a parità i livelli (v104; prima contavano prima i livelli)
+const better = (a, b) => !b || a.s > b.s || (a.s === b.s && a.l > b.l);
 const fmtRes = r => r.l + '/' + LEVELS + ' liv · ' + r.s + ' pt';
 let session = null;                          // {id, email, nickname}
 let gate = { mode:null }, gateOffset = 0, lastPhase = null;   // countdown di apertura/chiusura
@@ -123,7 +124,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v103' : 'Modalità demo: account e classifica restano su questo telefono. · v103';
+  mn.textContent = remote ? 'Classifica online · v104' : 'Modalità demo: account e classifica restano su questo telefono. · v104';
 }
 
 /* ================= UNLOCK: camera + code ================= */

@@ -84,7 +84,7 @@ La riga 1 viene creata dallo script.
 **`efg_submit`:**
 1. Se il giocatore non esiste: errore `not found`.
 2. Con `supabase-countdown.sql`, se la gara non è aperta (`efg_gate_open('10 seconds')`): errore `gara chiusa`.
-3. Fa un upsert su (`email`, `game`) e aggiorna la riga **solo se** la coppia (`levels`, `score`) nuova è maggiore della vecchia. Contano prima i livelli, poi i punti.
+3. Fa un upsert su (`email`, `game`) e aggiorna la riga **solo se** la coppia (`score`, `levels`) nuova è maggiore della vecchia. Contano prima i punti, poi i livelli (v104, `supabase-classifica-punti.sql`; prima il contrario).
 4. Scrive sempre il log `partita` con `{punti, livelli, record}`. `record` è vero se la riga è stata scritta.
 
 Il server non verifica che i punti siano coerenti con i livelli: si fida del telefono, a parte i vincoli delle colonne.
@@ -92,7 +92,7 @@ Il server non verifica che i punti siano coerenti con i livelli: si fida del tel
 **`efg_board` e `efg_board_group`:**
 - Per ogni giocatore sommano `levels` e `score` dei suoi record. `games` è il numero di giochi con almeno un livello superato.
 - Con `p_game = 'all'` si ottiene il Totale (al massimo 12 livelli); con un id, la classifica di quel gioco.
-- **Ordine:** `levels desc`, `score desc`, poi `max(updated_at) asc`, cioè a parità vince chi ha fatto il record prima.
+- **Ordine (v104, `supabase-classifica-punti.sql`):** `score desc`, `levels desc`, `games desc`, poi `max(updated_at) asc`, cioè a parità vince chi ha fatto il record prima. Prima era `levels desc`, `score desc`: rieseguire un file SQL vecchio rimette l'ordine vecchio.
 - **Limite:** 50 righe.
 
 **Regola del gruppo "Efuture"** (`efg_board_group`):
@@ -200,6 +200,7 @@ Formato di `efg_backups.data`, che è anche il file JSON scaricato dall'admin. P
 | `supabase-home-layout.sql` | `efg_impostazioni` con `home_layout` (di base `lista`) e `efg_admin_set_impostazione` che accetta `home_layout` (`ora`, `alto`, `lista`, `fisso`); identiche a quelle di `supabase-campi-registrazione.sql` | Rieseguibile, da eseguire dopo `supabase-campi-registrazione.sql` |
 | `supabase-modifica-utente.sql` | `efg_scores.email` con `on update cascade`; `efg_admin_set_dati(p_key, p_email, p_name, p_azienda, p_new_email, p_cellulare)` per correggere i dati di un utente dall'admin | Rieseguibile, dopo `supabase-campi-registrazione.sql` |
 | `supabase-bonus-recensione.sql` | `efg_bonus_recensione()` che legge i punti scelti in admin (`efg_settings.recensione_punti`, 200 se non impostati): sostituisce la prima versione, che dava sempre 200 | Rieseguibile, non tocca i dati; alla fine mostra i punti attuali |
+| `supabase-classifica-punti.sql` | `efg_submit` con record = più punti (a parità più livelli); `efg_board`/`efg_board_group` ordinate per punti, livelli, giochi; comprende anche `supabase-classifica-categoria.sql` | Rieseguibile, non tocca i dati; alla fine mostra i primi 5 della generale |
 | `supabase-classifica-categoria.sql` | `efg_profilo` restituisce anche `categoria`; `efg_board` e `efg_board_group` restituiscono anche `categoria` di ogni riga (per il resto uguali) | Rieseguibile, non tocca i dati; dopo `supabase-campi-registrazione.sql`; alla fine conta i giocatori per categoria |
 | `supabase-utente-da-contatto.sql` | `efg_admin_utente_da_contatto(p_key, p_id)`: crea un giocatore dai dati del contatto e lo collega | Rieseguibile; dopo `supabase-contatti-utente.sql` |
 | `supabase-contatti-utente.sql` | Colonna `efg_contatti.utente_pid`, `efg_admin_contatto_utente(p_key, p_id, p_utente)`, `efg_admin_contatti` con `utente {email, nome, azienda}`, `efg_admin_restore` con il collegamento. Anche in 2 parti: `supabase-parti/contatti-utente-1…2.sql` | Rieseguibile; dopo `supabase-contatti.sql` |

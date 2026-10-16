@@ -175,7 +175,7 @@ CODICI DI SBLOCCO (uno per gioco)
      sommano. Es. livello 1 finito in 35 s con 2 vite -> 1x25x2 = 50;
      livello 2 con 20 s avanzati e 3 vite -> 2x20x3 = 120. Il livello in cui scade il tempo o
      finiscono le vite vale 0, quelli già superati restano.
-     In classifica contano prima i livelli superati, poi i punti.
+     In classifica contano prima i punti, a parita' i livelli, poi i giochi.
      Aperti da soli, i giochi hanno tutti i livelli e nessun limite.
    - Classifica: Totale (somma dei record nei 4 giochi, massimo 12 livelli) e
      una per gioco. Se rigiochi, conta solo il risultato migliore.

@@ -95,7 +95,7 @@ playing        // gioco in corso nel player
 | `toast(msg, ms)` | Mostra il toast (3,2 s di default) |
 | `setMsg(el, text, kind)` | Testo e classe (`ok`, `err`) di un messaggio |
 | `openModal(id)` | Mostra una modale |
-| `better(a, b)` | `true` se il risultato `a` batte `b` (prima livelli, poi punti) |
+| `better(a, b)` | `true` se il risultato `a` batte `b` (prima punti, poi livelli) |
 | `fmtRes(r)` | Testo `L/3 liv · S pt` |
 
 **Home (lobby)**

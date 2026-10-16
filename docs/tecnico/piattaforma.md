@@ -204,7 +204,7 @@ I file non si applicano con il push: si incollano ed eseguono a mano in Supabase
 2. Il gioco invia messaggi `{type:'efg', ev:…}` al `parent` con `postMessage`. L'app accetta solo i messaggi con `type === 'efg'`, durante una partita e con `event.source` uguale all'iframe.
 3. `tick` aggiorna l'orologio; `result` porta tempi e vite di ogni livello superato.
 4. `showResult()` calcola i punti: per ogni livello superato `n × secondi avanzati × vite rimaste`, poi la somma (dettaglio in [app.md](app.md#calcolo-del-punteggio)).
-5. Se il risultato batte il record locale (prima i livelli, poi i punti) e il giocatore ha fatto l'accesso, l'app chiama `Backend.submit` → `efg_submit`. Il server aggiorna la riga solo se la coppia (`levels`, `score`) è maggiore di quella salvata.
+5. Se il risultato batte il record locale (prima i punti, poi i livelli) e il giocatore ha fatto l'accesso, l'app chiama `Backend.submit` → `efg_submit`. Il server aggiorna la riga solo se la coppia (`score`, `levels`) è maggiore di quella salvata.
 
 ### 5.4 Classifica e polling
 

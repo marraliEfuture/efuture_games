@@ -60,7 +60,7 @@ I **risultati dei controlli** (codice, database, prestazioni, spazio, vulnerabil
 4. **Gioca:** 3 livelli, al massimo 1 minuto ciascuno, 3 vite per livello.
    - Punti di un livello superato = numero del livello × secondi avanzati × vite rimaste.
    - Il livello perso vale 0.
-5. Se il risultato è il suo **record** su quel gioco, l'app lo invia alla classifica. In classifica contano prima i livelli superati, poi i punti. Il Totale è la somma dei record dei 4 giochi.
+5. Se il risultato è il suo **record** su quel gioco, l'app lo invia alla classifica. In classifica contano prima i punti, a parità i livelli superati, poi i giochi. Il Totale è la somma dei record dei 4 giochi.
 6. La **classifica** si vede nell'app (pulsante Classifica) e su `classifica.html`, proiettata e aggiornata ogni 15 s.
 7. Facoltativo: un admin avvia un **countdown** di apertura o di chiusura della gara, che vale per tutti.
 
@@ -92,6 +92,7 @@ I file SQL **non si applicano con il push**: vanno incollati ed eseguiti a mano 
 | `supabase-home-layout.sql` | Schermata dei giochi scelta in admin (`home_layout`) | Rieseguibile |
 | `supabase-modifica-utente.sql` | Correzione di nome, azienda, email e cellulare dall'admin | Rieseguibile |
 | `supabase-bonus-recensione.sql` | Punti del Bonus Recensione davvero modificabili dall'admin | Rieseguibile |
+| `supabase-classifica-punti.sql` | Classifiche e record in ordine di punti (poi livelli, poi giochi); comprende `supabase-classifica-categoria.sql` | Rieseguibile; da rieseguire dopo un file SQL vecchio |
 | `supabase-classifica-categoria.sql` | Classifica dell'app aperta sulla propria categoria (categoria nel profilo e nelle classifiche) | Rieseguibile |
 | `supabase-utente-da-contatto.sql` | Creare un utente da un contatto | Rieseguibile |
 | `supabase-contatti-utente.sql` | Contatti collegati a un utente registrato | Rieseguibile |

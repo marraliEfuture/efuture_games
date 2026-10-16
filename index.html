@@ -328,7 +328,7 @@ html[data-home=fisso] #review{position:sticky;bottom:8px;z-index:5;margin-top:12
   <div class="sheet">
     <div class="head"><div style="flex:1"><h2 id="hTitle">Istruzioni</h2></div><button class="close" data-close aria-label="Chiudi">✕</button></div>
     <p class="intro" style="text-align:left">Sblocca i giochi con il QR degli stand e scala la classifica.</p>
-    <p class="rules"><b>3 livelli</b> per gioco, <b>1 minuto</b> ciascuno.<br>Punti = <b>livello × secondi avanzati × vite</b>.<br>Contano prima i livelli, poi i punti.</p>
+    <p class="rules"><b>3 livelli</b> per gioco, <b>1 minuto</b> ciascuno.<br>Punti = <b>livello × secondi avanzati × vite</b>.<br>Contano prima i punti, a parità i livelli.</p>
     <p>I comandi sono nelle <b>Istruzioni</b> di ogni gioco.</p>
     <button class="btn" data-close type="button" style="align-self:center">Ho capito</button>
   </div>
@@ -465,12 +465,12 @@ html[data-home=fisso] #review{position:sticky;bottom:8px;z-index:5;margin-top:12
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=103"></script>
+<script src="config.js?v=104"></script>
 <script src="vendor/supabase.js"></script>
-<script src="backend.js?v=103"></script>
+<script src="backend.js?v=104"></script>
 <script src="vendor/jsQR.js"></script>
-<script src="fuochi.js?v=103"></script>
-<script src="hub.js?v=103"></script>
+<script src="fuochi.js?v=104"></script>
+<script src="hub.js?v=104"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });
