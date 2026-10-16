@@ -121,7 +121,14 @@ tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 .cat.staff{background:#e8f0fb;color:#1d4f86;border-color:#9fbbe0}
 .cat.sponsor{background:#fff3df;color:#8a5000;border-color:#e8c48a}
 .cat.ospite{background:#e9f7ee;color:#1f6b3d;border-color:#9fd3b2}
-#pCats{display:inline-flex;gap:6px;flex-wrap:wrap}
+#pCats,#cFil{display:inline-flex;gap:6px;flex-wrap:wrap}
+#cFil button{padding:6px 12px;font-size:12px}
+.cdesc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:340px;font-size:13px}
+.ctipo{white-space:nowrap;font-size:13px}
+.cint{white-space:nowrap;font-weight:600;font-size:12px;padding:3px 8px;border-radius:999px;background:#eef2f6}
+.cint.medio{background:#fff4d6}
+.cint.alto{background:#ffe1df;color:#9b1c14}
+#ctForm textarea{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:4px;resize:vertical}
 #pCats button{padding:6px 12px;font-size:12px}
 .subtel{display:block;font-size:11px;color:var(--muted,#5b7085)}
 /* icona della categoria in tabella (cliccabile) e nei pulsanti di Modifica */
@@ -328,6 +335,7 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
       <nav class="side" id="side" aria-label="Menu admin">
         <div class="shead"><b>Menu</b><button class="x" id="sideX" type="button" aria-label="Chiudi il menu">✕</button></div>
         <button class="tab on" data-tab="players" type="button">Utenti</button>
+        <button class="tab" data-tab="contacts" type="button">Contatti</button>
         <div class="grp">Collegamenti</div>
         <button class="tab sub" data-tab="qr" type="button">QR</button>
         <button class="tab sub" data-tab="links" type="button">Link</button>
@@ -364,6 +372,17 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
         </form>
         <p class="dim small" style="margin:6px 0 0">Colonna ⭐: <b>gialla</b> = ha cliccato «Bonus Recensione» nell'app; cliccala dopo aver trovato la sua recensione su Google per farla diventare <b>verde</b> (+<span class="rPtsTxt">200</span> punti nella classifica generale). Clic sulla verde per toglierla.</p>
         <div class="tablewrap" style="margin-top:10px"><table id="pTable"></table></div>
+      </section>
+
+      <!-- Contatti: feedback, richieste e segnalazioni registrati a mano dall'admin (supabase-contatti.sql) -->
+      <section data-pane="contacts" hidden>
+        <p class="dim" style="margin:0 0 10px">Feedback, richieste e segnalazioni raccolti all'evento. Li vedono e li inseriscono solo gli admin.</p>
+        <div class="bar"><span class="grow dim" id="cInfo"></span><span id="cFil" role="group" aria-label="Filtra per grado di interesse"></span>
+          <input id="cSearch" type="search" placeholder="Cerca nome, azienda, servizio…" aria-label="Cerca nei contatti" style="max-width:240px">
+          <button class="btn" id="cNew" type="button">➕ Nuovo contatto</button>
+          <button class="btn navy" id="cCsv" type="button">Scarica CSV</button></div>
+        <div class="msg" id="cMsg" aria-live="polite"></div>
+        <div class="tablewrap" style="margin-top:10px"><table id="cTable"></table></div>
       </section>
 
       <section data-pane="log" hidden>
@@ -552,6 +571,26 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
     <div class="row2"><button class="btn" id="pnGo" type="submit">Crea utente</button><button class="btn ghost" id="pnClose" type="button">Chiudi</button></div>
   </form>
 </div>
+<div class="pop" id="pCont" hidden role="dialog" aria-modal="true" aria-labelledby="ctT">
+  <form class="box" id="ctForm" autocomplete="off" style="max-width:520px">
+    <h3 id="ctT">Nuovo contatto</h3>
+    <div class="who" id="ctWho"></div>
+    <div class="dati"><div class="dgrid">
+      <label for="ctNome">Nome e cognome *</label><input id="ctNome" maxlength="80" required>
+      <label for="ctAz">Azienda</label><input id="ctAz" maxlength="80">
+      <label for="ctTel">Telefono</label><input id="ctTel" type="tel" inputmode="tel" maxlength="20" placeholder="Es. 333 123 4567">
+      <label for="ctMail">Email</label><input id="ctMail" type="email" inputmode="email">
+      <label for="ctServ">Servizio</label><div><input id="ctServ" list="ctServList" maxlength="60" placeholder="Scegli dall'elenco o scrivine uno nuovo" style="width:100%"><datalist id="ctServList"></datalist><div class="small dim" id="ctServHelp"></div></div>
+    </div></div>
+    <div class="field"><label for="ctDesc">Descrizione</label><textarea id="ctDesc" rows="5" maxlength="4000" placeholder="Cosa ha chiesto o segnalato, cosa ci siamo detti, cosa fare dopo…"></textarea></div>
+    <div class="grp2"><b>Tipo</b><div class="opts" id="ctTipo" role="radiogroup" aria-label="Tipo">
+      <button class="btn ghost" type="button" data-v="feedback" role="radio">💬 Feedback</button><button class="btn ghost" type="button" data-v="richiesta" role="radio">📩 Richiesta</button><button class="btn ghost" type="button" data-v="segnalazione" role="radio">⚠️ Segnalazione</button></div></div>
+    <div class="grp2"><b>Grado di interesse</b><div class="opts" id="ctInt" role="radiogroup" aria-label="Grado di interesse">
+      <button class="btn ghost" type="button" data-v="base" role="radio">⚪ Base</button><button class="btn ghost" type="button" data-v="medio" role="radio">🟡 Medio</button><button class="btn ghost" type="button" data-v="alto" role="radio">🔴 Alto</button></div></div>
+    <div class="msg" id="ctMsg" aria-live="polite"></div>
+    <div class="row2"><button class="btn danger" id="ctDel" type="button" hidden>Elimina</button><span style="flex:1"></span><button class="btn ghost" id="ctClose" type="button">Annulla</button><button class="btn" id="ctGo" type="submit">Salva</button></div>
+  </form>
+</div>
 <div class="pop" id="pEdit" hidden role="dialog" aria-modal="true" aria-labelledby="peT">
   <div class="box">
     <h3 id="peT">Modifica utente</h3>
@@ -597,10 +636,10 @@ code{background:var(--row);padding:1px 5px;border-radius:3px}
 
 <footer class="afoot noprint"><img src="img/efuture-logo.png" alt="efuture"></footer>
 
-<script src="config.js?v=94"></script>
+<script src="config.js?v=95"></script>
 <script src="vendor/supabase.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="tutorial/tutorials.js?v=94"></script>
+<script src="tutorial/tutorials.js?v=95"></script>
 <script>
 (function(){
 "use strict";
@@ -733,6 +772,7 @@ document.querySelectorAll('.tab[data-tab]').forEach(t => t.onclick = () => {
   document.querySelectorAll('.tab[data-tab]').forEach(x => x.classList.toggle('on', x === t));
   document.querySelectorAll('[data-pane]').forEach(p => p.hidden = p.dataset.pane !== t.dataset.tab);
   if (t.dataset.tab === 'players') loadPlayers();
+  if (t.dataset.tab === 'contacts') loadContacts();
   if (t.dataset.tab === 'log') loadLogs();
   if (t.dataset.tab === 'backup') loadBackups();
   if (t.dataset.tab === 'links') renderLinks();
@@ -968,6 +1008,78 @@ function pnSet(v){ pnTipo = v; $('pnTipo').querySelectorAll('button').forEach(b 
 $('pnTipo').addEventListener('click', e => { const b = e.target.closest('button'); if (b) pnSet(b.dataset.v); });
 $('pNewAdmin').onclick = () => { $('pnForm').reset(); pnSet('giocatore'); $('pnKeyBox').hidden = true; $('pnGo').hidden = false; setMsg($('pnMsg'), ''); $('pNew').hidden = false; $('pnEmail').focus(); };
 $('pnClose').onclick = () => { $('pNew').hidden = true; $('pnKey').textContent = ''; };
+
+/* ---------- contatti: feedback, richieste e segnalazioni (supabase-contatti.sql) ---------- */
+const INT = { base:'⚪ Base', medio:'🟡 Medio', alto:'🔴 Alto' };
+const TIPO_C = { feedback:'💬 Feedback', richiesta:'📩 Richiesta', segnalazione:'⚠️ Segnalazione' };
+let contacts = [], services = [], cFilter = 'tutti', ctEditing = null, ctInt = 'base', ctTipo = 'richiesta';
+async function loadContacts(){
+  setMsg($('cMsg'), '');
+  try { const r = await call('efg_admin_contatti') || {}; contacts = r.contatti || []; services = r.servizi || []; }
+  catch(err){
+    contacts = []; services = [];
+    if (/efg_admin_contatti|PGRST202|does not exist|Could not find/i.test(String(err && err.message))) setMsg($('cMsg'), 'Per usare i contatti esegui prima supabase-contatti.sql nel SQL Editor di Supabase.', 'err');
+    else onErr(err, $('cMsg'));
+  }
+  renderContacts();
+}
+function renderContacts(){
+  const box = $('cFil'); box.innerHTML = '';
+  [['tutti', 'Tutti', contacts.length]].concat(['alto', 'medio', 'base'].map(k => [k, INT[k], contacts.filter(c => c.interesse === k).length])).forEach(([k, l, n]) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'btn ' + (cFilter === k ? 'navy' : 'ghost'); b.textContent = l + ' · ' + n;
+    b.setAttribute('aria-pressed', cFilter === k); b.onclick = () => { cFilter = k; renderContacts(); }; box.appendChild(b);
+  });
+  const q = $('cSearch').value.trim().toLowerCase();
+  const list = contacts.filter(c => (cFilter === 'tutti' || c.interesse === cFilter) && (!q || [c.nome, c.azienda, c.servizio, c.email, c.descrizione, TIPO_C[c.tipo]].some(v => String(v || '').toLowerCase().includes(q))));
+  $('cInfo').textContent = contacts.length === 1 ? '1 contatto registrato' : contacts.length + ' contatti registrati';
+  fillTable($('cTable'), ['Data', 'Tipo', 'Nome', 'Azienda', 'Email · telefono', 'Servizio', 'Descrizione', 'Interesse', ''], list.map(c => {
+    const who = document.createElement('span'); who.textContent = c.email || ''; if (c.telefono){ const t = document.createElement('span'); t.className = 'subtel'; t.textContent = '📞 ' + c.telefono; who.appendChild(t); }
+    const d = document.createElement('span'); d.className = 'cdesc'; d.textContent = c.descrizione || ''; d.title = c.descrizione || '';
+    const g = document.createElement('span'); g.className = 'cint ' + c.interesse; g.textContent = INT[c.interesse] || c.interesse;
+    const sv = document.createElement('span'); if (c.servizio){ sv.className = 'tag'; sv.textContent = c.servizio; }
+    const b = document.createElement('button'); b.className = 'btn edit'; b.type = 'button'; b.textContent = 'Modifica'; b.onclick = () => openContact(c);
+    const tp = document.createElement('span'); tp.className = 'ctipo'; tp.textContent = TIPO_C[c.tipo] || TIPO_C.richiesta;
+    return [fmtDate(c.creato).slice(0, 17), tp, c.nome, c.azienda || '', who, sv, d, g, b];
+  }), ['small', '', '', '', '', '', '', '', '']);
+}
+$('cSearch').addEventListener('input', renderContacts);
+function ctSet(v){ ctInt = v; $('ctInt').querySelectorAll('button').forEach(b => { const on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); }
+$('ctInt').addEventListener('click', e => { const b = e.target.closest('button'); if (b) ctSet(b.dataset.v); });
+function ctTipoSet(v){ ctTipo = v; $('ctTipo').querySelectorAll('button').forEach(b => { const on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); }
+$('ctTipo').addEventListener('click', e => { const b = e.target.closest('button'); if (b) ctTipoSet(b.dataset.v); });
+function ctServHelp(){
+  const v = $('ctServ').value.trim(), known = services.some(x => x.toLowerCase() === v.toLowerCase());
+  $('ctServHelp').textContent = !v ? (services.length ? services.length + ' servizi già usati: tocca il campo per sceglierne uno.' : 'Scrivi il servizio: dalla prossima volta comparirà tra le scelte.') : known ? '' : '✨ Nuovo servizio: dopo il salvataggio sarà tra le scelte.';
+}
+$('ctServ').addEventListener('input', ctServHelp);
+function openContact(c){
+  ctEditing = c || null; $('ctForm').reset(); setMsg($('ctMsg'), '');
+  const dl = $('ctServList'); dl.innerHTML = ''; services.forEach(x => { const o = document.createElement('option'); o.value = x; dl.appendChild(o); });
+  $('ctT').textContent = c ? 'Modifica contatto' : 'Nuovo contatto';
+  $('ctWho').textContent = c ? 'Inserito il ' + fmtDate(c.creato) + (c.inserito_da ? ' da ' + c.inserito_da : '') + (c.modificato ? ' · modificato il ' + fmtDate(c.modificato) : '') : 'Feedback, richiesta o segnalazione raccolta all\'evento.';
+  if (c){ $('ctNome').value = c.nome || ''; $('ctAz').value = c.azienda || ''; $('ctTel').value = c.telefono || ''; $('ctMail').value = c.email || ''; $('ctServ').value = c.servizio || ''; $('ctDesc').value = c.descrizione || ''; }
+  ctSet(c ? c.interesse : 'base'); ctTipoSet(c && c.tipo || 'richiesta'); ctServHelp(); $('ctDel').hidden = !c; $('pCont').hidden = false; $('ctNome').focus();
+}
+$('cNew').onclick = () => openContact(null);
+$('ctClose').onclick = () => { $('pCont').hidden = true; };
+$('ctForm').addEventListener('submit', async e => {
+  e.preventDefault(); const m = $('ctMsg');
+  const v = { p_id: ctEditing ? ctEditing.id : null, p_nome: $('ctNome').value.trim(), p_azienda: $('ctAz').value.trim(), p_telefono: $('ctTel').value.trim(), p_email: $('ctMail').value.trim(),
+    p_servizio: $('ctServ').value.trim(), p_descrizione: $('ctDesc').value.trim(), p_interesse: ctInt, p_tipo: ctTipo };
+  if (v.p_nome.length < 2) return setMsg(m, 'Scrivi nome e cognome.', 'err');
+  setMsg(m, 'Salvo…');
+  try { await call('efg_admin_contatto_salva', v); $('pCont').hidden = true; await loadContacts(); setMsg($('cMsg'), (ctEditing ? 'Contatto aggiornato: ' : 'Contatto salvato: ') + v.p_nome + '.', 'ok'); }
+  catch(err){ if (/efg_admin_contatto_salva|PGRST202|does not exist|Could not find/i.test(String(err && err.message))) setMsg(m, 'Prima esegui supabase-contatti.sql nel SQL Editor di Supabase.', 'err'); else onErr(err, m); }
+});
+$('ctDel').onclick = async () => {
+  const c = ctEditing; if (!c) return;
+  if (!await ask('Eliminare il contatto di ' + c.nome + '?', 'Il contatto viene cancellato dal database. Non si può annullare.', 'Sì, elimina', true)) return;
+  try { await call('efg_admin_contatto_elimina', { p_id: c.id }); $('pCont').hidden = true; await loadContacts(); setMsg($('cMsg'), 'Contatto eliminato: ' + c.nome + '.', 'ok'); }
+  catch(err){ onErr(err, $('ctMsg')); }
+};
+$('cCsv').onclick = () => download('efuture-games-contatti-' + stamp() + '.csv',
+  toCsv(['Data', 'Tipo', 'Nome e cognome', 'Azienda', 'Telefono', 'Email', 'Servizio', 'Descrizione', 'Interesse', 'Inserito da'],
+    contacts.map(c => [fmtDate(c.creato), (TIPO_C[c.tipo] || TIPO_C.richiesta).replace(/^\S+ /, ''), c.nome, c.azienda || '', c.telefono || '', c.email || '', c.servizio || '', c.descrizione || '', (INT[c.interesse] || '').replace(/^\S+ /, ''), c.inserito_da || ''])), 'text/csv;charset=utf-8');
 $('pnCopy').onclick = async () => { const ok = await copyText($('pnKey').textContent); setMsg($('pnMsg'), ok ? 'Chiave copiata negli appunti.' : 'Copia non riuscita: selezionala a mano.', ok ? 'ok' : 'err'); };
 $('pnForm').addEventListener('submit', async e => {
   e.preventDefault();
@@ -1076,21 +1188,21 @@ $('lCsv').onclick = () => download('efuture-games-log-' + stamp() + '.csv',
 async function loadBackups(){
   let list;
   try { list = await call('efg_admin_backups') || []; } catch(err){ return onErr(err, $('bMsg')); }
-  fillTable($('bTable'), ['#', 'Creato', 'Nota', 'Utenti', 'Record', ''],
+  fillTable($('bTable'), ['#', 'Creato', 'Nota', 'Utenti', 'Record', 'Contatti', ''],
     list.map(b => {
       const box = document.createElement('div'); box.className = 'bar';
       const dl = document.createElement('button'); dl.className = 'btn ghost'; dl.type = 'button'; dl.textContent = 'Scarica';
       dl.onclick = async () => { try { const d = await call('efg_admin_backup_get', { p_id:b.id }); download('efuture-games-backup-' + b.id + '.json', JSON.stringify(d, null, 2), 'application/json'); } catch(err){ onErr(err, $('bMsg')); } };
       const rs = document.createElement('button'); rs.className = 'btn navy'; rs.type = 'button'; rs.textContent = 'Ripristina';
       rs.onclick = async () => {
-        if (!confirm('Ripristinare il backup #' + b.id + ' del ' + fmtDate(b.creato) + '?\n\nLa classifica attuale verrà sostituita (prima ne viene salvata una copia).')) return;
+        if (!confirm('Ripristinare il backup #' + b.id + ' del ' + fmtDate(b.creato) + '?\n\nLa classifica attuale verrà sostituita' + (b.contatti != null ? ', e anche i contatti' : '') + ' (prima ne viene salvata una copia).')) return;
         setMsg($('bMsg'), 'Ripristino in corso…');
         try { const r = await call('efg_admin_restore', { p_id:b.id }); setMsg($('bMsg'), 'Backup #' + b.id + ' ripristinato. Lo stato precedente è salvato nel backup #' + r.backup_prima + '.', 'ok'); loadBackups(); refreshStats(); }
         catch(err){ onErr(err, $('bMsg')); }
       };
       box.append(dl, rs);
-      return [b.id, fmtDate(b.creato), b.nota || '', b.giocatori, b.punteggi, box];
-    }), [null, 'small', null, 'num', 'num', null]);
+      return [b.id, fmtDate(b.creato), b.nota || '', b.giocatori, b.punteggi, b.contatti == null ? '—' : b.contatti, box];   // — = backup fatto prima dei contatti
+    }), [null, 'small', null, 'num', 'num', 'num', null]);
 }
 $('bReload').onclick = loadBackups;
 $('bMake').onclick = async () => {

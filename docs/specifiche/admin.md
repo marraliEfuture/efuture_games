@@ -52,6 +52,7 @@ Si aggiornano dopo Elimina, Backup, Ripristino e Reset.
 
 Si apre con il pulsante **☰ Menu** a sinistra nell'intestazione (visibile dopo l'accesso) e scorre da sinistra sopra la pagina. Si chiude con ✕, toccando lo sfondo, con Esc o scegliendo una voce. Il nome della sezione aperta compare come titolo sopra il contenuto. Voci:
 - **Utenti**;
+- **Contatti** (v95);
 - **Collegamenti:** QR, Link;
 - **Formazione:** Video utili, Tutorial, Laboratorio, Skills, FAQ, Documentazione;
 - **Admin:** Impostazioni, Qualità, Log, Backup, Chiave, Reset (Reset in rosso);
@@ -97,6 +98,18 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
   - **Elimina utente:** chiama `efg_admin_delete_player(p_key, p_email)`, chiude il popup, ricarica la tabella e aggiunge "· eliminato *nome*". L'utente potrà registrarsi di nuovo con la stessa email, ripartendo da zero.
 - **Ogni modifica chiede conferma** in una seconda finestra con la domanda ("Cambiare il tipo di…?", "Bloccare…?", "Sbloccare…?", "Reset della chiave di…?", "Eliminare…?"), le conseguenze spiegate e i pulsanti **Annulla** e **Sì, …** (rosso per bloccare ed eliminare). Con Annulla non cambia niente.
 - Tipo e disabilitazione servono `supabase-tipi-utenti.sql`: senza, il popup dice di eseguirlo.
+
+### Contatti
+
+*Aggiunta il 16/10/2026, v95. Serve `supabase-contatti.sql` (anche in 5 parti in `supabase-parti/contatti-1…5.sql`); senza, la sezione dice "Per usare i contatti esegui prima supabase-contatti.sql…".*
+
+Feedback, richieste e segnalazioni raccolti all'evento, inseriti a mano dall'admin (solo admin: la tabella `efg_contatti` non è leggibile dall'app).
+- **Barra:** "N contatti registrati", filtri **Tutti / 🔴 Alto / 🟡 Medio / ⚪ Base** con il numero, ricerca (nome, azienda, servizio, email, descrizione, tipo), **➕ Nuovo contatto**, **Scarica CSV** (`efuture-games-contatti-<data>.csv`: Data, Tipo, Nome e cognome, Azienda, Telefono, Email, Servizio, Descrizione, Interesse, Inserito da).
+- **Tabella** (dal più recente): Data, Tipo (💬 Feedback, 📩 Richiesta, ⚠️ Segnalazione), Nome, Azienda, Email · telefono, Servizio (etichetta), Descrizione (prime 2 righe, intera al passaggio del mouse), Interesse (pillola grigia/gialla/rossa), **Modifica**.
+- **Popup Nuovo / Modifica contatto** (`#pCont`): Nome e cognome (obbligatorio, 2–80 caratteri), Azienda, Telefono, Email, Servizio, Descrizione (fino a 4000 caratteri), Tipo (predefinito Richiesta), Grado di interesse (predefinito Base). In modifica: "Inserito il … da …", "modificato il …" e **Elimina** (con conferma).
+- **Servizio:** campo libero con l'elenco dei servizi già usati (`datalist`, da `efg_admin_contatti().servizi`). Un servizio nuovo mostra "✨ Nuovo servizio: dopo il salvataggio sarà tra le scelte."; se ha solo maiuscole diverse da uno esistente si salva con la scrittura già usata.
+- Funzioni: `efg_admin_contatti`, `efg_admin_contatto_salva` (p_id null = nuovo), `efg_admin_contatto_elimina`. Ogni inserimento, modifica ed eliminazione va nel Log ("admin: contatto …"). "Inserito da" = email dell'admin con chiave personale, oppure "chiave principale".
+- I contatti sono nei backup (colonna Contatti nella tabella Backup) e il ripristino li rimette; reset e "Cancella tutto" non li toccano.
 
 ### Impostazioni
 
@@ -323,7 +336,7 @@ Si rifanno tutti con `.claude/skills/efuture-games-admin/scripts/pptx_laboratori
 - Campo **Nota** (facoltativo) e pulsante **Crea backup e scarica**, che chiama `efg_admin_backup(p_key, p_note)`:
   - salva la copia nel database, con nota predefinita "backup manuale";
   - scarica il file `efuture-games-backup-<id>-<AAAAMMGG-HHMM>.json`.
-- **Tabella dei backup:** `#`, Creato, Nota, Utenti, Record e i pulsanti:
+- **Tabella dei backup:** `#`, Creato, Nota, Utenti, Record, Contatti (v95; "—" per i backup fatti prima dei contatti, che al ripristino non toccano i contatti) e i pulsanti:
   - **Scarica**: `efuture-games-backup-<id>.json`, tramite `efg_admin_backup_get`;
   - **Ripristina**: chiede conferma e chiama `efg_admin_restore`. Prima salva lo stato attuale in un nuovo backup automatico, di cui mostra il numero.
 - Il ripristino usa solo i backup salvati nel database. **Non si può caricare un file JSON dal computer.**
