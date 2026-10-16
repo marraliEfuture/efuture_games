@@ -84,7 +84,7 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
   | Livelli | Livelli totali, su 12 |
   | Punti | Punti totali |
   | Dettaglio per gioco | Per esempio `Efuture Bros 2/3 · 150 — Timenet 1/3 · 40` |
-  | (ultima) | Pulsanti **✏️ Modifica** (matita, v98: icona con etichetta "Modifica <nome>" per i lettori di schermo) e **🚫 Blocca** / **✅ Sblocca** (lo stesso comando del popup, con la stessa conferma; il risultato compare accanto a "N utenti registrati") |
+  | (ultima) | Pulsanti **✏️ Modifica** (matita, v98: icona con etichetta "Modifica <nome>" per i lettori di schermo) e **🚫** / **✅** (v99: solo icona, titolo "Blocca: …" / "Sblocca: …" e etichetta "Blocca/Sblocca <nome>"; lo stesso comando del popup, con la stessa conferma; il risultato compare accanto a "N utenti registrati") |
 
 - **Modifica** apre un popup con nome ed email e tre gruppi di comandi:
   - **Tipo:** Giocatore, Admin e giocatore, Solo admin (quello attuale è evidenziato). Chiama `efg_admin_set_tipo(p_key, p_email, p_tipo)` (valori `giocatore`, `admin_giocatore`, `admin`); nel log "admin: tipo utente". Effetti: i tipi admin possono entrare nel pannello con email e chiave personale e fare tutto; tornando Giocatore la chiave personale viene cancellata. Nell'app per ora tutti i tipi giocano e compaiono in classifica. La domanda di conferma spiega questi effetti per il tipo scelto.
@@ -340,8 +340,9 @@ Si rifanno tutti con `.claude/skills/efuture-games-admin/scripts/pptx_laboratori
   - salva la copia nel database, con nota predefinita "backup manuale";
   - scarica il file `efuture-games-backup-<id>-<AAAAMMGG-HHMM>.json`.
 - **Tabella dei backup:** `#`, Creato, Nota, Utenti, Record, Contatti (v95; "—" per i backup fatti prima dei contatti, che al ripristino non toccano i contatti) e i pulsanti:
-  - **Scarica**: `efuture-games-backup-<id>.json`, tramite `efg_admin_backup_get`;
-  - **Ripristina**: chiede conferma e chiama `efg_admin_restore`. Prima salva lo stato attuale in un nuovo backup automatico, di cui mostra il numero.
+  - (v99: pulsanti a sola icona, come in tutte le tabelle dell'admin)
+  - **⬇ Scarica**: `efuture-games-backup-<id>.json`, tramite `efg_admin_backup_get`;
+  - **↺ Ripristina**: chiede conferma e chiama `efg_admin_restore`. Prima salva lo stato attuale in un nuovo backup automatico, di cui mostra il numero.
 - Il ripristino usa solo i backup salvati nel database. **Non si può caricare un file JSON dal computer.**
 - Formato del file: vedi [database.md](database.md#backup-e-ripristino).
 
