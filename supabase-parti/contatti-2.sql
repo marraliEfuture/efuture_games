@@ -2,6 +2,7 @@
 -- Esegui le parti in ordine, una alla volta (ognuna si può rieseguire). Ultima riga di questa parte: "-- fine parte 2".
 
 drop function if exists public.efg_admin_contatto_salva(text,bigint,text,text,text,text,text,text,text);
+drop function if exists public.efg_admin_chi(text);   -- nome vecchio della funzione qui sotto
 create or replace function public.efg_admin_contatto_salva(p_key text, p_id bigint, p_nome text, p_azienda text, p_telefono text,
   p_email text, p_servizio text, p_descrizione text, p_interesse text, p_tipo text default 'richiesta')
 returns jsonb language plpgsql security definer set search_path = public as $$
@@ -23,7 +24,7 @@ begin
   if s is not null then select servizio into s0 from efg_contatti where lower(servizio) = lower(s) order by creato limit 1; s := coalesce(s0, s); end if;
   if p_id is null then
     insert into efg_contatti(nome, azienda, telefono, email, servizio, descrizione, interesse, tipo, inserito_da)
-      values (n, a, tel, e, s, d, g, t, efg_admin_chi(p_key)) returning id into nid;
+      values (n, a, tel, e, s, d, g, t, efg_chi_inserisce(p_key)) returning id into nid;
     insert into efg_log(kind, detail) values ('admin: contatto aggiunto', jsonb_build_object('id', nid, 'nome', n, 'tipo', t, 'servizio', s, 'interesse', g));
   else
     update efg_contatti set nome = n, azienda = a, telefono = tel, email = e, servizio = s, descrizione = d, interesse = g, tipo = t, modificato = now()

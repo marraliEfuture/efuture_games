@@ -12,7 +12,7 @@ begin
   return jsonb_build_object('ok', true, 'nome', n);
 end $$;
 
-revoke all on function public.efg_admin_chi(text), public.efg_admin_contatti(text),
+revoke all on function public.efg_chi_inserisce(text), public.efg_admin_contatti(text),
   public.efg_admin_contatto_salva(text,bigint,text,text,text,text,text,text,text,text), public.efg_admin_contatto_elimina(text,bigint) from public;
 grant execute on function public.efg_admin_contatti(text),
   public.efg_admin_contatto_salva(text,bigint,text,text,text,text,text,text,text,text), public.efg_admin_contatto_elimina(text,bigint) to anon, authenticated;

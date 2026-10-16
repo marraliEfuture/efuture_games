@@ -24,7 +24,7 @@ alter table public.efg_contatti enable row level security;   -- nessuna regola: 
 revoke all on table public.efg_contatti from anon, authenticated;
 
 -- chi ha inserito: l'email dell'admin (chiave personale) o "chiave principale"
-create or replace function public.efg_admin_chi(p_key text) returns text
+create or replace function public.efg_chi_inserisce(p_key text) returns text
 language sql immutable set search_path = public as $$
   select case when position(E'\n' in coalesce(p_key, '')) > 0 then lower(trim(split_part(p_key, E'\n', 1))) else 'chiave principale' end
 $$;
