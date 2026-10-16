@@ -87,6 +87,10 @@ input[type=text],input[type=email],input[type=password],select{width:100%;paddin
 .ttype{font-size:18px;line-height:1;cursor:default;white-space:nowrap}
 tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 .offtag{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;color:var(--danger);border:1px solid var(--danger);border-radius:3px;padding:0 5px;vertical-align:1px}
+.sorth{background:none;border:0;padding:0;font:inherit;font-weight:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.sorth .arr{font-size:10px;color:var(--muted)}
+th[aria-sort=ascending] .arr,th[aria-sort=descending] .arr{color:var(--orange,#f18c22)}
+.sorth:hover{text-decoration:underline}
 .btn.edit{background:#fff;color:var(--navy);border:1px solid var(--navy);padding:0;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px}
 .btn.edit:hover{background:#eaf6ff}
 .acts{display:flex;gap:6px;flex-wrap:nowrap}
@@ -803,12 +807,39 @@ async function loadPlayers(){
   try { players = await call('efg_admin_players') || []; } catch(err){ return onErr(err, $('pInfo')); }
   if (!$('rLink').value && document.activeElement !== $('rLink')) loadReviewLink();
   $('pInfo').textContent = players.length + ' utenti registrati';
-  renderCats();
-  const sorted = players.filter(p => catFilter === 'tutti' || catOf(p) === catFilter).sort((a, b) => b.livelli - a.livelli || b.punti - a.punti);
+  renderCats(); renderPlayers();
+}
+/* ordinamento della tabella Utenti: clic sul nome della colonna (di nuovo = verso opposto). Predefinito: Registrato, dal più recente */
+const P_SORT = [null, p => ['admin', 'admin_giocatore', 'giocatore'].indexOf(tipoOf(p)), p => ['staff', 'sponsor', 'ospite'].indexOf(catOf(p)),
+  p => p.recensione_ok ? 2 : p.recensione_clic ? 1 : 0, p => p.azienda || '', p => p.name || '', p => mailOf(p.email), p => p.created_at || '',
+  p => p.giochi || 0, p => p.livelli || 0, p => p.punti || 0, null];
+let pSort = { i: 7, dir: -1, desc: [3, 7, 8, 9, 10] };   // desc = colonne che partono dal valore più alto (recensione, data, numeri)
+function sortRows(list, keyFn, dir){
+  return list.map((p, n) => [p, keyFn(p), n]).sort((a, b) => {
+    const x = a[1], y = b[1], ex = x === '' || x == null, ey = y === '' || y == null;
+    if (ex !== ey) return ex ? 1 : -1;   // vuoti sempre in fondo
+    const c = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'it', { sensitivity:'base', numeric:true });
+    return c * dir || a[2] - b[2];
+  }).map(r => r[0]);
+}
+// rende cliccabili le intestazioni (pulsante con freccia ▲▼ e aria-sort)
+function sortableHead(tbl, keys, st, onChange){
+  tbl.querySelectorAll('thead th').forEach((th, i) => {
+    if (!keys[i]) return;
+    const label = th.textContent, b = document.createElement('button'); b.type = 'button'; b.className = 'sorth';
+    b.textContent = label; const ar = document.createElement('span'); ar.className = 'arr'; ar.textContent = st.i === i ? (st.dir > 0 ? '▲' : '▼') : '↕'; b.appendChild(ar);
+    b.title = 'Ordina per ' + (label === '⭐' ? 'recensione' : label.toLowerCase()); th.textContent = ''; th.appendChild(b);
+    th.setAttribute('aria-sort', st.i === i ? (st.dir > 0 ? 'ascending' : 'descending') : 'none');
+    b.onclick = () => { if (st.i === i) st.dir = -st.dir; else { st.i = i; st.dir = st.desc && st.desc.includes(i) ? -1 : 1; } onChange(); };
+  });
+}
+function renderPlayers(){
+  const sorted = sortRows(players.filter(p => catFilter === 'tutti' || catOf(p) === catFilter), P_SORT[pSort.i], pSort.dir);
   // il dettaglio per gioco e la scelta della categoria sono in Modifica (anche cliccando l'icona della categoria)
   fillTable($('pTable'), ['#', 'Tipo', 'Categoria', '⭐', 'Azienda', 'Nome', 'Email · cellulare', 'Registrato', 'Giochi sbloccati', 'Livelli', 'Punti', ''],
     sorted.map((p, i) => [i + 1, tipoIco(p), catIcon(p), reviewStar(p), p.azienda || '', nameCell(p), contactCell(p), fmtDate(p.created_at), p.giochi + '/4', p.livelli + '/12', p.punti, actions(p)]),
     [null, null, null, null, null, null, null, 'small', 'num', 'num', 'num', null]);
+  sortableHead($('pTable'), P_SORT, pSort, renderPlayers);
   $('pTable').querySelectorAll('tbody tr').forEach((tr, i) => { if (sorted[i] && sorted[i].disabilitato) tr.classList.add('off'); });
 }
 // categoria (serve supabase-campi-registrazione.sql): Staff, Sponsor, Ospite; filtro sopra la tabella e scelta riga per riga
@@ -819,7 +850,7 @@ function renderCats(){
   const box = $('pCats'); box.innerHTML = '';
   [['tutti', 'Tutti', players.length]].concat(Object.keys(CATS).map(k => [k, CATS_PL[k], players.filter(p => catOf(p) === k).length])).forEach(([k, l, n]) => {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'btn ' + (catFilter === k ? 'navy' : 'ghost'); b.textContent = l + ' · ' + n;
-    b.setAttribute('aria-pressed', catFilter === k); b.onclick = () => { catFilter = k; loadPlayers(); }; box.appendChild(b);
+    b.setAttribute('aria-pressed', catFilter === k); b.onclick = () => { catFilter = k; renderCats(); renderPlayers(); }; box.appendChild(b);
   });
 }
 // icona della categoria: Staff = la «e» di efuture, Sponsor = stretta di mano, Ospite = impiegato/a
