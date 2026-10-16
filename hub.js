@@ -52,6 +52,11 @@ let gate = { mode:null }, gateOffset = 0, lastPhase = null;   // countdown di ap
 const Backend = window.EFG_BACKEND, friendly = window.EFG_FRIENDLY, remote = Backend.remote;
 
 /* ================= LOBBY ================= */
+// categoria di chi gioca (scelta in Admin › Utenti): la classifica si apre lì e in home la posizione è in quella categoria
+const GROUPS = [['tutti', 'Generale'], ['ospite', 'Ospiti'], ['sponsor', 'Sponsor'], ['staff', 'Staff']];
+const GROUP_NAME = { ospite:'Ospiti', sponsor:'Sponsor', staff:'Staff' }, CAT_NAME = { ospite:'Ospite', sponsor:'Sponsor', staff:'Staff' };
+let myCat = null;   // null = non si sa (senza accesso o database senza supabase-classifica-categoria.sql): Generale
+const myGroup = () => (session && GROUP_NAME[myCat]) ? myCat : 'tutti';
 function renderGrid(){
   const grid = $('grid'); grid.innerHTML = '';
   for (const g of GAMES){
@@ -65,7 +70,7 @@ function renderGrid(){
     const rank = document.createElement('span'); rank.className = 'rank';
     const rk = ranks[g.id];
     if (!session) rank.hidden = true;   // senza accesso niente riga della classifica
-    else if (rk > 0){ rank.innerHTML = 'In classifica: <b></b>'; rank.querySelector('b').textContent = rk + '°'; }
+    else if (rk > 0){ rank.innerHTML = 'In classifica' + (GROUP_NAME[myGroup()] ? ' ' + GROUP_NAME[myGroup()] : '') + ': <b></b>'; rank.querySelector('b').textContent = rk + '°'; }
     else if (rk === -2) rank.textContent = 'Oltre il 50° posto';
     else if (rk === -1) rank.textContent = (bests[g.id] && !bests[g.id].l) ? 'Supera almeno un livello per entrare in classifica' : 'Non ancora in classifica';
     const best = document.createElement('span'); best.className = 'best';
@@ -83,15 +88,17 @@ function renderGrid(){
 }
 // posizione del giocatore nella classifica di ogni gioco, in questo momento
 // (numero = posizione, -1 = non ancora in classifica, -2 = oltre i primi 50, assente = non disponibile)
+// la posizione è quella nella categoria di chi gioca (Ospiti, Sponsor o Staff), come la classifica che vede per prima
 let ranks = {};
 async function loadRanks(){
   const me = session;
   if (!me){ ranks = {}; renderGrid(); return; }
-  const res = await Promise.all(GAMES.map(g => Backend.board(g.id).then(rows => {
+  const grp = myGroup();
+  const res = await Promise.all(GAMES.map(g => Backend.board(g.id, grp).then(rows => {
     const i = rows.findIndex(r => r.pid === me.id);
     return [g.id, i >= 0 ? i + 1 : (rows.length >= 50 ? -2 : -1), i >= 0 ? rows[i] : null];
   }, () => [g.id, ranks[g.id], undefined])));
-  if (session !== me) return;
+  if (session !== me || grp !== myGroup()) return;
   ranks = Object.fromEntries(res.map(r => [r[0], r[1]]));
   // il record mostrato in home è quello della classifica online (unica fonte): se l'admin ha azzerato i punti,
   // spariscono anche dal telefono. Si tiene la copia del telefono solo se la classifica non si legge o si è oltre il 50° posto.
@@ -304,7 +311,7 @@ const validEmail = e => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
 
 // l'accesso resta salvato sul telefono: se l'utente nel frattempo è stato cancellato (o tolto con un reset)
 // l'app lo dimentica e chiede di nuovo la registrazione. Senza rete o con il database vecchio non si tocca niente.
-async function forget(){ await Backend.signOut(); session = null; renderDock(); loadRanks(); }
+async function forget(){ await Backend.signOut(); session = null; myCat = null; renderDock(); loadRanks(); }
 async function verifySession(){
   const me = session; if (!me || !Backend.exists) return;
   let ok = null; try { ok = await Backend.exists(me); } catch(e){ return; }
@@ -315,7 +322,7 @@ async function verifySession(){
 }
 async function loggedIn(user){
   session = user; $('mAuth').hidden = true; renderDock(); toast('Benvenuto, ' + session.nickname + '!');
-  loadRanks(); askCompany();
+  myCat = null; loadRanks(); askCompany();
 }
 
 /* ---- campi della registrazione scelti in admin: nascosto, facoltativo o obbligatorio (l'email è sempre obbligatoria) ---- */
@@ -340,10 +347,21 @@ function showPreview(){
   if (n){ p.textContent = 'In classifica comparirai come '; const b = document.createElement('b'); b.textContent = boardName(n, a); p.append(b, '.'); }
 }
 
+/* ---- categoria di chi gioca: si legge dal profilo all'avvio, all'accesso e quando si torna sull'app ---- */
+async function loadProfile(){
+  const me = session; if (!me || !Backend.profile) return null;
+  let pr = null; try { pr = await Backend.profile(me); } catch(e){}
+  if (session !== me) return null;
+  const cat = pr && GROUP_NAME[pr.categoria] ? pr.categoria : null;
+  if (cat !== myCat){ myCat = cat; loadRanks(); }   // l'admin ha cambiato la categoria: posizioni ricalcolate
+  return pr;
+}
+document.addEventListener('visibilitychange', ()=>{ if (!document.hidden && session) loadProfile(); });
+
 /* ---- chi si era registrato senza azienda: gliela chiediamo (se in admin è obbligatoria) ---- */
 async function askCompany(){
-  const me = session; if (!me || !Backend.profile) return;
-  let pr = null; try { pr = await Backend.profile(me); } catch(e){}
+  const me = session;
+  const pr = await loadProfile();
   if (session !== me || !pr || !pr.manca_azienda) return;
   $('cPreview').textContent = boardName(pr.nome || me.nickname, 'Azienda'); setMsg($('cMsg'), ''); $('cCompany').value = '';
   openModal('mCompany');
@@ -408,24 +426,40 @@ $('fLogin').addEventListener('submit', async e=>{
   try { const r = await Backend.signIn(email); loggedIn(r.user); }
   catch(err){ setMsg(m, friendly(err), 'err'); }
 });
-$('btnLogout').onclick = async ()=>{ await Backend.signOut(); session = null; renderDock(); loadRanks(); toast('Sei uscito.'); };
+$('btnLogout').onclick = async ()=>{ await Backend.signOut(); session = null; myCat = null; renderDock(); loadRanks(); toast('Sei uscito.'); };
 
 /* ================= LEADERBOARD ================= */
-let boardTab = 'all';
+let boardTab = 'all', boardGroup = 'tutti';
+// Generale · Ospiti · Sponsor · Staff (si apre sulla categoria di chi gioca)
+function renderBoardGroups(){
+  const box = $('bGroups'); box.innerHTML = '';
+  GROUPS.forEach(([id, label])=>{
+    const t = document.createElement('button'); t.type = 'button'; t.className = 'grp' + (id === boardGroup ? ' on' : ''); t.textContent = label;
+    t.setAttribute('aria-pressed', id === boardGroup); if (id === myGroup() && id !== 'tutti') t.title = 'La tua categoria';
+    t.onclick = ()=>{ if (boardGroup === id) return; boardGroup = id; renderBoardGroups(); boardNote(); loadBoard(); };
+    box.appendChild(t);
+  });
+}
+function boardNote(){
+  const g = GROUP_NAME[boardGroup];
+  $('bNote').textContent = (g ? 'Classifica ' + (boardGroup === myGroup() ? 'della tua categoria: ' : 'della categoria ') + g + '. ' : 'Classifica generale: tutti insieme. ')
+    + (boardTab === 'all' ? 'Totale = somma dei 4 giochi + ⭐ bonus recensione. ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
+}
 function renderBoardTabs(){
   const tabs = $('bTabs'); tabs.innerHTML = '';
   [['all','Totale'], ...GAMES.map(g=>[g.id, g.name])].forEach(([id, label])=>{
     const t = document.createElement('button'); t.type = 'button'; t.className = 'tab' + (id===boardTab?' on':''); t.textContent = label;
-    t.onclick = ()=>{ boardTab = id; renderBoardTabs(); loadBoard(); };
+    t.onclick = ()=>{ boardTab = id; renderBoardTabs(); boardNote(); loadBoard(); };
     tabs.appendChild(t);
   });
 }
 function boardMessage(text){ const list = $('bList'); list.innerHTML = ''; const li = document.createElement('li'); li.className = 'empty'; li.style.cssText = 'display:block;background:none'; li.textContent = text; list.appendChild(li); }
 async function loadBoard(){
   boardMessage('Carico la classifica…');
-  let rows;
-  try { rows = await Backend.board(boardTab); } catch(e){ return boardMessage('Classifica non raggiungibile: controlla la connessione.'); }
-  if (!rows.length) return boardMessage('Ancora nessun punteggio. Gioca e sii il primo!');
+  let rows; const tab = boardTab, grp = boardGroup;
+  try { rows = await Backend.board(tab, grp); } catch(e){ return boardMessage('Classifica non raggiungibile: controlla la connessione.'); }
+  if (tab !== boardTab || grp !== boardGroup) return;   // nel frattempo ha cambiato scheda
+  if (!rows.length) return boardMessage(GROUP_NAME[grp] ? 'Nessun punteggio tra ' + (grp === 'ospite' ? 'gli Ospiti' : grp === 'staff' ? 'lo Staff' : 'gli Sponsor') + ' per ora.' : 'Ancora nessun punteggio. Gioca e sii il primo!');
   const list = $('bList'); list.innerHTML = '';
   rows.forEach((r, i)=>{
     const li = document.createElement('li'); if (session && r.pid === session.id) li.className = 'me';
@@ -434,6 +468,7 @@ async function loadBoard(){
     const n = document.createElement('span'); n.className = 'n';
     if (r.azienda && r.nome){ const az = document.createElement('span'); az.className = 'az'; az.textContent = r.azienda; const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = r.nome; n.append(az, nm); n.title = r.name; }
     else n.textContent = r.name;
+    if (grp === 'tutti' && CAT_NAME[r.categoria]){ const c = document.createElement('span'); c.className = 'cat ' + r.categoria; c.textContent = CAT_NAME[r.categoria]; (n.querySelector('.nm') || n).append(' ', c); }
     const d = document.createElement('span'); d.className = 'd';
     d.textContent = (boardTab === 'all' ? (r.games||0) + '/' + GAMES.length + ' giochi · ' + (r.levels||0) + '/' + LEVELS*GAMES.length : (r.levels||0) + '/' + LEVELS) + ' livelli' + (r.bonus ? ' · ⭐ +' + r.bonus + ' bonus' : '');
     w.append(n, d);
@@ -443,8 +478,8 @@ async function loadBoard(){
   });
 }
 $('btnBoard').onclick = ()=>{
-  $('bNote').textContent = (boardTab === 'all' ? 'Totale = somma dei 4 giochi + ⭐ bonus recensione. ' : '') + (remote ? '' : 'Modalità demo: solo i giocatori di questo telefono.');
-  renderBoardTabs(); openModal('mBoard'); loadBoard();
+  boardGroup = myGroup();   // ogni volta si apre sulla propria categoria
+  renderBoardGroups(); renderBoardTabs(); boardNote(); openModal('mBoard'); loadBoard();
 };
 
 /* ================= SCHERMO INTERO NEL BROWSER =================

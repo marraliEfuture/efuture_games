@@ -50,7 +50,7 @@ const Backend = remote ? {
     store.set('efgSessionLive', u); return { user:u };
   },
   async signOut(){ store.set('efgSessionLive', null); },
-  // nome, azienda e se manca l'azienda obbligatoria (null se il database non ha ancora la funzione)
+  // nome, azienda, categoria e se manca l'azienda obbligatoria (null se il database non ha ancora la funzione)
   async profile(user){
     try { return one(await rpc('efg_profilo', { p_email:user.email })); }
     catch(e){ if (missing(e)) return null; throw e; }
@@ -136,10 +136,10 @@ const Backend = remote ? {
     const tot = {};
     for (const r of Object.values(store.get('efgDemoScores4', {}))){
       if (game !== 'all' && r.game !== game) continue;
-      if (group === 'efuture' && !isEf(r.email)) continue;
-      if (group === 'ospiti' && isEf(r.email)) continue;
+      const cat = isEf(r.email) ? 'staff' : 'ospite';   // demo: Staff = email @efuture.it, gli altri Ospiti
+      if (group && group !== 'tutti' && !String(group).replace('ospiti', 'ospite').replace('efuture', 'staff').split(',').includes(cat)) continue;
       const u = users[r.email]; if (!u) continue;
-      const t = tot[r.email] = tot[r.email] || { pid:u.pid, name:(u.azienda ? u.azienda + ' - ' : '') + u.name, azienda:u.azienda || null, nome:u.name, levels:0, score:0, games:0 };
+      const t = tot[r.email] = tot[r.email] || { pid:u.pid, name:(u.azienda ? u.azienda + ' - ' : '') + u.name, azienda:u.azienda || null, nome:u.name, categoria:cat, levels:0, score:0, games:0 };
       t.score += r.score; t.levels += r.levels || 0; if ((r.levels||0) > 0) t.games++;
     }
     return Object.values(tot).sort((a,b)=>b.levels-a.levels || b.score-a.score).slice(0,50);
@@ -150,7 +150,7 @@ const Backend = remote ? {
 if (!Backend.remote){
   Backend.settings = async () => null;
   Backend.resetId = async () => null;
-  Backend.profile = async () => null;
+  Backend.profile = async user => ({ categoria: /@([a-z0-9-]+\.)*efuture\.it$/i.test(String(user && user.email || '')) ? 'staff' : 'ospite' });
   Backend.review = async user => ({ link:null, clic:!!(user && store.get('efgDemoReview', {})[user.email]), ok:false, punti:200 });
   Backend.reviewClick = async user => { const r = store.get('efgDemoReview', {}); r[user.email] = r[user.email] || new Date().toISOString(); store.set('efgDemoReview', r); return Backend.review(user); };
 }
