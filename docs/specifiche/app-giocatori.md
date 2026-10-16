@@ -227,7 +227,9 @@ Ogni riga mostra **Azienda - Nome**: l'azienda su una riga piccola arancione sop
 Si apre con il pulsante **Classifica** (finestra `mBoard`).
 - In cima solo il titolo "Classifica" e la ✕, senza logo efuture (v61).
 - Dalla v62 non c'è più il link "Apri la classifica a schermo intero": dall'app la classifica da proiettare non si apre mai.
-- **Schede:** **Totale** e i 4 giochi. Ogni cambio di scheda ricarica i dati con `Backend.board(id)`, cioè `efg_board`. Non c'è filtro per gruppo.
+- **Gruppi (v102):** sopra le schede la barra `#bGroups` **Generale · Ospiti · Sponsor · Staff**. Ogni volta che si apre, la classifica parte dalla **categoria di chi gioca** (`efg_profilo().categoria`, scelta in Admin › Utenti; senza accesso o con il database vecchio: Generale). Si può passare liberamente fra i quattro gruppi. Nella Generale accanto al nome c'è l'etichetta della categoria (Ospite, Sponsor, Staff). Serve `supabase-classifica-categoria.sql`.
+- **Schede:** **Totale** e i 4 giochi; valgono per ogni gruppo. Ogni cambio ricarica i dati con `Backend.board(id, gruppo)`: `efg_board` per la Generale, `efg_board_group` per le categorie.
+- **Home:** la posizione accanto al record è quella nella propria categoria ("In classifica Ospiti: 3°"). La categoria si rilegge all'avvio, all'accesso e quando si torna sull'app.
   Le schede sono staccate dalla prima posizione: 14 px di spazio e una riga sottile sotto (`#bTabs`).
 - **Riga su due livelli:**
   - posizione: tondo oro, argento o bronzo per i primi 3;
@@ -238,8 +240,9 @@ Si apre con il pulsante **Classifica** (finestra `mBoard`).
 - **Messaggi:**
   - "Carico la classifica…";
   - "Ancora nessun punteggio. Gioca e sii il primo!";
+  - in una categoria vuota: "Nessun punteggio tra gli Sponsor per ora." (e simili);
   - "Classifica non raggiungibile: controlla la connessione.".
-- **Nota** sotto la lista: "Totale = somma dei 4 giochi.". In demo: "Modalità demo: solo i giocatori di questo telefono.".
+- **Nota** sotto la lista: quale classifica si guarda ("Classifica della tua categoria: Ospiti.", "Classifica generale: tutti insieme.") e nel Totale "Totale = somma dei 4 giochi + ⭐ bonus recensione.". In demo: "Modalità demo: solo i giocatori di questo telefono.".
 - **Link** "Apri la classifica a schermo intero ↗": porta a `PUBLIC_URL + classifica.html`, sempre il sito pubblico.
 
 ## Installazione
