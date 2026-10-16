@@ -87,7 +87,8 @@ input[type=text],input[type=email],input[type=password],select{width:100%;paddin
 .ttype{font-size:18px;line-height:1;cursor:default;white-space:nowrap}
 tr.off td{color:#9aa6b2} tr.off .ttype{filter:grayscale(1);opacity:.6}
 .offtag{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;color:var(--danger);border:1px solid var(--danger);border-radius:3px;padding:0 5px;vertical-align:1px}
-.btn.edit{background:#fff;color:var(--navy);border:1px solid var(--navy);padding:4px 10px;font-size:12px}
+.btn.edit{background:#fff;color:var(--navy);border:1px solid var(--navy);padding:0;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px}
+.btn.edit:hover{background:#eaf6ff}
 .acts{display:flex;gap:6px;flex-wrap:nowrap}
 .rstar{background:none;border:0;padding:2px;font-size:24px;line-height:1;cursor:pointer;text-shadow:0 1px 0 rgba(0,0,0,.18)}
 .rstar.y{color:#f5b301}.rstar.g{color:#1f9d5c}
@@ -929,7 +930,10 @@ $('vDef').addEventListener('click', async e => {
   catch(err){ if (needRevSql(err)) setMsg($('vMsg'), 'Prima esegui supabase-recensioni.sql nel SQL Editor di Supabase.', 'err'); else onErr(err, $('vMsg')); }
 });
 function nameCell(p){ const d = document.createElement('span'); d.textContent = p.name; if (p.disabilitato){ const t = document.createElement('span'); t.className = 'offtag'; t.textContent = 'bloccato'; d.appendChild(t); } return d; }
-function editBtn(p){ const b = document.createElement('button'); b.type = 'button'; b.className = 'btn edit'; b.textContent = 'Modifica'; b.onclick = () => openEdit(p); return b; }
+// pulsante Modifica: una matita (Utenti, Contatti)
+const PENCIL = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+function pencilBtn(label, fn){ const b = document.createElement('button'); b.type = 'button'; b.className = 'btn edit'; b.innerHTML = PENCIL; b.title = 'Modifica'; b.setAttribute('aria-label', label); b.onclick = fn; return b; }
+function editBtn(p){ return pencilBtn('Modifica ' + p.name, () => openEdit(p)); }
 // in tabella: Modifica e, subito accanto, Blocca / Sblocca
 function actions(p){
   const box = document.createElement('div'); box.className = 'acts';
@@ -1048,7 +1052,7 @@ function renderContacts(){
     const d = document.createElement('span'); d.className = 'cdesc'; d.textContent = c.descrizione || ''; d.title = c.descrizione || '';
     const g = document.createElement('span'); g.className = 'cint ' + c.interesse; g.textContent = INT[c.interesse] || c.interesse;
     const sv = document.createElement('span'); if (c.servizio){ sv.className = 'tag'; sv.textContent = c.servizio; }
-    const b = document.createElement('button'); b.className = 'btn edit'; b.type = 'button'; b.textContent = 'Modifica'; b.onclick = () => openContact(c);
+    const b = pencilBtn('Modifica il contatto di ' + c.nome, () => openContact(c));
     const nm = document.createElement('span'); nm.textContent = c.nome;
     if (c.utente){ const u = document.createElement('span'); u.className = 'subtel';
       if (c.utente.email){ const p = players.find(x => x.email === c.utente.email); const lk = document.createElement('button'); lk.type = 'button'; lk.className = 'ulink';

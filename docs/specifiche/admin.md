@@ -84,7 +84,7 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
   | Livelli | Livelli totali, su 12 |
   | Punti | Punti totali |
   | Dettaglio per gioco | Per esempio `Efuture Bros 2/3 · 150 — Timenet 1/3 · 40` |
-  | (ultima) | Pulsanti **Modifica** e **🚫 Blocca** / **✅ Sblocca** (lo stesso comando del popup, con la stessa conferma; il risultato compare accanto a "N utenti registrati") |
+  | (ultima) | Pulsanti **✏️ Modifica** (matita, v98: icona con etichetta "Modifica <nome>" per i lettori di schermo) e **🚫 Blocca** / **✅ Sblocca** (lo stesso comando del popup, con la stessa conferma; il risultato compare accanto a "N utenti registrati") |
 
 - **Modifica** apre un popup con nome ed email e tre gruppi di comandi:
   - **Tipo:** Giocatore, Admin e giocatore, Solo admin (quello attuale è evidenziato). Chiama `efg_admin_set_tipo(p_key, p_email, p_tipo)` (valori `giocatore`, `admin_giocatore`, `admin`); nel log "admin: tipo utente". Effetti: i tipi admin possono entrare nel pannello con email e chiave personale e fare tutto; tornando Giocatore la chiave personale viene cancellata. Nell'app per ora tutti i tipi giocano e compaiono in classifica. La domanda di conferma spiega questi effetti per il tipo scelto.
@@ -105,7 +105,7 @@ All'ingresso è aperta Utenti. In stampa menu e titolo non compaiono.
 
 Feedback, richieste e segnalazioni raccolti all'evento, inseriti a mano dall'admin (solo admin: la tabella `efg_contatti` non è leggibile dall'app).
 - **Barra:** "N contatti registrati", filtri **Tutti / 🔴 Alto / 🟡 Medio / ⚪ Base** con il numero, ricerca (nome, azienda, servizio, email, descrizione, tipo), **➕ Nuovo contatto**, **Scarica CSV** (`efuture-games-contatti-<data>.csv`: Data, Tipo, Nome e cognome, Azienda, Telefono, Email, Servizio, Descrizione, Interesse, Inserito da).
-- **Tabella** (dal più recente): Data, Tipo (💬 Feedback, 📩 Richiesta, ⚠️ Segnalazione), Nome, Azienda, Email · telefono, Servizio (etichetta), Descrizione (prime 2 righe, intera al passaggio del mouse), Interesse (pillola grigia/gialla/rossa), **Modifica**.
+- **Tabella** (dal più recente): Data, Tipo (💬 Feedback, 📩 Richiesta, ⚠️ Segnalazione), Nome, Azienda, Email · telefono, Servizio (etichetta), Descrizione (prime 2 righe, intera al passaggio del mouse), Interesse (pillola grigia/gialla/rossa), **✏️** (matita: Modifica).
 - **Popup Nuovo / Modifica contatto** (`#pCont`): Nome e cognome (obbligatorio, 2–80 caratteri), Azienda, Telefono, Email, Servizio, Descrizione (fino a 4000 caratteri), Tipo (predefinito Richiesta), Grado di interesse (predefinito Base). In modifica: "Inserito il … da …", "modificato il …" e **Elimina** (con conferma).
 - **Servizio:** campo libero con l'elenco dei servizi già usati (`datalist`, da `efg_admin_contatti().servizi`). Un servizio nuovo mostra "✨ Nuovo servizio: dopo il salvataggio sarà tra le scelte."; se ha solo maiuscole diverse da uno esistente si salva con la scrittura già usata.
 - Funzioni: `efg_admin_contatti`, `efg_admin_contatto_salva` (p_id null = nuovo), `efg_admin_contatto_elimina`. Ogni inserimento, modifica ed eliminazione va nel Log ("admin: contatto …"). "Inserito da" = email dell'admin con chiave personale, oppure "chiave principale".
