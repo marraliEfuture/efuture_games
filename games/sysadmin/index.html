@@ -1049,14 +1049,23 @@ window.addEventListener('keyup', (e)=>{
   if (e.key==='ArrowUp'||e.key===' '||e.key==='w'||e.key==='W') keys.jumpHeld = false;
 });
 
+const HAS_TOUCH = 'ontouchstart' in window;
 function bindHold(elmt, onDown, onUp){
-  const down = (ev)=>{ ev.preventDefault(); try{ elmt.setPointerCapture(ev.pointerId); }catch(e){} onDown(); };
-  const up = (ev)=>{ ev.preventDefault(); onUp(); };
+  let held = false;
+  const down = (ev)=>{ ev.preventDefault(); try{ elmt.setPointerCapture(ev.pointerId); }catch(e){} held = true; onDown(); };
+  const up = (ev)=>{ if (ev) ev.preventDefault(); held = false; onUp(); };
   elmt.addEventListener('pointerdown', down);
   elmt.addEventListener('pointerup', up);
   elmt.addEventListener('pointerleave', up);
   elmt.addEventListener('pointercancel', up);
   elmt.addEventListener('contextmenu', (ev)=>ev.preventDefault());
+  // iPhone: se il rilascio non arriva, il pulsante si molla quando nessun dito lo tocca più
+  if (HAS_TOUCH) ['touchend','touchcancel'].forEach(t=>window.addEventListener(t, (ev)=>{
+    if (!held) return;
+    for (let i = 0; i < ev.touches.length; i++) if (elmt.contains(ev.touches[i].target)) return;
+    up();
+  }));
+  window.addEventListener('blur', ()=>{ if (held) up(); });
 }
 
 const btnJump = document.getElementById('btnJump');
@@ -1086,22 +1095,43 @@ function joyUpdate(ev){
   joy.classList.toggle('right', touch.right);
   joy.classList.toggle('up', joyUp);
 }
-function joyRelease(ev){
-  if (ev.pointerId !== joyId) return;
-  ev.preventDefault();
-  joyId = null; joyUp = false;
+/* v103 (iPhone: "ogni tanto il joystick si blocca"): su iOS il rilascio del dito a volte non arriva come
+   pointerup/pointercancel e il joystick restava "tenuto", ignorando i tocchi dopo (e il personaggio
+   continuava a camminare). Ora il dito si segue con gli eventi touch, un nuovo tocco riprende sempre il
+   joystick e si rilascia anche quando il dito non c'è più, se l'app va in secondo piano o perde il focus. */
+let joyTid = null;
+function joyEnd(){
+  joyId = joyTid = null; joyUp = false;
   touch.left = touch.right = false;
   joyKnob.style.transform = '';
   joy.classList.remove('held','left','right','up');
 }
-joy.addEventListener('pointerdown', (ev)=>{
+function joyRelease(ev){
+  if (joyId === null || ev.pointerId !== joyId) return;
   ev.preventDefault();
-  if (joyId !== null) return;
+  joyEnd();
+}
+joy.addEventListener('pointerdown', (ev)=>{
+  if (HAS_TOUCH && ev.pointerType === 'touch') return;   // il dito lo seguono gli eventi touch qui sotto
+  ev.preventDefault();
+  joyEnd();   // un "tenuto" rimasto appeso non blocca più il nuovo tocco
   joyId = ev.pointerId;
   try{ joy.setPointerCapture(ev.pointerId); }catch(e){}
   joy.classList.add('held');
   joyUpdate(ev);
 });
+joy.addEventListener('touchstart', (ev)=>{
+  if (ev.cancelable) ev.preventDefault();
+  const t = ev.changedTouches[0]; if (!t) return;
+  joyEnd(); joyTid = t.identifier;
+  joy.classList.add('held');
+  joyUpdate(t);
+}, {passive:false});
+function joyTouch(list){ for (let i = 0; i < list.length; i++) if (list[i].identifier === joyTid) return list[i]; return null; }
+window.addEventListener('touchmove', (ev)=>{ if (joyTid === null) return; const t = joyTouch(ev.changedTouches); if (t) joyUpdate(t); }, {passive:true});
+['touchend','touchcancel'].forEach(t=>window.addEventListener(t, (ev)=>{ if (joyTid !== null && !joyTouch(ev.touches)) joyEnd(); }));
+window.addEventListener('blur', joyEnd);
+document.addEventListener('visibilitychange', ()=>{ if (document.hidden) joyEnd(); });
 joy.addEventListener('pointermove', (ev)=>{ if (ev.pointerId === joyId){ ev.preventDefault(); joyUpdate(ev); } });
 joy.addEventListener('pointerup', joyRelease);
 joy.addEventListener('pointercancel', joyRelease);

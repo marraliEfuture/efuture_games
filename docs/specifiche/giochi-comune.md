@@ -102,6 +102,7 @@ Si attiva **solo con il telefono in verticale** (`@media (orientation:portrait)`
 - Sotto lo schermo: scritta **EFUTURE GAMES** in corsivo blu `#004675`.
 - **Fascia comandi:** al posto della croce c'è il joystick (SysAdmin, CoreTech) o la fascia di trascinamento (Timenet, inncloud); al posto di A e B ci sono i tasti del gioco; in basso i due tastini inclinati **MODE** e **AVVIA/PAUSA**.
 - **Griglia dell'altoparlante:** 6 fessure inclinate in basso a destra (non nei giochi con la fascia).
+- **Joystick su iPhone (v103):** in SysAdmin e CoreTech il dito sul joystick si segue con gli eventi touch (su iOS il rilascio come pointerup/pointercancel a volte non arrivava e il joystick restava "tenuto", ignorando i tocchi dopo). Un nuovo tocco riprende sempre il joystick; si rilascia anche quando il dito non è più tra i tocchi attivi, se la pagina va in secondo piano o perde il focus. Mouse e penna usano ancora i pointer event. In SysAdmin lo stesso controllo vale per SALTA, MOUSE e ANTIVIRUS.
 - Telefoni bassi (altezza ≤ 700 px): cornice e scritta più sottili. Telefoni grandi (≥ 390 × 780 px): joystick e tasti più grandi in SysAdmin, joystick un po' più grande in CoreTech.
 
 ### Attributi dello script
