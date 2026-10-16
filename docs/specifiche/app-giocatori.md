@@ -121,6 +121,7 @@ Finestra `mAuth` con due schede: **Registrati** e **Accedi**.
   - demo: `efgSession3`.
 
   Resta finché non si preme **Esci**, che cancella solo la sessione: record locali e sblocchi restano.
+- **Utente cancellato (v96):** a ogni apertura dell'app (e quando torna in primo piano) `verifySession` chiede al server se l'utente salvato esiste ancora (`Backend.exists` → `efg_profilo`). Se è stato cancellato dall'admin o tolto con un reset, la sessione si dimentica e si apre subito Registrati con "Il tuo utente non c'è più (nuova gara o cancellato): registrati di nuovo per giocare.". Senza rete o con il database senza `efg_profilo` non cambia niente. Anche un record rifiutato con "not found" fa uscire, con lo stesso messaggio nel risultato.
 - **Al login o alla registrazione:** toast "Benvenuto, *nome*!". Dalla v66 l'app **non** rimanda più al server i record del telefono: dopo un azzeramento dall'admin riporterebbe in classifica i punti vecchi (e senza accesso non si può giocare).
 
 ### Nome, azienda e categoria (v82)

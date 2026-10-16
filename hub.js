@@ -116,7 +116,7 @@ function renderDock(){
   $('btnBoard').hidden = !session;   // la classifica solo dopo l'accesso; le istruzioni sempre
   if (session){ $('who').textContent = 'Ciao, '; const b = document.createElement('b'); b.textContent = session.nickname; $('who').append(b); }
   const mn = $('modeNote'); mn.hidden = false;
-  mn.textContent = remote ? 'Classifica online · v95' : 'Modalità demo: account e classifica restano su questo telefono. · v95';
+  mn.textContent = remote ? 'Classifica online · v96' : 'Modalità demo: account e classifica restano su questo telefono. · v96';
 }
 
 /* ================= UNLOCK: camera + code ================= */
@@ -281,7 +281,10 @@ async function showResult(g, ok, reason, seconds, level, used, times, lives, ret
   else {
     setMsg(msg, 'Nuovo record! Salvo in classifica…', 'ok');
     try { await Backend.submit(session, g.id, score, levels); setMsg(msg, 'Nuovo record salvato in classifica!', 'ok'); }
-    catch(err){ setMsg(msg, 'Non riesco a salvare in classifica: ' + friendly(err), 'err'); }
+    catch(err){
+      if (/not found/i.test(String(err && err.message))){ setMsg(msg, 'Il tuo utente non c\'è più (nuova gara o cancellato): registrati di nuovo per entrare in classifica.', 'err'); forget(); }
+      else setMsg(msg, 'Non riesco a salvare in classifica: ' + friendly(err), 'err');
+    }
   }
   $('mResult').hidden = false;
   if (ok && window.EFGFuochi) window.EFGFuochi.start(7);   // fine del gioco: fuochi d'artificio
@@ -299,6 +302,17 @@ $('tabLogin').onclick = ()=>showAuth('login');
 $('btnAuth').onclick = ()=>{ showAuth('signup'); openModal('mAuth'); };
 const validEmail = e => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
 
+// l'accesso resta salvato sul telefono: se l'utente nel frattempo è stato cancellato (o tolto con un reset)
+// l'app lo dimentica e chiede di nuovo la registrazione. Senza rete o con il database vecchio non si tocca niente.
+async function forget(){ await Backend.signOut(); session = null; renderDock(); loadRanks(); }
+async function verifySession(){
+  const me = session; if (!me || !Backend.exists) return;
+  let ok = null; try { ok = await Backend.exists(me); } catch(e){ return; }
+  if (ok !== false || session !== me) return;
+  await forget();
+  showAuth('signup'); openModal('mAuth');   // chiede subito la nuova registrazione
+  setMsg($('sMsg'), 'Il tuo utente non c\'è più (nuova gara o cancellato): registrati di nuovo per giocare.', 'err');
+}
 async function loggedIn(user){
   session = user; $('mAuth').hidden = true; renderDock(); toast('Benvenuto, ' + session.nickname + '!');
   loadRanks(); askCompany();
@@ -577,7 +591,8 @@ Backend.resetId().then(id=>{
   bests = {}; store.set('efgBests4', bests);
   renderGrid(); if (!justUnlocked.size) toast('Nuova gara: sblocca di nuovo i giochi agli stand.', 4200);   // chi arriva da un QR vede il suo «sbloccato!»
 }).catch(()=>{});
-Backend.current().then(u=>{ session = u; renderDock(); loadRanks(); askCompany(); });
+Backend.current().then(u=>{ session = u; renderDock(); loadRanks(); askCompany(); verifySession(); });
+document.addEventListener('visibilitychange', ()=>{ if (!document.hidden) verifySession(); });   // app rimasta aperta durante un reset
 // visualizzazione predefinita dei giochi scelta in admin (Game, Light o Dark): i giochi la leggono da qui
 // finché il giocatore non ne sceglie una con il pulsante in alto nel gioco
 applyCampi();

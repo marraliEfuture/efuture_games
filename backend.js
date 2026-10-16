@@ -55,6 +55,11 @@ const Backend = remote ? {
     try { return one(await rpc('efg_profilo', { p_email:user.email })); }
     catch(e){ if (missing(e)) return null; throw e; }
   },
+  // l'utente salvato sul telefono esiste ancora? false = cancellato (o reset); null = non si sa (database vecchio)
+  async exists(user){
+    try { return !!one(await rpc('efg_profilo', { p_email:user.email })); }
+    catch(e){ if (missing(e)) return null; throw e; }
+  },
   async setCompany(user, azienda){ return one(await rpc('efg_set_azienda', { p_email:user.email, p_azienda:String(azienda||'').trim() })); },
   async submit(user, game, score, levels){ return !!(await rpc('efg_submit', { p_email:user.email, p_game:game, p_score:score, p_levels:levels })); },
   // game: 'all' (somma dei 4 giochi) oppure l'id del gioco → [{pid, name, levels, score, games, bonus}] ordinati
@@ -119,6 +124,7 @@ const Backend = remote ? {
     const u = { id:x.pid, email:x.email, nickname:x.name }; store.set('efgSession3', u); return { user:u };
   },
   async signOut(){ store.set('efgSession3', null); },
+  async exists(user){ return !!store.get('efgDemoUsers3', {})[normEmail(user.email)]; },
   async submit(user, game, score, levels){
     const rows = store.get('efgDemoScores4', {}); const k = user.email + '|' + game; const o = rows[k];
     if (o && (o.levels > levels || (o.levels === levels && o.score >= score))) return false;
