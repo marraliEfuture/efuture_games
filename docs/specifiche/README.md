@@ -91,6 +91,7 @@ I file SQL **non si applicano con il push**: vanno incollati ed eseguiti a mano 
 | `supabase-campi-registrazione.sql` | Azienda, cellulare, categoria; campi della registrazione scelti in admin; classifiche "Azienda - Nome" | Rieseguibile |
 | `supabase-home-layout.sql` | Schermata dei giochi scelta in admin (`home_layout`) | Rieseguibile |
 | `supabase-modifica-utente.sql` | Correzione di nome, azienda, email e cellulare dall'admin | Rieseguibile |
+| `supabase-contatti.sql` | Admin › Contatti (feedback, richieste, segnalazioni) e contatti nei backup | Rieseguibile |
 | `supabase-email-facoltativa.sql` | Email della registrazione facoltativa o non visibile, a scelta in admin | Rieseguibile |
 | `supabase-classifica-condivisa.sql` | Filtri e "Prossima posizione" della classifica condivisi tra PC | Rieseguibile |
 | `supabase-privacy-utenti.sql` | Toglie il cellulare dai giocatori e dai backup salvati. Aggiorna la registrazione e aggiunge "Elimina giocatore" | Una volta, sui database creati prima della v23. Su un database nuovo non serve: `supabase.sql` contiene già tutto |

@@ -86,7 +86,8 @@ CODICI DI SBLOCCO (uno per gioco)
    con la sola chiave principale (email vuota). Le chiavi non sono nel
    sito: nel database sono salvate solo cifrate. Dal pannello:
    Il menu si apre con il pulsante "Menu" in alto a sinistra: Utenti,
-   Collegamenti (QR, Link), Formazione (Video utili, Tutorial, Laboratorio,
+   Contatti (feedback, richieste e segnalazioni inseriti a mano, con
+   servizio e grado di interesse; CSV), Collegamenti (QR, Link), Formazione (Video utili, Tutorial, Laboratorio,
    Skills, FAQ, Documentazione),
    Admin (Qualità, Log, Backup, Chiave, Reset), Logout.
    - Utenti: elenco con simbolo del tipo, nome, email, punti per gioco;
