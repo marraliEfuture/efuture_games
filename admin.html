@@ -1064,6 +1064,10 @@ let contacts = [], services = [], cFilter = 'tutti', ctEditing = null, ctInt = '
 // utente collegato al contatto (supabase-contatti-utente.sql): si sceglie tra gli utenti dell'elenco Utenti
 const userLabel = p => (p.azienda ? p.azienda + ' - ' : '') + p.name + ' · ' + (mailOf(p.email) || 'senza email');
 const userOf = v => players.find(p => userLabel(p) === v) || null;
+// ordinamento come in Utenti: predefinito Data, dalla più recente
+const C_SORT = [c => c.creato || '', c => (TIPO_C[c.tipo] || '').replace(/^\S+ /, ''), c => c.nome || '', c => c.azienda || '', c => c.email || c.telefono || '',
+  c => c.servizio || '', c => c.descrizione || '', c => ({ alto:3, medio:2, base:1 })[c.interesse] || 0, null];
+let cSort = { i: 0, dir: -1, desc: [0, 7] };
 async function loadContacts(){
   setMsg($('cMsg'), '');
   try { const r = await call('efg_admin_contatti') || {}; contacts = r.contatti || []; services = r.servizi || []; }
@@ -1081,7 +1085,8 @@ function renderContacts(){
     b.setAttribute('aria-pressed', cFilter === k); b.onclick = () => { cFilter = k; renderContacts(); }; box.appendChild(b);
   });
   const q = $('cSearch').value.trim().toLowerCase();
-  const list = contacts.filter(c => (cFilter === 'tutti' || c.interesse === cFilter) && (!q || [c.nome, c.azienda, c.servizio, c.email, c.descrizione, TIPO_C[c.tipo], c.utente && c.utente.nome].some(v => String(v || '').toLowerCase().includes(q))));
+  const list0 = contacts.filter(c => (cFilter === 'tutti' || c.interesse === cFilter) && (!q || [c.nome, c.azienda, c.servizio, c.email, c.descrizione, TIPO_C[c.tipo], c.utente && c.utente.nome].some(v => String(v || '').toLowerCase().includes(q))));
+  const list = sortRows(list0, C_SORT[cSort.i], cSort.dir);
   $('cInfo').textContent = contacts.length === 1 ? '1 contatto registrato' : contacts.length + ' contatti registrati';
   fillTable($('cTable'), ['Data', 'Tipo', 'Nome', 'Azienda', 'Email · telefono', 'Servizio', 'Descrizione', 'Interesse', ''], list.map(c => {
     const who = document.createElement('span'); who.textContent = c.email || ''; if (c.telefono){ const t = document.createElement('span'); t.className = 'subtel'; t.textContent = '📞 ' + c.telefono; who.appendChild(t); }
@@ -1098,6 +1103,7 @@ function renderContacts(){
     const tp = document.createElement('span'); tp.className = 'ctipo'; tp.textContent = TIPO_C[c.tipo] || TIPO_C.richiesta;
     return [fmtDate(c.creato).slice(0, 17), tp, nm, c.azienda || '', who, sv, d, g, b];
   }), ['small', '', '', '', '', '', '', '', '']);
+  sortableHead($('cTable'), C_SORT, cSort, renderContacts);
 }
 $('cSearch').addEventListener('input', renderContacts);
 function ctSet(v){ ctInt = v; $('ctInt').querySelectorAll('button').forEach(b => { const on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); }
