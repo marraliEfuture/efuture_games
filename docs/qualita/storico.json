@@ -539,7 +539,7 @@
  },
  {
   "data": "2026-10-16",
-  "commit": "d6c63de",
+  "commit": "338b3d6",
   "versione": "v104",
   "esiti": {
    "codice": {
@@ -573,11 +573,11 @@
     "errore": 0
    }
   },
-  "spazio_kb": 46657.6,
+  "spazio_kb": 46657.8,
   "cartelle_kb": {
    ".claude": 160.2,
-   "(file principali)": 496.1,
-   "docs": 328.2,
+   "(file principali)": 496.2,
+   "docs": 328.3,
    "fonts": 120.3,
    "games": 923.8,
    "icons": 189.8,

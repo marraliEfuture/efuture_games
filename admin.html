@@ -812,7 +812,7 @@ async function loadPlayers(){
 /* ordinamento della tabella Utenti: clic sul nome della colonna (di nuovo = verso opposto). Predefinito: Registrato, dal più recente */
 const P_SORT = [null, p => ['admin', 'admin_giocatore', 'giocatore'].indexOf(tipoOf(p)), p => ['staff', 'sponsor', 'ospite'].indexOf(catOf(p)),
   p => p.recensione_ok ? 2 : p.recensione_clic ? 1 : 0, p => p.azienda || '', p => p.name || '', p => mailOf(p.email), p => p.created_at || '',
-  p => p.giochi || 0, p => p.livelli || 0, p => p.punti || 0, null];
+  p => p.giochi || 0, p => p.livelli || 0, p => (p.punti || 0) * 1000 + (p.livelli || 0) * 10 + (p.giochi || 0), null];   // Punti: a parità livelli, poi giochi (come la classifica, v104)
 let pSort = { i: 7, dir: -1, desc: [3, 7, 8, 9, 10] };   // desc = colonne che partono dal valore più alto (recensione, data, numeri)
 function sortRows(list, keyFn, dir){
   return list.map((p, n) => [p, keyFn(p), n]).sort((a, b) => {
