@@ -1,5 +1,5 @@
 {
- "versione": "v100",
+ "versione": "v101",
  "aree": {
   "codice": {
    "titolo": "Codice",
@@ -212,7 +212,7 @@
     {
      "nome": "Versione uguale in tutti i file",
      "esito": "ok",
-     "dettaglio": "v100 ovunque"
+     "dettaglio": "v101 ovunque"
     }
    ],
    "esiti": {
@@ -227,7 +227,7 @@
     {
      "nome": "File SQL letti",
      "esito": "ok",
-     "dettaglio": "supabase.sql, supabase-classifica-gruppi.sql, supabase-countdown.sql, supabase-privacy-utenti.sql, supabase-tipi-utenti.sql, supabase-nickname-unico.sql, supabase-campi-registrazione.sql, supabase-classifica-condivisa.sql, supabase-contatti-utente.sql, supabase-contatti.sql, supabase-email-facoltativa.sql, supabase-funzioni-admin.sql, supabase-home-layout.sql, supabase-modifica-utente.sql, supabase-nuovo-utente.sql, supabase-pulizia-funzioni.sql, supabase-recensioni.sql, supabase-reset-sblocchi.sql, supabase-utente-da-contatto.sql (nell'ordine di esecuzione)"
+     "dettaglio": "supabase.sql, supabase-classifica-gruppi.sql, supabase-countdown.sql, supabase-privacy-utenti.sql, supabase-tipi-utenti.sql, supabase-nickname-unico.sql, supabase-bonus-recensione.sql, supabase-campi-registrazione.sql, supabase-classifica-condivisa.sql, supabase-contatti-utente.sql, supabase-contatti.sql, supabase-email-facoltativa.sql, supabase-funzioni-admin.sql, supabase-home-layout.sql, supabase-modifica-utente.sql, supabase-nuovo-utente.sql, supabase-pulizia-funzioni.sql, supabase-recensioni.sql, supabase-reset-sblocchi.sql, supabase-utente-da-contatto.sql (nell'ordine di esecuzione)"
     },
     {
      "nome": "RLS attiva su tutte le tabelle",
@@ -294,8 +294,8 @@
     {
      "nome": "Peso della pagina: admin.html",
      "esito": "ok",
-     "dettaglio": "416.0 KB con 12 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
-     "valore": 416.0
+     "dettaglio": "416.4 KB con 12 risorse locali (soglie: 1500 KB avviso, 4000 KB errore)",
+     "valore": 416.4
     },
     {
      "nome": "Peso della pagina: games/coretech/index.html",
@@ -340,44 +340,44 @@
     {
      "nome": "Caricamento nel browser: index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 302 ms (DOM pronto in 290 ms) su telefono simulato, file locali, database escluso",
-     "valore": 302
+     "dettaglio": "caricata in 142 ms (DOM pronto in 120 ms) su telefono simulato, file locali, database escluso",
+     "valore": 142
     },
     {
      "nome": "Caricamento nel browser: classifica.html",
      "esito": "ok",
-     "dettaglio": "caricata in 144 ms (DOM pronto in 139 ms) su telefono simulato, file locali, database escluso",
-     "valore": 144
+     "dettaglio": "caricata in 131 ms (DOM pronto in 119 ms) su telefono simulato, file locali, database escluso",
+     "valore": 131
     },
     {
      "nome": "Caricamento nel browser: admin.html",
      "esito": "ok",
-     "dettaglio": "caricata in 103 ms (DOM pronto in 98 ms) su telefono simulato, file locali, database escluso",
-     "valore": 103
+     "dettaglio": "caricata in 86 ms (DOM pronto in 84 ms) su telefono simulato, file locali, database escluso",
+     "valore": 86
     },
     {
      "nome": "Caricamento nel browser: games/sysadmin/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 142 ms (DOM pronto in 136 ms) su telefono simulato, file locali, database escluso",
-     "valore": 142
+     "dettaglio": "caricata in 124 ms (DOM pronto in 118 ms) su telefono simulato, file locali, database escluso",
+     "valore": 124
     },
     {
      "nome": "Caricamento nel browser: games/coretech/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 99 ms (DOM pronto in 91 ms) su telefono simulato, file locali, database escluso",
-     "valore": 99
+     "dettaglio": "caricata in 76 ms (DOM pronto in 72 ms) su telefono simulato, file locali, database escluso",
+     "valore": 76
     },
     {
      "nome": "Caricamento nel browser: games/timenet/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 118 ms (DOM pronto in 109 ms) su telefono simulato, file locali, database escluso",
-     "valore": 118
+     "dettaglio": "caricata in 106 ms (DOM pronto in 98 ms) su telefono simulato, file locali, database escluso",
+     "valore": 106
     },
     {
      "nome": "Caricamento nel browser: games/inncloud/index.html",
      "esito": "ok",
-     "dettaglio": "caricata in 116 ms (DOM pronto in 113 ms) su telefono simulato, file locali, database escluso",
-     "valore": 116
+     "dettaglio": "caricata in 102 ms (DOM pronto in 99 ms) su telefono simulato, file locali, database escluso",
+     "valore": 102
     }
    ],
    "esiti": {
@@ -393,7 +393,7 @@
      "nome": "Spazio totale del sito",
      "esito": "ok",
      "dettaglio": "45.54 MB (limite consigliato GitHub Pages: 1 GB)",
-     "valore": 46634.3
+     "valore": 46636.7
     },
     {
      "nome": "Cartella video",
@@ -422,8 +422,8 @@
     {
      "nome": "Cartella (file principali)",
      "esito": "ok",
-     "dettaglio": "480.5 KB",
-     "valore": 480.5
+     "dettaglio": "482.3 KB",
+     "valore": 482.3
     },
     {
      "nome": "Cartella vendor",
@@ -434,8 +434,8 @@
     {
      "nome": "Cartella docs",
      "esito": "ok",
-     "dettaglio": "325.0 KB",
-     "valore": 325.0
+     "dettaglio": "325.6 KB",
+     "valore": 325.6
     },
     {
      "nome": "Cartella icons",
@@ -479,11 +479,11 @@
     "avviso": 0,
     "errore": 0
    },
-   "totale_kb": 46634.3,
+   "totale_kb": 46636.7,
    "cartelle_kb": {
     ".claude": 159.1,
-    "(file principali)": 480.5,
-    "docs": 325.0,
+    "(file principali)": 482.3,
+    "docs": 325.6,
     "fonts": 120.3,
     "games": 920.5,
     "icons": 189.8,
@@ -595,6 +595,6 @@
    "livello": "Buono"
   }
  },
- "data": "2026-10-16T09:52:38+00:00",
- "commit": "eff0d53"
+ "data": "2026-10-16T10:15:32+00:00",
+ "commit": "c0c4ad8"
 }
