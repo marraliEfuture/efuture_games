@@ -226,7 +226,8 @@ Card con il lettore video (`preload="none"`), il titolo, la descrizione e i puls
 - Presentazione «Laboratorio AI» (`video/laboratorio-ai.mp4`, 4 min 52 s): la presentazione `laboratorio.html` registrata; per presentarla dal vivo si usa Formazione › Laboratorio › Presenta;
 - The Fork con Claude in Chrome;
 - Forza 4 con Claude;
-- Foglio «Attività giornaliere» con Claude in Chrome.
+- Foglio «Attività giornaliere» con Claude in Chrome;
+- Tutorial RCM² per ISO 9001, 27001, 27017, 27018, GDPR e NIS2 (`video/tutorial-rcm2-am-solutions.mp4`, 13 min 36 s, senza audio). Dalla v94 la prima schermata, sotto il titolo, dice «Un unico programma per gestire certificazioni ISO, privacy e NIS2: audit sempre pronti, scadenze sotto controllo, miglioramento continuo e meno rischio di sanzioni.» (prima: «Tutorial pratico sul caso AM Solutions Srl – eCRF SaaS per la ricerca clinica»); aggiornata anche la copertina.
 
 Per evitare copie vecchie, l'indirizzo del video e della copertina riceve `?v=` ricavato dall'ETag o da Last-Modified del file (richiesta HEAD). Se non è disponibile, si usa l'ora attuale.
 
