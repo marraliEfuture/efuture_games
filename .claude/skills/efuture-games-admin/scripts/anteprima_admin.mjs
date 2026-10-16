@@ -2,7 +2,7 @@
 // Apre admin.html in Chromium, entra con una chiave qualsiasi e salva una schermata
 // per ogni sezione del menu (PC), il menu aperto, il popup Modifica e la sezione Utenti su telefono.
 // Uso: node anteprima_admin.mjs <cartella di uscita> [sezione ...]
-// Sezioni: players quality log backup reset key links videos tutorials lab skills qr settings
+// Sezioni: players quality log backup reset key links videos tutorials lab skills qr settings contacts
 // Il repository è EFG_REPO, altrimenti quello che contiene la skill, altrimenti la cartella corrente.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,7 +19,7 @@ const REPO = process.env.EFG_REPO || (() => {
   return process.cwd();
 })();
 const OUT = path.resolve(process.argv[2] || 'anteprima-admin');
-const ALL = ['players', 'quality', 'log', 'backup', 'reset', 'key', 'links', 'videos', 'tutorials', 'lab', 'skills', 'qr', 'settings'];
+const ALL = ['players', 'quality', 'log', 'backup', 'reset', 'key', 'links', 'videos', 'tutorials', 'lab', 'skills', 'qr', 'settings', 'contacts'];
 const WANT = process.argv.slice(3).length ? process.argv.slice(3) : ALL;
 fs.mkdirSync(OUT, { recursive: true });
 
@@ -36,6 +36,10 @@ const logs = [
   {id:3, at:iso(5), kind:'partita', email:'anna@esempio.it', game:'coretech', detail:{livelli:2, punti:300, record:true}},
   {id:2, at:iso(20), kind:'accesso', email:'bruno@esempio.it', detail:{esito:'ok'}},
   {id:1, at:iso(60), kind:'registrazione', email:'marta@efuture.it', detail:{nome:'Marta'}}];
+const contatti = [
+  {id:3, creato:iso(15), nome:'Paolo Verdi', azienda:'Studio Alfa', telefono:'333 000 1111', email:'paolo@esempio.it', servizio:'RCM²', descrizione:'Vuole una demo di RCM² per ISO 27001 e NIS2: hanno l’audit a gennaio. Richiamarlo la prossima settimana.', interesse:'alto', inserito_da:'marta@efuture.it'},
+  {id:2, creato:iso(90), nome:'Giulia Neri', azienda:'Beta Srl', telefono:'', email:'giulia@esempio.it', servizio:'Cloud e backup', descrizione:'Chiede un preventivo per il backup in cloud di 3 sedi.', interesse:'medio', inserito_da:'chiave principale'},
+  {id:1, creato:iso(240), nome:'Luca Bianchi', azienda:'', telefono:'347 222 3333', email:'', servizio:'Efuture Games', descrizione:'Segnala che CoreTech Pac sul suo telefono va lento al livello 3.', interesse:'base', inserito_da:'chiave principale'}];
 const backups = [{id:4, creato:iso(120), nota:'prima della gara', giocatori:3, punteggi:6},
   {id:3, creato:iso(1500), nota:'automatico prima di azzerare i punti', giocatori:3, punteggi:5},
   {id:2, creato:iso(1560), nota:'fine giornata 1', giocatori:3, punteggi:5},
@@ -50,6 +54,8 @@ window.supabase = { createClient: () => ({ rpc: async (fn, a) => {
     case 'efg_admin_set_user_key': { const p = players.find(x => x.email === a.p_email); if (p) p.chiave = !!a.p_new; return {data:{ok:true, nome:p && p.name, chiave:!!a.p_new}}; }
     case 'efg_admin_set_disabilitato': { const p = players.find(x => x.email === a.p_email); if (p) p.disabilitato = !!a.p_on; return {data:{ok:true, nome:p && p.name}}; }
     case 'efg_admin_delete_player': { const i = players.findIndex(x => x.email === a.p_email); const n = i >= 0 ? players[i].name : ''; if (i >= 0) players.splice(i, 1); return {data:{ok:true, nome:n, punteggi:0}}; }
+    case 'efg_admin_contatti': return {data:{contatti:contatti, servizi:[...new Set(contatti.map(c => c.servizio).filter(Boolean))].sort()}};
+    case 'efg_admin_contatto_salva': { const c = {id:contatti.length+1, creato:new Date().toISOString(), nome:a.p_nome, azienda:a.p_azienda, telefono:a.p_telefono, email:a.p_email, servizio:a.p_servizio, descrizione:a.p_descrizione, interesse:a.p_interesse, inserito_da:'chiave principale'}; if (a.p_id){ const i = contatti.findIndex(x => x.id === a.p_id); contatti[i] = Object.assign(contatti[i], c, {id:a.p_id}); } else contatti.unshift(c); return {data:{ok:true, id:c.id}}; }
     case 'efg_admin_logs': return {data:logs};
     case 'efg_admin_backups': return {data:backups};
     default: return {data:null};
