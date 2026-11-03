@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CompliFarm - Risk & Compliance Management in Cloud</title>
+<meta name="description" content="CompliFarm: tutta la compliance della tua organizzazione in una sola Banca Dati, dal browser. ISO 27001, 9001, 22301, 27701, GDPR, NIS2, AI Act, NIST CSF 2.0, Framework Nazionale.">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000;--bg2:#07090d;--card:#0c1016;--line:#1a222d;
+  --text:#fff;--muted:#9aa7b6;
+  --blue:#1e88f0;--blue2:#2aa7ff;--teal:#19c2c9;--green:#20c997;
+  --grad:linear-gradient(135deg,#1e6ff0 0%,#1aa0e8 50%,#19c9b8 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:Poppins,system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+.grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.blue{color:var(--blue2)}
+
+/* nav */
+header{position:fixed;inset:0 0 auto 0;z-index:50;background:rgba(0,0,0,.72);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:22px;letter-spacing:-.3px}
+.brand svg{width:30px;height:34px}
+.menu{display:flex;gap:28px;font-size:14.5px;color:var(--muted)}
+.menu a:hover{color:#fff}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;font-weight:600;font-size:15px;transition:.2s}
+.btn-p{background:var(--grad);color:#fff;box-shadow:0 8px 30px rgba(30,136,240,.35)}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(30,136,240,.5)}
+.btn-o{border:1px solid #2b3644;color:#fff}
+.btn-o:hover{border-color:var(--blue2)}
+.burger{display:none;background:none;border:0;color:#fff;font-size:26px;cursor:pointer}
+
+/* hero */
+.hero{padding:110px 0 40px;text-align:center;position:relative}
+.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(60% 50% at 50% 35%,rgba(30,136,240,.18),transparent 70%);pointer-events:none}
+.video-box{position:relative;max-width:900px;margin:0 auto;aspect-ratio:16/9;border-radius:22px;overflow:hidden;background:#000}
+.video-box video{width:100%;height:100%;object-fit:cover;display:block}
+.sound{position:absolute;right:14px;bottom:14px;background:rgba(0,0,0,.6);border:1px solid #2b3644;color:#fff;border-radius:999px;padding:7px 14px;font:500 13px Poppins,sans-serif;cursor:pointer}
+.eyebrow{display:inline-block;font-size:12.5px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);font-weight:600;margin-bottom:14px}
+.hero h1{font-size:clamp(30px,5vw,54px);line-height:1.12;font-weight:700;letter-spacing:-1px;margin:28px auto 16px;max-width:860px}
+.hero p.lead{color:var(--muted);font-size:clamp(16px,2vw,19px);max-width:680px;margin:0 auto 30px}
+.cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:38px}
+.chip{border:1px solid var(--line);background:var(--card);padding:7px 14px;border-radius:999px;font-size:13px;color:#cfd8e3}
+
+section{padding:90px 0}
+.sec-h{text-align:center;max-width:760px;margin:0 auto 50px}
+.sec-h h2{font-size:clamp(26px,3.6vw,40px);line-height:1.18;font-weight:700;letter-spacing:-.6px;margin-bottom:14px}
+.sec-h p{color:var(--muted);font-size:17px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:60px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px 16px;text-align:center}
+.stat b{display:block;font-size:42px;font-weight:800;line-height:1}
+.stat span{display:block;color:var(--muted);font-size:13.5px;margin-top:10px}
+
+/* cards */
+.grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:30px;transition:.25s}
+.card:hover{border-color:#24405e;transform:translateY(-3px)}
+.ico{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,rgba(30,111,240,.2),rgba(25,201,184,.2));display:grid;place-items:center;margin-bottom:18px;color:var(--teal)}
+.ico svg{width:24px;height:24px}
+.card h3{font-size:19px;font-weight:600;margin-bottom:8px}
+.card p{color:var(--muted);font-size:15px}
+
+/* modules */
+.mods{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mod{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:22px}
+.mod h4{font-size:16px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:9px}
+.mod h4:before{content:"";width:9px;height:9px;border-radius:50%;background:var(--grad);flex:none}
+.mod p{color:var(--muted);font-size:14px}
+
+/* for whom */
+.split{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
+.list{list-style:none;display:grid;gap:12px}
+.list li{display:flex;gap:12px;color:#d6dee8}
+.check{flex:none;width:22px;height:22px;border-radius:50%;background:rgba(32,201,151,.15);color:var(--green);display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:2px}
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.role{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.role b{display:block;font-weight:600;margin-bottom:4px}
+.role span{color:var(--muted);font-size:13.5px}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:s}
+.step{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px 22px}
+.step:before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--grad);font-weight:700;margin-bottom:16px}
+.step h4{font-weight:600;margin-bottom:6px}
+.step p{color:var(--muted);font-size:14px}
+.secure{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:40px}
+.secure div{display:flex;gap:10px;align-items:flex-start;color:#d6dee8;font-size:14.5px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:16px}
+
+/* pricing model */
+.price{background:linear-gradient(180deg,#0b1220,#05070b);border:1px solid #1b2b40;border-radius:26px;padding:50px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.price h2{font-size:clamp(26px,3.4vw,38px);line-height:1.2;font-weight:700;margin-bottom:14px}
+.price p{color:var(--muted)}
+.axes{display:grid;gap:14px}
+.axis{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:20px}
+.axis b{display:block;font-weight:600;margin-bottom:8px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pills span{font-size:13px;padding:5px 12px;border-radius:999px;background:rgba(30,136,240,.14);color:#bfe0ff}
+.incl{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.incl span{font-size:13px;color:#cfe;border:1px solid rgba(32,201,151,.35);border-radius:999px;padding:5px 12px}
+
+/* contact */
+.contact{text-align:center;background:radial-gradient(60% 80% at 50% 0%,rgba(25,201,184,.14),transparent 70%)}
+.form{max-width:620px;margin:0 auto;display:grid;gap:12px;text-align:left}
+.form .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form input,.form textarea,.form select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:#fff;font:15px Poppins,sans-serif}
+.form input:focus,.form textarea:focus,.form select:focus{outline:none;border-color:var(--blue2)}
+.form textarea{min-height:120px;resize:vertical}
+.form small{color:var(--muted);font-size:12.5px}
+
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:14px}
+.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+.foot a:hover{color:#fff}
+.sister{display:flex;gap:18px}
+
+.reveal{opacity:0;transform:translateY(24px);transition:.7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:900px){
+  .menu{display:none;position:absolute;top:68px;left:0;right:0;flex-direction:column;background:#000;padding:20px;border-bottom:1px solid var(--line)}
+  .menu.open{display:flex}
+  .burger{display:block}
+  .nav .btn-p{display:none}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stats .stat:last-child{grid-column:span 2}
+  .grid4,.mods,.split,.price,.steps,.secure{grid-template-columns:1fr}
+  .price{padding:30px 22px}
+  .roles,.form .row{grid-template-columns:1fr}
+  section{padding:64px 0}
+}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="CompliFarm">
+      <svg viewBox="0 0 30 34" fill="none"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1e6ff0"/><stop offset="1" stop-color="#19c9b8"/></linearGradient></defs><path d="M15 2 3 6.5v9C3 24 8.6 30 15 32c6.4-2 12-8 12-16.5v-9L15 2Z" stroke="url(#g)" stroke-width="3" stroke-linejoin="round"/><path d="m9 17 4.2 4.2L21.5 12" stroke="#20c997" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Compli<span class="blue">Farm</span></span>
+    </a>
+    <nav class="menu" id="menu">
+      <a href="#perche">Perché</a>
+      <a href="#moduli">Moduli</a>
+      <a href="#per-chi">Per chi</a>
+      <a href="#come">Come funziona</a>
+      <a href="#prezzo">Prezzo</a>
+      <a href="#contatti">Contatti</a>
+    </nav>
+    <a class="btn btn-p" href="#contatti">Richiedi una demo</a>
+    <button class="burger" aria-label="Menu" onclick="document.getElementById('menu').classList.toggle('open')">☰</button>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap">
+    <div class="video-box">
+      <video id="logo" autoplay muted loop playsinline poster="media/poster.jpg">
+        <source src="media/logo-complifarm.mp4" type="video/mp4">
+      </video>
+      <button class="sound" id="sound">🔇 Audio</button>
+    </div>
+    <span class="eyebrow" style="margin-top:34px">Risk &amp; Compliance Management in Cloud</span>
+    <h1>Tutta la compliance della tua organizzazione. <span class="grad">Una sola Banca Dati.</span></h1>
+    <p class="lead">Dal browser, tutto compreso. Rischi, controlli, documenti, registrazioni e adempimenti di tutte le norme che ti riguardano, nello stesso posto.</p>
+    <div class="cta">
+      <a class="btn btn-p" href="#contatti">Prenota una dimostrazione</a>
+      <a class="btn btn-o" href="#moduli">Scopri i moduli</a>
+    </div>
+    <div class="chips">
+      <span class="chip">ISO/IEC 27001</span><span class="chip">ISO 9001</span><span class="chip">ISO 22301</span><span class="chip">ISO/IEC 27701</span><span class="chip">GDPR</span><span class="chip">NIS2</span><span class="chip">AI Act</span><span class="chip">NIST CSF 2.0</span><span class="chip">Framework Nazionale</span>
+    </div>
+  </div>
+</section>
+
+<section id="perche">
+  <div class="wrap">
+    <div class="sec-h reveal">
+      <span class="eyebrow">Perché CompliFarm</span>
+      <h2>Dimostrare la conformità senza avere una funzione compliance interna.</h2>
+      <p>Un auditor, un'autorità o un Cliente chiedono evidenze. CompliFarm le produce, perché ogni videata nasce dal lavoro di consulenza sui sistemi di gestione e non da un modulo da riempire.</p>
+    </div>
+    <div class="grid4">
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></div><h3>Una sola Banca Dati</h3><p>La stessa Anagrafica, lo stesso Organigramma e gli stessi Asset alimentano SOA, Analisi del Rischio, BIA, GDPR e NIS2. Nessuna doppia imputazione, nessun foglio Excel parallelo.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 14l3 3 5-6"/></svg></div><h3>Documenti pronti</h3><p>Ogni stampa è un documento del Sistema di Gestione con il logo e i dati dell'Organizzazione. I Modelli Word del Master documentale arrivano già compilati dalla Banca Dati.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M8 11l2 2 4-4"/></svg></div><h3>Pensato dagli auditor</h3><p>Le videate seguono i punti di norma e producono le evidenze che servono in verifica ispettiva, in audit di certificazione e nelle richieste delle autorità.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div><h3>Aggiornato ogni settimana</h3><p>Novità normative e minacce arrivano con i Bollettini Compliance &amp; Threat e si trasformano in azioni dentro i Registri, con un clic.</p></div>
+    </div>
+    <div class="stats">
+      <div class="stat reveal"><b class="grad">1</b><span>Banca Dati per tutte le norme</span></div>
+      <div class="stat reveal"><b class="grad">9</b><span>schemi nella Dichiarazione di Applicabilità</span></div>
+      <div class="stat reveal"><b class="grad">20</b><span>Registri del Sistema di Gestione</span></div>
+      <div class="stat reveal"><b class="grad">0</b><span>installazioni, si accede dal browser</span></div>
+      <div class="stat reveal"><b class="grad">2</b><span>sole grandezze nel prezzo</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="moduli" style="background:var(--bg2)">
+  <div class="wrap">
+    <div class="sec-h reveal">
+      <span class="eyebrow">Che cosa fa</span>
+      <h2>Rischi, controlli, documenti, registrazioni e adempimenti. <span class="grad">Tutti nello stesso posto.</span></h2>
+      <p>Un solo programma, un solo accesso, tutti i moduli compresi.</p>
+    </div>
+    <div class="mods">
+      <div class="mod reveal"><h4>Anagrafiche e Organigramma</h4><p>Dipendenti con incarichi privacy e NIS, Fornitori, Clienti, Organigramma disegnato con responsabili, matrice degli Amministratori di Sistema.</p></div>
+      <div class="mod reveal"><h4>SOA e Piano di Trattamento</h4><p>ISO/IEC 27001, 27017, 27018, 27701, Framework Nazionale, NIST CSF 2.0, ISO 9001, ISO 22301, L. 190/2012. Ogni controllo con owner, attuazione, azioni e date.</p></div>
+      <div class="mod reveal"><h4>Analisi del Rischio</h4><p>Oggetti, Asset, Minacce, Vulnerabilità, Controlli-Minacce; rischio intrinseco, attuale e futuro con grafici e suggerimenti. SWOT dei processi per la ISO 9001.</p></div>
+      <div class="mod reveal"><h4>Business Impact Analysis</h4><p>Impatti per scenario e fascia temporale, MTPD, RTO e RPO, relazioni di supporto, modalità normale e semplificata, report per la ISO 22301.</p></div>
+      <div class="mod reveal"><h4>GDPR</h4><p>Registri del Titolare e del Responsabile, Analisi ENISA, DPIA, LIA, Data Breach, Diritti degli Interessati, Modelli Word (informative, nomine, contratti art. 28).</p></div>
+      <div class="mod reveal"><h4>NIS2</h4><p>Questionario Sicurezza Fornitori, Inventario dei Flussi di Rete, Misure di Base ACN, Guida NIS per gli Organi, Lettere di Incarico NIS.</p></div>
+      <div class="mod reveal"><h4>AI Act</h4><p>Riepilogo degli Strumenti AI e Modelli Word: regolamento d'uso e registro.</p></div>
+      <div class="mod reveal"><h4>Sistema di Gestione</h4><p>Albero dei documenti con stati, versioni, owner e approvazione; Master documentale importato con i segnaposto compilati; allegati.</p></div>
+      <div class="mod reveal"><h4>Registrazioni</h4><p>Venti Registri: Audit, Non Conformità, Azioni Correttive, Fornitori, Formazione con Attestati, Competenze, Change, Incidenti, Manutenzioni e altri.</p></div>
+      <div class="mod reveal"><h4>KPI e Miglioramento Continuo</h4><p>Indicatori con rilevazioni e grafici, Audit Interno con check list per schema, Riesame della Direzione con verbale.</p></div>
+      <div class="mod reveal"><h4>Formazione On-Line</h4><p>Corsi con regia, test e attestati, fruibili dagli Utenti dentro il programma.</p></div>
+      <div class="mod reveal"><h4>Compliance &amp; Threat Intelligence e Ticket</h4><p>Bollettini con presa in carico come azione o opportunità; richieste interne con workflow e SLA.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="disegnati">
+  <div class="wrap">
+    <div class="sec-h reveal">
+      <span class="eyebrow">GDPR, NIS2 e Sistema di Gestione</span>
+      <h2>Le persone, la rete, i documenti. Disegnati, non elencati.</h2>
+    </div>
+    <div class="grid4">
+      <div class="card reveal"><h3>Organigramma</h3><p>Funzioni, responsabili e incarichi privacy e NIS distribuiti disegnando. Esportabile in PowerPoint.</p></div>
+      <div class="card reveal"><h3>Flussi di Rete</h3><p>Elementi, collegamenti e flussi si disegnano e diventano l'inventario che l'ACN chiede per la misura ID.AM-03.</p></div>
+      <div class="card reveal"><h3>Stato Avanzamento Lavori</h3><p>Sistema documentale, certificazioni, prossimi audit e registrazioni: la Direzione sa sempre a che punto è il Sistema.</p></div>
+      <div class="card reveal"><h3>Mappa Neurale</h3><p>L'intera Banca Dati dell'Organizzazione in una vista a grafo: ogni legame tra persone, asset, rischi e controlli.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="per-chi" style="background:var(--bg2)">
+  <div class="wrap split">
+    <div class="reveal">
+      <span class="eyebrow">Per chi è</span>
+      <h2 style="font-size:clamp(26px,3.4vw,38px);line-height:1.2;font-weight:700;margin-bottom:22px">Per le organizzazioni che devono dimostrare la conformità a una o più norme.</h2>
+      <ul class="list">
+        <li><span class="check">✓</span>Piccole e medie organizzazioni, da 1 a 30 milioni di euro di fatturato</li>
+        <li><span class="check">✓</span>Aziende certificate o in certificazione ISO</li>
+        <li><span class="check">✓</span>Soggetti NIS2 importanti ed essenziali</li>
+        <li><span class="check">✓</span>Titolari e responsabili del trattamento</li>
+        <li><span class="check">✓</span>Terzo settore e sanità privata</li>
+      </ul>
+    </div>
+    <div class="roles reveal">
+      <div class="role"><b>Responsabile del Sistema di Gestione</b><span>Gestisce documenti, registri, audit e piani.</span></div>
+      <div class="role"><b>Direzione</b><span>Approva, riesamina e segue lo stato di avanzamento.</span></div>
+      <div class="role"><b>Responsabile IT</b><span>Asset, flussi di rete, misure ACN, incidenti.</span></div>
+      <div class="role"><b>DPO</b><span>Registri, DPIA, data breach, diritti degli interessati.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="come">
+  <div class="wrap">
+    <div class="sec-h reveal">
+      <span class="eyebrow">Come funziona</span>
+      <h2>Cloud nell'Unione Europea, utenti nominativi, <span class="grad">dati tuoi.</span></h2>
+      <p>Attivazione compresa: in quattro passi l'Organizzazione è operativa.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><h4>Ente e Utenti</h4><p>Creiamo l'Ente e le utenze nominative con i permessi concordati.</p></div>
+      <div class="step reveal"><h4>Master documentale</h4><p>Il Master viene caricato con ragione sociale, logo e figure responsabili.</p></div>
+      <div class="step reveal"><h4>Anagrafiche</h4><p>Dipendenti, Fornitori e Clienti importati da Excel; Organigramma impostato.</p></div>
+      <div class="step reveal"><h4>Avviamento</h4><p>Due ore a distanza con il Responsabile del Sistema di Gestione.</p></div>
+    </div>
+    <div class="secure">
+      <div><span class="check">✓</span>Ente dedicato con la propria Banca Dati e backup giornaliero</div>
+      <div><span class="check">✓</span>Utenze nominative, permessi per ruolo, autenticazione a due fattori</div>
+      <div><span class="check">✓</span>Aggiornamenti di versione senza fermo del servizio</div>
+      <div><span class="check">✓</span>Log delle Attività su ogni azione rilevante</div>
+      <div><span class="check">✓</span>Esportazione in Excel, Word e PDF e della Banca Dati completa, sempre</div>
+      <div><span class="check">✓</span>Contratto art. 28 GDPR, cancellazione dei dati entro 30 giorni dalla cessazione</div>
+    </div>
+  </div>
+</section>
+
+<section id="prezzo" style="padding-top:20px">
+  <div class="wrap">
+    <div class="price reveal">
+      <div>
+        <span class="eyebrow">Il prezzo</span>
+        <h2>Due grandezze. <span class="grad">Tutto compreso.</span></h2>
+        <p>Il canone annuo dipende solo dal numero di Utenti nominativi e dalla dimensione dell'Organizzazione. Nessun modulo a parte, nessuna sorpresa al rinnovo.</p>
+        <div class="incl"><span>Tutti i moduli</span><span>Master documentale</span><span>Bollettini</span><span>Aggiornamenti</span><span>Assistenza</span><span>Attivazione e avviamento</span></div>
+        <div class="cta" style="justify-content:flex-start;margin-top:28px"><a class="btn btn-p" href="#contatti">Richiedi l'offerta</a></div>
+      </div>
+      <div class="axes">
+        <div class="axis"><b>Utenti nominativi</b><div class="pills"><span>1</span><span>3</span><span>5</span><span>10</span><span>30</span><span>oltre</span></div></div>
+        <div class="axis"><b>Fatturato dell'Organizzazione</b><div class="pills"><span>fino a 1 mil.</span><span>fino a 3 mil.</span><span>fino a 5 mil.</span><span>fino a 10 mil.</span><span>fino a 30 mil.</span></div></div>
+        <div class="axis"><b>Opzioni</b><p style="font-size:14px">Sconti per contratti pluriennali e per Enti aggiuntivi dello stesso gruppo. Oltre i 30 milioni l'offerta è su misura.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contatti" class="contact">
+  <div class="wrap">
+    <div class="sec-h reveal">
+      <span class="eyebrow">Una dimostrazione</span>
+      <h2>Trenta minuti a distanza sulla Banca Dati demo.</h2>
+      <p>Poi un'offerta su misura in due giorni.</p>
+    </div>
+    <form class="form reveal" id="form">
+      <div class="row"><input name="nome" placeholder="Nome e cognome" required><input name="azienda" placeholder="Organizzazione" required></div>
+      <div class="row"><input name="email" type="email" placeholder="Email" required>
+        <select name="norma"><option value="">Norma di interesse</option><option>ISO/IEC 27001</option><option>ISO 9001</option><option>ISO 22301</option><option>GDPR</option><option>NIS2</option><option>AI Act</option><option>Più norme</option></select></div>
+      <textarea name="messaggio" placeholder="Raccontaci di cosa hai bisogno"></textarea>
+      <label style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" required style="width:auto;margin-top:4px"><small>Ho letto l'informativa privacy e acconsento a essere ricontattato.</small></label>
+      <button class="btn btn-p" type="submit" style="justify-content:center;border:0;cursor:pointer">Richiedi la demo</button>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="y"></span> CompliFarm · un prodotto <a href="https://farm4.it" style="color:#fff">FARM</a></div>
+    <div class="sister"><a href="https://farm4.it">farm4.it</a><a href="https://darkfarm.it">darkfarm.it</a><a href="#top">Torna su ↑</a></div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('y').textContent=new Date().getFullYear();
+const v=document.getElementById('logo'),s=document.getElementById('sound');
+s.onclick=()=>{v.muted=!v.muted;if(!v.muted)v.play();s.textContent=v.muted?'🔇 Audio':'🔊 Audio'};
+const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+document.querySelectorAll('.menu a').forEach(a=>a.onclick=()=>document.getElementById('menu').classList.remove('open'));
+document.getElementById('form').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);
+  const body=`Nome: ${f.get('nome')}\nOrganizzazione: ${f.get('azienda')}\nEmail: ${f.get('email')}\nNorma: ${f.get('norma')}\n\n${f.get('messaggio')}`;
+  location.href='mailto:info@complifarm.it?subject='+encodeURIComponent('Richiesta demo CompliFarm')+'&body='+encodeURIComponent(body)};
+</script>
+</body>
+</html>

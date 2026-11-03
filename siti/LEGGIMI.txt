@@ -1,0 +1,9 @@
+Siti FARM (HTML5 statici, una pagina ciascuno)
+
+farm4.it/       -> sito della societa' FARM (logo blu neon, Exo 2 + Inter)
+complifarm.it/  -> prodotto CompliFarm (logo scudo blu/verde acqua su nero, Poppins)
+darkfarm.it/    -> prodotto DarkFarm (logo neon rosso, Playfair Display + Inter)
+
+Per pubblicare: caricare il CONTENUTO di ogni cartella nella radice del rispettivo dominio.
+Il video del logo e' in media/ ed e' messo provvisoriamente in cima a ogni index.html.
+I moduli di contatto aprono il programma di posta verso info@<dominio>: verificare che l'indirizzo esista.

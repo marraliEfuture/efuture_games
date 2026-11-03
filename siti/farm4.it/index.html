@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FARM - Software, cloud e sicurezza per le organizzazioni</title>
+<meta name="description" content="FARM sviluppa software e piattaforme cloud per la compliance e la sicurezza informatica, con consulenza e formazione. CompliFarm e DarkFarm.">
+<meta name="theme-color" content="#020811">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#020811;--bg2:#06142a;--card:rgba(10,38,77,.35);--line:rgba(110,172,208,.18);
+  --text:#eaf4ff;--muted:#8fb0cc;
+  --blue:#16467f;--glow:#6eacd0;--neon:#4fc3ff;--bright:#bfe9ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4,.brand{font-family:"Exo 2",sans-serif}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
+#net{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
+.neon{color:var(--bright);text-shadow:0 0 8px rgba(79,195,255,.8),0 0 24px rgba(79,195,255,.45)}
+
+header{position:fixed;inset:0 0 auto 0;z-index:50;background:rgba(2,8,17,.75);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{font-weight:900;font-size:26px;letter-spacing:4px}
+.menu{display:flex;gap:30px;font-size:14.5px;color:var(--muted)}
+.menu a:hover{color:var(--bright)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:10px;font-weight:600;font-size:15px;transition:.2s;font-family:Inter,sans-serif}
+.btn-p{background:linear-gradient(135deg,#1d5fae,#2a8fd8);color:#fff;box-shadow:0 0 0 1px rgba(110,172,208,.5),0 0 24px rgba(79,195,255,.35)}
+.btn-p:hover{box-shadow:0 0 0 1px var(--neon),0 0 36px rgba(79,195,255,.6)}
+.btn-o{border:1px solid var(--line);color:var(--text)}
+.btn-o:hover{border-color:var(--glow)}
+.burger{display:none;background:none;border:0;color:#fff;font-size:26px;cursor:pointer}
+
+.hero{padding:104px 0 60px;text-align:center}
+.video-box{position:relative;max-width:940px;margin:0 auto;aspect-ratio:848/478;border-radius:20px;overflow:hidden;box-shadow:0 0 0 1px var(--line),0 30px 80px rgba(0,0,0,.6),0 0 80px rgba(22,70,127,.5)}
+.video-box video{width:100%;height:100%;object-fit:cover;display:block}
+.sound{position:absolute;right:14px;bottom:14px;background:rgba(2,8,17,.7);border:1px solid var(--line);color:#fff;border-radius:999px;padding:7px 14px;font:500 13px Inter,sans-serif;cursor:pointer}
+.eyebrow{display:inline-block;font:700 12.5px "Exo 2",sans-serif;letter-spacing:4px;text-transform:uppercase;color:var(--glow);margin-bottom:14px}
+.hero h1{font-size:clamp(30px,5vw,56px);line-height:1.1;font-weight:800;margin:34px auto 16px;max-width:900px}
+.hero p{color:var(--muted);font-size:clamp(16px,2vw,19px);max-width:700px;margin:0 auto 30px}
+.cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+section{padding:90px 0;position:relative}
+.sec-h{text-align:center;max-width:760px;margin:0 auto 50px}
+.sec-h h2{font-size:clamp(28px,3.8vw,42px);line-height:1.15;font-weight:800;margin-bottom:14px}
+.sec-h p{color:var(--muted);font-size:17px}
+
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;backdrop-filter:blur(6px);transition:.25s}
+.card:hover{border-color:rgba(110,172,208,.55);box-shadow:0 0 30px rgba(79,195,255,.15);transform:translateY(-3px)}
+.ico{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;margin-bottom:18px;color:var(--neon);border:1px solid var(--line);background:rgba(22,70,127,.35);box-shadow:0 0 18px rgba(79,195,255,.2)}
+.ico svg{width:24px;height:24px}
+.card h3{font-size:20px;font-weight:700;margin-bottom:8px}
+.card p{color:var(--muted);font-size:15px}
+
+.products{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.prod{border-radius:22px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column;transition:.25s;background:#000}
+.prod:hover{transform:translateY(-4px)}
+.prod .media{aspect-ratio:16/9;overflow:hidden;background:#000}
+.prod .media video,.prod .media img{width:100%;height:100%;object-fit:cover;display:block}
+.prod .body{padding:28px;flex:1;display:flex;flex-direction:column;gap:10px}
+.prod h3{font-size:26px;font-weight:800}
+.prod p{color:var(--muted);font-size:15px;flex:1}
+.prod .go{font-weight:600;margin-top:8px}
+.prod.compli{background:linear-gradient(180deg,#000,#050b14)}
+.prod.compli:hover{border-color:#1aa0e8;box-shadow:0 0 40px rgba(26,160,232,.25)}
+.prod.compli h3 span{color:#2aa7ff}.prod.compli .go{color:#19c9b8}
+.prod.dark{background:linear-gradient(180deg,#0a0001,#1a0303)}
+.prod.dark:hover{border-color:#c0211a;box-shadow:0 0 40px rgba(220,40,30,.3)}
+.prod.dark h3{font-family:"Exo 2";color:#ff4a3d;text-shadow:0 0 14px rgba(255,60,40,.55)}.prod.dark .go{color:#ff6b5e}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tags span{font-size:12.5px;padding:4px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+.vals{display:grid;gap:14px}
+.val{display:flex;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.val b{font-family:"Exo 2";font-size:28px;font-weight:900;line-height:1;min-width:44px}
+.val h4{font-size:17px;margin-bottom:2px}
+.val p{color:var(--muted);font-size:14.5px}
+
+.contact{text-align:center}
+.form{max-width:620px;margin:0 auto;display:grid;gap:12px;text-align:left}
+.form .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form input,.form textarea,.form select{width:100%;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:#fff;font:15px Inter,sans-serif}
+.form input:focus,.form textarea:focus,.form select:focus{outline:none;border-color:var(--neon);box-shadow:0 0 14px rgba(79,195,255,.25)}
+.form textarea{min-height:120px}
+.form small{color:var(--muted);font-size:12.5px}
+
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:14px;position:relative;z-index:1;background:rgba(2,8,17,.85)}
+.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.foot a:hover{color:var(--bright)}
+.sister{display:flex;gap:18px}
+
+.reveal{opacity:0;transform:translateY(24px);transition:.7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:900px){
+  .menu{display:none;position:absolute;top:68px;left:0;right:0;flex-direction:column;background:var(--bg);padding:20px;border-bottom:1px solid var(--line)}
+  .menu.open{display:flex}
+  .burger{display:block}.nav .btn-p{display:none}
+  .grid3,.products,.split,.form .row{grid-template-columns:1fr}
+  section{padding:64px 0}
+}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}#net{display:none}}
+</style>
+</head>
+<body>
+<canvas id="net" aria-hidden="true"></canvas>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand neon" href="#top">FARM</a>
+    <nav class="menu" id="menu">
+      <a href="#cosa">Cosa facciamo</a>
+      <a href="#prodotti">Prodotti</a>
+      <a href="#metodo">Metodo</a>
+      <a href="#contatti">Contatti</a>
+    </nav>
+    <a class="btn btn-p" href="#contatti">Parliamone</a>
+    <button class="burger" aria-label="Menu" onclick="document.getElementById('menu').classList.toggle('open')">☰</button>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap">
+    <div class="video-box">
+      <video id="logo" autoplay muted loop playsinline poster="media/poster.jpg">
+        <source src="media/logo-farm.mp4" type="video/mp4">
+      </video>
+      <button class="sound" id="sound">🔇 Audio</button>
+    </div>
+    <h1>Software, cloud e sicurezza che <span class="neon">collegano</span> compliance e protezione.</h1>
+    <p>FARM progetta e sviluppa piattaforme digitali per le organizzazioni che devono governare rischi, norme e minacce informatiche. Con consulenza e formazione, per portarle davvero in azienda.</p>
+    <div class="cta">
+      <a class="btn btn-p" href="#prodotti">Scopri i prodotti</a>
+      <a class="btn btn-o" href="#contatti">Contattaci</a>
+    </div>
+  </div>
+</section>
+
+<section id="cosa">
+  <div class="wrap">
+    <div class="sec-h reveal">
+      <span class="eyebrow">Cosa facciamo</span>
+      <h2>Una rete di competenze, un solo interlocutore.</h2>
+      <p>Tecnologia, metodo e persone: ogni nodo lavora per lo stesso obiettivo, organizzazioni conformi e protette.</p>
+    </div>
+    <div class="grid3">
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 9-4 3 4 3M16 9l4 3-4 3M14 5l-4 14"/></svg></div><h3>Sviluppo software</h3><p>Progettazione, sviluppo e manutenzione di software proprietario, pensato con chi lo usa ogni giorno.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 18a5 5 0 1 1 .9-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 8H7Z"/></svg></div><h3>Piattaforme SaaS e cloud</h3><p>Servizi erogati in SaaS e PaaS su infrastruttura cloud nell'Unione Europea, sempre aggiornati e senza installazioni.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></div><h3>Sicurezza e protezione dei dati</h3><p>Servizi di sicurezza informatica, monitoraggio delle minacce e protezione dei dati personali.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3"/><path d="M6 20v-1a6 6 0 0 1 12 0v1M19 8h2M3 8h2"/></svg></div><h3>Consulenza</h3><p>Consulenza organizzativa, gestionale e informatica su sistemi di gestione ISO, GDPR, NIS2 e AI Act.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4Z"/><path d="M7 9v5c0 1.5 2.2 3 5 3s5-1.5 5-3V9"/></svg></div><h3>Formazione</h3><p>Formazione e aggiornamento professionale, in aula, a distanza e on-line dentro le nostre piattaforme.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 11l10-5M7 13l10 5"/></svg></div><h3>Servizi digitali</h3><p>Integrazioni, automazioni e servizi tecnologici complementari attorno ai nostri prodotti.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="prodotti" style="background:linear-gradient(180deg,transparent,rgba(6,20,42,.7),transparent)">
+  <div class="wrap">
+    <div class="sec-h reveal">
+      <span class="eyebrow">I prodotti</span>
+      <h2>Due piattaforme, una sola visione.</h2>
+      <p>Dalla conformità alle norme al monitoraggio delle minacce: tutto quello che serve per dimostrare e difendere la sicurezza dell'organizzazione.</p>
+    </div>
+    <div class="products">
+      <a class="prod compli reveal" href="https://complifarm.it">
+        <div class="media"><img src="media/complifarm.jpg" alt="Logo CompliFarm" loading="lazy" onerror="this.style.display='none'"></div>
+        <div class="body">
+          <h3>Compli<span>Farm</span></h3>
+          <p>Risk &amp; Compliance Management in cloud. Una sola Banca Dati per ISO 27001, 9001, 22301, 27701, GDPR, NIS2, AI Act, NIST CSF 2.0 e Framework Nazionale: rischi, controlli, documenti e registrazioni nello stesso posto.</p>
+          <div class="tags"><span>ISO</span><span>GDPR</span><span>NIS2</span><span>AI Act</span><span>SaaS</span></div>
+          <span class="go">Vai a complifarm.it →</span>
+        </div>
+      </a>
+      <a class="prod dark reveal" href="https://darkfarm.it">
+        <div class="media"><img src="media/darkfarm.jpg" alt="Logo DarkFarm" loading="lazy" onerror="this.style.display='none'"></div>
+        <div class="body">
+          <h3>DarkFarm</h3>
+          <p>Threat intelligence e monitoraggio del dark web. Credenziali esposte, superficie d'attacco e segnali di minaccia trovati prima che diventino incidenti, e trasformati in azioni.</p>
+          <div class="tags"><span>Dark web</span><span>Threat intelligence</span><span>Superficie esposta</span><span>NIS2</span></div>
+          <span class="go">Vai a darkfarm.it →</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="metodo">
+  <div class="wrap split">
+    <div class="reveal">
+      <span class="eyebrow">Il metodo</span>
+      <h2 style="font-size:clamp(28px,3.6vw,40px);line-height:1.15;font-weight:800;margin-bottom:16px">Nati dal lavoro sul campo, <span class="neon">non da un foglio di specifiche.</span></h2>
+      <p style="color:var(--muted)">Le nostre piattaforme nascono dall'esperienza quotidiana di consulenti, auditor e tecnici della sicurezza. Le usiamo noi, con i nostri Clienti, prima di proporle.</p>
+    </div>
+    <div class="vals">
+      <div class="val reveal"><b class="neon">01</b><div><h4>Evidenze, non moduli</h4><p>Ogni funzione produce quello che chiedono auditor, autorità e Clienti.</p></div></div>
+      <div class="val reveal"><b class="neon">02</b><div><h4>Dati dell'organizzazione, in Europa</h4><p>Cloud nell'UE, utenze nominative, dati sempre esportabili.</p></div></div>
+      <div class="val reveal"><b class="neon">03</b><div><h4>Tutto compreso</h4><p>Prezzi chiari, attivazione e assistenza incluse, nessuna sorpresa al rinnovo.</p></div></div>
+      <div class="val reveal"><b class="neon">04</b><div><h4>Sempre aggiornati</h4><p>Novità normative e minacce arrivano nei prodotti e diventano azioni.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="contatti" class="contact">
+  <div class="wrap">
+    <div class="sec-h reveal">
+      <span class="eyebrow">Contatti</span>
+      <h2>Colleghiamoci.</h2>
+      <p>Raccontaci la tua organizzazione: ti proponiamo una dimostrazione dei prodotti o un incontro con i nostri consulenti.</p>
+    </div>
+    <form class="form reveal" id="form">
+      <div class="row"><input name="nome" placeholder="Nome e cognome" required><input name="azienda" placeholder="Organizzazione" required></div>
+      <div class="row"><input name="email" type="email" placeholder="Email" required>
+        <select name="interesse"><option value="">Mi interessa</option><option>CompliFarm</option><option>DarkFarm</option><option>Consulenza</option><option>Formazione</option><option>Altro</option></select></div>
+      <textarea name="messaggio" placeholder="Messaggio"></textarea>
+      <label style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" required style="width:auto;margin-top:4px"><small>Ho letto l'informativa privacy e acconsento a essere ricontattato.</small></label>
+      <button class="btn btn-p" type="submit" style="justify-content:center;border:0;cursor:pointer">Invia</button>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="y"></span> FARM · Software, cloud e sicurezza</div>
+    <div class="sister"><a href="https://complifarm.it">complifarm.it</a><a href="https://darkfarm.it">darkfarm.it</a><a href="#top">Torna su ↑</a></div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('y').textContent=new Date().getFullYear();
+const v=document.getElementById('logo'),s=document.getElementById('sound');
+s.onclick=()=>{v.muted=!v.muted;if(!v.muted)v.play();s.textContent=v.muted?'🔇 Audio':'🔊 Audio'};
+const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+document.querySelectorAll('.menu a').forEach(a=>a.onclick=()=>document.getElementById('menu').classList.remove('open'));
+document.getElementById('form').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);
+  const body=`Nome: ${f.get('nome')}\nOrganizzazione: ${f.get('azienda')}\nEmail: ${f.get('email')}\nInteresse: ${f.get('interesse')}\n\n${f.get('messaggio')}`;
+  location.href='mailto:info@farm4.it?subject='+encodeURIComponent('Contatto dal sito FARM')+'&body='+encodeURIComponent(body)};
+
+/* rete di nodi come nel logo */
+(()=>{const c=document.getElementById('net');if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+const x=c.getContext('2d');let W,H,P=[];
+function rs(){W=c.width=innerWidth;H=c.height=innerHeight;const n=Math.min(70,Math.floor(W*H/22000));
+  P=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3}))}
+rs();addEventListener('resize',rs);
+(function f(){x.clearRect(0,0,W,H);
+  for(const p of P){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1}
+  for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(d<150){x.strokeStyle=`rgba(110,172,208,${(1-d/150)*.35})`;x.lineWidth=1;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()}}
+  for(const p of P){x.fillStyle='rgba(191,233,255,.85)';x.shadowColor='#4fc3ff';x.shadowBlur=8;x.beginPath();x.arc(p.x,p.y,1.8,0,7);x.fill()}
+  x.shadowBlur=0;requestAnimationFrame(f)})()})();
+</script>
+</body>
+</html>
