@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DarkFarm - Threat Intelligence e monitoraggio del dark web</title>
-<meta name="description" content="DarkFarm sorveglia dark web, fughe di dati e superficie esposta della tua organizzazione e trasforma i segnali di minaccia in azioni.">
+<title>DarkFarm - Postura di sicurezza ed esposizione digitale</title>
+<meta name="description" content="DarkFarm controlla giorno per giorno quanto è esposta e quanto è sicura l'infrastruttura informatica di un'azienda, e trasforma i dati tecnici in problemi chiari, azioni da compiere e prove da mostrare.">
 <meta name="theme-color" content="#0a0001">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,13 +13,14 @@
 :root{
   --bg:#0a0001;--bg2:#170101;--card:rgba(52,6,5,.35);--line:rgba(255,60,40,.2);
   --text:#f6e9e7;--muted:#c09a95;
-  --red:#ff2a1f;--red2:#ff4a3d;--deep:#5a1411;--ember:#ffb057;
+  --red:#ff2a1f;--red2:#ff4a3d;--deep:#5a1411;--ember:#ffb057;--ok:#7fd38a;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 h1,h2,h3,h4,.brand{font-family:"Playfair Display",Georgia,serif}
+h1,h2{text-wrap:balance}
 .wrap{max-width:1160px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
 #embers{position:fixed;inset:0;z-index:0;pointer-events:none}
 body:before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(70% 50% at 50% 0%,rgba(120,10,6,.35),transparent 70%),radial-gradient(50% 40% at 80% 100%,rgba(90,20,17,.35),transparent 70%)}
@@ -31,7 +32,7 @@ header{position:fixed;inset:0 0 auto 0;z-index:50;background:rgba(10,0,1,.78);ba
 .brand{font-weight:900;font-size:26px;letter-spacing:.5px;position:relative;padding:2px 0}
 .brand:before,.brand:after{content:"";position:absolute;left:0;right:0;height:1.5px;background:var(--red);box-shadow:0 0 8px var(--red)}
 .brand:before{top:-2px}.brand:after{bottom:-2px}
-.menu{display:flex;gap:30px;font-size:14.5px;color:var(--muted)}
+.menu{display:flex;gap:28px;font-size:14.5px;color:var(--muted)}
 .menu a:hover{color:#fff}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:6px;font-weight:600;font-size:15px;transition:.2s}
 .btn-p{background:linear-gradient(180deg,#c3170f,#7d0b07);color:#fff;box-shadow:0 0 0 1px #ff4a3d,0 0 22px rgba(255,42,31,.45)}
@@ -45,45 +46,79 @@ header{position:fixed;inset:0 0 auto 0;z-index:50;background:rgba(10,0,1,.78);ba
 .video-box video{width:100%;height:100%;object-fit:cover;display:block}
 .sound{position:absolute;right:14px;bottom:14px;background:rgba(10,0,1,.7);border:1px solid var(--line);color:#fff;border-radius:999px;padding:7px 14px;font:500 13px Inter,sans-serif;cursor:pointer}
 .eyebrow{display:inline-block;font:600 12.5px Inter,sans-serif;letter-spacing:4px;text-transform:uppercase;color:var(--red2);margin-bottom:14px}
-.hero h1{font-size:clamp(32px,5.4vw,62px);line-height:1.08;font-weight:900;margin:36px auto 18px;max-width:920px}
-.hero p{color:var(--muted);font-size:clamp(16px,2vw,19px);max-width:700px;margin:0 auto 30px}
+.hero h1{font-size:clamp(32px,5.2vw,58px);line-height:1.1;font-weight:900;margin:36px auto 18px;max-width:940px}
+.hero p{color:var(--muted);font-size:clamp(16px,2vw,19px);max-width:720px;margin:0 auto 30px}
 .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.trio{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:34px}
+.trio span{font-size:13.5px;padding:7px 15px;border-radius:999px;border:1px solid var(--line);background:rgba(23,1,1,.7);color:#f0cfca}
 
 section{padding:90px 0;position:relative}
 .sec-h{text-align:center;max-width:780px;margin:0 auto 50px}
 .sec-h h2{font-size:clamp(28px,4vw,46px);line-height:1.12;font-weight:800;margin-bottom:14px}
 .sec-h p{color:var(--muted);font-size:17px}
 
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px;transition:.25s;backdrop-filter:blur(4px)}
+/* tre domande */
+.q3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:30px}
+.q h3{font-size:24px;font-weight:800;margin-bottom:10px;line-height:1.2}
+.q p{color:var(--muted);font-size:15px}
+
+/* percorso */
+.path{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:56px}
+.pstep{position:relative;background:rgba(23,1,1,.75);border:1px solid var(--line);border-radius:12px;padding:22px 18px;text-align:center}
+.pstep b{display:block;font:900 22px "Playfair Display",serif;margin-bottom:6px}
+.pstep span{color:var(--muted);font-size:13.5px;display:block}
+.pstep:not(:last-child):after{content:"→";position:absolute;right:-12px;top:50%;transform:translate(50%,-50%);color:var(--red2);font-weight:700;text-shadow:0 0 8px var(--red);z-index:2}
+.pstep:last-child{border-color:rgba(127,211,138,.45)}
+.pstep:last-child b{color:var(--ok)}
+
+/* moduli */
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px;transition:.25s;backdrop-filter:blur(4px)}
 .card:hover{border-color:rgba(255,74,61,.6);box-shadow:0 0 30px rgba(255,42,31,.2);transform:translateY(-3px)}
-.ico{width:48px;height:48px;border-radius:10px;display:grid;place-items:center;margin-bottom:18px;color:#ff6b5e;border:1px solid var(--line);background:rgba(90,20,17,.4);box-shadow:0 0 18px rgba(255,42,31,.2)}
-.ico svg{width:24px;height:24px}
-.card h3{font-size:21px;font-weight:800;margin-bottom:8px}
-.card p{color:var(--muted);font-size:15px}
+.ico{width:46px;height:46px;border-radius:10px;display:grid;place-items:center;margin-bottom:16px;color:#ff6b5e;border:1px solid var(--line);background:rgba(90,20,17,.4);box-shadow:0 0 18px rgba(255,42,31,.2)}
+.ico svg{width:23px;height:23px}
+.card h3{font-size:19px;font-weight:800;margin-bottom:8px;line-height:1.25}
+.card p{color:var(--muted);font-size:14.5px}
 
-.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:s}
-.fstep{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 22px}
-.fstep:before{counter-increment:s;content:"0" counter(s);display:block;font:900 34px "Playfair Display",serif;margin-bottom:10px;color:transparent;-webkit-text-stroke:1.2px #ff5a4a;text-shadow:0 0 12px rgba(255,42,31,.6)}
-.fstep h4{font-size:19px;margin-bottom:6px}
-.fstep p{color:var(--muted);font-size:14px}
-
+/* esempio problema */
 .split{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+.problem{background:#0d0101;border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:inset 0 0 40px rgba(120,10,6,.3)}
+.problem .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}
+.problem .lab{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.problem h4{font-family:Inter,sans-serif;font-size:16.5px;font-weight:600;margin-top:4px}
+.score{flex:none;text-align:center;border:1px solid rgba(255,74,61,.6);border-radius:12px;padding:8px 14px;box-shadow:0 0 18px rgba(255,42,31,.3)}
+.score b{display:block;font:900 30px "Playfair Display",serif;line-height:1;color:#ffd9d4;text-shadow:0 0 10px var(--red)}
+.score span{font-size:11.5px;color:var(--muted)}
+.factors{display:grid;gap:8px;margin-bottom:16px}
+.factor{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;font-size:13.5px;color:#e9c9c4}
+.bar{height:7px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#7d0b07,#ff4a3d);box-shadow:0 0 8px var(--red)}
+.meta{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;border-top:1px solid var(--line);padding-top:14px;font-size:13.5px}
+.meta div span{display:block;color:var(--muted);font-size:12px}
+.state{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid rgba(255,176,87,.5);color:var(--ember);font-size:12.5px}
+.note{margin-top:12px;font-size:12.5px;color:var(--muted);opacity:.8}
 .list{list-style:none;display:grid;gap:12px}
 .list li{display:flex;gap:12px}
 .dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);margin-top:9px}
-.console{background:#080000;border:1px solid var(--line);border-radius:12px;padding:20px;font:13.5px/1.8 ui-monospace,Menlo,Consolas,monospace;color:#e9b9b3;box-shadow:inset 0 0 40px rgba(120,10,6,.35)}
-.console .hd{display:flex;gap:6px;margin-bottom:12px}.console .hd i{width:10px;height:10px;border-radius:50%;background:#3e0707}
-.console .r{color:#ff6b5e}.console .y{color:var(--ember)}.console .g{color:#7fd38a}
 
-.link-compli{display:flex;gap:24px;align-items:center;background:linear-gradient(90deg,rgba(52,6,5,.5),rgba(10,0,1,.4));border:1px solid var(--line);border-radius:16px;padding:30px;margin-top:40px}
+/* come funziona */
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.profiles{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.profiles span{font-size:12.5px;padding:4px 11px;border-radius:999px;border:1px solid var(--line);color:#f0cfca}
+
+/* per chi */
+.who{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.who .card h3{font-size:21px}
+
+.link-compli{display:flex;gap:24px;align-items:center;background:linear-gradient(90deg,rgba(52,6,5,.5),rgba(10,0,1,.4));border:1px solid var(--line);border-radius:16px;padding:30px}
 .link-compli p{color:var(--muted)}
 
 .contact{text-align:center}
 .form{max-width:620px;margin:0 auto;display:grid;gap:12px;text-align:left}
 .form .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.form input,.form textarea{width:100%;background:rgba(23,1,1,.85);border:1px solid var(--line);border-radius:8px;padding:14px 16px;color:#fff;font:15px Inter,sans-serif}
-.form input:focus,.form textarea:focus{outline:none;border-color:var(--red2);box-shadow:0 0 14px rgba(255,42,31,.3)}
+.form input,.form textarea,.form select{width:100%;background:rgba(23,1,1,.85);border:1px solid var(--line);border-radius:8px;padding:14px 16px;color:#fff;font:15px Inter,sans-serif}
+.form input:focus,.form textarea:focus,.form select:focus{outline:none;border-color:var(--red2);box-shadow:0 0 14px rgba(255,42,31,.3)}
 .form textarea{min-height:120px}
 .form small{color:var(--muted);font-size:12.5px}
 
@@ -94,14 +129,18 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-s
 
 .reveal{opacity:0;transform:translateY(24px);transition:.7s cubic-bezier(.2,.7,.2,1)}
 .reveal.in{opacity:1;transform:none}
+@media (max-width:1000px){.grid4{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:900px){
   .menu{display:none;position:absolute;top:68px;left:0;right:0;flex-direction:column;background:var(--bg);padding:20px;border-bottom:1px solid var(--line)}
   .menu.open{display:flex}
   .burger{display:block}.nav .btn-p{display:none}
-  .grid3,.flow,.split,.form .row{grid-template-columns:1fr}
+  .q3,.split,.how,.who,.form .row{grid-template-columns:1fr}
+  .path{grid-template-columns:1fr;gap:14px}
+  .pstep:not(:last-child):after{content:"↓";right:50%;top:auto;bottom:-7px;transform:translate(50%,50%)}
   .link-compli{flex-direction:column;align-items:flex-start}
   section{padding:64px 0}
 }
+@media (max-width:560px){.grid4{grid-template-columns:1fr}.factor{grid-template-columns:1fr;gap:4px}}
 @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}#embers{display:none}}
 </style>
 </head>
@@ -112,12 +151,13 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-s
   <div class="wrap nav">
     <a class="brand neon" href="#top">DarkFarm</a>
     <nav class="menu" id="menu">
-      <a href="#cosa">Cosa sorveglia</a>
-      <a href="#come">Come funziona</a>
-      <a href="#perche">Perché</a>
+      <a href="#a-cosa-serve">A cosa serve</a>
+      <a href="#cosa-fa">Cosa fa</a>
+      <a href="#come-funziona">Come funziona</a>
+      <a href="#per-chi">Per chi è</a>
       <a href="#contatti">Contatti</a>
     </nav>
-    <a class="btn btn-p" href="#contatti">Verifica gratuita</a>
+    <a class="btn btn-p" href="#contatti">Richiedi una demo</a>
     <button class="burger" aria-label="Menu" onclick="document.getElementById('menu').classList.toggle('open')">☰</button>
   </div>
 </header>
@@ -131,74 +171,123 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-s
       </video>
       <button class="sound" id="sound">🔇 Audio</button>
     </div>
-    <h1>Quello che si dice di te <span class="neon">nel lato oscuro</span> della rete.</h1>
-    <p>DarkFarm sorveglia dark web, fughe di dati e superficie esposta della tua organizzazione. Trova credenziali, dati e vulnerabilità prima di chi vuole usarli, e li trasforma in azioni.</p>
+    <h1>La postura di sicurezza della tua infrastruttura, <span class="neon">verificata giorno per giorno.</span></h1>
+    <p>DarkFarm controlla quanto è esposta e quanto è sicura l'infrastruttura informatica di un'azienda. Trasforma i dati tecnici in problemi chiari, azioni da compiere e prove da mostrare.</p>
     <div class="cta">
-      <a class="btn btn-p" href="#contatti">Richiedi una verifica</a>
-      <a class="btn btn-o" href="#cosa">Cosa sorveglia</a>
+      <a class="btn btn-p" href="#contatti">Richiedi una dimostrazione</a>
+      <a class="btn btn-o" href="#cosa-fa">Scopri cosa fa</a>
     </div>
+    <div class="trio"><span>Problema</span><span>Priorità</span><span>Azione</span><span>Prova</span><span>Verifica</span></div>
   </div>
 </section>
 
-<section id="cosa">
+<section id="a-cosa-serve">
   <div class="wrap">
     <div class="sec-h reveal">
-      <span class="eyebrow">Cosa sorveglia</span>
-      <h2>Ogni segnale, <span class="outline">prima</span> che diventi un incidente.</h2>
-      <p>Fonti aperte, forum, mercati e canali del dark web, archivi di data breach e la tua superficie esposta su Internet, sotto osservazione continua.</p>
+      <span class="eyebrow">A cosa serve</span>
+      <h2>Tre domande a cui ogni azienda deve saper rispondere.</h2>
+      <p>DarkFarm risponde a tutte e tre.</p>
     </div>
-    <div class="grid3">
-      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div><h3>Credenziali esposte</h3><p>Account aziendali, password e sessioni trafugate che circolano in combo list, infostealer log e archivi di violazioni.</p></div>
-      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div><h3>Superficie esposta</h3><p>Domini, sottodomini, indirizzi, servizi e certificati raggiungibili da Internet, con le vulnerabilità note che li riguardano.</p></div>
-      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H5l-1 4V4Z"/><path d="M8 9h8M8 12h5"/></svg></div><h3>Dark web e forum</h3><p>Menzioni del marchio, vendita di accessi, dati e documenti nei forum, nei mercati e nei siti di leak dei gruppi ransomware.</p></div>
-      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 21h20L12 3Z"/><path d="M12 10v5M12 18h.01"/></svg></div><h3>Domini fraudolenti</h3><p>Domini simili al tuo, pagine di phishing e imitazioni del marchio registrate per ingannare Clienti e dipendenti.</p></div>
-      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M15 20v-1a4 4 0 0 1 6-3.4"/></svg></div><h3>Identità e persone chiave</h3><p>Esposizione degli indirizzi aziendali e delle figure più bersagliate: direzione, amministrazione, IT.</p></div>
-      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"/><path d="M12 8v5M12 16h.01"/></svg></div><h3>Fornitori e terze parti</h3><p>Segnali di compromissione nella catena di fornitura, come chiede la NIS2 per la sicurezza dei fornitori.</p></div>
+    <div class="q3">
+      <div class="q reveal"><h3>Dove siamo esposti?</h3><p>Sistemi, siti, domini e indirizzi raggiungibili da Internet, con le vulnerabilità note che li riguardano.</p></div>
+      <div class="q reveal"><h3>Chi sta toccando i nostri sistemi?</h3><p>Chi accede come amministratore e con quali privilegi, sui server Windows e sugli apparati di rete.</p></div>
+      <div class="q reveal"><h3>Come dimostriamo che stiamo agendo?</h3><p>Ogni problema ha un responsabile, una scadenza, una verifica finale e una prova conservata.</p></div>
+    </div>
+    <div class="path reveal" aria-label="Il percorso di ogni problema">
+      <div class="pstep"><b>Problema</b><span>rilevato e spiegato</span></div>
+      <div class="pstep"><b>Priorità</b><span>punteggio da 0 a 100</span></div>
+      <div class="pstep"><b>Azione</b><span>responsabile e scadenza</span></div>
+      <div class="pstep"><b>Prova</b><span>conservata e consultabile</span></div>
+      <div class="pstep"><b>Verifica</b><span>il problema è risolto davvero</span></div>
     </div>
   </div>
 </section>
 
-<section id="come" style="background:linear-gradient(180deg,transparent,rgba(23,1,1,.8),transparent)">
+<section id="cosa-fa" style="background:linear-gradient(180deg,transparent,rgba(23,1,1,.8),transparent)">
+  <div class="wrap">
+    <div class="sec-h reveal">
+      <span class="eyebrow">Cosa fa</span>
+      <h2>Dalla rilevazione alla <span class="outline">prova</span>, in un solo posto.</h2>
+      <p>Rileva dove l'azienda è vulnerabile, cosa succede ai suoi account amministrativi e se le sue credenziali sono finite in dati rubati. Poi dice cosa fare per prima cosa e segue la correzione.</p>
+    </div>
+    <div class="grid4">
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></div><h3>Vulnerabilità e superficie esposta</h3><p>Scansiona la rete e individua sistemi, servizi aperti e vulnerabilità note. Ogni problema riceve un punteggio di rischio da 0 a 100, spiegato in modo comprensibile.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div><h3>Esposizione digitale</h3><p>Controlla domini aziendali, domini che li imitano, indirizzi IP pubblici e indirizzi email dei dipendenti. Segnala le credenziali presenti in archivi di dati rubati già noti.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/></svg></div><h3>Active Directory</h3><p>Analizza il dominio Windows: account privilegiati, gruppi, computer, criteri di gruppo, trust e certificati. Segnala gli amministratori che non risultano censiti.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div><h3>Accessi amministrativi</h3><p>Raccoglie gli accessi degli amministratori di sistema da server Windows, firewall, switch, Linux e virtualizzazione, su un archivio protetto dalle modifiche con verifica dell'integrità.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18l-7 8v6l-4-2v-4L3 5Z"/></svg></div><h3>Minacce rilevanti</h3><p>Dalle fonti di threat intelligence seleziona solo ciò che riguarda davvero l'infrastruttura del cliente, in forma semplice e non da analista.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3 6 1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/></svg></div><h3>Azioni</h3><p>Una coda unica di interventi, con responsabile, scadenza e stato. Un'azione si considera chiusa solo dopo la verifica.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 14l3 3 5-6"/></svg></div><h3>Evidenze e report</h3><p>Report per la direzione, report tecnici e pacchetti di prove per auditor e revisori. Niente indicatori generici: si dichiara cosa è verificato e con quale prova.</p></div>
+      <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><circle cx="12" cy="12" r="2"/><path d="M7 12h3M14 11l3.5-4.5M14 13l3.5 4.5"/></svg></div><h3>Mappa delle relazioni</h3><p>Un grafo che mostra come sono collegati sistemi, vulnerabilità e minacce, per spiegare perché un problema è importante.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="priorita">
+  <div class="wrap split">
+    <div class="reveal">
+      <span class="eyebrow">Un problema, spiegato</span>
+      <h2 style="font-size:clamp(28px,3.8vw,42px);line-height:1.12;font-weight:800;margin-bottom:18px">Prima ciò che conta di più. E il perché.</h2>
+      <p style="color:var(--muted);margin-bottom:20px">Il punteggio di rischio non è una scatola nera: mostra da cosa dipende, così chi decide capisce subito dove intervenire per primo.</p>
+      <ul class="list">
+        <li><span class="dot"></span>Gravità della vulnerabilità</li>
+        <li><span class="dot"></span>Se la falla è sfruttata attivamente</li>
+        <li><span class="dot"></span>Esposizione del sistema a Internet</li>
+        <li><span class="dot"></span>Importanza del sistema per l'azienda</li>
+      </ul>
+    </div>
+    <div class="reveal">
+      <div class="problem" aria-label="Esempio di problema">
+        <div class="top">
+          <div><span class="lab">Problema</span><h4>Servizio di accesso remoto con vulnerabilità nota</h4></div>
+          <div class="score"><b>82</b><span>su 100</span></div>
+        </div>
+        <div class="factors">
+          <div class="factor">Gravità<div class="bar"><i style="width:85%"></i></div></div>
+          <div class="factor">Sfruttata attivamente<div class="bar"><i style="width:90%"></i></div></div>
+          <div class="factor">Esposto a Internet<div class="bar"><i style="width:100%"></i></div></div>
+          <div class="factor">Importanza del sistema<div class="bar"><i style="width:60%"></i></div></div>
+        </div>
+        <div class="meta">
+          <div><span>Azione</span>Aggiornare e limitare l'accesso</div>
+          <div><span>Responsabile</span>Responsabile IT</div>
+          <div><span>Scadenza</span>entro 7 giorni</div>
+          <div><span>Stato</span><span class="state">In attesa di verifica</span></div>
+        </div>
+      </div>
+      <p class="note">Esempio illustrativo.</p>
+    </div>
+  </div>
+</section>
+
+<section id="come-funziona" style="background:linear-gradient(180deg,transparent,rgba(23,1,1,.8),transparent)">
   <div class="wrap">
     <div class="sec-h reveal">
       <span class="eyebrow">Come funziona</span>
-      <h2>Dalla minaccia all'azione.</h2>
+      <h2>Uno scanner in sede, una sola piattaforma.</h2>
     </div>
-    <div class="flow">
-      <div class="fstep reveal"><h4>Raccolta</h4><p>Domini, marchi e indirizzi dell'organizzazione diventano gli oggetti da sorvegliare.</p></div>
-      <div class="fstep reveal"><h4>Rilevazione</h4><p>Le fonti vengono analizzate di continuo e ogni corrispondenza genera una segnalazione.</p></div>
-      <div class="fstep reveal"><h4>Valutazione</h4><p>Ogni segnalazione è classificata per gravità, con il contesto e le prove raccolte.</p></div>
-      <div class="fstep reveal"><h4>Intervento</h4><p>Azioni consigliate, presa in carico, tracciamento fino alla chiusura e report per la Direzione.</p></div>
+    <div class="how">
+      <div class="card reveal"><h3>Uno scanner in sede per cliente</h3><p>Un piccolo programma installato presso il cliente, su Windows, Linux o macOS, esegue le scansioni di rete, raccoglie i log, riceve i messaggi syslog dagli apparati e valuta Active Directory. Comunica solo verso l'esterno, quindi non richiede aperture sul firewall, e si aggiorna da solo con ripristino automatico.</p></div>
+      <div class="card reveal"><h3>Una sola piattaforma, tanti clienti</h3><p>Gestione a più livelli, fornitore, cliente e sede, con i dati rigorosamente separati tra un cliente e l'altro.</p></div>
+      <div class="card reveal"><h3>Un'unica interfaccia, quattro profili</h3><p>Ognuno vede solo ciò che gli serve.</p>
+        <div class="profiles"><span>Amministratore globale</span><span>Amministratore del fornitore</span><span>Operatore</span><span>Consultatore</span></div></div>
     </div>
   </div>
 </section>
 
-<section id="perche">
+<section id="per-chi">
   <div class="wrap">
-    <div class="split">
-      <div class="reveal">
-        <span class="eyebrow">Perché DarkFarm</span>
-        <h2 style="font-size:clamp(28px,3.8vw,42px);line-height:1.12;font-weight:800;margin-bottom:22px">Vedere quello che vede chi attacca.</h2>
-        <ul class="list">
-          <li><span class="dot"></span>Allarmi su cosa conta davvero, senza rumore di fondo</li>
-          <li><span class="dot"></span>Dashboard e report chiari per la Direzione e per l'IT</li>
-          <li><span class="dot"></span>Evidenze utili per la gestione degli incidenti NIS2 e dei data breach GDPR</li>
-          <li><span class="dot"></span>Attivazione rapida, nessun agente da installare</li>
-          <li><span class="dot"></span>Dati trattati in Unione Europea</li>
-        </ul>
-      </div>
-      <div class="console reveal" aria-label="Esempio di segnalazioni">
-        <div class="hd"><i></i><i></i><i></i></div>
-        <div><span class="r">[ALTA]</span> credenziali aziendali in un log infostealer</div>
-        <div><span class="r">[ALTA]</span> dominio simile al marchio registrato ieri</div>
-        <div><span class="y">[MEDIA]</span> servizio di accesso remoto esposto</div>
-        <div><span class="y">[MEDIA]</span> certificato in scadenza su un sottodominio</div>
-        <div><span class="g">[CHIUSA]</span> password reimpostate, sessioni revocate</div>
-        <div style="opacity:.6;margin-top:8px">— esempio illustrativo —</div>
-      </div>
+    <div class="sec-h reveal">
+      <span class="eyebrow">Per chi è</span>
+      <h2>Per chi gestisce la sicurezza e per chi la deve dimostrare.</h2>
     </div>
-    <div class="link-compli reveal">
-      <div style="flex:1"><h3 style="font-size:24px;margin-bottom:6px">Insieme a CompliFarm</h3><p>Le minacce rilevate da DarkFarm possono diventare incidenti, azioni e registrazioni nel Sistema di Gestione di CompliFarm: dalla scoperta all'evidenza per l'auditor.</p></div>
+    <div class="who">
+      <div class="card reveal"><h3>Fornitori di servizi gestiti (MSP)</h3><p>Un'unica console per controllare la sicurezza di tutti i clienti, con report pronti da consegnare.</p></div>
+      <div class="card reveal"><h3>Responsabili IT</h3><p>Un elenco ordinato di cosa correggere per primo e la verifica che sia stato corretto.</p></div>
+      <div class="card reveal"><h3>Direzione, DPO, auditor</h3><p>Una panoramica chiara e prove documentate, senza gergo tecnico.</p></div>
+    </div>
+    <div class="link-compli reveal" style="margin-top:40px">
+      <div style="flex:1"><h3 style="font-size:24px;margin-bottom:6px">Il braccio tecnico di CompliFarm</h3><p>DarkFarm raccoglie le prove tecniche. La parte normativa, ISO 27001, NIS2, GDPR e DORA, resta nella piattaforma gemella CompliFarm.</p></div>
       <a class="btn btn-o" href="https://complifarm.it">Scopri CompliFarm →</a>
     </div>
   </div>
@@ -208,15 +297,16 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-s
   <div class="wrap">
     <div class="sec-h reveal">
       <span class="eyebrow">Contatti</span>
-      <h2>Scopri cosa c'è là fuori.</h2>
-      <p>Richiedi una verifica iniziale sul tuo dominio: ti mostriamo i risultati in una sessione a distanza.</p>
+      <h2>Vediamo insieme la tua postura di sicurezza.</h2>
+      <p>Richiedi una dimostrazione: ti mostriamo come DarkFarm porta ogni problema dalla rilevazione alla verifica.</p>
     </div>
     <form class="form reveal" id="form">
       <div class="row"><input name="nome" placeholder="Nome e cognome" required><input name="azienda" placeholder="Organizzazione" required></div>
-      <div class="row"><input name="email" type="email" placeholder="Email aziendale" required><input name="dominio" placeholder="Dominio da verificare (es. azienda.it)"></div>
+      <div class="row"><input name="email" type="email" placeholder="Email aziendale" required>
+        <select name="profilo"><option value="">Sono</option><option>Fornitore di servizi gestiti (MSP)</option><option>Responsabile IT</option><option>Direzione</option><option>DPO o auditor</option><option>Altro</option></select></div>
       <textarea name="messaggio" placeholder="Messaggio"></textarea>
-      <label style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" required style="width:auto;margin-top:4px"><small>Ho letto l'informativa privacy e acconsento a essere ricontattato. Confermo di essere autorizzato a richiedere la verifica del dominio indicato.</small></label>
-      <button class="btn btn-p" type="submit" style="justify-content:center;border:0;cursor:pointer">Richiedi la verifica</button>
+      <label style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" required style="width:auto;margin-top:4px"><small>Ho letto l'informativa privacy e acconsento a essere ricontattato.</small></label>
+      <button class="btn btn-p" type="submit" style="justify-content:center;border:0;cursor:pointer">Richiedi la dimostrazione</button>
     </form>
   </div>
 </section>
@@ -237,8 +327,8 @@ const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 document.querySelectorAll('.menu a').forEach(a=>a.onclick=()=>document.getElementById('menu').classList.remove('open'));
 document.getElementById('form').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);
-  const body=`Nome: ${f.get('nome')}\nOrganizzazione: ${f.get('azienda')}\nEmail: ${f.get('email')}\nDominio: ${f.get('dominio')}\n\n${f.get('messaggio')}`;
-  location.href='mailto:info@darkfarm.it?subject='+encodeURIComponent('Richiesta verifica DarkFarm')+'&body='+encodeURIComponent(body)};
+  const body=`Nome: ${f.get('nome')}\nOrganizzazione: ${f.get('azienda')}\nEmail: ${f.get('email')}\nProfilo: ${f.get('profilo')}\n\n${f.get('messaggio')}`;
+  location.href='mailto:info@darkfarm.it?subject='+encodeURIComponent('Richiesta dimostrazione DarkFarm')+'&body='+encodeURIComponent(body)};
 
 /* scintille come nel logo */
 (()=>{const c=document.getElementById('embers');if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
