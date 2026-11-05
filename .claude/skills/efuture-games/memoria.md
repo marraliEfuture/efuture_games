@@ -8,7 +8,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 
 - **Cos'è:** Efuture Games – CARE Conference Edition. Web app (PWA installabile) con 4 giochi da sbloccare con un QR allo stand dei 4 marchi, registrazione senza password e classifica comune.
 - **I giochi:** Efuture Bros (Efuture, prima "SysAdmin Runner"), CoreTech Pac, Timenet Breakout, inncloud Invaders.
-- **Dove gira:** GitHub Pages dal ramo `main` → https://marraliefuture.github.io/efuture_games/ · dati su Supabase (regione Frankfurt).
+- **Dove gira:** GitHub Pages dal ramo `main` → https://marraliefuture.github.io/efuture_games/ · dati su Supabase (regione West Europe – London, eu-west-2; piano gratuito).
 - **Referente:** marrali@efuture.it (Efuture). Scrive in italiano e preferisce spiegazioni semplici, senza gergo tecnico.
 
 ## Regole e convenzioni
@@ -85,6 +85,7 @@ Niente segreti qui: niente codici di sblocco, chiave admin, password o dati dei 
 | 15/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | v83: schermata dei giochi configurabile in Admin › Impostazioni (4 opzioni, predefinita Giochi in lista); corretto un errore della v82 per cui l'app non applicava i campi scelti in admin. |
 | 15/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | v84: in Admin › Utenti › Modifica si correggono nome, azienda, email e cellulare; video "Tutorial RCM² AM Solutions" (efuture) in Formazione › Video e come artifact privato https://claude.ai/artifact/FVS1VJUpg1QMcQeGdEvupX. |
 | 15/10 | Claude Code `session_01LdUZVoKfYuMV2hAhBE7cjt` | v85: classifica al proiettore con filtro Fase (Live: giochi, comparsa automatica, top 3, ospiti e sponsor, QR; Finale: generale, comparsa manuale, top 10, solo ospiti, senza QR), Top "Tutti", filtri e "Prossima posizione" condivisi tra PC tramite database. |
+| 05/11 | Claude Code `session_013xftXgBy1R1ErbyMgmP2T4` | Sito e admin non funzionavano: il repository era diventato privato (GitHub Pages gratis funziona solo sui pubblici → 404); l'utente l'ha reso di nuovo pubblico e Pages è ripartito. Il database risultava attivo (Healthy). Classifiche vuote perché alle 16:11 l'utente ha fatto un reset punti voluto: i 30 giocatori restano, i punteggi ripartono da zero. |
 
 Le chat di claude.ai e di ChatGPT non sono leggibili da Claude Code: se l'utente ne riassume una, aggiungila qui.
 
@@ -118,6 +119,7 @@ Risposte dell'utente (07/10):
 - Ogni step si pubblica su main appena pronto, per provarlo sul telefono.
 
 ## In sospeso / da ricordare
+- Il repository deve restare **pubblico**: se diventa privato GitHub Pages si spegne (404). Supabase gratuito va in pausa dopo ~7 giorni senza uso: se l'admin dice "nessuna connessione con il database", controllare la dashboard di Supabase (Restore project).
 - 16/10 v104: classifica in ordine di **punti** decrescenti; a parità livelli, poi giochi (con almeno un livello), poi chi è arrivato prima. Anche il record di ogni gioco è la partita con più punti. `supabase-classifica-punti.sql` (comprende `supabase-classifica-categoria.sql`) eseguito il 16/10; rieseguire SQL vecchi rimette l'ordine per livelli. Il backup del database prima dell'SQL lo fa l'utente da Admin › Backup (Claude non può: niente chiave admin; il push di tag git è rifiutato con 403).
 - 16/10 v103: segnalato "il joystick ogni tanto si blocca, solo su iPhone" (Efuture Bros e CoreTech Pac). Corretto seguendo il dito con gli eventi touch e sbloccando sempre al nuovo tocco; non provato su un iPhone vero: chiedere all'utente se il problema si ripresenta.
 
